@@ -12,7 +12,7 @@ namespace GMGInventory.Common.Models
         public int? StatusId { get; set; }
     }
 
-    public class PurchaseReceiveVM
+    public class PurchaseReceiveVM : APIHM_VM
     {
         public int Id { get; set; }
 
@@ -70,7 +70,7 @@ namespace GMGInventory.Common.Models
 
     }
 
-    public class PurchaseReceiveDetailsVM :PurchaseReceiveVM
+    public class PurchaseReceiveDetailsVM : PurchaseReceiveVM
     {
         [Display(Name = "Currency")]
         public string Currency { get; set; }
@@ -90,7 +90,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Disapproved By")]
         public string? DisapprovedBy { get; set; }
 
-      
+
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }

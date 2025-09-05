@@ -164,27 +164,6 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
-            var tasks = from t in context.TrackerTasks
-                        let namenum = t.Module + " " + t.Summary
-                        let prioritynum = t.Priority.ToLower() == "high" ? 3
-                                        : t.Priority.ToLower() == "medium" ? 2
-                                        : t.Priority.ToLower() == "low" ? 1
-                                        : 0
-                        let statusnum = t.Status.ToLower() == "open" ? 6
-                                      : t.Status.ToLower() == "incomplete" ? 5
-                                      : t.Status.ToLower() == "doing" ? 4
-                                      : t.Status.ToLower() == "testing" ? 3
-                                      : t.Status.ToLower() == "for production" ? 2
-                                      : t.Status.ToLower() == "on production" ? 1
-                                      : 0
-                        select new
-                        {
-                            Tasks = t,
-                            NameOrder = namenum,
-                            PriorityOrder = prioritynum,
-                            StatusOrder = statusnum
-                        };
-
           var details = from task in context.TrackerTasks
                           join userc in userManager.Users on task.UserCreated equals userc.Id
                           join userm in userManager.Users on task.UserModified equals userm.Id into m
@@ -193,6 +172,7 @@ namespace GMGInventory.Application.Repositories
                           select new TaskDetailsVM
                           {
                               Id = task.Id,
+                              Number = string.Format("#{0:0000#}", task.Number),
                               Module = task.Module,
                               Summary = task.Summary,
                               Function = task.Function,
@@ -214,46 +194,28 @@ namespace GMGInventory.Application.Repositories
                               DateModifiedD = task.DateModified,
                               ModifyExpiration = task.DateCreated.AddDays(5) <= DateTime.Now ? null : $"{(int)(task.DateCreated.AddDays(5) - DateTime.Now).Days} day(s) {(int)(task.DateCreated.AddDays(5) - DateTime.Now).Hours} hour(s) {(task.DateCreated.AddDays(5) - DateTime.Now).Minutes} minute(s)",
                               IsAssignee = currentUserId == task.AssigneeId,
-                              PreviousTaskId = (from t in tasks
-                                                where t.Tasks.DateCreated < task.DateCreated
-                                                orderby t.PriorityOrder descending
-                                                      , t.StatusOrder descending
-                                                      , t.NameOrder descending
-                                                      , t.Tasks.DateCreated descending
-                                                select t.Tasks.Id).FirstOrDefault() != Guid.Empty
-                                             ? (from t in tasks
-                                                where t.Tasks.DateCreated < task.DateCreated
-                                                orderby t.PriorityOrder descending
-                                                      , t.StatusOrder descending
-                                                      , t.NameOrder descending
-                                                      , t.Tasks.DateCreated descending
-                                                select t.Tasks.Id).First()
-                                             : (from t in tasks
-                                                orderby t.PriorityOrder descending
-                                                      , t.StatusOrder descending
-                                                      , t.NameOrder descending
-                                                      , t.Tasks.DateCreated descending
-                                                select t.Tasks.Id).First(),
-                              NextTaskId = (from t in tasks
-                                            where t.Tasks.DateCreated > task.DateCreated
-                                            orderby t.PriorityOrder ascending
-                                                  , t.StatusOrder ascending
-                                                  , t.NameOrder ascending
-                                                  , t.Tasks.DateCreated ascending
-                                            select t.Tasks.Id).FirstOrDefault() != Guid.Empty
-                                         ? (from t in tasks
-                                            where t.Tasks.DateCreated > task.DateCreated
-                                            orderby t.PriorityOrder ascending
-                                                  , t.StatusOrder ascending
-                                                  , t.NameOrder ascending
-                                                  , t.Tasks.DateCreated ascending
-                                            select t.Tasks.Id).First()
-                                         : (from t in tasks
-                                            orderby t.PriorityOrder ascending
-                                                  , t.StatusOrder ascending
-                                                  , t.NameOrder ascending
-                                                  , t.Tasks.DateCreated ascending
-                                            select t.Tasks.Id).First(),
+                              PreviousTaskId = (from t in context.TrackerTasks
+                                                where t.Number < task.Number
+                                                orderby t.Number descending
+                                                select t.Id).FirstOrDefault() != Guid.Empty
+                                             ? (from t in context.TrackerTasks
+                                                where t.Number < task.Number
+                                                orderby t.Number descending
+                                                select t.Id).First()
+                                             : (from t in context.TrackerTasks
+                                                orderby t.Number descending
+                                                select t.Id).First(),
+                              NextTaskId = (from t in context.TrackerTasks
+                                            where t.Number > task.Number
+                                            orderby t.Number ascending
+                                            select t.Id).FirstOrDefault() != Guid.Empty
+                                         ? (from t in context.TrackerTasks
+                                            where t.Number > task.Number
+                                            orderby t.Number ascending
+                                            select t.Id).First()
+                                         : (from t in context.TrackerTasks
+                                            orderby t.Number ascending
+                                            select t.Id).First(),
                               Histories = from history in task.Histories
                                           join userh in userManager.Users on history.UserCreated equals userh.Id
                                           orderby history.DateCreated descending
@@ -313,27 +275,6 @@ namespace GMGInventory.Application.Repositories
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
-            var tasks = from t in context.TrackerTasks
-                        let namenum = t.Module + " " + t.Summary
-                        let prioritynum = t.Priority.ToLower() == "high" ? 3
-                                        : t.Priority.ToLower() == "medium" ? 2
-                                        : t.Priority.ToLower() == "low" ? 1
-                                        : 0
-                        let statusnum = t.Status.ToLower() == "open" ? 6
-                                      : t.Status.ToLower() == "incomplete" ? 5
-                                      : t.Status.ToLower() == "doing" ? 4
-                                      : t.Status.ToLower() == "testing" ? 3
-                                      : t.Status.ToLower() == "for production" ? 2
-                                      : t.Status.ToLower() == "on production" ? 1
-                                      : 0
-                        select new
-                        {
-                            Tasks = t,
-                            NameOrder = namenum,
-                            PriorityOrder = prioritynum,
-                            StatusOrder = statusnum
-                        };
-
             var details = from task in context.TrackerTasks
                           join userc in userManager.Users on task.UserCreated equals userc.Id
                           join userm in userManager.Users on task.UserModified equals userm.Id into m
@@ -342,6 +283,7 @@ namespace GMGInventory.Application.Repositories
                           select new TaskDetailsVM
                           {
                               Id = task.Id,
+                              Number = string.Format("#{0:0000#}", task.Number),
                               Module = task.Module,
                               Summary = task.Summary,
                               Function = task.Function,
@@ -363,46 +305,28 @@ namespace GMGInventory.Application.Repositories
                               DateModifiedD = task.DateModified,
                               ModifyExpiration = task.DateCreated.AddDays(5) <= DateTime.Now ? null : $"{(int)(task.DateCreated.AddDays(5) - DateTime.Now).Days} day(s) {(int)(task.DateCreated.AddDays(5) - DateTime.Now).Hours} hour(s) {(task.DateCreated.AddDays(5) - DateTime.Now).Minutes} minute(s)",
                               IsAssignee = currentUserId == task.AssigneeId,
-                              PreviousTaskId = (from t in tasks
-                                                where t.Tasks.DateCreated < task.DateCreated
-                                                orderby t.PriorityOrder descending
-                                                      , t.StatusOrder descending
-                                                      , t.NameOrder descending
-                                                      , t.Tasks.DateCreated descending
-                                                select t.Tasks.Id).FirstOrDefault() != Guid.Empty
-                                             ? (from t in tasks
-                                                where t.Tasks.DateCreated < task.DateCreated
-                                                orderby t.PriorityOrder descending
-                                                      , t.StatusOrder descending
-                                                      , t.NameOrder descending
-                                                      , t.Tasks.DateCreated descending
-                                                select t.Tasks.Id).First()
-                                             : (from t in tasks
-                                                orderby t.PriorityOrder descending
-                                                      , t.StatusOrder descending
-                                                      , t.NameOrder descending
-                                                      , t.Tasks.DateCreated descending
-                                                select t.Tasks.Id).First(),
-                              NextTaskId = (from t in tasks
-                                            where t.Tasks.DateCreated > task.DateCreated
-                                            orderby t.PriorityOrder ascending
-                                                  , t.StatusOrder ascending
-                                                  , t.NameOrder ascending
-                                                  , t.Tasks.DateCreated ascending
-                                            select t.Tasks.Id).FirstOrDefault() != Guid.Empty
-                                         ? (from t in tasks
-                                            where t.Tasks.DateCreated > task.DateCreated
-                                            orderby t.PriorityOrder ascending
-                                                  , t.StatusOrder ascending
-                                                  , t.NameOrder ascending
-                                                  , t.Tasks.DateCreated ascending
-                                            select t.Tasks.Id).First()
-                                         : (from t in tasks
-                                            orderby t.PriorityOrder ascending
-                                                  , t.StatusOrder ascending
-                                                  , t.NameOrder ascending
-                                                  , t.Tasks.DateCreated ascending
-                                            select t.Tasks.Id).First(),
+                              PreviousTaskId = (from t in context.TrackerTasks
+                                                where t.Number < task.Number
+                                                orderby t.Number descending
+                                                select t.Id).FirstOrDefault() != Guid.Empty
+                                             ? (from t in context.TrackerTasks
+                                                where t.Number < task.Number
+                                                orderby t.Number descending
+                                                select t.Id).First()
+                                             : (from t in context.TrackerTasks
+                                                orderby t.Number descending
+                                                select t.Id).First(),
+                              NextTaskId = (from t in context.TrackerTasks
+                                            where t.Number > task.Number
+                                            orderby t.Number ascending
+                                            select t.Id).FirstOrDefault() != Guid.Empty
+                                         ? (from t in context.TrackerTasks
+                                            where t.Number > task.Number
+                                            orderby t.Number ascending
+                                            select t.Id).First()
+                                         : (from t in context.TrackerTasks
+                                            orderby t.Number ascending
+                                            select t.Id).First()
                           };
             return await details.FirstOrDefaultAsync();
         }
@@ -480,8 +404,14 @@ namespace GMGInventory.Application.Repositories
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
+                var latestNumber = 0;
+                var latestTask = await context.TrackerTasks.OrderByDescending(s => s.Number).FirstOrDefaultAsync();
+                if (latestTask != null)
+                    latestNumber = latestTask.Number;
+
                 var newTask = new Tracker_Task
                 {
+                    Number = latestNumber + 1,
                     Module = task.Module,
                     Summary = task.Summary,
                     Function = task.Function,

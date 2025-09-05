@@ -1,6 +1,8 @@
 using GMGInventory.Application.Configurations;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
+using GMGInventory.Application.Services;
+using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     .EnableSensitiveDataLogging()
     .LogTo(Console.WriteLine));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.Configure<APIHMSettings>(builder.Configuration.GetSection("APIHMSettings"));
 
 builder.Services.Configure<FormOptions>(options =>
 {
@@ -88,6 +92,10 @@ builder.Services.AddScoped(typeof(IChequeStatusRepository), typeof(ChequeStatusR
 builder.Services.AddScoped(typeof(IItemLocationRepository), typeof(ItemLocationRepository));
 
 builder.Services.AddScoped(typeof(ITrackerRepository), typeof(TrackerRepository));
+
+builder.Services.AddScoped<IAPIHM_Service, APIHM_Service>();
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

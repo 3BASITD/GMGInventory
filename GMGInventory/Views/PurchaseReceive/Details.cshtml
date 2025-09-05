@@ -3,6 +3,7 @@
     ViewData["Title"] = "Purchase Receiving Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
     var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
+    var hashMicroUserAccess = (ViewsAccessVM)ViewData["HashMicroUserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -13,6 +14,22 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
+            @if (Model.Status.ToLower() == "draft" || Model.Status.ToLower() == "submitted" || Model.Status.ToLower() == "approved")
+            {
+
+                @if (Model.HashMicroMoveId != null)
+                {
+                    <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="ViewHashMicro()" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                        <span class="fas fa-cloud"></span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="MoveToHashMicro()">
+                        <span class="fas fa-upload"></span> Move to HashMicro
+                    </button>
+                }
+            }
             @if (userAccess.CanPrint)
             {
                 <div class="dropdown float-right ml-2">
@@ -113,11 +130,11 @@
                             <strong>Resubmit Details:</strong>
                             @if (Model?.ResubmitId != null)
                             {
-                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseReceive", new {Id = Model?.ResubmitId})" class="alert-link">here</a>.</div>
+                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseReceive", new { Id = Model?.ResubmitId })" class="alert-link">here</a>.</div>
                             }
                             @if (Model?.ResubmitFromId != null)
                             {
-                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseReceive", new {Id = Model?.ResubmitFromId})" class="alert-link">here</a>.</div>
+                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseReceive", new { Id = Model?.ResubmitFromId })" class="alert-link">here</a>.</div>
                             }
                         </div>
                     </div>
@@ -326,13 +343,47 @@
     </div>
 </div>
 
+@if (hashMicroUserAccess.CanUploadDownload)
+{
+    <div class="modal fade" id="viewHMModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">HashMicro Transfer Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Document Number</dt>
+                        <dd class="col-sm-8">@(Model.DocumentNumber ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Move Id</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveId?.ToString() ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Move Name</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveName ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Status upon Moving</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveStatus ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Moved By</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveBy ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Date Moved</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveDate ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+        var hashmicro_user_access = @Html.Raw(Json.Serialize(hashMicroUserAccess));
         var ro_data = @Json.Serialize(Model);
-
-        console.log(ro_data);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -383,9 +434,9 @@
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false : true },
-                { 
-                    data: "totalAmount", 
-                    name: "TotalAmount", 
+                {
+                    data: "totalAmount",
+                    name: "TotalAmount",
                     className: "form-cell",
                     render: function (data, type, row) {
                         if (type === 'display') {
@@ -490,130 +541,167 @@
             $(".btn-details-submit").on("click", function () {
                 SaveReceive("SUBMITTED");
             });
+        }
 
-            function SaveReceive(status) {
-                var items = itemDT.data();
-                if (items.filter(s => s.toReceive == true).length == 0) {
-                    toastr.warning("No item to receive. Select an item on the list to continue", "Warning");
-                } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) == 0).length > 0) {
-                    toastr.warning("Some items have 0 quantity. Can't receive an item with 0 quantity", "Warning");
-                } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) > parseInt(s.toReceiveQuantityD)).length > 0) {
-                    toastr.warning("Some items exceed purchase order quantity. Can't receive an item that exceeds to receive quantity.", "Warning");
-                } else {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("SaveItemsJson")",
-                        data: {
-                            Id: ro_data.id,
-                            status: status,
-                            items: GetItemsToReceive()
-                        },
-                        success: function (data, status, xhr) {
-                            if (data.status == "Success") {
-                                window.location.reload();
-                            } else {
-                                toastr.error(data.message, data.status);
-                            }
+        function SaveReceive(status) {
+            var items = itemDT.data();
+            if (items.filter(s => s.toReceive == true).length == 0) {
+                toastr.warning("No item to receive. Select an item on the list to continue", "Warning");
+            } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) == 0).length > 0) {
+                toastr.warning("Some items have 0 quantity. Can't receive an item with 0 quantity", "Warning");
+            } else if (items.filter(s => s.toReceive == true && parseInt(s.quantity) > parseInt(s.toReceiveQuantityD)).length > 0) {
+                toastr.warning("Some items exceed purchase order quantity. Can't receive an item that exceeds to receive quantity.", "Warning");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveItemsJson")",
+                    data: {
+                        Id: ro_data.id,
+                        status: status,
+                        items: GetItemsToReceive()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Success") {
+                            window.location.reload();
+                        } else {
+                            toastr.error(data.message, data.status);
                         }
-                    });
-                }
-            }
-
-            function GetItemsToReceive() {
-                var item_to_receive = [];
-                itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    var row_data = this.data();
-                    row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
-                    row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
-
-                    if (row_data.toReceive == true)
-                        item_to_receive.push(row_data);
-                });
-                return item_to_receive;
-            }
-
-            if (user_access.canApproveDisapprove) {
-                $('.btn-details-approve').click(function (e) {
-                    swal({
-                        title: "Approve Purchase Receiving",
-                        text: "Continue to approve this purchase receiving?",
-                        icon: "success",
-                        buttons: true,
-                        successMode: true
-                    }).then((confirm) => {
-                        if (confirm) {
-                            $.ajax({
-                                url: "@Url.Action("ApproveJson")",
-                                type: "POST",
-                                data: { Id: ro_data.id },
-                                success: function (data, status, xhr) {
-                                    if (data.status == "Success") {
-                                        window.location.reload();
-                                    } else {
-                                        toastr.error(data.message, data.status);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                });
-
-                $('.btn-details-disapprove').click(function (e) {
-                    swal({
-                        title: "Disapprove Purchase Receiving",
-                        text: "Continue to disapprove this purchase receiving?",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true,
-                        content: {
-                            element: "input",
-                            attributes: {
-                                placeholder: "Reason for Disapproving",
-                                type: "text"
-                            }
-                        }
-                    }).then((confirm) => {
-                        if (confirm !== null) {
-                            $.ajax({
-                                url: "@Url.Action("DisapproveJson")",
-                                type: "POST",
-                                data: {
-                                    Id: ro_data.id,
-                                    reason: confirm
-                                },
-                                success: function (data, status, xhr) {
-                                    if (data.status == "Success") {
-                                        window.location.reload();
-                                    } else {
-                                        toastr.error(data.message, data.status);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                });
-            }
-
-            if (user_access.canPrint) {
-                $(".btn-details-print").on("click", function () {
-                    var print_company = $(this).data("company");
-                    $.LoadingOverlay("show", {
-                        image: "",
-                        fontawesome: "fas fa-print"
-                    });
-                    setTimeout(function () {
-                        let win = window.open('@Url.Action("PrintDetails")/' + ro_data.id + '?Company=' + print_company, '');
-                        var wintimer = setInterval(function () {
-                            if (win.closed) {
-                                clearInterval(wintimer);
-                                hideLoader();
-                            }
-                        }, 100);
-                    }, 500);
+                    }
                 });
             }
         }
 
+        function GetItemsToReceive() {
+            var item_to_receive = [];
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var row_data = this.data();
+                row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
+                row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
 
+                if (row_data.toReceive == true)
+                    item_to_receive.push(row_data);
+            });
+            return item_to_receive;
+        }
+
+        if (user_access.canApproveDisapprove) {
+            $('.btn-details-approve').click(function (e) {
+                swal({
+                    title: "Approve Purchase Receiving",
+                    text: "Continue to approve this purchase receiving?",
+                    icon: "success",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("ApproveJson")",
+                            type: "POST",
+                            data: { Id: ro_data.id },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            $('.btn-details-disapprove').click(function (e) {
+                swal({
+                    title: "Disapprove Purchase Receiving",
+                    text: "Continue to disapprove this purchase receiving?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                    content: {
+                        element: "input",
+                        attributes: {
+                            placeholder: "Reason for Disapproving",
+                            type: "text"
+                        }
+                    }
+                }).then((confirm) => {
+                    if (confirm !== null) {
+                        $.ajax({
+                            url: "@Url.Action("DisapproveJson")",
+                            type: "POST",
+                            data: {
+                                Id: ro_data.id,
+                                reason: confirm
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        if (user_access.canPrint) {
+            $(".btn-details-print").on("click", function () {
+                var print_company = $(this).data("company");
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("PrintDetails")/' + ro_data.id + '?Company=' + print_company, '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+        }
+
+        if (hashmicro_user_access.canUploadDownload) {
+            function ViewHashMicro() {
+                $("#viewHMModal").modal("show");
+            }
+
+            function MoveToHashMicro() {
+                swal({
+                    title: "Move to HashMicro",
+                    content: {
+                        element: "div",
+                        attributes: {
+                            innerHTML: (ro_data.status.toLowerCase() == "draft" ? "Sales invoice is currently on <strong>Draft</strong> and " : "") + "Moving to HashMicro can only be done once. Are you sure you want to continue?"
+                        }
+                    },
+                    icon: "warning",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("MoveToHashMicro", "PurchaseReceive")",
+                            type: "POST",
+                            data: {
+                                Id: ro_data.id,
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
     </script>
 }

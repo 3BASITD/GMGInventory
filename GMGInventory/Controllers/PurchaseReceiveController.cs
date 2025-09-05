@@ -6,13 +6,16 @@ using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
     public class PurchaseReceiveController(IAccessRepository accessRepository
-                                           , IPurchaseReceiveRepository receiveRepository) : BaseController(accessRepository)
+                                         , IPurchaseReceiveRepository receiveRepository
+                                         , IAPIHM_Service apiHMService
+                                         , IOptions<APIHMSettings> apiHMOptions) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 
@@ -28,6 +31,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
+            ViewData["HashMicroUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.HashMicroBill)).Convert();
 
             return View();
         }
@@ -52,6 +56,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
             ViewData["UserAccessBasic"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingBasic)).Convert();
+            ViewData["HashMicroUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.HashMicroBill)).Convert();
 
             var receive = await receiveRepository.GetDetails(Id);
             if (receive == null)
@@ -223,6 +228,22 @@ namespace GMGInventory.Controllers
             return File(stream.ToArray(),
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         DateTime.Now.ToString("yyyyMMdd") + " Purchase Receive.xlsx");
+        }
+
+        public async Task<IActionResult> MoveToHashMicro(int? Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.HashMicroBill, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await apiHMService.MovePurchaseOrder(Id, apiHMOptions.Value.Host, apiHMOptions.Value.User, apiHMOptions.Value.Password));
+        }
+
+        public async Task<IActionResult> MoveAllToHashMicro(DateTime DateFrom, DateTime DateTo)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.HashMicroBill, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await apiHMService.MoveAllPostedPurchaseOrder(DateFrom, DateTo, apiHMOptions.Value.Host, apiHMOptions.Value.User, apiHMOptions.Value.Password));
         }
     }
 }

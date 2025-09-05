@@ -3,6 +3,7 @@ using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Data.Migrations;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient.Server;
@@ -47,7 +48,12 @@ namespace GMGInventory.Application.Repositories
                                  Warehouse = receive.Warehouse.Code,
                                  Status = receive.Status.Code,
                                  ReceiveDateD = receive.ReceiveDate,
-                                 Remarks = receive.Remarks
+                                 Remarks = receive.Remarks,
+                                 HashMicroMoveId = receive.HashMicroMoveId,
+                                 HashMicroMoveName = receive.HashMicroMoveName,
+                                 HashMicroMoveStatus = receive.HashMicroMoveStatus,
+                                 HashMicroMoveBy = receive.HashMicroMoveBy == null ? null : receive.HashMicroMoveBy.FirstName + " " + receive.HashMicroMoveBy.LastName,
+                                 HashMicroMoveDateD = receive.HashMicroMoveDate
                              });
             return await receiveVM.ToListAsync();
         }
@@ -103,6 +109,18 @@ namespace GMGInventory.Application.Repositories
                     data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
                 }
             }
+            var totalReceivingRecord = await context.PurchaseReceivings
+                                                    .Where(s => s.Status.Code.ToLower() == "approved"
+                                                             && filter.DateFrom <= s.ReceiveDate.Date
+                                                             && s.ReceiveDate.Date <= filter.DateTo)
+                                                    .CountAsync();
+            var totalReceivingNotMovedRecord = await context.PurchaseReceivings
+                                                            .Where(s => s.Status.Code.ToLower() == "approved"
+                                                                     && filter.DateFrom <= s.ReceiveDate.Date
+                                                                     && s.ReceiveDate.Date <= filter.DateTo
+                                                                     && s.HashMicroMoveById == null)
+                                                            .CountAsync();
+
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<PurchaseReceiveVM>
@@ -110,7 +128,9 @@ namespace GMGInventory.Application.Repositories
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
-                Data = pageList
+                Data = pageList,
+                TotalQuantity = totalReceivingRecord,
+                TotalQuantity2 = totalReceivingNotMovedRecord
             };
         }
 
@@ -163,7 +183,12 @@ namespace GMGInventory.Application.Repositories
                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = receive.DateCreated,
                               UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                              DateModifiedD = receive.DateModified
+                              DateModifiedD = receive.DateModified,
+                              HashMicroMoveId = receive.HashMicroMoveId,
+                              HashMicroMoveName = receive.HashMicroMoveName,
+                              HashMicroMoveStatus = receive.HashMicroMoveStatus,
+                              HashMicroMoveBy = receive.HashMicroMoveBy == null ? null : receive.HashMicroMoveBy.FirstName + " " + receive.HashMicroMoveBy.LastName,
+                              HashMicroMoveDateD = receive.HashMicroMoveDate
                           };
             return await details.FirstOrDefaultAsync();
         }
@@ -201,7 +226,7 @@ namespace GMGInventory.Application.Repositories
                             };
             return await receiveVM.ToListAsync();
         }
-     
+
         public async Task<IList<PurchaseReceiveLineItemVM>> GetWithPOItemsListAsync(int purchaseReceivingId) // for details
         {
             var orderId = await context.PurchaseReceivings
@@ -212,14 +237,14 @@ namespace GMGInventory.Application.Repositories
             var receiveVM = from order in context.PurchaseOrderNewLineItems
                             let receive = context.PurchaseReceivingLineItems
                                          .Where(s => s.OrderItemId == order.Id && s.PurchaseReceivingId == purchaseReceivingId).FirstOrDefault()
-                          
-                            where order.PurchaseOrderId == orderId 
+
+                            where order.PurchaseOrderId == orderId
 
                             select new PurchaseReceiveLineItemVM
                             {
                                 Id = receive == null ? 0 : receive.Id,
                                 ToReceive = receive != null,
-                                PurchaseReceivingId = receive != null? receive.PurchaseReceivingId : 0,
+                                PurchaseReceivingId = receive != null ? receive.PurchaseReceivingId : 0,
                                 LineNumber = order.LineNumber,
                                 OrderItemId = order.Id,
                                 ItemId = order.RequestItem.Item == null ? null : order.RequestItem.Item.Id,
@@ -233,7 +258,7 @@ namespace GMGInventory.Application.Repositories
                                                                     && a.OrderItemId == order.Id)
                                                        .Select(a => a.Quantity)
                                                        .Sum(),
-                         
+
                                 UnitId = order.RequestItem.Item == null ? order.RequestItem.Unit.Id : order.RequestItem.Item.Unit.Id,
                                 UnitCode = order.RequestItem.Item == null ? order.RequestItem.Unit.Code : order.RequestItem.Item.Unit.Code,
                                 UnitCostD = order.UnitCost
@@ -436,16 +461,16 @@ namespace GMGInventory.Application.Repositories
 
             return response;
         }
-      
+
         public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId)
         {
             var orders = from orderItems in context.PurchaseOrderNewLineItems
-                           let receivingItems = orderItems.PurchaseReceivingLineItems
-                                          .Where(a => a.PurchaseReceiving.Status.Name.ToLower() == "approved")
-                                          .Select(a => (int?)a.Quantity)
-                                          .Sum() ?? 0
-                           where receivingItems != orderItems.Quantity
-                           select orderItems.PurchaseOrderId;
+                         let receivingItems = orderItems.PurchaseReceivingLineItems
+                                        .Where(a => a.PurchaseReceiving.Status.Name.ToLower() == "approved")
+                                        .Select(a => (int?)a.Quantity)
+                                        .Sum() ?? 0
+                         where receivingItems != orderItems.Quantity
+                         select orderItems.PurchaseOrderId;
 
 
             return await context.PurchaseOrderNews
@@ -533,12 +558,13 @@ namespace GMGInventory.Application.Repositories
                                 await context.ItemInventories.AddAsync(newItemInventory);
                             }
                         }
-                    };
+                    }
+                    ;
                     await context.SaveChangesAsync(currentUserId);
                 }
                 response.Status = "Success";
                 response.Message = "Purchase receive successfully approved.";
-                }
+            }
             return response;
         }
 

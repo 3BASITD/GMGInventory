@@ -181,7 +181,12 @@ namespace GMGInventory.Application.Repositories
                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = invoice.DateCreated,
                                  UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                                 DateModifiedD = invoice.DateModified
+                                 DateModifiedD = invoice.DateModified,
+                                 HashMicroMoveId = invoice.HashMicroMoveId,
+                                 HashMicroMoveName = invoice.HashMicroMoveName,
+                                 HashMicroMoveStatus = invoice.HashMicroMoveStatus,
+                                 HashMicroMoveBy = invoice.HashMicroMoveBy == null ? null : invoice.HashMicroMoveBy.FirstName + " " + invoice.HashMicroMoveBy.LastName,
+                                 HashMicroMoveDateD = invoice.HashMicroMoveDate
                              });
             return await invoiceVM.FirstOrDefaultAsync();
         }
@@ -297,7 +302,11 @@ namespace GMGInventory.Application.Repositories
                                                let discount2 = (100 - orderli.Discount2) / 100
                                                where invli.ItemId == orderli.ItemId
                                                select invli.Quantity * invli.UnitPrice * discount1 * discount2).Sum(),
-
+                               HashMicroMoveId = inv.HashMicroMoveId,
+                               HashMicroMoveName = inv.HashMicroMoveName,
+                               HashMicroMoveStatus = inv.HashMicroMoveStatus,
+                               HashMicroMoveBy = inv.HashMicroMoveBy == null ? null : inv.HashMicroMoveBy.FirstName + " " + inv.HashMicroMoveBy.LastName,
+                               HashMicroMoveDateD = inv.HashMicroMoveDate
                            };
 
             return await invoices.ToListAsync();
@@ -364,6 +373,17 @@ namespace GMGInventory.Application.Repositories
                     }
                 }
             }
+            var totalInvoicedRecord = await context.Invoices
+                                                   .Where(s => s.Status.Code.ToLower() == "invoiced"
+                                                            && filter.DateFrom <= s.InvoiceDate.Date 
+                                                            && s.InvoiceDate.Date <= filter.DateTo)
+                                                   .CountAsync();
+            var totalInvoicedNotMovedRecord = await context.Invoices
+                                                           .Where(s => s.Status.Code.ToLower() == "invoiced"
+                                                                    && filter.DateFrom <= s.InvoiceDate.Date
+                                                                    && s.InvoiceDate.Date <= filter.DateTo
+                                                                    && s.HashMicroMoveById == null)
+                                                           .CountAsync();
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
             var dataList = pageList.ToList();
@@ -372,7 +392,9 @@ namespace GMGInventory.Application.Repositories
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
                 RecordsFiltered = filterRecord,
-                Data = dataList
+                Data = dataList,
+                TotalQuantity = totalInvoicedRecord,
+                TotalQuantity2 = totalInvoicedNotMovedRecord
             };
         }
 
@@ -702,7 +724,7 @@ namespace GMGInventory.Application.Repositories
                                        ItemId = i.Item,
                                        Quantity = i.Quantity,
                                        UnitPrice = s.SellingPrice
-                                       };
+                                   };
                     context.InvoiceLineItems.AddRange(newitems);
 
                     // update item

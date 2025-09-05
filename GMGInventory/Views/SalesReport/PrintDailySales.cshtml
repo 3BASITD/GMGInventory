@@ -74,7 +74,8 @@
                 var dates = Model.Contents.OrderBy(s => s.InvoiceDateD).Select(s => s.InvoiceDate).Distinct();
                 foreach(var date in dates)
                 {
-                    var items = Model.Contents.Where(s => s.InvoiceDate == date).OrderBy(s => s.CustomerCode).Select((item, id) => new { Item = item, Id = id });
+                    // var items = Model.Contents.Where(s => s.InvoiceDate == date).OrderBy(s => s.CustomerCode).Select((item, id) => new { Item = item, Id = id });
+                    var items = Model.Contents.Where(s => s.InvoiceDate == date).OrderBy(s => s.BIRInvoiceNumber).Select((item, id) => new { Item = item, Id = id });
                     foreach(var item in items)
                     {
                         <tr>

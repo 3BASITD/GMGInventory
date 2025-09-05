@@ -7,10 +7,12 @@ namespace GMGInventory.Data
     {
         public User()
         {
+            this.InvoiceHashMicroMoveBy = new HashSet<Invoice>();
             this.PurchaseOrderApprover = new HashSet<PurchaseOrderNew>();
             this.PurchaseOrderDisapprover = new HashSet<PurchaseOrderNew>();
             this.PurchaseReceivingApprover = new HashSet<PurchaseReceiving>();
             this.PurchaseReceivingDisapprover = new HashSet<PurchaseReceiving>();
+            this.PurchaseReceivingHashMicroMoveBy = new HashSet<PurchaseReceiving>();
             this.PurchaseRequestApprover1 = new HashSet<PurchaseRequest>();
             this.PurchaseRequestApprover2 = new HashSet<PurchaseRequest>();
             this.PurchaseRequestDisapprover = new HashSet<PurchaseRequest>();
@@ -43,6 +45,9 @@ namespace GMGInventory.Data
         public DateTime? DateModified { get; set; }
 
 
+        [InverseProperty(nameof(Invoice.HashMicroMoveBy))]
+        public ICollection<Invoice> InvoiceHashMicroMoveBy { get; set; }
+
         [InverseProperty(nameof(PurchaseOrderNew.Approver))]
         public ICollection<PurchaseOrderNew> PurchaseOrderApprover { get; set; }
 
@@ -54,6 +59,9 @@ namespace GMGInventory.Data
 
         [InverseProperty(nameof(PurchaseReceiving.Disapprover))]
         public ICollection<PurchaseReceiving> PurchaseReceivingDisapprover { get; set; }
+
+        [InverseProperty(nameof(PurchaseReceiving.HashMicroMoveBy))]
+        public ICollection<PurchaseReceiving> PurchaseReceivingHashMicroMoveBy { get; set; }
 
         [InverseProperty(nameof(PurchaseRequest.Approver1))]
         public ICollection<PurchaseRequest> PurchaseRequestApprover1 { get; set; }

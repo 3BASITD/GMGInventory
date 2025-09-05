@@ -47,13 +47,17 @@
 }
 
 <div class="card @(Model.Status.Equals("doing", StringComparison.OrdinalIgnoreCase) ? "card-primary"
-                           : Model.Status.Equals("testing", StringComparison.OrdinalIgnoreCase) ? "card-warning"
-                           : Model.Status.Equals("incomplete", StringComparison.OrdinalIgnoreCase) ? "card-danger"
-                           : Model.Status.Equals("for production", StringComparison.OrdinalIgnoreCase) ? "card-info"
-                           : Model.Status.Equals("on production", StringComparison.OrdinalIgnoreCase) ? "card-success"
-                           : "card-default") card-for-task">
+                                : Model.Status.Equals("testing", StringComparison.OrdinalIgnoreCase) ? "card-warning"
+                                : Model.Status.Equals("incomplete", StringComparison.OrdinalIgnoreCase) ? "card-danger"
+                                : Model.Status.Equals("for production", StringComparison.OrdinalIgnoreCase) ? "card-info"
+                                : Model.Status.Equals("on production", StringComparison.OrdinalIgnoreCase) ? "card-success"
+                                : "card-default") card-for-task">
     <div class="card-header">
-        <span class="card-title"><span class="emoji">📋</span><span class="text-muted">&#91;@Model.Module&#93;</span> <strong>@Model.Summary</strong></span>
+        <span class="card-title">
+            <span class="h4">@Model.Number</span>
+            <span class="emoji">📋</span>
+            <span class="text-muted">&#91;@Model.Module&#93;</span> <strong>@Model.Summary</strong>
+        </span>
         <div class="card-tools details-tools-container">
             @if (Model.Status.Equals("open", StringComparison.OrdinalIgnoreCase))
             {
@@ -140,8 +144,8 @@
                         <ul class="nav nav-tabs card-header-tabs">
                             <li class="nav-item">
                                 <a class="nav-link px-3 active" id="nav-history-tab" role="tab"
-                                    data-bs-toggle="tab" data-bs-target="#nav-history"
-                                    aria-controls="nav-history" aria-selected="true">
+                                   data-bs-toggle="tab" data-bs-target="#nav-history"
+                                   aria-controls="nav-history" aria-selected="true">
                                     <span class="emoji">🕓</span>History
                                 </a>
                             </li>
@@ -149,8 +153,8 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link px-3" id="nav-comment-tab" role="tab"
-                                        data-bs-toggle="tab" data-bs-target="#nav-comment"
-                                        aria-controls="nav-comment" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-comment"
+                                       aria-controls="nav-comment" aria-selected="true">
                                         <span class="emoji">💬</span>Comment
                                         <span class="comment-counter badge rounded-pill bg-invert ml-2 px-2@(Model.CommentCount == 0 ? " d-none" : "")">@Model.CommentCount</span>
                                     </a>
@@ -160,8 +164,8 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link px-3" id="nav-issue-tab" role="tab"
-                                        data-bs-toggle="tab" data-bs-target="#nav-issue"
-                                        aria-controls="nav-issue" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-issue"
+                                       aria-controls="nav-issue" aria-selected="true">
                                         <span class="emoji">🐞</span>Issue
                                         <span class="issue-counter badge rounded-pill bg-danger ml-2 px-2@(Model.IssueCount == 0 ? " d-none" : "")">@Model.IssueCount</span>
                                     </a>
@@ -172,7 +176,7 @@
                     <div class="card-body">
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="nav-history" role="tabpanel"
-                                    aria-labelledby="nav-history-tab">
+                                 aria-labelledby="nav-history-tab">
                                 <div class="container history-container timeline py-2">
                                     @foreach (var History in Model.Histories)
                                     {
@@ -872,7 +876,7 @@
                     <a href="@Url.Action("Index", "Tracker")" class="btn btn-light text-dark btn-sm float-right ml-2">
                         <span class="emoji">🔙</span> Back to List
                     </a>`);
-                    
+
                     $("#details-function").html(data.function);
                     $("#details-behavior").html(data.behavior);
                     $("#details-access").html(data.accessControl);
@@ -949,14 +953,16 @@
                     }
                     extraData.DisapproveReason = reason;
                 }
-
                 $.ajax({
                     type: 'POST',
                     url: '@Url.Action("UpdateTask", "Tracker")',
                     data: {
                         Id: task_data.id,
+                        Module: task_data.module,
                         Summary: task_data.summary,
-                        Description: task_data.description,
+                        Function: task_data.function,
+                        Behavior: task_data.behavior,
+                        AccessControl: task_data.accessControl,
                         Status: options.status,
                         Priority: task_data.priority,
                         Assignee: task_data.assigneeId,

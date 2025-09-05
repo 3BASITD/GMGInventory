@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Sales Invoice Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var hashMicroUserAccess = (ViewsAccessVM)ViewData["HashMicroUserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -16,6 +17,18 @@
             <div class="card-tools">
                 @if (Model.Status.ToLower() != "cancelled")
                 {
+                    @if (Model.HashMicroMoveId != null)
+                    {
+                        <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="ViewHashMicro()" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                            <span class="fas fa-cloud"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="MoveToHashMicro()">
+                            <span class="fas fa-upload"></span> Move to HashMicro
+                        </button>
+                    }
                     @if (userAccess.CanDelete)
                     {
                         <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
@@ -425,9 +438,46 @@
         </div>
     </div>
 }
+
+@if (hashMicroUserAccess.CanUploadDownload)
+{
+    <div class="modal fade" id="viewHMModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">HashMicro Transfer Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Invoice Number</dt>
+                        <dd class="col-sm-8">@(Model.InvoiceNumber ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Move Id</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveId?.ToString() ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Move Name</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveName ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Status upon Moving</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveStatus ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Moved By</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveBy ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                        <dt class="col-sm-4">Date Moved</dt>
+                        <dd class="col-sm-8">@(Model.HashMicroMoveDate ?? "<span class=\"text-muted\">Missing data</span>")</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var hashmicro_user_access = @Html.Raw(Json.Serialize(hashMicroUserAccess));
         var invoice_data = @Html.Raw(Json.Serialize(Model));
 
         // Load agent data for select2
@@ -803,6 +853,7 @@
                 });
             }
         }
+
         if (user_access.canPrint) {
             $(".btn-details-print").on("click", function () {
                 var print_company = $(this).data("company");
@@ -835,6 +886,45 @@
                     }, 500);
                 }
             });
+        }
+
+        if (hashmicro_user_access.canUploadDownload) {
+            function ViewHashMicro() {
+                $("#viewHMModal").modal("show");
+            }
+
+            function MoveToHashMicro() {
+                swal({
+                    title: "Move to HashMicro",
+                    content: {
+                        element: "div",
+                        attributes: {
+                            innerHTML: (invoice_data.status.toLowerCase() == "draft" ? "Sales invoice is currently on <strong>Draft</strong> and " : "") + "Moving to HashMicro can only be done once. Are you sure you want to continue?"
+                        }
+                    },
+                    icon: "warning",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("MoveToHashMicro", "SalesInvoice")",
+                            type: "POST",
+                            data: {
+                                Id: invoice_data.id,
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
         }
     </script>
 }

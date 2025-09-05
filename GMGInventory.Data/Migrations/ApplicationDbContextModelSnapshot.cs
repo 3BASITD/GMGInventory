@@ -883,6 +883,30 @@ namespace GMGInventory.Data.Migrations
                             PageId = 67,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 68,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 68,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 69,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 69,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -1664,6 +1688,21 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DisapprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("HashMicroMoveById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("HashMicroMoveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("HashMicroMoveId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HashMicroMoveName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HashMicroMoveStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("InvoiceDate")
                         .HasColumnType("datetime2");
 
@@ -1694,6 +1733,8 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("HashMicroMoveById");
 
                     b.HasIndex("InvoiceTypeId");
 
@@ -3758,6 +3799,21 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("HashMicroMoveById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("HashMicroMoveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("HashMicroMoveId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HashMicroMoveName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HashMicroMoveStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PurchaseOrderId")
                         .HasColumnType("int");
 
@@ -3795,6 +3851,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("ApproverId");
 
                     b.HasIndex("DisapproverId");
+
+                    b.HasIndex("HashMicroMoveById");
 
                     b.HasIndex("PurchaseOrderId");
 
@@ -5404,6 +5462,9 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
                     b.Property<string>("Priority")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
@@ -6057,13 +6118,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "333413ba-107b-4624-ae53-ad27c5a249c4",
+                            ConcurrencyStamp = "0815f447-ce07-431c-a74a-44474382ac6b",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFfU7eqcHp50pXR2/VJZBbwJwUIW33unLWBmk1rThC2+VmW+Uleg9SdobMAxB9OtEQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB78S6JNL6/GNZA/fcCgeMmUCSKP4oJEB30TJDmTN1pdTu3v/E3irxPQDQ5i0F5FzQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9bdafa7f-9092-4f87-abad-46447fbd779f",
+                            SecurityStamp = "fedd9f6d-7423-4f23-aa5c-e01e88769ab9",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6078,13 +6139,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9e2b9673-8b9a-4ba5-aa14-992999433694",
+                            ConcurrencyStamp = "d200bd38-5798-497a-9621-9bf770d50617",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDquIkgCw0N0oP4NGF6gi7DghAzEF+4HEYOQrW/0L9ZBboPn9WIjysoDd5w4A92oHA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAwO7c7jYc6qaj2fG3uw1E/bXnbs/e5Rk8Fya4cBUqMKaZ/pBwuPzpra4Kjh7jFIBA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "16b7dd94-1b3a-49bb-880a-cd0c87aefacc",
+                            SecurityStamp = "79e900cc-4091-4d18-a50c-967111c79f86",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6260,6 +6321,10 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Invoice", b =>
                 {
+                    b.HasOne("GMGInventory.Data.User", "HashMicroMoveBy")
+                        .WithMany("InvoiceHashMicroMoveBy")
+                        .HasForeignKey("HashMicroMoveById");
+
                     b.HasOne("GMGInventory.Data.InvoiceType", "InvoiceType")
                         .WithMany("Invoices")
                         .HasForeignKey("InvoiceTypeId")
@@ -6283,6 +6348,8 @@ namespace GMGInventory.Data.Migrations
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("HashMicroMoveBy");
 
                     b.Navigation("InvoiceType");
 
@@ -6747,6 +6814,10 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseReceivingDisapprover")
                         .HasForeignKey("DisapproverId");
 
+                    b.HasOne("GMGInventory.Data.User", "HashMicroMoveBy")
+                        .WithMany("PurchaseReceivingHashMicroMoveBy")
+                        .HasForeignKey("HashMicroMoveById");
+
                     b.HasOne("GMGInventory.Data.PurchaseOrderNew", "PurchaseOrder")
                         .WithMany("PurchaseReceivings")
                         .HasForeignKey("PurchaseOrderId")
@@ -6774,6 +6845,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Approver");
 
                     b.Navigation("Disapprover");
+
+                    b.Navigation("HashMicroMoveBy");
 
                     b.Navigation("PurchaseOrder");
 
@@ -7776,6 +7849,8 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.User", b =>
                 {
+                    b.Navigation("InvoiceHashMicroMoveBy");
+
                     b.Navigation("PurchaseOrderApprover");
 
                     b.Navigation("PurchaseOrderDisapprover");
@@ -7783,6 +7858,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("PurchaseReceivingApprover");
 
                     b.Navigation("PurchaseReceivingDisapprover");
+
+                    b.Navigation("PurchaseReceivingHashMicroMoveBy");
 
                     b.Navigation("PurchaseRequestApprover1");
 

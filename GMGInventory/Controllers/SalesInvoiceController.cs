@@ -5,12 +5,15 @@ using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
     public class SalesInvoiceController(IAccessRepository accessRepository
-                                      , IInvoiceRepository invoiceRepository) : BaseController(accessRepository)
+                                      , IInvoiceRepository invoiceRepository
+                                      , IAPIHM_Service apiHMService
+                                      , IOptions<APIHMSettings> apiHMOptions) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> GetInvoiceTypeOptions(int? IncludeId)
@@ -28,6 +31,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
+            ViewData["HashMicroUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.HashMicroInvoice)).Convert();
 
             return View();
         }
@@ -48,6 +52,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
+            ViewData["HashMicroUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.HashMicroInvoice)).Convert();
 
             var order = await invoiceRepository.GetDetailsAsync(Id);
             if (order == null)
@@ -173,6 +178,22 @@ namespace GMGInventory.Controllers
                 responseModel.NewRow = responseId;
             }
             return Json(responseModel);
+        }
+
+        public async Task<IActionResult> MoveToHashMicro(int? Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.HashMicroInvoice, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await apiHMService.MoveSalesInvoice(Id, apiHMOptions.Value.Host, apiHMOptions.Value.User, apiHMOptions.Value.Password));
+        }
+
+        public async Task<IActionResult> MoveAllToHashMicro(DateTime DateFrom, DateTime DateTo)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.HashMicroInvoice, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await apiHMService.MoveAllPostedSalesInvoice(DateFrom, DateTo, apiHMOptions.Value.Host, apiHMOptions.Value.User, apiHMOptions.Value.Password));
         }
     }
 }

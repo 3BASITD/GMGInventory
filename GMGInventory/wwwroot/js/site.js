@@ -1,6 +1,10 @@
 ﻿$(document).ready(function () {
     $.fn.dataTable.ext.errMode = function (settings, helpPage, message) {
-        console.error('DataTables error:', message);
+        var today = new Date();
+        var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
+        log += " DataTables error:";
+
+        console.error(log, message);
     };
 
     toastr.options = {
@@ -40,7 +44,11 @@
             else if (xhr.status === 503)
                 toastr.error("The service is temporarily unavailable. Please check back shortly.", "503 Service Unavailable");
             else {
-                console.error(xhr);
+                var today = new Date();
+                var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
+                log += " Ajax Error:";
+                console.error(log, xhr);
+
                 if (!xhr.responseJSON)
                     toastr.error(xhr.responseJSON.error, xhr.status + " " + xhr.statusText);
                 else
@@ -90,9 +98,15 @@
     });
 
     $(document).ajaxSend(function (event, jqxhr, settings) {
+        var msg = settings.loaderMessage || "";
+
         $.LoadingOverlay("show", {
             image: "",
             fontawesome: "fa fa-compact-disc fa-spin",
+            custom: $("<div class=\"loading-message\">" + msg + "</div>"),
+            textColor: "#333",
+            textResizeFactor: 0.2,
+            textAutoResize: true,
             progress: true,
             zIndex: 2147483645
         });
@@ -122,12 +136,12 @@
 
         var today = new Date();
         var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
-        log += " Ajax Load Time "
+        log += " Ajax Load Time:"
         var logTime = String(ajax_run_hh).padStart(2, "0");
         logTime += ":" + String(ajax_run_mm).padStart(2, "0");
         logTime += ":" + String(ajax_run_ss).padStart(2, "0");
         logTime += "." + String(ajax_run_time).padStart(3, "0");
-        console.log('%c %s%c %s %s', 'background-color:lightblue;font-weight:bold;', log, 'background-color:transparent;', logTime, requestURL);
+        console.info('%c %s %c %s %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', logTime, requestURL);
 
         if (active_select_search.length > 0)
             active_select_search.focus();
@@ -275,13 +289,16 @@ function reloadInputNumberRule() {
     });
 }
 
-
 var startTime;
 
-function showLoader() {
+function showLoader(msg) {
     $.LoadingOverlay("show", {
         image: "",
         fontawesome: "fa fa-cog fa-spin",
+        text: msg || "",
+        textColor: "#333",
+        textResizeFactor: 0.2,
+        textAutoResize: true,
         zIndex: 2147483645
     });
 
@@ -300,7 +317,8 @@ function hideLoader() {
         const minutes = totalMinutes % 60;
         const hours = Math.floor(totalMinutes / 60);
 
-        console.info(`Loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+        var log = endTime.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
+        console.info('%c %s %c %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', `Loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
         startTime = null;
     }
     $.LoadingOverlay("hide");
@@ -353,7 +371,8 @@ function hideBatchLoader(mod) {
             const minutes = totalMinutes % 60;
             const hours = Math.floor(totalMinutes / 60);
 
-            console.info(`Batch loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+            var log = endTime.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
+            console.info('%c %s %c %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', `Batch loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
             batchStartTime = null;
         }
         $.LoadingOverlay("hide");

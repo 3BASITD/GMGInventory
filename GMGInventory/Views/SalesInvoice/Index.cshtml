@@ -2,12 +2,19 @@
 
 @{
     ViewData["Title"] = "Sales Invoice";
+    var hashMicroUserAccess = (ViewsAccessVM)ViewData["HashMicroUserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
+            @if (hashMicroUserAccess.CanUploadDownload)
+            {
+                <button class="btn btn-light text-dark btn-sm float-right ml-2" onclick="MoveAllToHashMicro()">
+                    <span class="fas fa-upload"></span> Move All to HashMicro
+                </button>
+            }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -99,8 +106,75 @@
     </div>
 </div>
 
+@if (hashMicroUserAccess.CanUploadDownload)
+{
+    <div class="modal fade" id="viewHMModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">HashMicro Transfer Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Invoice Number</dt>
+                        <dd class="col-sm-8 hashmicro-invoice-number"></dd>
+                        <dt class="col-sm-4">Move Id</dt>
+                        <dd class="col-sm-8 hashmicro-move-id"></dd>
+                        <dt class="col-sm-4">Move Name</dt>
+                        <dd class="col-sm-8 hashmicro-move-name"></dd>
+                        <dt class="col-sm-4">Status upon Moving</dt>
+                        <dd class="col-sm-8 hashmicro-move-status"></dd>
+                        <dt class="col-sm-4">Moved By</dt>
+                        <dd class="col-sm-8 hashmicro-move-by"></dd>
+                        <dt class="col-sm-4">Date Moved</dt>
+                        <dd class="col-sm-8 hashmicro-move-date"></dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewAllHMModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Moving All to HashMicro Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row hashmicro-moving-info">
+                    </div>
+                    <table class="table table-head-fixed table-striped table-hover table-moveall">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
     <script>
+        var hashmicro_user_access = @Html.Raw(Json.Serialize(hashMicroUserAccess));
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -161,7 +235,14 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        if (hashmicro_user_access.canUploadDownload && (data.status.toLowerCase() == "draft" || data.status.toLowerCase() == "invoiced")) {
+                            if(data.hashMicroMoveId) {
+                                actions += '<button type="button" class="btn btn-secondary btn-xs" onclick="ViewHashMicro(this)" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-cloud"></i></button>';
+                            } else {
+                                actions += '<button type="button" class="btn  btn-light text-dark btn-xs" onclick="MoveToHashMicro(this)" data-microtip-title="Move to HashMicro" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-upload"></i></button>';
+                            }
+                        }
                         return actions + "</div>";
                     }
                 }
@@ -174,5 +255,107 @@
             $(".table-invoice th").removeClass("text-end");
             hideLoader();
         });
+
+        if (hashmicro_user_access.canUploadDownload) {
+            function ViewHashMicro(invoice) {
+                var row = $(invoice).parents("tr");
+                var rowData = invoiceDT.row(row).data();
+
+                $(".hashmicro-invoice-number").html(rowData.invoiceNumber || '<span class="text-muted">Missing data</span>');
+                $(".hashmicro-move-id").html(rowData.hashMicroMoveId || '<span class="text-muted">Missing data</span>');
+                $(".hashmicro-move-name").html(rowData.hashMicroMoveName || '<span class="text-muted">Missing data</span>');
+                $(".hashmicro-move-status").html(rowData.hashMicroMoveStatus || '<span class="text-muted">Missing data</span>');
+                $(".hashmicro-move-by").html(rowData.hashMicroMoveBy || '<span class="text-muted">Missing data</span>');
+                $(".hashmicro-move-date").html(rowData.hashMicroMoveDate || '<span class="text-muted">Missing data</span>');
+
+                $("#viewHMModal").modal("show");
+            }
+
+            function MoveAllToHashMicro() {
+                var json = invoiceDT.ajax.json();
+
+                swal({
+                    title: "Move All to HashMicro",
+                    text: "This action will transfer all invoiced records to HashMicro. The process may take some time, depending on the number of records to be moved. Are you sure you want to proceed?",
+                    content: {
+                        element: "div",
+                        attributes: {
+                            innerHTML: `
+                                Total Invoiced (within Filter Date): <strong>${json.totalQuantity}</strong><br/>
+                                <strong>Total Invoiced (within Filter Date, Not yet moved): ${json.totalQuantity2}</strong><br/>
+                                Filter Date From <strong>${formatDateEn(new Date($("#filter-from").val()))}</strong><br/>
+                                Filter Date To <strong>${formatDateEn(new Date($("#filter-to").val()))}</strong><br/>
+                                `
+                        }
+                    },
+                    icon: "warning",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("MoveAllToHashMicro", "SalesInvoice")",
+                            type: "POST",
+                            data: {
+                                DateFrom: $("#filter-from").val(),
+                                DateTo: $("#filter-to").val()
+                            },
+                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the transfer, which may result in some records being transferred while others are not.</small>",
+                            success: function (data, status, xhr) {
+                                var success_ctr = 0;
+                                $("table.table-moveall tbody").html("");
+                                $.each(data, function (i, v) {
+                                    $("table.table-moveall tbody").append(`<tr><td>${v.newRow}</td><td>${v.message}</td></tr>`);
+                                    success_ctr++;
+                                });
+                                if(success_ctr > 0) {
+                                    invoiceDT.ajax.reload();
+                                } else {
+                                    $("table.table-moveall tbody").append(`<tr><td colspan="2" class="text-center text-muted"><em>Nothing was moved</em></td></tr>`);
+                                }
+                                $("#viewAllHMModal").modal("show");
+                            }
+                        });
+                    }
+                });
+            }
+
+            function MoveToHashMicro(invoice) {
+                var row = $(invoice).parents("tr");
+                var rowData = invoiceDT.row(row).data();
+
+                swal({
+                    title: "Move to HashMicro",
+                    //text: (rowData.status.toLowerCase() == "draft" ? "Sales invoice is currently on <strong>Draft</strong> and " : "") + "Moving to HashMicro can only be done once. Are you sure you want to continue?",
+                    content: {
+                        element: "div",
+                        attributes: {
+                            innerHTML: (rowData.status.toLowerCase() == "draft" ? "Sales invoice is currently on <strong>Draft</strong> and " : "") + "Moving to HashMicro can only be done once. Are you sure you want to continue?"
+                        }
+                    },
+                    icon: "warning",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("MoveToHashMicro", "SalesInvoice")",
+                            type: "POST",
+                            data: {
+                                Id: rowData.id,
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    invoiceDT.ajax.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
     </script>
-    }
+}

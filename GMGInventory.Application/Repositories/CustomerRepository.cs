@@ -42,7 +42,8 @@ namespace GMGInventory.Application.Repositories
                                    select new
                                    {
                                        CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2 / 100)) ?? 0
+                                       //InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2 / 100)) ?? 0
+                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2)) ?? 0
                                    };
             var customerPayments = from pay in context.CustomerPaymentDetails
                                    where pay.Invoice.Status.Code.ToLower() == "invoiced"

@@ -50,6 +50,15 @@ namespace GMGInventory.Data
         public int? ResubmitId { get; set; }
         public virtual PurchaseReceiving Resubmit { get; set; }
 
+        public int? HashMicroMoveId { get; set; }
+        public string? HashMicroMoveName { get; set; }
+        public string? HashMicroMoveStatus { get; set; }
+
+        [ForeignKey("HashMicroMoveById")]
+        public string? HashMicroMoveById { get; set; }
+        public User HashMicroMoveBy { get; set; }
+        public DateTime? HashMicroMoveDate { get; set; }
+
         public ICollection<PurchaseReceiving> PurchaseReceivingResubmits { get; set; }
         public ICollection<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
         public ICollection<PurchaseReturnNew> PurchaseReturns { get; set; }

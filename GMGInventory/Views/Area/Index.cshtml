@@ -79,6 +79,41 @@
     </form>
 }
 
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Area Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Code</dt>
+                    <dd class="col-sm-8 modal-detail-code"></dd>
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8 modal-detail-name"></dd>
+                    <dt class="col-sm-4">Commission Rate</dt>
+                    <dd class="col-sm-8 modal-detail-commission" %></dd>
+                    <dt class="col-sm-4">User Created</dt>
+                    <dd class="col-sm-8 modal-detail-usercreated"></dd>
+                    <dt class="col-sm-4">Date Created</dt>
+                    <dd class="col-sm-8 modal-detail-datecreated"></dd>
+                    <dt class="col-sm-4">User Modified</dt>
+                    <dd class="col-sm-8 modal-detail-usermodified"></dd>
+                    <dt class="col-sm-4">Date Modified</dt>
+                    <dd class="col-sm-8 modal-detail-datemodified"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @if (userAccess.CanAdd)
 {
     <!-- Create Modal -->
@@ -191,40 +226,6 @@
 
 @if (userAccess.CanDelete)
 {
-    <!-- Details Modal -->
-    <div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Area Details</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <dl class="row">
-                        <dt class="col-sm-4">Code</dt>
-                        <dd class="col-sm-8 modal-detail-code"></dd>
-                        <dt class="col-sm-4">Name</dt>
-                        <dd class="col-sm-8 modal-detail-name"></dd>
-                        <dt class="col-sm-4">Commission Rate</dt>
-                        <dd class="col-sm-8 modal-detail-commission" %></dd>
-                        <dt class="col-sm-4">User Created</dt>
-                        <dd class="col-sm-8 modal-detail-usercreated"></dd>
-                        <dt class="col-sm-4">Date Created</dt>
-                        <dd class="col-sm-8 modal-detail-datecreated"></dd>
-                        <dt class="col-sm-4">User Modified</dt>
-                        <dd class="col-sm-8 modal-detail-usermodified"></dd>
-                        <dt class="col-sm-4">Date Modified</dt>
-                        <dd class="col-sm-8 modal-detail-datemodified"></dd>
-                    </dl>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
 }
 
 @if (userAccess.CanUploadDownload)

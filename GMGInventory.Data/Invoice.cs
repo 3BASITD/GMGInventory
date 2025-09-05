@@ -46,6 +46,15 @@ namespace GMGInventory.Data
         public string? DisapprovedBy { get; set; }
         public DateTime? DisapprovedDate { get; set; }
 
+        public int? HashMicroMoveId { get; set; }
+        public string? HashMicroMoveName { get; set; }
+        public string? HashMicroMoveStatus { get; set; }
+
+        [ForeignKey("HashMicroMoveById")]
+        public string? HashMicroMoveById { get; set; }
+        public User HashMicroMoveBy { get; set; }
+        public DateTime? HashMicroMoveDate { get; set; }
+
         public ICollection<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }
         public ICollection<SOACRLineItem> SOACRLineItems { get; set; }

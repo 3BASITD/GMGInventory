@@ -569,3 +569,17 @@ body.dark-mode .bg-invert {
 .note-editor .note-placeholder {
     white-space: pre-line;
 }
+
+.swal-content__div {
+    text-align: left;
+}
+
+.loadingoverlay_element:has(.loading-message) {
+    width: auto !important;
+    max-width: 80%;
+    white-space: normal;
+    text-align: center;
+    padding: 10px 20px;
+    font-size: 4vh;
+    display: inline-block !important;
+}

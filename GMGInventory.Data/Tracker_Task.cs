@@ -11,7 +11,7 @@ namespace GMGInventory.Data
             Histories = new HashSet<Tracker_TaskHistory>();
         }
 
-        public int? Number { get; set; }
+        public int Number { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]
         public string Module { get; set; }

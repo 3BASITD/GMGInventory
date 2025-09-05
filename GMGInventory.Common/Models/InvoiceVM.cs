@@ -4,7 +4,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace GMGInventory.Common.Models
 {
-    public class InvoiceVM
+    public class InvoiceVM : APIHM_VM
     {
         public int Id { get; set; }
 
@@ -68,7 +68,7 @@ namespace GMGInventory.Common.Models
         public decimal BalanceD => TotalAmountD - (TBRD ?? 0) - (CreditD ?? 0) + (DebitD ?? 0) - (PaidAmountD ?? 0m) + (FreightChargeD ?? 0);
     }
 
-    public class InvoiceDetailsVM
+    public class InvoiceDetailsVM : APIHM_VM
     {
         public int Id { get; set; }
 
