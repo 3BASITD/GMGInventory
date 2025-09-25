@@ -103,7 +103,7 @@ namespace GMGInventory.Application.Repositories
                                                                    : s.Status.ToLower() == "on production" ? 1
                                                                    : 0)
                                                         .ThenBy(s => s.Module + " " + s.Summary); break;
-                            case "DueDate": data = data.OrderBy(s => s.Priority); break;
+                            case "DueDate": data = data.OrderBy(s => s.DueDateD); break;
                             default: break;
                         }
                     }

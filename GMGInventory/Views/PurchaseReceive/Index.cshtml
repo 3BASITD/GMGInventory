@@ -224,6 +224,7 @@
             },
             success: function (data, status, xhr) {
                 $("#filter-supplier").select2({
+                    ajax: null, //already fetched outside
                     minimumInputLength: -1,
                     allowClear: true,
                     placeholder: "ALL",
@@ -250,6 +251,7 @@
             },
             success: function (data, status, xhr) {
                 $("#filter-warehouse").select2({
+                    ajax: null, //already fetched outside
                     minimumInputLength: -1,
                     allowClear: true,
                     placeholder: "ALL",
@@ -277,6 +279,7 @@
             },
             success: function (data, status, xhr) {
                 $("#filter-status").select2({
+                    ajax: null, //already fetched outside
                     minimumResultsForSearch: -1,
                     allowClear: true,
                     placeholder: "ALL",
@@ -446,11 +449,18 @@
                 var row = $(preceiving).parents("tr");
                 var rowData = receiveDT.row(row).data();
 
+                var msg = (rowData.status.toLowerCase() == "draft"
+                              ? "Product receiving is currently on <strong>Draft</strong> and "
+                              : rowData.status.toLowerCase() == "submitted"
+                                  ? "Product receiving is currently <strong>Submitted</strong> and "
+                                  : ""
+                          ) + "Moving to HashMicro can only be done once. Are you sure you want to continue?";
                 swal({
                     title: "Move to HashMicro",
                     content: {
                         element: "div",
                         attributes: {
+                            style: "color: black;",
                             innerHTML: (rowData.status.toLowerCase() == "draft" ? "Product receiving is currently on <strong>Draft</strong> and " 
                                       : rowData.status.toLowerCase() == "submitted" ? "Product receiving is currently <strong>Submitted</strong> and "
                                       : "") + "Moving to HashMicro can only be done once. Are you sure you want to continue?"

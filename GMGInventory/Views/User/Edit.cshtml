@@ -76,6 +76,7 @@
             data: { includeId: "@Model!.RoleId" },
             success: function (data, status, xhr) {
                 $("#Role").select2({
+                    ajax: null, //already fetched outside
                     data: data
                 });
             }

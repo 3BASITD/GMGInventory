@@ -44,6 +44,15 @@ namespace GMGInventory.Common.Models
         public string message { get; set; }
         public int move_id { get; set; }
         public string move_name { get; set; }
+
+        public IList<APIHM_SuccessDataResponse> data { get; set; }
+        public int page_total { get; set; }
+    }
+
+    public class APIHM_SuccessDataResponse
+    {
+        public int id { get; set; }
+        public string name { get; set; }
     }
 
     // Error model

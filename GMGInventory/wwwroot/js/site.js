@@ -2,9 +2,7 @@
     $.fn.dataTable.ext.errMode = function (settings, helpPage, message) {
         var today = new Date();
         var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
-        log += " DataTables error:";
-
-        console.error(log, message);
+        console.error('%c %s %c %s %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', "DataTables error:", message);
     };
 
     toastr.options = {
@@ -44,15 +42,14 @@
             else if (xhr.status === 503)
                 toastr.error("The service is temporarily unavailable. Please check back shortly.", "503 Service Unavailable");
             else {
-                var today = new Date();
-                var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
-                log += " Ajax Error:";
-                console.error(log, xhr);
-
-                if (!xhr.responseJSON)
-                    toastr.error(xhr.responseJSON.error, xhr.status + " " + xhr.statusText);
-                else
-                    toastr.error("There seems to be a problem loading some data. Please reload the page and try again.", "Unknown Error");
+                toastr.error("There seems to be a problem loading some data. Please reload the page and try again.", "Unknown Error");
+                console.error("Unknown error encountered while loading ajax");
+                console.error("xhr");
+                console.log(xhr);
+                console.error("status");
+                console.log(status);
+                console.error("error");
+                console.log(error);
             }
             hideLoader();
         }
@@ -136,12 +133,11 @@
 
         var today = new Date();
         var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
-        log += " Ajax Load Time:"
         var logTime = String(ajax_run_hh).padStart(2, "0");
         logTime += ":" + String(ajax_run_mm).padStart(2, "0");
         logTime += ":" + String(ajax_run_ss).padStart(2, "0");
         logTime += "." + String(ajax_run_time).padStart(3, "0");
-        console.info('%c %s %c %s %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', logTime, requestURL);
+        console.info('%c %s %c %s %s %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', "Ajax Load Time: ", logTime, requestURL);
 
         if (active_select_search.length > 0)
             active_select_search.focus();
@@ -227,6 +223,13 @@
     //    });
     //});
 });
+
+function ToastrAndConsoleError(title, message) {
+    var today = new Date();
+    var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
+    console.error('%c %s %c %s %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', title, message);
+    toastr.error(message, title);
+}
 
 $.validator.setDefaults({
     errorClass: 'text-danger text-xs fw-lighter fst-italic m-0',
@@ -318,7 +321,7 @@ function hideLoader() {
         const hours = Math.floor(totalMinutes / 60);
 
         var log = endTime.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
-        console.info('%c %s %c %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', `Loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+        console.info('%c %s %c %s %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', 'Loading finished. Time taken:', `${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
         startTime = null;
     }
     $.LoadingOverlay("hide");
@@ -372,7 +375,7 @@ function hideBatchLoader(mod) {
             const hours = Math.floor(totalMinutes / 60);
 
             var log = endTime.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
-            console.info('%c %s %c %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', `Batch loading finished. Time taken: ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
+            console.info('%c %s %c %s %s', 'background-color:lightblue;font-weight:bold;color:black;', log, 'background-color:transparent;', 'Batch loading finished. Time taken:', `${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`);
             batchStartTime = null;
         }
         $.LoadingOverlay("hide");
@@ -390,20 +393,41 @@ jQuery.fn.extend({
     }
 });
 
-function select2_search($el, term) {
-    $el.select2('open');
+$.fn.select2.defaults.set("ajax", {
+    delay: 2000,
+    cache: true,
+    dataType: "json",
+    type: "POST",
+    data: function (params) {
+        return {
+            search: params.term,
+            page: params.page || 1
+        };
+    },
+    processResults: function (data, params) {
+        params.page = params.page || 1;
+        return {
+            results: data.items,
+            pagination: {
+                more: (params.page * 50) < data.total_count
+            }
+        };
+    }
+});
 
-    // Get the search box within the dropdown or the selection
-    // Dropdown = single, Selection = multiple
-    var $search = $el.data('select2').dropdown.$search || $el.data('select2').selection.$search;
-    // This is undocumented and may change in the future
-
-    $search.val(term);
-    $search.trigger('keyup');
-
-    // Timer for delayed trigger while waiting ajax to load
-    setTimeout(function () { $('.select2-results__option').trigger("mouseup"); }, 500);
-}
+/*
+$("#sample-url-query").select2({
+    ajax: {
+        url: "",
+        data: function (params) {
+            let base = $.fn.select2.defaults.defaults.ajax.data(params);
+            return Object.assign(base, {
+                tempId: 1
+            });
+        }
+    }
+});
+*/
 
 function ReplaceEmptyString(str, replacement) {
     if (str == null || str.trim() == "")

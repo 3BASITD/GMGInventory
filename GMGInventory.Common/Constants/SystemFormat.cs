@@ -15,6 +15,7 @@
                  ? Nickname
                  : (FirstName + " " + LastName);
         }
+
         public static string GetInnermostExceptionMessage(Exception ex)
         {
             while (ex.InnerException != null)
@@ -22,6 +23,19 @@
                 ex = ex.InnerException;
             }
             return ex.Message;
+        }
+
+        public static string ToValidFileName(string input, string replacement = "_")
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return "untitled";
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var cleaned = string.Join(replacement, input.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
+
+            cleaned = cleaned.Trim().TrimEnd('.');
+
+            return string.IsNullOrEmpty(cleaned) ? "untitled" : cleaned;
         }
     }
 }

@@ -907,6 +907,54 @@ namespace GMGInventory.Data.Migrations
                             PageId = 69,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 70,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 70,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 71,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 71,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 72,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 72,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 73,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 73,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -1242,6 +1290,1671 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("ChequeStatuses");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Alpha2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Alpha3")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 4,
+                            Alpha2 = "AF",
+                            Alpha3 = "AFG",
+                            Name = "Afghanistan"
+                        },
+                        new
+                        {
+                            Id = 248,
+                            Alpha2 = "AX",
+                            Alpha3 = "ALA",
+                            Name = "Åland Islands"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Alpha2 = "AL",
+                            Alpha3 = "ALB",
+                            Name = "Albania"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Alpha2 = "DZ",
+                            Alpha3 = "DZA",
+                            Name = "Algeria"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Alpha2 = "AS",
+                            Alpha3 = "ASM",
+                            Name = "American Samoa"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Alpha2 = "AD",
+                            Alpha3 = "AND",
+                            Name = "Andorra"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Alpha2 = "AO",
+                            Alpha3 = "AGO",
+                            Name = "Angola"
+                        },
+                        new
+                        {
+                            Id = 660,
+                            Alpha2 = "AI",
+                            Alpha3 = "AIA",
+                            Name = "Anguilla"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Alpha2 = "AQ",
+                            Alpha3 = "ATA",
+                            Name = "Antarctica"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Alpha2 = "AG",
+                            Alpha3 = "ATG",
+                            Name = "Antigua and Barbuda"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Alpha2 = "AR",
+                            Alpha3 = "ARG",
+                            Name = "Argentina"
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Alpha2 = "AM",
+                            Alpha3 = "ARM",
+                            Name = "Armenia"
+                        },
+                        new
+                        {
+                            Id = 533,
+                            Alpha2 = "AW",
+                            Alpha3 = "ABW",
+                            Name = "Aruba"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Alpha2 = "AU",
+                            Alpha3 = "AUS",
+                            Name = "Australia"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Alpha2 = "AT",
+                            Alpha3 = "AUT",
+                            Name = "Austria"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Alpha2 = "AZ",
+                            Alpha3 = "AZE",
+                            Name = "Azerbaijan"
+                        },
+                        new
+                        {
+                            Id = 44,
+                            Alpha2 = "BS",
+                            Alpha3 = "BHS",
+                            Name = "Bahamas"
+                        },
+                        new
+                        {
+                            Id = 48,
+                            Alpha2 = "BH",
+                            Alpha3 = "BHR",
+                            Name = "Bahrain"
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Alpha2 = "BD",
+                            Alpha3 = "BGD",
+                            Name = "Bangladesh"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Alpha2 = "BB",
+                            Alpha3 = "BRB",
+                            Name = "Barbados"
+                        },
+                        new
+                        {
+                            Id = 112,
+                            Alpha2 = "BY",
+                            Alpha3 = "BLR",
+                            Name = "Belarus"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            Alpha2 = "BE",
+                            Alpha3 = "BEL",
+                            Name = "Belgium"
+                        },
+                        new
+                        {
+                            Id = 84,
+                            Alpha2 = "BZ",
+                            Alpha3 = "BLZ",
+                            Name = "Belize"
+                        },
+                        new
+                        {
+                            Id = 204,
+                            Alpha2 = "BJ",
+                            Alpha3 = "BEN",
+                            Name = "Benin"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            Alpha2 = "BM",
+                            Alpha3 = "BMU",
+                            Name = "Bermuda"
+                        },
+                        new
+                        {
+                            Id = 64,
+                            Alpha2 = "BT",
+                            Alpha3 = "BTN",
+                            Name = "Bhutan"
+                        },
+                        new
+                        {
+                            Id = 68,
+                            Alpha2 = "BO",
+                            Alpha3 = "BOL",
+                            Name = "Bolivia (Plurinational State of)"
+                        },
+                        new
+                        {
+                            Id = 535,
+                            Alpha2 = "BQ",
+                            Alpha3 = "BES",
+                            Name = "Bonaire, Sint Eustatius and Saba"
+                        },
+                        new
+                        {
+                            Id = 70,
+                            Alpha2 = "BA",
+                            Alpha3 = "BIH",
+                            Name = "Bosnia and Herzegovina"
+                        },
+                        new
+                        {
+                            Id = 72,
+                            Alpha2 = "BW",
+                            Alpha3 = "BWA",
+                            Name = "Botswana"
+                        },
+                        new
+                        {
+                            Id = 74,
+                            Alpha2 = "BV",
+                            Alpha3 = "BVT",
+                            Name = "Bouvet Island"
+                        },
+                        new
+                        {
+                            Id = 76,
+                            Alpha2 = "BR",
+                            Alpha3 = "BRA",
+                            Name = "Brazil"
+                        },
+                        new
+                        {
+                            Id = 86,
+                            Alpha2 = "IO",
+                            Alpha3 = "IOT",
+                            Name = "British Indian Ocean Territory"
+                        },
+                        new
+                        {
+                            Id = 96,
+                            Alpha2 = "BN",
+                            Alpha3 = "BRN",
+                            Name = "Brunei Darussalam"
+                        },
+                        new
+                        {
+                            Id = 100,
+                            Alpha2 = "BG",
+                            Alpha3 = "BGR",
+                            Name = "Bulgaria"
+                        },
+                        new
+                        {
+                            Id = 854,
+                            Alpha2 = "BF",
+                            Alpha3 = "BFA",
+                            Name = "Burkina Faso"
+                        },
+                        new
+                        {
+                            Id = 108,
+                            Alpha2 = "BI",
+                            Alpha3 = "BDI",
+                            Name = "Burundi"
+                        },
+                        new
+                        {
+                            Id = 132,
+                            Alpha2 = "CV",
+                            Alpha3 = "CPV",
+                            Name = "Cabo Verde"
+                        },
+                        new
+                        {
+                            Id = 116,
+                            Alpha2 = "KH",
+                            Alpha3 = "KHM",
+                            Name = "Cambodia"
+                        },
+                        new
+                        {
+                            Id = 120,
+                            Alpha2 = "CM",
+                            Alpha3 = "CMR",
+                            Name = "Cameroon"
+                        },
+                        new
+                        {
+                            Id = 124,
+                            Alpha2 = "CA",
+                            Alpha3 = "CAN",
+                            Name = "Canada"
+                        },
+                        new
+                        {
+                            Id = 136,
+                            Alpha2 = "KY",
+                            Alpha3 = "CYM",
+                            Name = "Cayman Islands"
+                        },
+                        new
+                        {
+                            Id = 140,
+                            Alpha2 = "CF",
+                            Alpha3 = "CAF",
+                            Name = "Central African Republic"
+                        },
+                        new
+                        {
+                            Id = 148,
+                            Alpha2 = "TD",
+                            Alpha3 = "TCD",
+                            Name = "Chad"
+                        },
+                        new
+                        {
+                            Id = 152,
+                            Alpha2 = "CL",
+                            Alpha3 = "CHL",
+                            Name = "Chile"
+                        },
+                        new
+                        {
+                            Id = 156,
+                            Alpha2 = "CN",
+                            Alpha3 = "CHN",
+                            Name = "China"
+                        },
+                        new
+                        {
+                            Id = 162,
+                            Alpha2 = "CX",
+                            Alpha3 = "CXR",
+                            Name = "Christmas Island"
+                        },
+                        new
+                        {
+                            Id = 166,
+                            Alpha2 = "CC",
+                            Alpha3 = "CCK",
+                            Name = "Cocos (Keeling) Islands"
+                        },
+                        new
+                        {
+                            Id = 170,
+                            Alpha2 = "CO",
+                            Alpha3 = "COL",
+                            Name = "Colombia"
+                        },
+                        new
+                        {
+                            Id = 174,
+                            Alpha2 = "KM",
+                            Alpha3 = "COM",
+                            Name = "Comoros"
+                        },
+                        new
+                        {
+                            Id = 180,
+                            Alpha2 = "CD",
+                            Alpha3 = "COD",
+                            Name = "Congo (Democratic Republic of the)"
+                        },
+                        new
+                        {
+                            Id = 178,
+                            Alpha2 = "CG",
+                            Alpha3 = "COG",
+                            Name = "Congo (Republic of the)"
+                        },
+                        new
+                        {
+                            Id = 184,
+                            Alpha2 = "CK",
+                            Alpha3 = "COK",
+                            Name = "Cook Islands"
+                        },
+                        new
+                        {
+                            Id = 188,
+                            Alpha2 = "CR",
+                            Alpha3 = "CRI",
+                            Name = "Costa Rica"
+                        },
+                        new
+                        {
+                            Id = 384,
+                            Alpha2 = "CI",
+                            Alpha3 = "CIV",
+                            Name = "Côte d'Ivoire"
+                        },
+                        new
+                        {
+                            Id = 191,
+                            Alpha2 = "HR",
+                            Alpha3 = "HRV",
+                            Name = "Croatia"
+                        },
+                        new
+                        {
+                            Id = 192,
+                            Alpha2 = "CU",
+                            Alpha3 = "CUB",
+                            Name = "Cuba"
+                        },
+                        new
+                        {
+                            Id = 531,
+                            Alpha2 = "CW",
+                            Alpha3 = "CUW",
+                            Name = "Curaçao"
+                        },
+                        new
+                        {
+                            Id = 196,
+                            Alpha2 = "CY",
+                            Alpha3 = "CYP",
+                            Name = "Cyprus"
+                        },
+                        new
+                        {
+                            Id = 203,
+                            Alpha2 = "CZ",
+                            Alpha3 = "CZE",
+                            Name = "Czechia"
+                        },
+                        new
+                        {
+                            Id = 208,
+                            Alpha2 = "DK",
+                            Alpha3 = "DNK",
+                            Name = "Denmark"
+                        },
+                        new
+                        {
+                            Id = 262,
+                            Alpha2 = "DJ",
+                            Alpha3 = "DJI",
+                            Name = "Djibouti"
+                        },
+                        new
+                        {
+                            Id = 212,
+                            Alpha2 = "DM",
+                            Alpha3 = "DMA",
+                            Name = "Dominica"
+                        },
+                        new
+                        {
+                            Id = 214,
+                            Alpha2 = "DO",
+                            Alpha3 = "DOM",
+                            Name = "Dominican Republic"
+                        },
+                        new
+                        {
+                            Id = 218,
+                            Alpha2 = "EC",
+                            Alpha3 = "ECU",
+                            Name = "Ecuador"
+                        },
+                        new
+                        {
+                            Id = 818,
+                            Alpha2 = "EG",
+                            Alpha3 = "EGY",
+                            Name = "Egypt"
+                        },
+                        new
+                        {
+                            Id = 222,
+                            Alpha2 = "SV",
+                            Alpha3 = "SLV",
+                            Name = "El Salvador"
+                        },
+                        new
+                        {
+                            Id = 226,
+                            Alpha2 = "GQ",
+                            Alpha3 = "GNQ",
+                            Name = "Equatorial Guinea"
+                        },
+                        new
+                        {
+                            Id = 232,
+                            Alpha2 = "ER",
+                            Alpha3 = "ERI",
+                            Name = "Eritrea"
+                        },
+                        new
+                        {
+                            Id = 233,
+                            Alpha2 = "EE",
+                            Alpha3 = "EST",
+                            Name = "Estonia"
+                        },
+                        new
+                        {
+                            Id = 748,
+                            Alpha2 = "SZ",
+                            Alpha3 = "SWZ",
+                            Name = "Eswatini"
+                        },
+                        new
+                        {
+                            Id = 231,
+                            Alpha2 = "ET",
+                            Alpha3 = "ETH",
+                            Name = "Ethiopia"
+                        },
+                        new
+                        {
+                            Id = 238,
+                            Alpha2 = "FK",
+                            Alpha3 = "FLK",
+                            Name = "Falkland Islands (Malvinas)"
+                        },
+                        new
+                        {
+                            Id = 234,
+                            Alpha2 = "FO",
+                            Alpha3 = "FRO",
+                            Name = "Faroe Islands"
+                        },
+                        new
+                        {
+                            Id = 242,
+                            Alpha2 = "FJ",
+                            Alpha3 = "FJI",
+                            Name = "Fiji"
+                        },
+                        new
+                        {
+                            Id = 246,
+                            Alpha2 = "FI",
+                            Alpha3 = "FIN",
+                            Name = "Finland"
+                        },
+                        new
+                        {
+                            Id = 250,
+                            Alpha2 = "FR",
+                            Alpha3 = "FRA",
+                            Name = "France"
+                        },
+                        new
+                        {
+                            Id = 254,
+                            Alpha2 = "GF",
+                            Alpha3 = "GUF",
+                            Name = "French Guiana"
+                        },
+                        new
+                        {
+                            Id = 258,
+                            Alpha2 = "PF",
+                            Alpha3 = "PYF",
+                            Name = "French Polynesia"
+                        },
+                        new
+                        {
+                            Id = 260,
+                            Alpha2 = "TF",
+                            Alpha3 = "ATF",
+                            Name = "French Southern Territories"
+                        },
+                        new
+                        {
+                            Id = 266,
+                            Alpha2 = "GA",
+                            Alpha3 = "GAB",
+                            Name = "Gabon"
+                        },
+                        new
+                        {
+                            Id = 270,
+                            Alpha2 = "GM",
+                            Alpha3 = "GMB",
+                            Name = "Gambia"
+                        },
+                        new
+                        {
+                            Id = 268,
+                            Alpha2 = "GE",
+                            Alpha3 = "GEO",
+                            Name = "Georgia"
+                        },
+                        new
+                        {
+                            Id = 276,
+                            Alpha2 = "DE",
+                            Alpha3 = "DEU",
+                            Name = "Germany"
+                        },
+                        new
+                        {
+                            Id = 288,
+                            Alpha2 = "GH",
+                            Alpha3 = "GHA",
+                            Name = "Ghana"
+                        },
+                        new
+                        {
+                            Id = 292,
+                            Alpha2 = "GI",
+                            Alpha3 = "GIB",
+                            Name = "Gibraltar"
+                        },
+                        new
+                        {
+                            Id = 300,
+                            Alpha2 = "GR",
+                            Alpha3 = "GRC",
+                            Name = "Greece"
+                        },
+                        new
+                        {
+                            Id = 304,
+                            Alpha2 = "GL",
+                            Alpha3 = "GRL",
+                            Name = "Greenland"
+                        },
+                        new
+                        {
+                            Id = 308,
+                            Alpha2 = "GD",
+                            Alpha3 = "GRD",
+                            Name = "Grenada"
+                        },
+                        new
+                        {
+                            Id = 312,
+                            Alpha2 = "GP",
+                            Alpha3 = "GLP",
+                            Name = "Guadeloupe"
+                        },
+                        new
+                        {
+                            Id = 316,
+                            Alpha2 = "GU",
+                            Alpha3 = "GUM",
+                            Name = "Guam"
+                        },
+                        new
+                        {
+                            Id = 320,
+                            Alpha2 = "GT",
+                            Alpha3 = "GTM",
+                            Name = "Guatemala"
+                        },
+                        new
+                        {
+                            Id = 831,
+                            Alpha2 = "GG",
+                            Alpha3 = "GGY",
+                            Name = "Guernsey"
+                        },
+                        new
+                        {
+                            Id = 324,
+                            Alpha2 = "GN",
+                            Alpha3 = "GIN",
+                            Name = "Guinea"
+                        },
+                        new
+                        {
+                            Id = 624,
+                            Alpha2 = "GW",
+                            Alpha3 = "GNB",
+                            Name = "Guinea-Bissau"
+                        },
+                        new
+                        {
+                            Id = 328,
+                            Alpha2 = "GY",
+                            Alpha3 = "GUY",
+                            Name = "Guyana"
+                        },
+                        new
+                        {
+                            Id = 332,
+                            Alpha2 = "HT",
+                            Alpha3 = "HTI",
+                            Name = "Haiti"
+                        },
+                        new
+                        {
+                            Id = 334,
+                            Alpha2 = "HM",
+                            Alpha3 = "HMD",
+                            Name = "Heard Island and McDonald Islands"
+                        },
+                        new
+                        {
+                            Id = 336,
+                            Alpha2 = "VA",
+                            Alpha3 = "VAT",
+                            Name = "Holy See"
+                        },
+                        new
+                        {
+                            Id = 340,
+                            Alpha2 = "HN",
+                            Alpha3 = "HND",
+                            Name = "Honduras"
+                        },
+                        new
+                        {
+                            Id = 344,
+                            Alpha2 = "HK",
+                            Alpha3 = "HKG",
+                            Name = "Hong Kong"
+                        },
+                        new
+                        {
+                            Id = 348,
+                            Alpha2 = "HU",
+                            Alpha3 = "HUN",
+                            Name = "Hungary"
+                        },
+                        new
+                        {
+                            Id = 352,
+                            Alpha2 = "IS",
+                            Alpha3 = "ISL",
+                            Name = "Iceland"
+                        },
+                        new
+                        {
+                            Id = 356,
+                            Alpha2 = "IN",
+                            Alpha3 = "IND",
+                            Name = "India"
+                        },
+                        new
+                        {
+                            Id = 360,
+                            Alpha2 = "ID",
+                            Alpha3 = "IDN",
+                            Name = "Indonesia"
+                        },
+                        new
+                        {
+                            Id = 364,
+                            Alpha2 = "IR",
+                            Alpha3 = "IRN",
+                            Name = "Iran (Islamic Republic of)"
+                        },
+                        new
+                        {
+                            Id = 368,
+                            Alpha2 = "IQ",
+                            Alpha3 = "IRQ",
+                            Name = "Iraq"
+                        },
+                        new
+                        {
+                            Id = 372,
+                            Alpha2 = "IE",
+                            Alpha3 = "IRL",
+                            Name = "Ireland"
+                        },
+                        new
+                        {
+                            Id = 380,
+                            Alpha2 = "IT",
+                            Alpha3 = "ITA",
+                            Name = "Italy"
+                        },
+                        new
+                        {
+                            Id = 388,
+                            Alpha2 = "JM",
+                            Alpha3 = "JAM",
+                            Name = "Jamaica"
+                        },
+                        new
+                        {
+                            Id = 392,
+                            Alpha2 = "JP",
+                            Alpha3 = "JPN",
+                            Name = "Japan"
+                        },
+                        new
+                        {
+                            Id = 832,
+                            Alpha2 = "JE",
+                            Alpha3 = "JEY",
+                            Name = "Jersey"
+                        },
+                        new
+                        {
+                            Id = 400,
+                            Alpha2 = "JO",
+                            Alpha3 = "JOR",
+                            Name = "Jordan"
+                        },
+                        new
+                        {
+                            Id = 398,
+                            Alpha2 = "KZ",
+                            Alpha3 = "KAZ",
+                            Name = "Kazakhstan"
+                        },
+                        new
+                        {
+                            Id = 404,
+                            Alpha2 = "KE",
+                            Alpha3 = "KEN",
+                            Name = "Kenya"
+                        },
+                        new
+                        {
+                            Id = 296,
+                            Alpha2 = "KI",
+                            Alpha3 = "KIR",
+                            Name = "Kiribati"
+                        },
+                        new
+                        {
+                            Id = 408,
+                            Alpha2 = "KP",
+                            Alpha3 = "PRK",
+                            Name = "Korea (Democratic People’s Republic of)"
+                        },
+                        new
+                        {
+                            Id = 410,
+                            Alpha2 = "KR",
+                            Alpha3 = "KOR",
+                            Name = "Korea (Republic of)"
+                        },
+                        new
+                        {
+                            Id = 414,
+                            Alpha2 = "KW",
+                            Alpha3 = "KWT",
+                            Name = "Kuwait"
+                        },
+                        new
+                        {
+                            Id = 417,
+                            Alpha2 = "KG",
+                            Alpha3 = "KGZ",
+                            Name = "Kyrgyzstan"
+                        },
+                        new
+                        {
+                            Id = 418,
+                            Alpha2 = "LA",
+                            Alpha3 = "LAO",
+                            Name = "Lao People’s Democratic Republic"
+                        },
+                        new
+                        {
+                            Id = 428,
+                            Alpha2 = "LV",
+                            Alpha3 = "LVA",
+                            Name = "Latvia"
+                        },
+                        new
+                        {
+                            Id = 422,
+                            Alpha2 = "LB",
+                            Alpha3 = "LBN",
+                            Name = "Lebanon"
+                        },
+                        new
+                        {
+                            Id = 426,
+                            Alpha2 = "LS",
+                            Alpha3 = "LSO",
+                            Name = "Lesotho"
+                        },
+                        new
+                        {
+                            Id = 430,
+                            Alpha2 = "LR",
+                            Alpha3 = "LBR",
+                            Name = "Liberia"
+                        },
+                        new
+                        {
+                            Id = 434,
+                            Alpha2 = "LY",
+                            Alpha3 = "LB Y",
+                            Name = "Libya"
+                        },
+                        new
+                        {
+                            Id = 438,
+                            Alpha2 = "LI",
+                            Alpha3 = "LIE",
+                            Name = "Liechtenstein"
+                        },
+                        new
+                        {
+                            Id = 440,
+                            Alpha2 = "LT",
+                            Alpha3 = "LTU",
+                            Name = "Lithuania"
+                        },
+                        new
+                        {
+                            Id = 442,
+                            Alpha2 = "LU",
+                            Alpha3 = "LUX",
+                            Name = "Luxembourg"
+                        },
+                        new
+                        {
+                            Id = 446,
+                            Alpha2 = "MO",
+                            Alpha3 = "MAC",
+                            Name = "Macao"
+                        },
+                        new
+                        {
+                            Id = 450,
+                            Alpha2 = "MG",
+                            Alpha3 = "MDG",
+                            Name = "Madagascar"
+                        },
+                        new
+                        {
+                            Id = 454,
+                            Alpha2 = "MW",
+                            Alpha3 = "MWI",
+                            Name = "Malawi"
+                        },
+                        new
+                        {
+                            Id = 458,
+                            Alpha2 = "MY",
+                            Alpha3 = "MYS",
+                            Name = "Malaysia"
+                        },
+                        new
+                        {
+                            Id = 462,
+                            Alpha2 = "MV",
+                            Alpha3 = "MDV",
+                            Name = "Maldives"
+                        },
+                        new
+                        {
+                            Id = 466,
+                            Alpha2 = "ML",
+                            Alpha3 = "MLI",
+                            Name = "Mali"
+                        },
+                        new
+                        {
+                            Id = 470,
+                            Alpha2 = "MT",
+                            Alpha3 = "MLT",
+                            Name = "Malta"
+                        },
+                        new
+                        {
+                            Id = 584,
+                            Alpha2 = "MH",
+                            Alpha3 = "MHL",
+                            Name = "Marshall Islands"
+                        },
+                        new
+                        {
+                            Id = 474,
+                            Alpha2 = "MQ",
+                            Alpha3 = "MTQ",
+                            Name = "Martinique"
+                        },
+                        new
+                        {
+                            Id = 478,
+                            Alpha2 = "MR",
+                            Alpha3 = "MRT",
+                            Name = "Mauritania"
+                        },
+                        new
+                        {
+                            Id = 480,
+                            Alpha2 = "MU",
+                            Alpha3 = "MUS",
+                            Name = "Mauritius"
+                        },
+                        new
+                        {
+                            Id = 175,
+                            Alpha2 = "YT",
+                            Alpha3 = "MYT",
+                            Name = "Mayotte"
+                        },
+                        new
+                        {
+                            Id = 484,
+                            Alpha2 = "MX",
+                            Alpha3 = "MEX",
+                            Name = "Mexico"
+                        },
+                        new
+                        {
+                            Id = 583,
+                            Alpha2 = "FM",
+                            Alpha3 = "FSM",
+                            Name = "Micronesia (Federated States of)"
+                        },
+                        new
+                        {
+                            Id = 498,
+                            Alpha2 = "MD",
+                            Alpha3 = "MDA",
+                            Name = "Moldova (Republic of)"
+                        },
+                        new
+                        {
+                            Id = 492,
+                            Alpha2 = "MC",
+                            Alpha3 = "MCO",
+                            Name = "Monaco"
+                        },
+                        new
+                        {
+                            Id = 496,
+                            Alpha2 = "MN",
+                            Alpha3 = "MNG",
+                            Name = "Mongolia"
+                        },
+                        new
+                        {
+                            Id = 499,
+                            Alpha2 = "ME",
+                            Alpha3 = "MNE",
+                            Name = "Montenegro"
+                        },
+                        new
+                        {
+                            Id = 500,
+                            Alpha2 = "MS",
+                            Alpha3 = "MSR",
+                            Name = "Montserrat"
+                        },
+                        new
+                        {
+                            Id = 504,
+                            Alpha2 = "MA",
+                            Alpha3 = "MAR",
+                            Name = "Morocco"
+                        },
+                        new
+                        {
+                            Id = 508,
+                            Alpha2 = "MZ",
+                            Alpha3 = "MOZ",
+                            Name = "Mozambique"
+                        },
+                        new
+                        {
+                            Id = 104,
+                            Alpha2 = "MM",
+                            Alpha3 = "MMR",
+                            Name = "Myanmar"
+                        },
+                        new
+                        {
+                            Id = 516,
+                            Alpha2 = "NA",
+                            Alpha3 = "NAM",
+                            Name = "Namibia"
+                        },
+                        new
+                        {
+                            Id = 520,
+                            Alpha2 = "NR",
+                            Alpha3 = "NRU",
+                            Name = "Nauru"
+                        },
+                        new
+                        {
+                            Id = 524,
+                            Alpha2 = "NP",
+                            Alpha3 = "NPL",
+                            Name = "Nepal"
+                        },
+                        new
+                        {
+                            Id = 528,
+                            Alpha2 = "NL",
+                            Alpha3 = "NLD",
+                            Name = "Netherlands"
+                        },
+                        new
+                        {
+                            Id = 554,
+                            Alpha2 = "NZ",
+                            Alpha3 = "NZL",
+                            Name = "New Zealand"
+                        },
+                        new
+                        {
+                            Id = 540,
+                            Alpha2 = "NC",
+                            Alpha3 = "NCL",
+                            Name = "New Caledonia"
+                        },
+                        new
+                        {
+                            Id = 558,
+                            Alpha2 = "NI",
+                            Alpha3 = "NIC",
+                            Name = "Nicaragua"
+                        },
+                        new
+                        {
+                            Id = 562,
+                            Alpha2 = "NE",
+                            Alpha3 = "NER",
+                            Name = "Niger"
+                        },
+                        new
+                        {
+                            Id = 566,
+                            Alpha2 = "NG",
+                            Alpha3 = "NGA",
+                            Name = "Nigeria"
+                        },
+                        new
+                        {
+                            Id = 570,
+                            Alpha2 = "NU",
+                            Alpha3 = "NIU",
+                            Name = "Niue"
+                        },
+                        new
+                        {
+                            Id = 574,
+                            Alpha2 = "NF",
+                            Alpha3 = "NFK",
+                            Name = "Norfolk Island"
+                        },
+                        new
+                        {
+                            Id = 580,
+                            Alpha2 = "MP",
+                            Alpha3 = "MNP",
+                            Name = "Northern Mariana Islands"
+                        },
+                        new
+                        {
+                            Id = 578,
+                            Alpha2 = "NO",
+                            Alpha3 = "NOR",
+                            Name = "Norway"
+                        },
+                        new
+                        {
+                            Id = 512,
+                            Alpha2 = "OM",
+                            Alpha3 = "OMN",
+                            Name = "Oman"
+                        },
+                        new
+                        {
+                            Id = 586,
+                            Alpha2 = "PK",
+                            Alpha3 = "PAK",
+                            Name = "Pakistan"
+                        },
+                        new
+                        {
+                            Id = 585,
+                            Alpha2 = "PW",
+                            Alpha3 = "PLW",
+                            Name = "Palau"
+                        },
+                        new
+                        {
+                            Id = 275,
+                            Alpha2 = "PS",
+                            Alpha3 = "PSE",
+                            Name = "Palestine, State of"
+                        },
+                        new
+                        {
+                            Id = 591,
+                            Alpha2 = "PA",
+                            Alpha3 = "PAN",
+                            Name = "Panama"
+                        },
+                        new
+                        {
+                            Id = 598,
+                            Alpha2 = "PG",
+                            Alpha3 = "PNG",
+                            Name = "Papua New Guinea"
+                        },
+                        new
+                        {
+                            Id = 600,
+                            Alpha2 = "PY",
+                            Alpha3 = "PRY",
+                            Name = "Paraguay"
+                        },
+                        new
+                        {
+                            Id = 604,
+                            Alpha2 = "PE",
+                            Alpha3 = "PER",
+                            Name = "Peru"
+                        },
+                        new
+                        {
+                            Id = 608,
+                            Alpha2 = "PH",
+                            Alpha3 = "PHL",
+                            Name = "Philippines"
+                        },
+                        new
+                        {
+                            Id = 612,
+                            Alpha2 = "PN",
+                            Alpha3 = "PCN",
+                            Name = "Pitcairn"
+                        },
+                        new
+                        {
+                            Id = 616,
+                            Alpha2 = "PL",
+                            Alpha3 = "POL",
+                            Name = "Poland"
+                        },
+                        new
+                        {
+                            Id = 620,
+                            Alpha2 = "PT",
+                            Alpha3 = "PRT",
+                            Name = "Portugal"
+                        },
+                        new
+                        {
+                            Id = 630,
+                            Alpha2 = "PR",
+                            Alpha3 = "PRI",
+                            Name = "Puerto Rico"
+                        },
+                        new
+                        {
+                            Id = 634,
+                            Alpha2 = "QA",
+                            Alpha3 = "QAT",
+                            Name = "Qatar"
+                        },
+                        new
+                        {
+                            Id = 638,
+                            Alpha2 = "RE",
+                            Alpha3 = "REU",
+                            Name = "Réunion"
+                        },
+                        new
+                        {
+                            Id = 642,
+                            Alpha2 = "RO",
+                            Alpha3 = "ROU",
+                            Name = "Romania"
+                        },
+                        new
+                        {
+                            Id = 643,
+                            Alpha2 = "RU",
+                            Alpha3 = "RUS",
+                            Name = "Russian Federation"
+                        },
+                        new
+                        {
+                            Id = 646,
+                            Alpha2 = "RW",
+                            Alpha3 = "RWA",
+                            Name = "Rwanda"
+                        },
+                        new
+                        {
+                            Id = 652,
+                            Alpha2 = "BL",
+                            Alpha3 = "BLM",
+                            Name = "Saint Barthélemy"
+                        },
+                        new
+                        {
+                            Id = 654,
+                            Alpha2 = "SH",
+                            Alpha3 = "SHN",
+                            Name = "Saint Helena, Ascension and Tristan da Cunha"
+                        },
+                        new
+                        {
+                            Id = 659,
+                            Alpha2 = "KN",
+                            Alpha3 = "KNA",
+                            Name = "Saint Kitts and Nevis"
+                        },
+                        new
+                        {
+                            Id = 662,
+                            Alpha2 = "LC",
+                            Alpha3 = "LCA",
+                            Name = "Saint Lucia"
+                        },
+                        new
+                        {
+                            Id = 663,
+                            Alpha2 = "MF",
+                            Alpha3 = "MAF",
+                            Name = "Saint Martin (French part)"
+                        },
+                        new
+                        {
+                            Id = 666,
+                            Alpha2 = "PM",
+                            Alpha3 = "SPM",
+                            Name = "Saint Pierre and Miquelon"
+                        },
+                        new
+                        {
+                            Id = 670,
+                            Alpha2 = "VC",
+                            Alpha3 = "VCT",
+                            Name = "Saint Vincent and the Grenadines"
+                        },
+                        new
+                        {
+                            Id = 882,
+                            Alpha2 = "WS",
+                            Alpha3 = "WSM",
+                            Name = "Samoa"
+                        },
+                        new
+                        {
+                            Id = 674,
+                            Alpha2 = "SM",
+                            Alpha3 = "SMR",
+                            Name = "San Marino"
+                        },
+                        new
+                        {
+                            Id = 678,
+                            Alpha2 = "ST",
+                            Alpha3 = "STP",
+                            Name = "Sao Tome and Principe"
+                        },
+                        new
+                        {
+                            Id = 682,
+                            Alpha2 = "SA",
+                            Alpha3 = "SAU",
+                            Name = "Saudi Arabia"
+                        },
+                        new
+                        {
+                            Id = 686,
+                            Alpha2 = "SN",
+                            Alpha3 = "SEN",
+                            Name = "Senegal"
+                        },
+                        new
+                        {
+                            Id = 688,
+                            Alpha2 = "RS",
+                            Alpha3 = "SRB",
+                            Name = "Serbia"
+                        },
+                        new
+                        {
+                            Id = 690,
+                            Alpha2 = "SC",
+                            Alpha3 = "SYC",
+                            Name = "Seychelles"
+                        },
+                        new
+                        {
+                            Id = 694,
+                            Alpha2 = "SL",
+                            Alpha3 = "SLE",
+                            Name = "Sierra Leone"
+                        },
+                        new
+                        {
+                            Id = 702,
+                            Alpha2 = "SG",
+                            Alpha3 = "SGP",
+                            Name = "Singapore"
+                        },
+                        new
+                        {
+                            Id = 534,
+                            Alpha2 = "SX",
+                            Alpha3 = "SXM",
+                            Name = "Sint Maarten (Dutch part)"
+                        },
+                        new
+                        {
+                            Id = 703,
+                            Alpha2 = "SK",
+                            Alpha3 = "SVK",
+                            Name = "Slovakia"
+                        },
+                        new
+                        {
+                            Id = 705,
+                            Alpha2 = "SI",
+                            Alpha3 = "SVN",
+                            Name = "Slovenia"
+                        },
+                        new
+                        {
+                            Id = 90,
+                            Alpha2 = "SB",
+                            Alpha3 = "SLB",
+                            Name = "Solomon Islands"
+                        },
+                        new
+                        {
+                            Id = 706,
+                            Alpha2 = "SO",
+                            Alpha3 = "SOM",
+                            Name = "Somalia"
+                        },
+                        new
+                        {
+                            Id = 710,
+                            Alpha2 = "ZA",
+                            Alpha3 = "ZAF",
+                            Name = "South Africa"
+                        },
+                        new
+                        {
+                            Id = 239,
+                            Alpha2 = "GS",
+                            Alpha3 = "SGS",
+                            Name = "South Georgia and the South Sandwich Islands"
+                        },
+                        new
+                        {
+                            Id = 728,
+                            Alpha2 = "SS",
+                            Alpha3 = "SSD",
+                            Name = "South Sudan"
+                        },
+                        new
+                        {
+                            Id = 724,
+                            Alpha2 = "ES",
+                            Alpha3 = "ESP",
+                            Name = "Spain"
+                        },
+                        new
+                        {
+                            Id = 144,
+                            Alpha2 = "LK",
+                            Alpha3 = "LKA",
+                            Name = "Sri Lanka"
+                        },
+                        new
+                        {
+                            Id = 729,
+                            Alpha2 = "SD",
+                            Alpha3 = "SDN",
+                            Name = "Sudan"
+                        },
+                        new
+                        {
+                            Id = 740,
+                            Alpha2 = "SR",
+                            Alpha3 = "SUR",
+                            Name = "Suriname"
+                        },
+                        new
+                        {
+                            Id = 744,
+                            Alpha2 = "SJ",
+                            Alpha3 = "SJM",
+                            Name = "Svalbard and Jan Mayen"
+                        },
+                        new
+                        {
+                            Id = 752,
+                            Alpha2 = "SE",
+                            Alpha3 = "SWE",
+                            Name = "Sweden"
+                        },
+                        new
+                        {
+                            Id = 756,
+                            Alpha2 = "CH",
+                            Alpha3 = "CHE",
+                            Name = "Switzerland"
+                        },
+                        new
+                        {
+                            Id = 760,
+                            Alpha2 = "SY",
+                            Alpha3 = "SYR",
+                            Name = "Syrian Arab Republic"
+                        },
+                        new
+                        {
+                            Id = 158,
+                            Alpha2 = "TW",
+                            Alpha3 = "TWN",
+                            Name = "Taiwan (Province of China)"
+                        },
+                        new
+                        {
+                            Id = 762,
+                            Alpha2 = "TJ",
+                            Alpha3 = "TJK",
+                            Name = "Tajikistan"
+                        },
+                        new
+                        {
+                            Id = 834,
+                            Alpha2 = "TZ",
+                            Alpha3 = "TZA",
+                            Name = "Tanzania, United Republic of"
+                        },
+                        new
+                        {
+                            Id = 764,
+                            Alpha2 = "TH",
+                            Alpha3 = "THA",
+                            Name = "Thailand"
+                        },
+                        new
+                        {
+                            Id = 768,
+                            Alpha2 = "TG",
+                            Alpha3 = "TGO",
+                            Name = "Togo"
+                        },
+                        new
+                        {
+                            Id = 780,
+                            Alpha2 = "TT",
+                            Alpha3 = "TTO",
+                            Name = "Trinidad and Tobago"
+                        },
+                        new
+                        {
+                            Id = 788,
+                            Alpha2 = "TN",
+                            Alpha3 = "TUN",
+                            Name = "Tunisia"
+                        },
+                        new
+                        {
+                            Id = 792,
+                            Alpha2 = "TR",
+                            Alpha3 = "TUR",
+                            Name = "Turkey"
+                        },
+                        new
+                        {
+                            Id = 800,
+                            Alpha2 = "UG",
+                            Alpha3 = "UGA",
+                            Name = "Uganda"
+                        },
+                        new
+                        {
+                            Id = 804,
+                            Alpha2 = "UA",
+                            Alpha3 = "UKR",
+                            Name = "Ukraine"
+                        },
+                        new
+                        {
+                            Id = 784,
+                            Alpha2 = "AE",
+                            Alpha3 = "ARE",
+                            Name = "United Arab Emirates"
+                        },
+                        new
+                        {
+                            Id = 826,
+                            Alpha2 = "GB",
+                            Alpha3 = "GBR",
+                            Name = "United Kingdom of Great Britain and Northern Ireland"
+                        },
+                        new
+                        {
+                            Id = 840,
+                            Alpha2 = "US",
+                            Alpha3 = "USA",
+                            Name = "United States of America"
+                        },
+                        new
+                        {
+                            Id = 858,
+                            Alpha2 = "UY",
+                            Alpha3 = "URY",
+                            Name = "Uruguay"
+                        },
+                        new
+                        {
+                            Id = 862,
+                            Alpha2 = "VE",
+                            Alpha3 = "VEN",
+                            Name = "Venezuela (Bolivarian Republic of)"
+                        },
+                        new
+                        {
+                            Id = 704,
+                            Alpha2 = "VN",
+                            Alpha3 = "VNM",
+                            Name = "Viet Nam"
+                        },
+                        new
+                        {
+                            Id = 850,
+                            Alpha2 = "VI",
+                            Alpha3 = "VIR",
+                            Name = "Virgin Islands (U.S.)"
+                        },
+                        new
+                        {
+                            Id = 891,
+                            Alpha2 = "YE",
+                            Alpha3 = "YEM",
+                            Name = "Yemen"
+                        },
+                        new
+                        {
+                            Id = 894,
+                            Alpha2 = "ZM",
+                            Alpha3 = "ZMB",
+                            Name = "Zambia"
+                        },
+                        new
+                        {
+                            Id = 716,
+                            Alpha2 = "ZW",
+                            Alpha3 = "ZWE",
+                            Name = "Zimbabwe"
+                        });
+                });
+
             modelBuilder.Entity("GMGInventory.Data.CreditTerm", b =>
                 {
                     b.Property<int>("Id")
@@ -1283,19 +2996,12 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime>("EffectiveDate")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,5)");
 
                     b.HasKey("Id");
 
@@ -1427,6 +3133,45 @@ namespace GMGInventory.Data.Migrations
                             Code = "GOOD",
                             Name = "GOOD"
                         });
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CustomerBrandDiscount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("BrandId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BrandId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CustomerBrandDiscount");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
@@ -1571,6 +3316,56 @@ namespace GMGInventory.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.Driver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("LicenseDateExpiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LicenseNumber")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Restriction")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Drivers");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Forwarder", b =>
                 {
                     b.Property<int>("Id")
@@ -1686,6 +3481,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("DisapprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("HashMicroMoveById")
@@ -3538,6 +5336,9 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsVATIncluded")
                         .HasColumnType("bit");
 
@@ -4830,6 +6631,42 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("SalesReturnLineItems");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.ServiceLevelAgreement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("PriorAvailability")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceLevelAgreements");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.ShippingAddress", b =>
                 {
                     b.Property<int>("Id")
@@ -5268,6 +7105,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("ContactPerson")
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CurrencyId")
                         .HasColumnType("int");
 
@@ -5290,7 +7130,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("OfficeTelNo")
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("RegionId")
+                    b.Property<int?>("RegionId")
                         .HasColumnType("int");
 
                     b.Property<string>("TIN")
@@ -5312,6 +7152,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BusinessStyleId");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("CurrencyId");
 
@@ -5724,6 +7566,49 @@ namespace GMGInventory.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.Vehicle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateExpiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateRegistered")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FleetPlateNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Vehicles");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Warehouse", b =>
                 {
                     b.Property<int>("Id")
@@ -6097,6 +7982,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<bool>("IsDarkMode")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("IsNavIconPlain")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(50)");
 
@@ -6118,13 +8006,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0815f447-ce07-431c-a74a-44474382ac6b",
+                            ConcurrencyStamp = "7c520851-ed36-4431-949f-180e9d612166",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEB78S6JNL6/GNZA/fcCgeMmUCSKP4oJEB30TJDmTN1pdTu3v/E3irxPQDQ5i0F5FzQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMiowsa3G2zgOYsGlL80yBvRKclnF4kBPmzSxXAY/5BS2emweGQo2Zwe0ydq8H7mag==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fedd9f6d-7423-4f23-aa5c-e01e88769ab9",
+                            SecurityStamp = "d42a3eac-ad8e-4f15-8c1e-2ccea0b0419a",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6139,13 +8027,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d200bd38-5798-497a-9621-9bf770d50617",
+                            ConcurrencyStamp = "59d5d044-1e9b-4580-b481-8bd130dc7c35",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAwO7c7jYc6qaj2fG3uw1E/bXnbs/e5Rk8Fya4cBUqMKaZ/pBwuPzpra4Kjh7jFIBA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB8IycWOqoQh5XOqkTwEAl4IS4Mi2nYWvxxcPx9j/V6oz1jE4ZZjCWCigDZlXNpQpw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "79e900cc-4091-4d18-a50c-967111c79f86",
+                            SecurityStamp = "ea429ba7-9e76-4920-b8d7-de015945f74f",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -6279,6 +8167,23 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("CustomerAccountStatus");
 
                     b.Navigation("CustomerType");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.CustomerBrandDiscount", b =>
+                {
+                    b.HasOne("GMGInventory.Data.Brand", "Brand")
+                        .WithMany("CustomerBrandDiscounts")
+                        .HasForeignKey("BrandId");
+
+                    b.HasOne("GMGInventory.Data.Customer", "Customer")
+                        .WithMany("CustomerBrandDiscounts")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
@@ -7278,6 +9183,12 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.Country", "Country")
+                        .WithMany("Suppliers")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.Currency", "Currency")
                         .WithMany("Suppliers")
                         .HasForeignKey("CurrencyId")
@@ -7286,9 +9197,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasOne("GMGInventory.Data.Region", "Region")
                         .WithMany("Suppliers")
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RegionId");
 
                     b.HasOne("GMGInventory.Data.CreditTerm", "Term")
                         .WithMany("Suppliers")
@@ -7297,6 +9206,8 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("BusinessStyle");
+
+                    b.Navigation("Country");
 
                     b.Navigation("Currency");
 
@@ -7472,6 +9383,8 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
                 {
+                    b.Navigation("CustomerBrandDiscounts");
+
                     b.Navigation("Items");
                 });
 
@@ -7485,6 +9398,11 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.ChequeStatus", b =>
                 {
                     b.Navigation("Cheques");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.Country", b =>
+                {
+                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.CreditTerm", b =>
@@ -7508,6 +9426,8 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.Customer", b =>
                 {
                     b.Navigation("Cheques");
+
+                    b.Navigation("CustomerBrandDiscounts");
 
                     b.Navigation("CustomerPayments");
 

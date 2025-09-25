@@ -25,6 +25,14 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ChangeNavIcon(string id, string isNavIconPlain)
+        {
+            await userRepository.UpdateNavIconAsync(id, isNavIconPlain == "on");
+            return RedirectToAction(nameof(Index));
+        }
+
         public async Task<ActionResult> Update()
         {
             var currentUserName = User?.Identity?.Name ?? "";

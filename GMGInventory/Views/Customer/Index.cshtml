@@ -429,11 +429,13 @@
             url: "@Url.Action("GetOptions", "Region")",
             success: function (data, status, xhr) {
                 $("#create-region").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal"),
                     minimumResultsForSearch: -1
                 });
                 $("#edit-region").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal"),
                     minimumResultsForSearch: -1
@@ -457,26 +459,12 @@
             },
             ajax: {
                 url: "@Url.Action("GetByRegionOptions", "Area")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
                 data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1,
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
                         region: $("#create-region").val()
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                    });
+                }
             },
             dropdownParent: $("#createModal")
         });
@@ -487,12 +475,14 @@
             url: "@Url.Action("GetOptions", "CustomerType")",
             success: function (data, status, xhr) {
                 $("#create-customer-type").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     //theme: "bootstrap-5",
                     dropdownParent: $("#createModal"),
                     minimumResultsForSearch: -1
                 });
                 $("#edit-customer-type").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     //theme: "bootstrap-5",
                     dropdownParent: $("#editModal"),
@@ -507,10 +497,12 @@
             url: "@Url.Action("GetOptions", "Agent")",
             success: function (data, status, xhr) {
                 $("#create-agent").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal")
                 });
                 $("#edit-agent").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal")
                 });
@@ -524,11 +516,13 @@
             url: "@Url.Action("GetOptions", "CreditTerm")",
             success: function (data, status, xhr) {
                 $("#create-credit-term").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal"),
                     minimumResultsForSearch: -1
                 });
                 $("#edit-credit-term").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal"),
                     minimumResultsForSearch: -1
@@ -543,11 +537,13 @@
             url: "@Url.Action("GetOptions", "CustomerAccountStatus")",
             success: function (data, status, xhr) {
                 $("#create-account-status").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal"),
                     minimumResultsForSearch: -1
                 });
                 $("#edit-account-status").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal"),
                     minimumResultsForSearch: -1
@@ -591,14 +587,14 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.isActive) {
                             if (user_access.canDelete) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Deactivate Customer" data-microtip-position="top-left" role="tooltip"><i class="fas fa-exclamation-triangle"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Deactivate Customer" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-exclamation-triangle"></i></button>';
                             }
                         } else {
                             if (user_access.canAdd || user_access.canEdit) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Customer" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Customer" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
                             }
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';

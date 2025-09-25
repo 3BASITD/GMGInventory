@@ -244,7 +244,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Unserved Quantity")]
         public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
-        public int UnservedQuantityD => QuantityD - ServedQuantityD;
+        //public int UnservedQuantityD => QuantityD - ServedQuantityD;
+        public int UnservedQuantityD => Math.Max(0, QuantityD - InventoryCountD);
 
         [Display(Name = "Packed Quantity")]
         public string PackedQuantity => string.Format(SystemFormat.StringIntegerComma, PackedQuantityD);
@@ -305,6 +306,7 @@ namespace GMGInventory.Common.Models
 
     public class SalesOrderFormItemVM
     {
+        public int LineNumber { get; set; }
         public int Item { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }

@@ -7,6 +7,7 @@ namespace GMGInventory.Data
         public Customer()
         {
             this.CustomerPayments = new HashSet<CustomerPayment>();
+            this.CustomerBrandDiscounts = new HashSet<CustomerBrandDiscount>();
             //this.Forwarders = new HashSet<Forwarder>();
             //this.Payments = new HashSet<Payment>();
             this.SalesOrders = new HashSet<SalesOrder>();
@@ -79,6 +80,7 @@ namespace GMGInventory.Data
         //public string? FaxNumber { get; set; }
 
         public ICollection<CustomerPayment> CustomerPayments { get; set; }
+        public ICollection<CustomerBrandDiscount> CustomerBrandDiscounts { get; set; }
         //public ICollection<Forwarder> Forwarders { get; set; }
         //public ICollection<Payment> Payments { get; set; }
         public ICollection<SalesOrder> SalesOrders { get; set; }

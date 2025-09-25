@@ -360,7 +360,7 @@
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
+                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
                         }
                     },
                     name: "ItemCode",
@@ -413,7 +413,7 @@
                     className: "form-cell",
                     render: function (data, type, row) {
                         if (type === 'display') {
-                            return $("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + '&nbsp;' + data;
+                            return $("#order-currency").select2("data")[0].text + '&nbsp;' + data;
                         }
 
                         return data;
@@ -426,7 +426,7 @@
 
                 columnDTTotalInteger(api, 6);
                 if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
-                    columnDTTotalDecimal(api, 9, $("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + '&nbsp;');
+                    columnDTTotalDecimal(api, 9, $("#order-currency").select2("data")[0].text + '&nbsp;');
                 else
                     columnDTTotalDecimal(api, 9);
             }
@@ -475,7 +475,7 @@
                 rowData.lineNumber = newLineNumber;
                 itemDT.row(row).data(rowData);
 
-                itemDT.draw();
+                itemDT.order([1, 'asc']).draw();
             });
 
             $(".btn-down-item").off("click").on("click", function () {
@@ -497,7 +497,7 @@
                 rowData.lineNumber = newLineNumber;
                 itemDT.row(row).data(rowData);
 
-                itemDT.draw();
+                itemDT.order([1, 'asc']).draw();
             });
 
             var typeText = $("#order-type").select2("data")[0]?.text.toLowerCase() || "";
@@ -563,6 +563,7 @@
                     },
                     success: function (data, status, xhr) {
                         $("#order-type").select2({
+                            ajax: null, //already fetched outside
                             data: data,
                             minimumResultsForSearch: -1
                         }).on("select2:select", function () {
@@ -609,6 +610,7 @@
                     },
                     success: function (data) {
                         $("#order-purpose").select2({
+                            ajax: null, //already fetched outside
                             data: data,
                             minimumResultsForSearch: -1
                         }).on("change", function () {
@@ -644,16 +646,17 @@
             url: "@Url.Action("GetOptions", "Currency")",
             success: function (data, status, xhr) {
                 $("#order-currency").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     minimumResultsForSearch: -1
                 }).on("change", function () {
-                    $("#order-currency-rate").val($("#order-currency").select2("data")[0]?.rate);
+                    $("#order-currency-rate").val($("#order-currency").select2("data")[0]?.rate || 1);
                     if (itemDT && itemDT.rows().count() > 0)
                         itemDT.rows().invalidate().draw();
                 });
             },
             complete: function (xhr, status) {
-                $("#order-currency-rate").val($("#order-currency").select2("data")[0]?.rate);
+                $("#order-currency-rate").val($("#order-currency").select2("data")[0]?.rate || 1);
             }
         });
 
@@ -663,6 +666,7 @@
             url: "@Url.Action("GetOptions", "Region")",
             success: function (data, status, xhr) {
                 $("#order-region").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     minimumResultsForSearch: -1
                 }).on("change", function () {
@@ -805,28 +809,14 @@
                 },
                 ajax: {
                     url: "@Url.Action("GetOptionsByName2", "Supplier")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
                     data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1,
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
                             includeId: selectedSupplier,
                             isLocal: isLocal,
                             isForeign: isForeign
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                        });
+                    }
                 }
             }).on("select2:select", function () {
                 var selectedSupplier = $("#order-supplier").select2("data")[0];
@@ -856,6 +846,7 @@
                 },
                 success: function (data, status, xhr) {
                     $("#order-terms").select2({
+                        ajax: null, //already fetched outside
                         minimumResultsForSearch: -1,
                         placeholder: "<empty>",
                         data: data
@@ -874,6 +865,7 @@
                 },
                 success: function (data, status, xhr) {
                     $("#order-mode").select2({
+                        ajax: null, //already fetched outside
                         minimumResultsForSearch: -1,
                         placeholder: "<empty>",
                         data: data
@@ -892,6 +884,7 @@
                 },
                 success: function (data, status, xhr) {
                     $("#order-delivery-address").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         minimumResultsForSearch: -1,
                         templateResult: function (repo) {
@@ -930,6 +923,7 @@
                 },
                 success: function (data, status, xhr) {
                     $("#add-pr-number").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         minimumInputLength: -1,
                         placeholder: "<empty>",
@@ -962,6 +956,7 @@
                 },
                 success: function (data, status, xhr) {
                     $("#add-name").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         //minimumResultsForSearch: -1,
                         placeholder: "<empty>",
@@ -1019,7 +1014,7 @@
                         $("#add-unit").data("Id", selected.unitId);
                         $("#add-unit-cost").val(selected.previousCostD);
                         if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
-                            $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' 0.00');
+                            $("#add-total-amount").val($("#order-currency").select2("data")[0].text + ' 0.00');
                         else
                             $("#add-total-amount").val("0.00");
                     }).off("select2:unselecting").on("select2:unselecting", function () {
@@ -1033,7 +1028,7 @@
                         $("#add-unit").data("Id", -1);
                         $("#add-unit-cost").val("0.00");
                         if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
-                            $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' 0.00');
+                            $("#add-total-amount").val($("#order-currency").select2("data")[0].text + ' 0.00');
                         else
                             $("#add-total-amount").val("0.00");
                     });
@@ -1051,7 +1046,7 @@
             var cost = $("#add-unit-cost").val() || 0;
 
             if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
-                $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' ' + FormatStringDecimal(quantity * cost));
+                $("#add-total-amount").val($("#order-currency").select2("data")[0].text + ' ' + FormatStringDecimal(quantity * cost));
             else
                 $("#add-total-amount").val(FormatStringDecimal(quantity * cost));
         }
@@ -1075,6 +1070,7 @@
             url: "@Url.Action("GetOptions", "Unit")",
             success: function (data, status, xhr) {
                 $("#add-unit2").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     minimumResultsForSearch: -1,
                     placeholder: "<empty>",
@@ -1100,7 +1096,7 @@
             $("#add-unit").data("Id", "");
             $("#add-unit-cost").val("0.00");
             if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
-                $("#add-total-amount").val($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim() + ' 0.00');
+                $("#add-total-amount").val($("#order-currency").select2("data")[0].text + ' 0.00');
             else
                 $("#add-total-amount").val("0.00");
         }
@@ -1170,7 +1166,7 @@
                 var tempTotal = $("#add-total-amount").val();
 
                 if ($.fn.select2 && $("#order-currency").hasClass("select2-hidden-accessible"))
-                    tempTotal = $("#add-total-amount").val().replace($("#order-currency").select2("data")[0].abbreviation.split("/")[0].trim(), "").trim();
+                    tempTotal = $("#add-total-amount").val().replace($("#order-currency").select2("data")[0].text, "").trim();
 
                 itemDT.row.add({
                     purchaseOrderId: 0, 

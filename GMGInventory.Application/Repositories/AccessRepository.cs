@@ -96,207 +96,208 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> SaveRolesPagesAsync(string RoleId, string RoleName, IList<AccessVM> accesses)
         {
-            var response = new ResponseModel();
-            if (string.IsNullOrWhiteSpace(RoleName))
+            try
             {
-                response.Status = "Error";
-                response.Message = "Role name is required.";
-            }
-            else if (context.Roles.Any(s => s.Name.ToLower() == RoleName.ToLower() && s.Id != RoleId))
-            {
-                response.Status = "Error";
-                response.Message = "Role name already exists.";
-            }
-            else
-            {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                var role = await roleManager.FindByIdAsync(RoleId);
-                if (role == null)
+                if (string.IsNullOrWhiteSpace(RoleName))
                 {
-                    // Add
-                    var newRole = new Role
-                    {
-                        Name = RoleName,
-                        NormalizedName = RoleName.ToUpper(),
-                        IsActive = true,
-                        UserCreated = currentUserId,
-                        DateCreated = DateTime.Now
-                    };
-                    var result = await roleManager.CreateAsync(newRole);
-                    if (result.Succeeded)
-                    {
-                        var newRoleId = newRole.Id;
-
-                        foreach (var access in accesses)
-                        {
-                            var newAccess = new Access
-                            {
-                                RoleId = newRoleId,
-                                PageId = access.PageId,
-                                CanView = access.CanView,
-                                CanAdd = access.CanAdd,
-                                CanEdit = access.CanEdit,
-                                CanDelete = access.CanDelete,
-                                CanApproveDisapprove = access.CanApproveDisapprove,
-                                CanUploadDownload = access.CanUploadDownload,
-                                CanPrint = access.CanPrint,
-                                UserCreated = currentUserId,
-                                DateCreated = DateTime.Now
-                            };
-                            context.Accesses.Add(newAccess);
-                        }
-                        await context.SaveChangesAsync(currentUserId);
-
-                        response.Status = "Success";
-                        response.Message = "The role has been successfully added. You can now assign it to users.";
-                    }
-                    else
-                    {
-                        response.Status = "Error";
-                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
-                    }
+                    return new ResponseModel { Status = "Error", Message = "Role name is required" };
+                }
+                else if (context.Roles.Any(s => s.Name.ToLower() == RoleName.ToLower() && s.Id != RoleId))
+                {
+                    return new ResponseModel { Status = "Error", Message = "Role name already exists" };
                 }
                 else
                 {
-                    // Edit
-                    role.Name = RoleName;
-                    role.NormalizedName = RoleName.ToUpper();
-                    role.UserCreated = currentUserId;
-                    role.DateCreated = DateTime.Now;
-                    context.Roles.Update(role);
-                    await context.SaveChangesAsync(currentUserId);
-
-                    foreach (var access in accesses)
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                    var role = await roleManager.FindByIdAsync(RoleId);
+                    if (role == null)
                     {
-                        var acc = await context.Accesses.Where(s => s.PageId == access.PageId && s.RoleId == RoleId).FirstOrDefaultAsync();
-                        if (acc == null)
+                        // Add
+                        var newRole = new Role
                         {
-                            var newAccess = new Access
+                            Name = RoleName,
+                            NormalizedName = RoleName.ToUpper(),
+                            IsActive = true,
+                            UserCreated = currentUserId,
+                            DateCreated = DateTime.Now
+                        };
+                        var result = await roleManager.CreateAsync(newRole);
+                        if (result.Succeeded)
+                        {
+                            var newRoleId = newRole.Id;
+
+                            foreach (var access in accesses)
                             {
-                                RoleId = RoleId,
-                                PageId = access.PageId,
-                                CanView = access.CanView,
-                                CanAdd = access.CanAdd,
-                                CanEdit = access.CanEdit,
-                                CanDelete = access.CanDelete,
-                                CanApproveDisapprove = access.CanApproveDisapprove,
-                                CanUploadDownload = access.CanUploadDownload,
-                                CanPrint = access.CanPrint,
-                                UserCreated = currentUserId,
-                                DateCreated = DateTime.Now
-                            };
-                            context.Accesses.Add(newAccess);
+                                var newAccess = new Access
+                                {
+                                    RoleId = newRoleId,
+                                    PageId = access.PageId,
+                                    CanView = access.CanView,
+                                    CanAdd = access.CanAdd,
+                                    CanEdit = access.CanEdit,
+                                    CanDelete = access.CanDelete,
+                                    CanApproveDisapprove = access.CanApproveDisapprove,
+                                    CanUploadDownload = access.CanUploadDownload,
+                                    CanPrint = access.CanPrint,
+                                    UserCreated = currentUserId,
+                                    DateCreated = DateTime.Now
+                                };
+                                context.Accesses.Add(newAccess);
+                            }
+                            await context.SaveChangesAsync(currentUserId);
+
+                            return new ResponseModel { Status = "Success", Message = "The role has been successfully added. You can now assign it to users" };
                         }
                         else
                         {
-                            acc.CanView = access.CanView;
-                            acc.CanAdd = access.CanAdd;
-                            acc.CanEdit = access.CanEdit;
-                            acc.CanDelete = access.CanDelete;
-                            acc.CanApproveDisapprove = access.CanApproveDisapprove;
-                            acc.CanUploadDownload = access.CanUploadDownload;
-                            acc.CanPrint = access.CanPrint;
-                            acc.UserModified = currentUserId;
-                            acc.DateModified = DateTime.Now;
-                            context.Accesses.Update(acc);
+                            return new ResponseModel { Status = "Error", Message = string.Join(", ", result.Errors.Select(e => e.Description)) };
                         }
                     }
-                    await context.SaveChangesAsync(currentUserId);
+                    else
+                    {
+                        // Edit
+                        role.Name = RoleName;
+                        role.NormalizedName = RoleName.ToUpper();
+                        role.UserCreated = currentUserId;
+                        role.DateCreated = DateTime.Now;
+                        context.Roles.Update(role);
+                        await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "The role has been successfully update.";
+                        foreach (var access in accesses)
+                        {
+                            var acc = await context.Accesses.Where(s => s.PageId == access.PageId && s.RoleId == RoleId).FirstOrDefaultAsync();
+                            if (acc == null)
+                            {
+                                var newAccess = new Access
+                                {
+                                    RoleId = RoleId,
+                                    PageId = access.PageId,
+                                    CanView = access.CanView,
+                                    CanAdd = access.CanAdd,
+                                    CanEdit = access.CanEdit,
+                                    CanDelete = access.CanDelete,
+                                    CanApproveDisapprove = access.CanApproveDisapprove,
+                                    CanUploadDownload = access.CanUploadDownload,
+                                    CanPrint = access.CanPrint,
+                                    UserCreated = currentUserId,
+                                    DateCreated = DateTime.Now
+                                };
+                                context.Accesses.Add(newAccess);
+                            }
+                            else
+                            {
+                                acc.CanView = access.CanView;
+                                acc.CanAdd = access.CanAdd;
+                                acc.CanEdit = access.CanEdit;
+                                acc.CanDelete = access.CanDelete;
+                                acc.CanApproveDisapprove = access.CanApproveDisapprove;
+                                acc.CanUploadDownload = access.CanUploadDownload;
+                                acc.CanPrint = access.CanPrint;
+                                acc.UserModified = currentUserId;
+                                acc.DateModified = DateTime.Now;
+                                context.Accesses.Update(acc);
+                            }
+                        }
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Success", Message = "Role has been successully updated" };
+                    }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> DeleteDeactivateRoleAsync(string RoleId)
         {
-            var response = new ResponseModel();
-            var role = await roleManager.FindByIdAsync(RoleId);
-            if (role == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid role";
-            }
-            else
-            {
-                var userInRole = await userManager.GetUsersInRoleAsync(role.Name);
-                if (userInRole.Count > 0)
+                var role = await roleManager.FindByIdAsync(RoleId);
+                if (role == null)
                 {
-                    // Deactivate
-                    role.IsActive = false;
-
-                    var result = await roleManager.UpdateAsync(role);
-                    if (result.Succeeded)
-                    {
-                        response.Status = "Success";
-                        response.Message = "Role successully deactivated";
-                    }
-                    else
-                    {
-                        response.Status = "Error";
-                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
-                    }
+                    return new ResponseModel { Status = "Error", Message = "Invalid role" };
                 }
                 else
                 {
-                    // Delete
-                    var accesses = await context.Accesses.Where(s => s.RoleId == RoleId).ToListAsync();
-                    context.Accesses.RemoveRange(accesses);
-                    await context.SaveChangesAsync();
-
-                    var result = await roleManager.DeleteAsync(role);
-                    if (result.Succeeded)
+                    var userInRole = await userManager.GetUsersInRoleAsync(role.Name);
+                    if (userInRole.Count > 0)
                     {
-                        response.Status = "Success";
-                        response.Message = "Role successully deleted";
+                        // Deactivate
+                        role.IsActive = false;
+
+                        var result = await roleManager.UpdateAsync(role);
+                        if (result.Succeeded)
+                        {
+                            return new ResponseModel { Status = "Success", Message = "Role successfully deactivated" };
+                        }
+                        else
+                        {
+                            return new ResponseModel { Status = "Error", Message = string.Join(", ", result.Errors.Select(e => e.Description)) };
+                        }
                     }
                     else
                     {
-                        response.Status = "Error";
-                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
-                    }
+                        // Delete
+                        var accesses = await context.Accesses.Where(s => s.RoleId == RoleId).ToListAsync();
+                        context.Accesses.RemoveRange(accesses);
+                        await context.SaveChangesAsync();
 
+                        var result = await roleManager.DeleteAsync(role);
+                        if (result.Succeeded)
+                        {
+                            return new ResponseModel { Status = "Error", Message = "Role successfully deleted" };
+                        }
+                        else
+                        {
+                            return new ResponseModel { Status = "Error", Message = string.Join(", ", result.Errors.Select(e => e.Description)) };
+                        }
+
+                    }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> ReactivateRoleAsync(string RoleId)
         {
-            var response = new ResponseModel();
-            var role = await roleManager.FindByIdAsync(RoleId);
-            if (role == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid role";
-            }
-            else
-            {
-                if (role.IsActive)
+                var role = await roleManager.FindByIdAsync(RoleId);
+                if (role == null)
                 {
-                    response.Status = "Warning";
-                    response.Message = "The role is already active.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid role" };
                 }
                 else
                 {
-                    role.IsActive = true;
-
-                    var result = await roleManager.UpdateAsync(role);
-                    if (result.Succeeded)
+                    if (role.IsActive)
                     {
-                        response.Status = "Success";
-                        response.Message = "Role successully activated";
+                        return new ResponseModel { Status = "Warning", Message = "The role is already active" };
                     }
                     else
                     {
-                        response.Status = "Error";
-                        response.Message = string.Join(", ", result.Errors.Select(e => e.Description));
+                        role.IsActive = true;
+
+                        var result = await roleManager.UpdateAsync(role);
+                        if (result.Succeeded)
+                        {
+                            return new ResponseModel { Status = "Success", Message = "Role successfully activaterd" };
+                        }
+                        else
+                        {
+                            return new ResponseModel { Status = "Error", Message = string.Join(", ", result.Errors.Select(e => e.Description)) };
+                        }
                     }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<IList<string>> GetUserAllowedPagesAsync(string UserId)

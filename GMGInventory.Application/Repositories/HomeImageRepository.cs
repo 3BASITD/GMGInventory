@@ -172,164 +172,170 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> SaveAsync(HomeImageFormVM form)
         {
-            var response = new ResponseModel();
-
-
-            if (form.File == null || form.File.Length == 0)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid file";
-            }
-            else
-            {
-                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\HomeImages");
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(form.File.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                if (form.File == null || form.File.Length == 0)
                 {
-                    await form.File.CopyToAsync(fileStream);
-                }
-
-                var savedFile = Path.Combine("images\\HomeImages", uniqueFileName);
-
-                var homeImage = await context.HomeImages.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
-                var lastHomeImage = await context.HomeImages.OrderByDescending(s => s.DisplayOrder).FirstOrDefaultAsync();
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                if (homeImage != null)
-                {
-                    var filePathDelete = Path.Combine(uploadsFolder, homeImage.File);
-
-                    if (File.Exists(filePathDelete))
-                        File.Delete(filePathDelete);
-
-                    homeImage.File = uniqueFileName;
-                    homeImage.Title = form.Title;
-                    homeImage.Description = form.Description;
-                    homeImage.DisplayTime = form.DisplayTime;
-                    homeImage.DisplayOrder = lastHomeImage == null ? 1 : (lastHomeImage.DisplayOrder + 1);
-
-                    context.HomeImages.Update(homeImage);
-                    await context.SaveChangesAsync(currentUserId);
-
-                    response.Status = "Success";
-                    response.Message = "Home image successfully updated.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid file" };
                 }
                 else
                 {
-                    homeImage = new HomeImage
+                    var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\HomeImages");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(form.File.FileName);
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        Id = 0,
-                        File = uniqueFileName,
-                        Title = form.Title,
-                        Description = form.Description,
-                        DisplayTime = form.DisplayTime,
-                        DisplayOrder = lastHomeImage == null ? 1 : (lastHomeImage.DisplayOrder + 1)
-                    };
+                        await form.File.CopyToAsync(fileStream);
+                    }
 
-                    await context.HomeImages.AddAsync(homeImage);
-                    await context.SaveChangesAsync(currentUserId);
+                    var savedFile = Path.Combine("images\\HomeImages", uniqueFileName);
 
-                    response.Status = "Success";
-                    response.Message = "Home image successfully added.";
+                    var homeImage = await context.HomeImages.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+                    var lastHomeImage = await context.HomeImages.OrderByDescending(s => s.DisplayOrder).FirstOrDefaultAsync();
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                    if (homeImage != null)
+                    {
+                        var filePathDelete = Path.Combine(uploadsFolder, homeImage.File);
+
+                        if (File.Exists(filePathDelete))
+                            File.Delete(filePathDelete);
+
+                        homeImage.File = uniqueFileName;
+                        homeImage.Title = form.Title;
+                        homeImage.Description = form.Description;
+                        homeImage.DisplayTime = form.DisplayTime;
+                        homeImage.DisplayOrder = lastHomeImage == null ? 1 : (lastHomeImage.DisplayOrder + 1);
+
+                        context.HomeImages.Update(homeImage);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Success", Message = "Home image successfully updated" };
+                    }
+                    else
+                    {
+                        homeImage = new HomeImage
+                        {
+                            Id = 0,
+                            File = uniqueFileName,
+                            Title = form.Title,
+                            Description = form.Description,
+                            DisplayTime = form.DisplayTime,
+                            DisplayOrder = lastHomeImage == null ? 1 : (lastHomeImage.DisplayOrder + 1)
+                        };
+
+                        await context.HomeImages.AddAsync(homeImage);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Error", Message = "Home image successfully added" };
+                    }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> DeleteAsync(int ImageId)
         {
-            var response = new ResponseModel();
-            var image = await context.HomeImages.Where(s => s.Id == ImageId && s.DisplayOrder != 0).FirstOrDefaultAsync();
-            if (image == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Image record is invalid";
+                var image = await context.HomeImages.Where(s => s.Id == ImageId && s.DisplayOrder != 0).FirstOrDefaultAsync();
+                if (image == null)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Image record is invalid" };
+                }
+                else
+                {
+                    var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\HomeImages");
+                    var filePath = Path.Combine(uploadsFolder, image.File);
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                    //if (File.Exists(filePath))
+                    //    File.Delete(filePath);
+
+                    //context.HomeImages.Remove(image);
+                    image.DisplayOrder = 0;
+                    context.HomeImages.Update(image);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    return new ResponseModel { Status = "Success", Message = "Image successfully deleted" };
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\HomeImages");
-                var filePath = Path.Combine(uploadsFolder, image.File);
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-                //if (File.Exists(filePath))
-                //    File.Delete(filePath);
-
-                //context.HomeImages.Remove(image);
-                image.DisplayOrder = 0;
-                context.HomeImages.Update(image);
-                await context.SaveChangesAsync(currentUserId);
-
-                response.Status = "Success";
-                response.Message = "Image successfully deleted";
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
             }
-
-            return response;
         }
 
         public async Task<ResponseModel> MoveUpAsync(int ImageId)
         {
-            var response = new ResponseModel();
-            var image = await context.HomeImages.Where(s => s.Id == ImageId).FirstOrDefaultAsync();
-            if (image == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Image record is invalid";
-            }
-            else
-            {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int currentOrder = image.DisplayOrder;
-
-                var upperImage = await context.HomeImages.Where(s => s.DisplayOrder == currentOrder - 1 && s.DisplayOrder != 0).FirstOrDefaultAsync();
-                if (upperImage != null)
+                var image = await context.HomeImages.Where(s => s.Id == ImageId).FirstOrDefaultAsync();
+                if (image == null)
                 {
-                    upperImage.DisplayOrder = currentOrder;
-                    context.HomeImages.Update(upperImage);
+                    return new ResponseModel { Status = "Error", Message = "Image record is invalid" };
                 }
-                image.DisplayOrder = currentOrder - 1;
-                context.HomeImages.Update(image);
-                await context.SaveChangesAsync(currentUserId);
+                else
+                {
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                    int currentOrder = image.DisplayOrder;
 
-                response.Status = "Success";
-                response.Message = "Image successfully updated";
+                    var upperImage = await context.HomeImages.Where(s => s.DisplayOrder == currentOrder - 1 && s.DisplayOrder != 0).FirstOrDefaultAsync();
+                    if (upperImage != null)
+                    {
+                        upperImage.DisplayOrder = currentOrder;
+                        context.HomeImages.Update(upperImage);
+                    }
+                    image.DisplayOrder = currentOrder - 1;
+                    context.HomeImages.Update(image);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    return new ResponseModel { Status = "Error", Message = "Image successfully updated" };
+                }
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> MoveDownAsync(int ImageId)
         {
-            var response = new ResponseModel();
-            var image = await context.HomeImages.Where(s => s.Id == ImageId).FirstOrDefaultAsync();
-            if (image == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Image record is invalid";
-            }
-            else
-            {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int currentOrder = image.DisplayOrder;
-
-                var lowerImage = await context.HomeImages.Where(s => s.DisplayOrder == currentOrder + 1 && s.DisplayOrder != 0).FirstOrDefaultAsync();
-                if (lowerImage != null)
+                var image = await context.HomeImages.Where(s => s.Id == ImageId).FirstOrDefaultAsync();
+                if (image == null)
                 {
-                    lowerImage.DisplayOrder = currentOrder;
-                    context.HomeImages.Update(lowerImage);
+                    return new ResponseModel { Status = "Error", Message = "Image record is invalid" };
                 }
-                image.DisplayOrder = currentOrder + 1;
-                context.HomeImages.Update(image);
-                await context.SaveChangesAsync(currentUserId);
+                else
+                {
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                    int currentOrder = image.DisplayOrder;
 
-                response.Status = "Success";
-                response.Message = "Image successfully updated";
+                    var lowerImage = await context.HomeImages.Where(s => s.DisplayOrder == currentOrder + 1 && s.DisplayOrder != 0).FirstOrDefaultAsync();
+                    if (lowerImage != null)
+                    {
+                        lowerImage.DisplayOrder = currentOrder;
+                        context.HomeImages.Update(lowerImage);
+                    }
+                    image.DisplayOrder = currentOrder + 1;
+                    context.HomeImages.Update(image);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    return new ResponseModel { Status = "Success", Message = "Image successfully updated" };
+                }
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
     }
 }

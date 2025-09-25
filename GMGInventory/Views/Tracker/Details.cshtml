@@ -697,6 +697,7 @@
 
         if (issue_user_access.canAdd) {
             $('#add-issue-severity').select2({
+                ajax: null,
                 data: severityOptions,
                 minimumResultsForSearch: -1,
                 templateResult: function (repo) {
@@ -716,6 +717,7 @@
 
         if (issue_user_access.canEdit) {
             $('#edit-issue-severity').select2({
+                ajax: null,
                 data: severityOptions,
                 minimumResultsForSearch: -1,
                 templateResult: function (repo) {

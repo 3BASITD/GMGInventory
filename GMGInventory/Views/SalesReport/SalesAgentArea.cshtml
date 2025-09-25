@@ -176,26 +176,7 @@
                 return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
             ajax: {
-                url: "@Url.Action("GetOptions2", "Agent")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions2", "Agent")"
             },
             dropdownParent: $('#filterModal')
         });
@@ -214,6 +195,7 @@
             url: "@Url.Action("GetOptions", "Area")",
             success: function (data, status, xhr) {
                 $("#filter-area").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -277,7 +259,7 @@
                         .append('<td colspan="3">Total for <strong>' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data()[0].agentTotalSales + '</td>')
                         .append('<td></td>')
-                        .append('<td><button class="btn btn-warning btn-xs btn-chart" data-bs-toggle="modal" data-bs-target="#chartModal" data-agent-id="' + rows.data()[0].agentId + '" data-agent-name="' + rows.data()[0].agentName + '" data-microtip-title="Show Chart" data-microtip-position="top-left" role="tooltip"><i class="fas fa-chart-pie"></i></button></td>');
+                        .append('<td><button class="btn btn-warning btn-xs btn-chart" data-bs-toggle="modal" data-bs-target="#chartModal" data-agent-id="' + rows.data()[0].agentId + '" data-agent-name="' + rows.data()[0].agentName + '" data-microtip-title="Show Chart" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-chart-pie"></i></button></td>');
                 },
                 dataSrc: function (data) {
                     if (data.agentCode.trim() == data.agentName.trim()) {

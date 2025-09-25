@@ -39,9 +39,14 @@ namespace GMGInventory.Common.Models
 
         [Required]
         [Display(Name = "Region")]
-        public int RegionId { get; set; }
-        public string RegionName { get; set; }
+        public int? RegionId { get; set; }
+        public string? RegionName { get; set; }
         public SelectList? Regions { get; set; }
+
+        [Required]
+        [Display(Name = "Country")]
+        public int CountryId { get; set; }
+        public string CountryName { get; set; }
 
         [Required]
         [Display(Name = "Term")]
@@ -94,10 +99,15 @@ namespace GMGInventory.Common.Models
 
         [Required]
         [Display(Name = "Region")]
-        public int RegionId { get; set; }
+        public int? RegionId { get; set; }
         [Display(Name = "Region")]
-        public string RegionName { get; set; }
-        public RegionVM Region { get; set; }
+        public string? RegionName { get; set; }
+
+        [Required]
+        [Display(Name = "Country")]
+        public int? CountryId { get; set; }
+        [Display(Name = "Country")]
+        public string? CountryName { get; set; }
 
         [Display(Name = "Term")]
         public int TermId { get; set; }
@@ -139,8 +149,8 @@ namespace GMGInventory.Common.Models
         public string Currency { get; set; }
         public string ConversionFactor => string.Format(SystemFormat.StringDecimalComma, ConversionFactorD);
         public decimal ConversionFactorD { get; set; }
-        public string ConvertedTotalCost => "PH₱ " + string.Format(SystemFormat.StringDecimalComma, ConvertedTotalCostD);
-        public decimal ConvertedTotalCostD => Math.Round(TotalCostD / ConversionFactorD, 2);
+        public string ConvertedTotalCost => "PHP " + string.Format(SystemFormat.StringDecimalComma, ConvertedTotalCostD);
+        public decimal ConvertedTotalCostD => Math.Round(TotalCostD * ConversionFactorD, 2);
         public string ReplenishDate => ReplenishDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReplenishDateD { get; set; }
         public string ReplenishBy { get; set; }

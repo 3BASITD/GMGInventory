@@ -44,7 +44,7 @@ namespace GMGInventory.Application.Repositories
                                Unit = pRequest.Item.Unit.Code, 
                                UnitCost = porder.UnitCost,
                                DocumentNumber = porder.PurchaseOrder.DocumentNumber,
-                               Supplier = porder.PurchaseOrder.Supplier.Code,
+                               Supplier = porder.PurchaseOrder.Supplier.Name,
                                OrderDateD = porder.PurchaseOrder.OrderDate,
                                UnservedQuantity =  pRequest.Quantity - porder.Quantity,
                                UnservedAmount = (pRequest.Quantity - porder.Quantity) * porder.UnitCost
@@ -185,9 +185,8 @@ namespace GMGInventory.Application.Repositories
                                 UnitCost = poItems.UnitCost,
                                 TotalAmount = poItems.Quantity * poItems.UnitCost,
                                 DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
-                                Supplier = poItems.PurchaseOrder.Supplier.Code,
+                                Supplier = poItems.PurchaseOrder.Supplier.Name,
                                 ReturnDateD = preturn.PurchaseReturn.ReturnDate, // change to return
-
                                 ReturnQuantity = preturn.Quantity,
                                 ReturnTotalAmount = poItems.UnitCost * preturn.Quantity
                             };
@@ -317,11 +316,9 @@ namespace GMGInventory.Application.Repositories
                                                  Unit = preceive.OrderItem.RequestItem.Item.Unit.Code,
                                                  UnitCost = preceive.OrderItem.UnitCost,
                                                  TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
-
                                                  DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
-                                                 Supplier = poItems.PurchaseOrder.Supplier.Code,
+                                                 Supplier = poItems.PurchaseOrder.Supplier.Name,
                                                  ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
-
                                                  UnservedQuantity = poItems.Quantity - preceive.Quantity,
                                                  UnservedAmount = (poItems.Quantity - preceive.Quantity) * preceive.OrderItem.UnitCost
                                              };

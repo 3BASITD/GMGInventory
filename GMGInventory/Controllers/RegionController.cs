@@ -12,9 +12,9 @@ namespace GMGInventory.Controllers
                                 , IRegionRepository regionRepository) : BaseController(accessRepository)
     {
 
-        public async Task<IActionResult> GetOptions(int? IncludeId)
+        public async Task<IActionResult> GetOptions(int? IncludeId, bool? IncludeLocal, bool? IncludeInternational)
         {
-            return Json(await regionRepository.GetOptions(IncludeId));
+            return Json(await regionRepository.GetOptions(IncludeId, IncludeLocal ?? true, IncludeInternational ?? false));
         }
 
         public async Task<IActionResult> Index()

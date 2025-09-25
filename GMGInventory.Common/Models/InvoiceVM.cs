@@ -12,6 +12,10 @@ namespace GMGInventory.Common.Models
         public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
         public DateTime InvoiceDateD { get; set; }
 
+        [Display(Name = "Invoice Due Date")]
+        public string InvoiceDueDate => InvoiceDueDateD.ToString(SystemFormat.StringDate);
+        public DateTime InvoiceDueDateD { get; set; }
+
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
 
@@ -112,6 +116,11 @@ namespace GMGInventory.Common.Models
         public string InvoiceDate1 => InvoiceDateD.ToString(SystemFormat.StringDate);
         public string InvoiceDate3 => InvoiceDateD.ToString(SystemFormat.StringDate3);
         public DateTime InvoiceDateD { get; set; }
+
+        [Display(Name = "Invoice Due Date")]
+        public string? InvoiceDueDate1 => InvoiceDueDateD == null ? null : InvoiceDueDateD.Value.ToString(SystemFormat.StringDate);
+        public string? InvoiceDueDate3 => InvoiceDueDateD == null ? null : InvoiceDueDateD.Value.ToString(SystemFormat.StringDate3);
+        public DateTime? InvoiceDueDateD { get; set; }
 
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
@@ -240,6 +249,7 @@ namespace GMGInventory.Common.Models
         public int PackId { get; set; }
         public string BIRInvoiceNumber { get; set; }
         public DateTime InvoiceDate { get; set; }
+        public DateTime? DueDate { get; set; }
         public int InvoiceType { get; set; }
         public string Remarks { get; set; }
         public int Agent { get; set; }

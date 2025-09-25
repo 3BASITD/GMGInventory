@@ -33,6 +33,7 @@ namespace GMGInventory.Data
         public string Nickname { get; set; }
 
         public bool IsDarkMode { get; set; }
+        public bool? IsNavIconPlain { get; set; }
         public bool IsActive { get; set; }
 
         [Column(TypeName = "nvarchar(450)")]

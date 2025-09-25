@@ -15,5 +15,6 @@ namespace GMGInventory.Data
         public string VehicleType { get; set; }
         public DateTime? DateRegistered { get; set; }
         public DateTime? DateExpiration { get; set; }
+        public bool IsActive { get; set; }
     }
 }

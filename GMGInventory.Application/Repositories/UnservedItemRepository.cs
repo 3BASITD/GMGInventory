@@ -57,7 +57,8 @@ namespace GMGInventory.Application.Repositories
                                  SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
                                  UnitPriceD = l.SellingPrice,
                                  //UnservedQuantityD = l.Quantity - (packedQuantity - returnedQuantity)
-                                 UnservedQuantityD = l.Quantity - i > 0 ? l.Quantity - i : 0
+                                 //UnservedQuantityD = l.Quantity - i > 0 ? l.Quantity - i : 0
+                                 UnservedQuantityD = Math.Max(0, l.Quantity - i)
                              };
             return await salesOrder.ToListAsync();
         }

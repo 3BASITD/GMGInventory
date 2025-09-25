@@ -253,6 +253,14 @@ namespace GMGInventory.Application.Repositories
             await userManager.UpdateAsync(user);
         }
 
+        public async Task UpdateNavIconAsync(string id, bool isNavIconPlain)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            user.IsNavIconPlain = isNavIconPlain;
+
+            await userManager.UpdateAsync(user);
+        }
+
         public async Task<int> UpdateUserAsync(UserInformationForUpdateVM userInformationVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);

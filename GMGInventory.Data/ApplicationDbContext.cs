@@ -16,6 +16,7 @@ namespace GMGInventory.Data
         {
             base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new CountrySeedConfiguration());
             builder.ApplyConfiguration(new CustomerAccountStatusSeedConfiguration());
             builder.ApplyConfiguration(new CustomerTypeSeedConfiguration());
             builder.ApplyConfiguration(new InvoiceTypeSeedConfiguration());
@@ -152,9 +153,13 @@ namespace GMGInventory.Data
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Area> Areas { get; set; }
         public DbSet<Brand> Brands { get; set; }
+        public DbSet<BusinessStyle> BusinessStyles { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Cheque> Cheques { get; set; }
+        public DbSet<ChequeStatus> ChequeStatuses { get; set; }
         //public DbSet<CreditDebitMemo> CreditDebitMemos { get; set; }
         //public DbSet<CreditDebitMemoType> CreditDebitMemoTypes { get; set; }
+        public DbSet<Country> Countries { get; set; }
         public DbSet<CreditTerm> CreditTerms { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -162,6 +167,7 @@ namespace GMGInventory.Data
         public DbSet<CustomerPayment> CustomerPayments { get; set; }
         public DbSet<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public DbSet<CustomerType> CustomerTypes { get; set; }
+        public DbSet<Driver> Drivers { get; set; }
         public DbSet<Forwarder> Forwarders { get; set; }
         public DbSet<HomeImage> HomeImages { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
@@ -170,10 +176,12 @@ namespace GMGInventory.Data
         //public DbSet<InvoiceSequence> InvoiceSequences { get; set; }
         public DbSet<InvoiceType> InvoiceTypes { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<ItemConversion> ItemConversions { get; set; }
         public DbSet<ItemInventory> ItemInventories { get; set; }
+        public DbSet<ItemLocation> ItemLocations { get; set; }
         public DbSet<ItemPrice> ItemPrices { get; set; }
         public DbSet<ItemType> ItemTypes { get; set; }
-        public DbSet<ItemLocation> ItemLocations { get; set; }
+        public DbSet<LocationCode> LocationCodes { get; set; }
         public DbSet<Pack> Packs { get; set; }
         public DbSet<PackLineItem> PackLineItems { get; set; }
         public DbSet<PackReturn> PackReturns { get; set; }
@@ -185,14 +193,13 @@ namespace GMGInventory.Data
         //public DbSet<PaymentDetail> PaymentDetails { get; set; }
         public DbSet<PhysicalCountHistory> PhysicalCountHistories { get; set; }
         //public DbSet<PriceType> PriceTypes { get; set; }
-        public DbSet<PurchaseOrderDeliveryMode> PurchaseOrderDeliveryModes { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-        public DbSet<PurchaseOrderNew> PurchaseOrderNews { get; set; }
+        public DbSet<PurchaseOrderDeliveryMode> PurchaseOrderDeliveryModes { get; set; }
         public DbSet<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
+        public DbSet<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public DbSet<PurchaseOrderNewLineItem> PurchaseOrderNewLineItems { get; set; }
         public DbSet<PurchaseOrderNewLineItemNewCost> PurchaseOrderNewLineItemNewCosts { get; set; }
         public DbSet<PurchaseOrderNewLineItemNewQuantity> PurchaseOrderNewLineItemNewQuantities { get; set; }
-
         public DbSet<PurchaseOrderType> PurchaseOrderTypes { get; set; }
         public DbSet<PurchaseReceiving> PurchaseReceivings { get; set; }
         public DbSet<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
@@ -205,6 +212,7 @@ namespace GMGInventory.Data
         public DbSet<PurchaseReturnNew> PurchaseReturnNews { get; set; }
         public DbSet<PurchaseReturnNewLineItem> PurchaseReturnNewLineItems { get; set; }
         public DbSet<PurchaseStatus> PurchaseStatuses { get; set; }
+        public DbSet<ReasonOfReturn> ReasonOfReturns { get; set; }
         public DbSet<ReceptaclePrintHistory> ReceptaclePrintHistories { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
@@ -214,6 +222,7 @@ namespace GMGInventory.Data
         //public DbSet<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
         public DbSet<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         //public DbSet<SalesReturnTotalReturnAmount> SalesReturnTotalReturnAmounts { get; set; }
+        public DbSet<ServiceLevelAgreement> ServiceLevelAgreements { get; set; }
         public DbSet<ShippingAddress> ShippingAddresses { get; set; }
         public DbSet<SOACR> SOACRs { get; set; }
         public DbSet<SOACRCheck> SOACRChecks { get; set; }
@@ -230,13 +239,7 @@ namespace GMGInventory.Data
         public DbSet<TransferItem> TransferItems { get; set; }
         public DbSet<TransferItemDetail> TransferItemDetails { get; set; }
         public DbSet<Unit> Units { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
-        public DbSet<ReasonOfReturn> ReasonOfReturns { get; set; }
-        public DbSet<LocationCode> LocationCodes { get; set; }
-        public DbSet<BusinessStyle> BusinessStyles { get; set; }
-        public DbSet<ItemConversion> ItemConversions { get; set; }
-        public DbSet<Cheque> Cheques { get; set; }
-        public DbSet<ChequeStatus> ChequeStatuses { get; set; }
-
     }
 }

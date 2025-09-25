@@ -5,8 +5,6 @@ namespace GMGInventory.Common.Models
 {
     public class ChequeVM : GenericAuditVM
     {
-        public int Id { get; set; }
-
         [Required]
         [Display(Name = "Collect Date")]
         public string CollectDate => CollectDateD.ToString(SystemFormat.StringDate3);

@@ -4,7 +4,7 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
     var navPages = (List<string>?)ViewData["NavigationPages"];
-    var newIcon = false;
+    var newIcon = (ViewData["IsNavIconPlain"] as bool?) == false;
 }
 
 @if (navPages == null || navPages.Count == 0)
@@ -573,19 +573,20 @@ else
             </li>
         }
 
-        @if (navPages.Contains(PageNames.Agents.ToEnumString())
-            || navPages.Contains(PageNames.Accesses.ToEnumString())
+        @if (navPages.Contains(PageNames.Accesses.ToEnumString())
+            || navPages.Contains(PageNames.Agents.ToEnumString())
             || navPages.Contains(PageNames.Areas.ToEnumString())
             || navPages.Contains(PageNames.Brands.ToEnumString())
             || navPages.Contains(PageNames.Categories.ToEnumString())
+            || navPages.Contains(PageNames.Currency.ToEnumString())
             || navPages.Contains(PageNames.Forwarders.ToEnumString())
+            || navPages.Contains(PageNames.HomeImage.ToEnumString())
             || navPages.Contains(PageNames.ItemTypes.ToEnumString())
             || navPages.Contains(PageNames.LocationCodes.ToEnumString())
             || navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString())
             || navPages.Contains(PageNames.Regions.ToEnumString())
             || navPages.Contains(PageNames.Suppliers.ToEnumString())
             || navPages.Contains(PageNames.Users.ToEnumString())
-            || navPages.Contains(PageNames.HomeImage.ToEnumString())
             || navPages.Contains(PageNames.AuditLogs.ToEnumString()))
         {
             var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "HomeImage", "AuditLog" }).Contains(currentController ?? "");
@@ -604,24 +605,6 @@ else
                     ADMINISTRATION
                 </a>
                 <ul aria-labelledby="menuAdministration" class="dropdown-menu mt-lg-3 border-0 shadow">
-                    @if (navPages.Contains(PageNames.Agents.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Agent" ? "active" : "")"
-                               asp-area="" asp-controller="Agent" asp-action="Index">
-                                @if (newIcon)
-                                {
-                                    <span class="emoji">🧑‍💼</span>
-                                }
-                                else
-                                {
-
-                                    <i class="nav-icon fas fa-user-secret"></i>
-                                }
-                                Agents
-                            </a>
-                        </li>
-                    }
                     @if (navPages.Contains(PageNames.Accesses.ToEnumString()))
                     {
                         <li>
@@ -637,6 +620,24 @@ else
                                     <i class="nav-icon fas fa-user-tag"></i>
                                 }
                                 Access
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Agents.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Agent" ? "active" : "")"
+                               asp-area="" asp-controller="Agent" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">🧑‍💼</span>
+                                }
+                                else
+                                {
+
+                                    <i class="nav-icon fas fa-user-secret"></i>
+                                }
+                                Agents
                             </a>
                         </li>
                     }
@@ -694,6 +695,42 @@ else
                             </a>
                         </li>
                     }
+                    @if (navPages.Contains(PageNames.Currency.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Currency" ? "active" : "")"
+                               asp-area="" asp-controller="Currency" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">💱</span>
+                                }
+                                else
+                                {
+
+                                    <i class="nav-icon fas fa-ruble-sign"></i>
+                                }
+                                Currencies
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.Driver.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Driver" ? "active" : "")"
+                               asp-area="" asp-controller="Driver" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">👨‍🔧</span>
+                                }
+                                else
+                                {
+
+                                    <i class="nav-icon fas fa-address-card"></i>
+                                }
+                                Drivers
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.Forwarders.ToEnumString()))
                     {
                         <li>
@@ -709,6 +746,24 @@ else
                                     <i class="nav-icon fas fa-shipping-fast"></i>
                                 }
                                 Forwarders
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.HomeImage.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "HomeImage" ? "active" : "")"
+                               asp-area="" asp-controller="HomeImage" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">🖼️</span>
+                                }
+                                else
+                                {
+
+                                    <i class="nav-icon fas fa-chalkboard"></i>
+                                }
+                                Home Images
                             </a>
                         </li>
                     }
@@ -821,21 +876,21 @@ else
                             </a>
                         </li>
                     }
-                    @if (navPages.Contains(PageNames.HomeImage.ToEnumString()))
+                    @if (navPages.Contains(PageNames.Vehicle.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "HomeImage" ? "active" : "")"
-                               asp-area="" asp-controller="HomeImage" asp-action="Index">
+                            <a class="dropdown-item @(currentController == "Vehicle" ? "active" : "")"
+                               asp-area="" asp-controller="Vehicle" asp-action="Index">
                                 @if (newIcon)
                                 {
-                                    <span class="emoji">🖼️</span>
+                                    <span class="emoji">🚚</span>
                                 }
                                 else
                                 {
 
-                                    <i class="nav-icon fas fa-chalkboard"></i>
+                                    <i class="nav-icon fas fa-truck-moving"></i>
                                 }
-                                Home Images
+                                Vehicles
                             </a>
                         </li>
                     }

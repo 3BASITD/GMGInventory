@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -14,42 +13,55 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
 
         public RegionRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper) : base(context, httpContextAccessor, userManager)
+            , UserManager<User> userManager) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
-            this.mapper = mapper;
         }
 
         public async Task<IList<RegionVM>> GetAllRegionAsync()
         {
-            var regions = await context.Regions.ToListAsync();
-            var regionsVM = mapper.Map<List<RegionVM>>(regions);
-            foreach (RegionVM cvm in regionsVM)
-            {
-                cvm.UserCreated = await GetNickname(cvm.UserCreated);
-                cvm.UserModified = await GetNickname(cvm.UserModified);
-            }
-            return regionsVM;
+            var regions = from region in context.Regions
+                          join userc in userManager.Users on region.UserCreated equals userc.Id
+                          join userm in userManager.Users on region.UserModified equals userm.Id into m
+                          from userm in m.DefaultIfEmpty()
+                          select new RegionVM
+                          {
+                              Id = region.Id,
+                              Name = region.Name,
+                              Code = region.Code,
+                              IsActive = region.IsActive,
+                              UserCreated = userc.FirstName + " " + userc.LastName,
+                              DateCreatedD = region.DateCreated,
+                              UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                              DateModifiedD = region.DateModified
+                          };
+            return await regions.ToListAsync();
         }
 
         public async Task<RegionVM?> GetRegionVMAsync(int? id)
         {
-            var regions = await context.Regions.Where(s => s.Id == id).FirstOrDefaultAsync();
-            if (regions == null)
-            {
-                return null;
-            }
-            var regionsVM = mapper.Map<RegionVM>(regions);
-            regionsVM.UserCreated = await GetNickname(regionsVM.UserCreated);
-            regionsVM.UserModified = await GetNickname(regionsVM.UserModified);
-            return regionsVM;
+            var selected = from region in context.Regions
+                           join userc in userManager.Users on region.UserCreated equals userc.Id
+                           join userm in userManager.Users on region.UserModified equals userm.Id into m
+                           from userm in m.DefaultIfEmpty()
+                           where region.Id == id
+                           select new RegionVM
+                           {
+                               Id = region.Id,
+                               Name = region.Name,
+                               Code = region.Code,
+                               IsActive = region.IsActive,
+                               UserCreated = userc.FirstName + " " + userc.LastName,
+                               DateCreatedD = region.DateCreated,
+                               UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                               DateModifiedD = region.DateModified
+                           };
+            return await selected.FirstOrDefaultAsync();
         }
 
         public async Task<IList<Region>> GetAllActiveRegionAsync(int includeId)
@@ -69,18 +81,18 @@ namespace GMGInventory.Application.Repositories
             return await context.Areas.AnyAsync(s => s.RegionId == id);
         }
 
-        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId, bool IncludeLocal, bool IncludeInternational)
         {
-            return await context.Regions
-                                .Where(s => s.IsActive || s.Id == IncludeId)
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.Name,
-                                    Selected = IncludeId != null && IncludeId == s.Id
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
+            var regions = from rgn in context.Regions
+                          where rgn.IsActive || rgn.Id == IncludeId
+                          orderby rgn.Name
+                          select new JsonOptionsModel
+                          {
+                              Id = rgn.Id.ToString(),
+                              Text = rgn.Name,
+                              Selected = IncludeId != null && IncludeId == rgn.Id
+                          };
+            return await regions.ToListAsync();
         }
 
         public async Task<int?> GetIdAsync(string? Name)
@@ -93,7 +105,7 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetAllLocationCodeAsync()).AsQueryable();
+            var data = (await GetAllRegionAsync()).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -151,39 +163,16 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<RegionVM>> GetAllLocationCodeAsync()
-        {
-
-            var regions = from region in context.Regions
-
-                          join userc in userManager.Users on region.UserCreated equals userc.Id
-                          join userm in userManager.Users on region.UserModified equals userm.Id into m
-                          from userm in m.DefaultIfEmpty()
-
-                          select new RegionVM
-                          {
-                              Id = region.Id,
-                              Name = region.Name,
-                              Code = region.Code,
-                              IsActive = region.IsActive,
-                              DateCreatedD = region.DateCreated,
-                              DateModifiedD = region.DateModified == null ? null : region.DateModified.Value,
-                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                              UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
-                          };
-            return await regions.ToListAsync();
-        }
-
         public async Task AddAsync(RegionVM regionVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var location = new LocationCode
+            var region = new Region
             {
                 Code = regionVM.Code,
                 Name = regionVM.Name,
                 IsActive = true
             };
-            await context.LocationCodes.AddAsync(location);
+            await context.Regions.AddAsync(region);
             await context.SaveChangesAsync(currentUserId);
         }
 

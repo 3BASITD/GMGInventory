@@ -156,6 +156,7 @@
             },
             success: function (data, status, xhr) {
                 $("#filter-type").select2({
+                    ajax: null, //already fetched outside
                     minimumResultsForSearch: -1,
                     allowClear: true,
                     placeholder: "ALL",
@@ -189,6 +190,7 @@
                     },
                     success: function (data) {
                         $("#filter-purpose").select2({
+                            ajax: null, //already fetched outside
                             minimumResultsForSearch: -1,
                             allowClear: true,
                             placeholder: "ALL",
@@ -214,6 +216,7 @@
             },
             success: function (data, status, xhr) {
                 $("#filter-region").select2({
+                    ajax: null, //already fetched outside
                     minimumResultsForSearch: -1,
                     allowClear: true,
                     placeholder: "ALL",
@@ -235,6 +238,7 @@
             },
             success: function (data, status, xhr) {
                 $("#filter-status").select2({
+                    ajax: null, //already fetched outside
                     minimumResultsForSearch: -1,
                     allowClear: true,
                     placeholder: "ALL",
@@ -286,10 +290,10 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.status.toLowerCase() == "draft" && data.orderBy == $("#current-user-nickname").val()) {
                             if (user_access.canDelete) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                             }
                         }
                         return actions + "</div>";

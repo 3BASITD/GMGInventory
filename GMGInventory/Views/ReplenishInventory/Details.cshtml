@@ -329,12 +329,13 @@
         // Load currency data for select2
         $.ajax({
             type: "POST",
-            url: "@Url.Action("GetCurrencyOptions")",
+            url: "@Url.Action("GetOptions", "Currency")",
             data: {
                 IncludeId: @Model!.CurrencyId
                     },
             success: function (data, status, xhr) {
                 $("#replenish-currency").select2({
+                    ajax: null, //already fetched outside
                     data: data
                 });
                 $("#replenish-currency").on("select2:select", function () {
@@ -368,26 +369,7 @@
                     "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Item")"
             },
             dropdownParent: $("#addModal")
         });
@@ -452,7 +434,7 @@
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
-                if (data.id === $("#add-code").select2("data")[0].id) {
+                if (data.id == $("#add-code").select2("data")[0].id) {
                     rowIndexes.push(idx);
                 }
                 return false;
@@ -504,7 +486,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (user_access.canEdit) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         }
                         return actions;
                     },
@@ -513,7 +495,7 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.id + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.id + ')"><i class="fas fa-info-circle text-info"></i></span>'
                     },
                     name: "ItemCode",
                     className: "form-cell"

@@ -420,26 +420,7 @@
                 return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Customer")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Customer")"
             },
             dropdownParent: $("#filterModal")
         });
@@ -456,18 +437,21 @@
             success: function (data, status, xhr) {
                 if (user_access.canAdd) {
                     $("#create-status").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         dropdownParent: $("#createModal")
                     });
                 }
                 if (user_access.canEdit) {
                     $("#edit-status").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         dropdownParent: $("#editModal")
                     });
                 }
 
                 $("#filter-status").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -486,12 +470,14 @@
             success: function (data, status, xhr) {
                 if (user_access.canAdd) {
                     $("#create-customer").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         dropdownParent: $("#createModal")
                     });
                 }
                 if (user_access.canEdit) {
                     $("#edit-customer").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         dropdownParent: $("#editModal")
                     });
@@ -505,6 +491,7 @@
             url: "@Url.Action("GetOptions", "User")",
             success: function (data, status, xhr) {
                 $("#filter-createdBy").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -559,9 +546,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
-                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Cheque" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Cheque" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
                     }

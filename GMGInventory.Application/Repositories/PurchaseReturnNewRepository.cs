@@ -211,7 +211,7 @@ namespace GMGInventory.Application.Repositories
                               Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Name,
                               CurrencyId = retrn.PurchaseReceive.PurchaseOrder.Currency.Id,
                               Currency = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,
-                              CurrencyCode = retrn.PurchaseReceive.PurchaseOrder.Currency.Code,
+                              CurrencyCode = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,
                               CurrencyRateD = retrn.PurchaseReceive.PurchaseOrder.CurrencyRate,
                               Warehouse = retrn.PurchaseReceive.Warehouse.Name,
                               DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,

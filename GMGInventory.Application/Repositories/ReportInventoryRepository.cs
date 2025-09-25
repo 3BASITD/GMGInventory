@@ -679,71 +679,26 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<StockStatusRVM>> GetStockStatus(ListFilterInventoryModel filter)
         {
-
             var stocks = from item in context.Items
-                                             .Include(s => s.Brand)
-                                             .Include(s => s.ItemType)
-                                             .Include(s => s.Unit)
-                         join iteminv in context.ItemInventories
-                                      on item.Id equals iteminv.ItemId
-
-                         let quantity = context.ItemInventories
-                                               .Where(s => s.ItemId == item.Id)
-                                               .Sum(s => (int?)s.Quantity) ?? 0
-                         let packedQuantity = context.PackLineItems
-                                                     .Where(s => s.ItemId == item.Id)
-                                                     .Sum(s => (int?)s.Quantity) ?? 0
-                         let returnedQuantity = context.SalesReturnLineItems
-                                                       .Where(s => s.ItemId == item.Id)
-                                                       .Sum(s => (int?)s.Quantity) ?? 0
-                         let unitcost = context.PurchaseOrderLineItems
-                                               .Include(s => s.PurchaseOrder)
-                                               .Where(s => s.ItemId == item.Id)
-                                               .Average(s => s.PurchaseOrder.CurrencyRate * s.UnitPrice)
-                         where (filter.Brand == null || item.Brand.Id == filter.Brand)
-                         && (filter.Item == null || item.Id == filter.Item)
-                         && (filter.Warehouse == null || iteminv.WarehouseId == filter.Warehouse)
+                         let ii = context.ItemInventories.Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true).Select(s => s.Quantity).FirstOrDefault()
+                         let lc = context.PurchaseOrderNewLineItems
+                                      .Where(s => s.RequestItem.ItemId == item.Id)
+                                      .OrderByDescending(s => s.PurchaseOrder.OrderDate)
+                                      .Select(s => (decimal?)s.UnitCost)
+                                      .FirstOrDefault() ?? 0
                          select new StockStatusRVM
                          {
                              Brand = item.Brand.Name,
                              ItemCode = item.Code,
                              ItemName = item.Name,
                              ItemType = item.ItemType.Name,
-                             PartNumber = item.PartNumber + "",
-                             QuantityOnHandD = quantity + (packedQuantity - returnedQuantity),
+                             PartNumber = item.PartNumber,
+                             QuantityOnHandD = ii,
                              Unit = item.Unit.Name,
-                             UnitCostD = 0
+                             UnitCostD = lc
                          };
 
-            var grpstocks = from stock in await stocks.ToListAsync()
-                            orderby stock.Brand ascending, stock.ItemCode ascending, stock.ItemName ascending, stock.PartNumber ascending
-                            group stock by new
-                            {
-                                stock.Brand,
-                                stock.ItemCode,
-                                stock.ItemName,
-                                stock.ItemType,
-                                stock.PartNumber,
-                                stock.QuantityOnHandD,
-                                stock.Unit,
-                                stock.UnitCostD
-                            } into i
-                            select new StockStatusRVM
-                            {
-                                Brand = i.Key.Brand,
-                                ItemCode = i.Key.ItemCode,
-                                ItemName = i.Key.ItemName,
-                                ItemType = i.Key.ItemType,
-                                PartNumber = i.Key.PartNumber,
-                                QuantityOnHandD = i.Sum(s => s.QuantityOnHandD),
-                                Unit = i.Key.Unit,
-                                UnitCostD = 0//i.Average(s => s.UnitCostD)
-
-                            };
-
-
-
-            return grpstocks.ToList();
+            return await stocks.ToListAsync();
         }
 
         public async Task<ForDataTables<StockStatusRVM>> GetStockStatusDT(DataTablesRequestForm form, ListFilterInventoryModel filter)
@@ -761,7 +716,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.ItemType.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.PartNumber + "").ToLower().Contains(form.SearchValue.ToLower())
                                     || x.QuantityOnHand.ToString().Contains(form.SearchValue)
                                     || x.TotalCostD.ToString().Contains(form.SearchValue)
                                     || x.Unit.ToLower().Contains(form.SearchValue.ToLower())

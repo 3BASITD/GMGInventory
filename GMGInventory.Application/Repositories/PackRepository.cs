@@ -322,14 +322,14 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<string?> CheckItemAsync(PackFormVM form)
+        public string? CheckItem(PackFormVM form)
         {
             var invalids = from ite in form.Items
                            join itm in context.Items on ite.Item equals itm.Id
                            let ii = (from inv in context.ItemInventories
-                                    where inv.Warehouse.IsMain == true
-                                    && inv.ItemId == ite.Item
-                                    select inv.Quantity).FirstOrDefault()
+                                     where inv.Warehouse.IsMain == true
+                                     && inv.ItemId == ite.Item
+                                     select inv.Quantity).FirstOrDefault()
                            where ii < ite.Quantity
                            select itm.Name + ": Ordered " + ite.Quantity + ", Available " + ii + " (Short by " + (ite.Quantity - ii) + ")<br />";
             return invalids.Any() ? string.Join(", ", invalids) : null;

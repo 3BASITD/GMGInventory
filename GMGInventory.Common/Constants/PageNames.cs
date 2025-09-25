@@ -73,6 +73,10 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Tracker Issue")] TrackerIssue,
         [PageNamesString("HashMicro (Invoice)")] HashMicroInvoice,
         [PageNamesString("HashMicro (Bill)")] HashMicroBill,
+        [PageNamesString("Driver")] Driver,
+        [PageNamesString("Vehicle")] Vehicle,
+        [PageNamesString("Currency")] Currency, 
+        [PageNamesString("Service Level Agreement")] ServiceLevelAgreement,
     }
 
     public static class PageNameExtensions

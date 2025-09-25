@@ -88,16 +88,16 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page, int? regionId)
         {
             var orders = from order in context.SalesOrders
-                         let oli = from soli in order.SalesOrderLineItems
-                                   let ii = context.ItemInventories
-                                         .Where(s => s.ItemId == soli.ItemId
-                                                  && s.Warehouse.IsMain == true)
-                                         .Sum(s => (int?)s.Quantity) ?? 0
-                                   select new
-                                   {
-                                       soli.Quantity,
-                                       Stock = ii
-                                   }
+                         //let oli = from soli in order.SalesOrderLineItems
+                         //          let ii = context.ItemInventories
+                         //                .Where(s => s.ItemId == soli.ItemId
+                         //                         && s.Warehouse.IsMain == true)
+                         //                .Sum(s => (int?)s.Quantity) ?? 0
+                         //          select new
+                         //          {
+                         //              soli.Quantity,
+                         //              Stock = ii
+                         //          }
                          where order.Status.Code.ToLower() != "submitted"
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
@@ -182,7 +182,7 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where inv.Invoice.Status.Code.ToLower() == "invoiced"
-                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } 
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
                                                                        equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
                                    let discount2 = (100 - oli.Discount2) / 100
@@ -366,8 +366,8 @@ namespace GMGInventory.Application.Repositories
                                OrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
-                               TotalAmountD = order.SalesOrderLineItems.Sum(s => s.Quantity 
-                                                                               * s.SellingPrice 
+                               TotalAmountD = order.SalesOrderLineItems.Sum(s => s.Quantity
+                                                                               * s.SellingPrice
                                                                                * (100 - s.Discount1) / 100
                                                                                * (100 - s.Discount2) / 100),
                                CustomerAddress = order.Customer
@@ -487,6 +487,7 @@ namespace GMGInventory.Application.Repositories
                                                                        && s.ItemId == order.ItemId)
                                                               .Sum(s => (int?)s.Quantity) ?? 0
                                 where order.SalesOrderId == salesOrderId
+                                orderby order.LineNumber ascending
                                 select new SalesOrderItemVM
                                 {
                                     Discount1D = order.Discount1,
@@ -510,12 +511,6 @@ namespace GMGInventory.Application.Repositories
                                     Unit = order.Item.Unit.Code
                                 }).ToListAsync();
 
-            int newLineNumber = 1;
-            foreach (var item in itemVM.OrderBy(s => s.LineNumber))
-            {
-                item.LineNumber = newLineNumber++;
-            }
-
             return itemVM;
         }
 
@@ -535,6 +530,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.InvoicedQuantity.ToString().Contains(form.SearchValue)
                                     || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.LineNumber.ToString().Contains(form.SearchValue)
                                     || x.NetPriceD.ToString().Contains(form.SearchValue)
                                     || x.PackedQuantity.ToString().Contains(form.SearchValue)
                                     || x.Quantity.ToString().Contains(form.SearchValue)
@@ -560,6 +556,7 @@ namespace GMGInventory.Application.Repositories
                         case "InvoicedQuantity": data = data.OrderBy(s => s.InvoicedQuantity); break;
                         case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderBy(s => s.ItemName); break;
+                        case "LineNumber": data = data.OrderBy(s => s.LineNumber); break;
                         case "Quantity": data = data.OrderBy(s => s.Quantity); break;
                         case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
                         case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantity); break;
@@ -582,6 +579,7 @@ namespace GMGInventory.Application.Repositories
                         case "InvoicedQuantity": data = data.OrderByDescending(s => s.InvoicedQuantity); break;
                         case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
                         case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
+                        case "LineNumber": data = data.OrderByDescending(s => s.LineNumber); break;
                         case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
                         case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
                         case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantity); break;
@@ -608,127 +606,142 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form)
         {
-            ResponseModel<int> response = new();
-
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-            var agent = await context.Agents.Where(s => s.Id == form.Agent).FirstOrDefaultAsync();
-            if (agent == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Agent is invalid";
-            }
-            else
-            {
-                var customer = await context.Customers.Where(s => s.Id == form.Customer).FirstOrDefaultAsync();
-                if (customer == null)
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                var agent = await context.Agents.Where(s => s.Id == form.Agent).FirstOrDefaultAsync();
+                if (agent == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Customer is invalid";
+                    return new ResponseModel<int> { Status = "Error", Message = "Agent is invalid" };
                 }
                 else
                 {
-
-                    var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
-
-                    int statusId = context.Statuses
-                                          .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
-                                                   || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
-                                          .Select(s => s.Id)
-                                          .First();
-                    if (orderVM == null)
+                    var customer = await context.Customers.Where(s => s.Id == form.Customer).FirstOrDefaultAsync();
+                    if (customer == null)
                     {
-
-                        var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
-                        string soNumber = "";
-                        if (previous == null)
-                        {
-                            var latestOrder = context.SalesOrders
-                                                     .Where(s => s.SalesOrderNumber.StartsWith("SO"))
-                                                     .OrderByDescending(s => s.SalesOrderNumber)
-                                                     .Select(s => s.SalesOrderNumber)
-                                                     .FirstOrDefault();
-                            var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
-                            soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
-                        }
-                        else
-                        {
-                            soNumber = previous.SalesOrderNumber;
-                        }
-
-                        orderVM = new SalesOrder
-                        {
-                            AgentId = agent.Id,
-                            CustomerId = customer.Id,
-                            RequiredDeliveryDate = form.DeliveryDate,
-                            PurchaseOrder = form.PurchaseOrder,
-                            Remarks = form.Remarks,
-                            SalesOrderDate = form.OrderDate,
-                            SalesOrderNumber = soNumber,
-                            StatusId = statusId
-                        };
-                        await context.SalesOrders.AddAsync(orderVM);
-                        await context.SaveChangesAsync(currentUserId);
-
-                        if (previous != null)
-                        {
-                            var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
-                            if (soLineItems != null)
-                            {
-                                context.SalesOrderLineItems.RemoveRange(soLineItems);
-                                await context.SaveChangesAsync(currentUserId);
-                            }
-
-
-                            var soDelivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
-                            if (soDelivery != null)
-                            {
-                                context.SalesOrderDeliveryMonitorings.RemoveRange(soDelivery);
-                                await context.SaveChangesAsync(currentUserId);
-                            }
-
-                            context.SalesOrders.Remove(previous);
-                            await context.SaveChangesAsync(currentUserId);
-                        }
-
-                        SalesOrderDeliveryMonitoring salesOrderDelivery = new()
-                        {
-                            ForwarderId = form.Forwarder,
-                            SalesOrderId = orderVM.Id
-                        };
-
-                        await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
-                        await context.SaveChangesAsync(currentUserId);
+                        return new ResponseModel<int> { Status = "Error", Message = "Customer is invalid" };
                     }
                     else
                     {
-                        orderVM.AgentId = agent.Id;
-                        orderVM.CustomerId = customer.Id;
-                        orderVM.RequiredDeliveryDate = form.DeliveryDate;
-                        orderVM.Remarks = form.Remarks;
-                        orderVM.SalesOrderDate = form.OrderDate;
-                        orderVM.StatusId = statusId;
 
-                        context.SalesOrders.Update(orderVM);
-                        await context.SaveChangesAsync(currentUserId);
+                        var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
 
-                        var salesOrderDelivery = await context.SalesOrderDeliveryMonitorings
-                                                              .Where(s => s.SalesOrderId == orderVM.Id)
-                                                              .FirstOrDefaultAsync();
-                        if (salesOrderDelivery != null)
+                        int statusId = context.Statuses
+                                              .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
+                                                       || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
+                                              .Select(s => s.Id)
+                                              .First();
+                        if (orderVM == null)
                         {
-                            salesOrderDelivery.ForwarderId = form.Forwarder;
+
+                            var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
+                            string soNumber = "";
+                            if (previous == null)
+                            {
+                                var latestOrder = context.SalesOrders
+                                                         .Where(s => s.SalesOrderNumber.StartsWith("SO"))
+                                                         .OrderByDescending(s => s.SalesOrderNumber)
+                                                         .Select(s => s.SalesOrderNumber)
+                                                         .FirstOrDefault();
+                                var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
+                                soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+                            }
+                            else
+                            {
+                                soNumber = previous.SalesOrderNumber;
+                            }
+
+
+                            if (form.Status.ToLower().Contains("draft")
+                            && await context.SalesOrders.AnyAsync(s => s.StatusId == statusId && s.SalesOrderNumber == soNumber))
+                            {
+                                return new ResponseModel<int> { Status = "Error", Message = "Failed to add. A draft SO with the same SO Number already exists" };
+                            }
+                            else
+                            {
+
+                                orderVM = new SalesOrder
+                                {
+                                    AgentId = agent.Id,
+                                    CustomerId = customer.Id,
+                                    RequiredDeliveryDate = form.DeliveryDate,
+                                    PurchaseOrder = form.PurchaseOrder,
+                                    Remarks = form.Remarks,
+                                    SalesOrderDate = form.OrderDate,
+                                    SalesOrderNumber = soNumber,
+                                    StatusId = statusId
+                                };
+                                await context.SalesOrders.AddAsync(orderVM);
+                                await context.SaveChangesAsync(currentUserId);
+
+                                if (previous != null)
+                                {
+                                    var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                                    if (soLineItems != null)
+                                    {
+                                        context.SalesOrderLineItems.RemoveRange(soLineItems);
+                                        await context.SaveChangesAsync(currentUserId);
+                                    }
+
+
+                                    var soDelivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                                    if (soDelivery != null)
+                                    {
+                                        context.SalesOrderDeliveryMonitorings.RemoveRange(soDelivery);
+                                        await context.SaveChangesAsync(currentUserId);
+                                    }
+
+                                    context.SalesOrders.Remove(previous);
+                                    await context.SaveChangesAsync(currentUserId);
+                                }
+
+                                SalesOrderDeliveryMonitoring salesOrderDelivery = new()
+                                {
+                                    ForwarderId = form.Forwarder,
+                                    SalesOrderId = orderVM.Id
+                                };
+
+                                await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
+                                await context.SaveChangesAsync(currentUserId);
+                            }
                         }
+                        else
+                        {
+                            orderVM.AgentId = agent.Id;
+                            orderVM.CustomerId = customer.Id;
+                            orderVM.RequiredDeliveryDate = form.DeliveryDate;
+                            orderVM.Remarks = form.Remarks;
+                            orderVM.SalesOrderDate = form.OrderDate;
+                            orderVM.StatusId = statusId;
+
+                            context.SalesOrders.Update(orderVM);
+                            await context.SaveChangesAsync(currentUserId);
+
+                            var salesOrderDelivery = await context.SalesOrderDeliveryMonitorings
+                                                                  .Where(s => s.SalesOrderId == orderVM.Id)
+                                                                  .FirstOrDefaultAsync();
+                            if (salesOrderDelivery != null)
+                            {
+                                salesOrderDelivery.ForwarderId = form.Forwarder;
+                            }
+                        }
+
+                        await SaveItemsAsync(form.Items, orderVM.Id);
+
+                        return new ResponseModel<int>
+                        {
+                            Status = "Success",
+                            Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.",
+                            NewRow = orderVM.Id
+                        };
                     }
-
-                    await SaveItemsAsync(form.Items, orderVM.Id);
-
-                    response.Status = "Success";
-                    response.Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.";
-                    response.NewRow = orderVM.Id;
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel<int> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task SaveItemsAsync(IList<SalesOrderFormItemVM> Items, int salesOrderId)
@@ -743,6 +756,7 @@ namespace GMGInventory.Application.Repositories
             var itemsVM = Items.Where(s => items.Contains(s.Item) == false)
                                .Select(s => new SalesOrderLineItem
                                {
+                                   LineNumber = s.LineNumber,
                                    Discount1 = s.Discount1,
                                    Discount2 = s.Discount2,
                                    ItemId = s.Item,
@@ -759,6 +773,7 @@ namespace GMGInventory.Application.Repositories
             {
                 // update all available in db
                 var dbitem = await citemsVM.Where(s => s.ItemId == di.Item).FirstAsync();
+                dbitem.LineNumber = di.LineNumber;
                 dbitem.Discount1 = di.Discount1;
                 dbitem.Discount2 = di.Discount2;
                 dbitem.Quantity = di.Quantity;

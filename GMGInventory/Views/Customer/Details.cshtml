@@ -782,10 +782,12 @@
             url: "@Url.Action("GetOptions", "Region")",
             success: function (data, status, xhr) {
                 $("#create-region").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal")
                 });
                 $("#edit-region").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal")
                 });
@@ -808,27 +810,13 @@
             },
             ajax: {
                 url: "@Url.Action("GetByRegionOptions", "Area")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
                 data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1,
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
                         region: $("#edit-region").val(),
                         includeId: @Model?.AreaId
-                                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                    });
+                }
             },
             dropdownParent: $("#editModal")
         });
@@ -839,11 +827,13 @@
             url: "@Url.Action("GetOptions", "CustomerType")",
             success: function (data, status, xhr) {
                 $("#create-customer-type").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     //theme: "bootstrap-5",
                     dropdownParent: $("#createModal")
                 });
                 $("#edit-customer-type").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     //theme: "bootstrap-5",
                     dropdownParent: $("#editModal")
@@ -857,10 +847,12 @@
             url: "@Url.Action("GetOptions", "Agent")",
             success: function (data, status, xhr) {
                 $("#create-agent").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal")
                 });
                 $("#edit-agent").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal")
                 });
@@ -874,10 +866,12 @@
             url: "@Url.Action("GetOptions", "CreditTerm")",
             success: function (data, status, xhr) {
                 $("#create-credit-term").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal")
                 });
                 $("#edit-credit-term").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal")
                 });
@@ -891,11 +885,13 @@
             url: "@Url.Action("GetOptions", "CustomerAccountStatus")",
             success: function (data, status, xhr) {
                 $("#create-account-status").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#createModal"),
                     minimumResultsForSearch: -1
                 });
                 $("#edit-account-status").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#editModal"),
                     minimumResultsForSearch: -1
@@ -1240,7 +1236,7 @@
                 Code: { required: true, maxlength: 10 },
                 Name: { required: true, maxlength: 100 },
                 Email: { maxlength: 50 },
-                CreditLimit: { required: true, range: [0, 1999999.99] },
+                CreditLimit: { required: true, range: [0, 9999999999.99] },
                 // Address: { required: true },
                 // ContactPerson: { maxlength: 150 },
                 // ContactNumber: { maxlength: 100 },
@@ -1251,7 +1247,7 @@
                 Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
                 Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
-                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
+                CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-9999999999.99." },
                 // Address: { required: "Please enter address." },
                 // ContactPerson: { maxlength: "Contact Person must not exceed 150 characters." },
                 // ContactNumber: { maxlength: "Contact Number number must not exceed 100 characters." },

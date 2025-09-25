@@ -1,4 +1,4 @@
-﻿@model IEnumerable<GenericAuditVM>
+﻿@model IEnumerable<RegionVM>
 
 @{
     ViewData["Title"] = "Region";
@@ -85,7 +85,6 @@
                                     <label for="create-name" class="control-label mb-0 d-block">Name</label>
                                     <input name="name" id="create-name" class="form-control form-control-sm" />
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -220,17 +219,17 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
                         if (data.isActive) {
                             if (user_access.canEdit) {
-                                actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                             }
                             if (user_access.canDelete) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Region" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Region" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                             }
                         } else {
                             if (user_access.canAdd || user_access.canEdit) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Region" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Region" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
                             }
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
@@ -375,7 +374,7 @@
                     url: "@Url.Action("CreateJson")",
                     data: {
                         Code: $("#create-code").val(),
-                        Name: $("#create-name").val(),
+                        Name: $("#create-name").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {

@@ -64,10 +64,6 @@ namespace GMGInventory.Application.Configurations
             CreateMap<Currency, CurrencyVM>().ReverseMap();
             CreateMap<Currency, GenericAuditVM>().ReverseMap();
 
-            // Region
-            CreateMap<Region, RegionVM>().ReverseMap();
-            CreateMap<Region, GenericAuditVM>().ReverseMap();
-
             // CustomerType
             CreateMap<CustomerType, CustomerTypeVM>().ReverseMap();
             CreateMap<CustomerType, GenericAuditVM>().ReverseMap();

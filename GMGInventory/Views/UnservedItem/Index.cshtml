@@ -134,6 +134,7 @@
             url: "@Url.Action("GetOptions", "Region")",
             success: function (data, status, xhr) {
                 $("#filter-region").select2({
+                    ajax: null, //already fetched outside
                     allowClear: true,
                     placeholder: '<empty>',
                     data: $.map(data, function (v, i) {

@@ -1,4 +1,6 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -7,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using MigraDocCore.DocumentObjectModel;
 using MigraDocCore.DocumentObjectModel.Tables;
 using MigraDocCore.Rendering;
+using PdfSharp.Quality;
+using System.Data;
 
 namespace GMGInventory.Controllers
 {
@@ -300,27 +304,35 @@ namespace GMGInventory.Controllers
 
             var section = document.AddSection();
 
-            section.PageSetup.TopMargin = Unit.FromCentimeter(5.25);
-            section.PageSetup.HeaderDistance = Unit.FromCentimeter(2);
-            var headerTable = section.Headers.Primary.AddTable();
-            headerTable.AddColumn(Unit.FromCentimeter(4));
-            headerTable.AddColumn(Unit.FromCentimeter(4));
-            headerTable.AddColumn(Unit.FromCentimeter(4));
-            headerTable.AddColumn(Unit.FromCentimeter(4));
+            //section.PageSetup.TopMargin = Unit.FromCentimeter(5.25);
+            section.PageSetup.TopMargin = Unit.FromCentimeter(2);
+            section.PageSetup.LeftMargin = Unit.FromCentimeter(1.75);
+            section.PageSetup.RightMargin = Unit.FromCentimeter(1.75);
+            //section.PageSetup.HeaderDistance = Unit.FromCentimeter(2);
+            section.PageSetup.HeaderDistance = Unit.FromCentimeter(1);
 
-            var headerRow = headerTable.AddRow();
+            var topHeader = section.Headers.Primary.AddTable();
+            topHeader.AddColumn(Unit.FromCentimeter(3));
+            topHeader.AddColumn(Unit.FromCentimeter(5.75));
+            topHeader.AddColumn(Unit.FromCentimeter(3.75));
+            topHeader.AddColumn(Unit.FromCentimeter(5));
+
+            var headerRow = topHeader.AddRow();
 
             var titleCell = headerRow.Cells[0];
             titleCell.MergeRight = 2;
 
-            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS";
+            //var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS
+            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS TRADING";
             var titleParagraph = titleCell.AddParagraph(comp);
             titleParagraph.Format = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Left,
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 10, Bold = true }
+                Font = new Font { Size = 14, Bold = true }
             };
+
+            Unit FontSize = 10;
 
             var pageCell = headerRow.Cells[3];
             var pageParagraph = pageCell.AddParagraph();
@@ -332,8 +344,14 @@ namespace GMGInventory.Controllers
             {
                 Alignment = ParagraphAlignment.Right,
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8 }
+                Font = new Font { Size = FontSize }
             };
+
+            var headerTable = section.AddTable();
+            headerTable.AddColumn(Unit.FromCentimeter(3));
+            headerTable.AddColumn(Unit.FromCentimeter(5.75));
+            headerTable.AddColumn(Unit.FromCentimeter(3.75));
+            headerTable.AddColumn(Unit.FromCentimeter(5));
 
             var subtitleRow = headerTable.AddRow();
             var subtitleCell = subtitleRow.Cells[0];
@@ -342,65 +360,68 @@ namespace GMGInventory.Controllers
             subtitleParagraph1.Format = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Center,
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8, Bold = true }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize, Bold = true }
             };
             var subtitleParagraph2 = subtitleCell.AddParagraph($"CR No.: {string.Format("{0:##00000}", details.SOACRNumber)}");
             subtitleParagraph2.Format = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Center,
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8 }
+                Font = new Font { Size = FontSize }
             };
 
             var row1 = headerTable.AddRow();
             row1.Cells[0].AddParagraph("Customer Code:").Format = new ParagraphFormat
             {
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8 }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize }
             };
             row1.Cells[1].AddParagraph(details.CustomerCode).Format = new ParagraphFormat
             {
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8, Bold = true }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize, Bold = true }
             };
             row1.Cells[2].AddParagraph("Counter Receipt Date:").Format = new ParagraphFormat
             {
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8 }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize }
             };
-            row1.Cells[3].AddParagraph(details.DateFrom).Format = new ParagraphFormat
+            //row1.Cells[3].AddParagraph(details.DateFrom).Format = new ParagraphFormat
+            row1.Cells[3].AddParagraph(DateTime.Today.ToString("MMMM d, yyyy")).Format = new ParagraphFormat
             {
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8, Bold = true }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize, Bold = true }
             };
 
             var row2 = headerTable.AddRow();
             row2.Cells[0].AddParagraph("Customer Name:").Format = new ParagraphFormat
             {
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8 }
+                Font = new Font { Size = FontSize }
             };
             row2.Cells[1].AddParagraph(details.CustomerName).Format = new ParagraphFormat
             {
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8, Bold = true }
+                Font = new Font { Size = FontSize, Bold = true }
             };
             row2.Cells[2].AddParagraph("Date to be Collected:").Format = new ParagraphFormat
             {
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8 }
+                Font = new Font { Size = FontSize }
             };
-            row2.Cells[3].AddParagraph(details.DateTo).Format = new ParagraphFormat
+            //row2.Cells[3].AddParagraph(details.DateTo).Format = new ParagraphFormat
+            row2.Cells[3].AddParagraph(" ").Format = new ParagraphFormat
             {
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8, Bold = true }
+                Font = new Font { Size = FontSize, Bold = true }
             };
 
-            var tableHeader = section.Headers.Primary.AddTable();
+            //var tableHeader = section.Headers.Primary.AddTable
+            var tableHeader = section.AddTable();
             tableHeader.Borders.Bottom.Width = 0.75;
 
-            var columnWidth = new double[] { 3.0, 2.6, 2.3, 2.7, 2.7, 2.7 };
+            var columnWidth = new double[] { 3, 3, 2.5, 3, 3, 3 };
 
             foreach (var w in columnWidth)
             {
@@ -415,9 +436,12 @@ namespace GMGInventory.Controllers
                 chcell.Format = new ParagraphFormat
                 {
                     Alignment = chctr < 3 ? ParagraphAlignment.Center : ParagraphAlignment.Right,
-                    Font = new Font { Size = 8, Bold = true }
+                    Font = new Font { Size = FontSize, Bold = true }
                 };
             }
+
+            var space = section.AddParagraph(" ");
+            space.Format.Font.Size = 5;
 
             var table = section.AddTable();
 
@@ -425,7 +449,6 @@ namespace GMGInventory.Controllers
             {
                 table.AddColumn(Unit.FromCentimeter(w));
             }
-
             foreach (var item in details.Contents)
             {
 
@@ -433,13 +456,13 @@ namespace GMGInventory.Controllers
                 {
                     Alignment = ParagraphAlignment.Center,
                     LineSpacingRule = LineSpacingRule.OnePtFive,
-                    Font = new Font { Size = 8 }
+                    Font = new Font { Size = FontSize }
                 };
                 var cellFormatRight = new ParagraphFormat
                 {
                     Alignment = ParagraphAlignment.Right,
                     LineSpacingRule = LineSpacingRule.OnePtFive,
-                    Font = new Font { Size = 8 }
+                    Font = new Font { Size = FontSize }
                 };
                 var row = table.AddRow();
                 row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
@@ -450,15 +473,22 @@ namespace GMGInventory.Controllers
                 row.Cells[5].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
             }
 
+            var cellFormatLeftBold = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Left,
+                Font = new Font { Size = FontSize, Bold = true }
+            };
             var cellFormatRightBold = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Right,
-                Font = new Font { Size = 8, Bold = true }
+                Font = new Font { Size = FontSize, Bold = true }
             };
             var footerRow = table.AddRow();
-            footerRow.Borders.Top.Width = 0.75;
-            footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
-            footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
+            footerRow.Borders.Top.Width = 0.75; 
+            footerRow.Cells[0].MergeRight = 1;
+            footerRow.Cells[0].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatLeftBold.Clone();
+            //footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
+            //footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
             footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
             footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
             footerRow.Cells[4].AddParagraph(details.TotalFreightCost).Format = cellFormatRightBold.Clone();
@@ -491,27 +521,33 @@ namespace GMGInventory.Controllers
 
             var section = document.AddSection();
 
-            section.PageSetup.TopMargin = Unit.FromCentimeter(5.25);
-            section.PageSetup.HeaderDistance = Unit.FromCentimeter(2);
-            var headerTable = section.Headers.Primary.AddTable();
-            headerTable.AddColumn(Unit.FromCentimeter(4));
-            headerTable.AddColumn(Unit.FromCentimeter(4));
-            headerTable.AddColumn(Unit.FromCentimeter(4));
-            headerTable.AddColumn(Unit.FromCentimeter(4));
+            //section.PageSetup.TopMargin = Unit.FromCentimeter(5.25);
+            section.PageSetup.TopMargin = Unit.FromCentimeter(2);
+            section.PageSetup.LeftMargin = Unit.FromCentimeter(1.75);
+            section.PageSetup.RightMargin = Unit.FromCentimeter(1.75);
+            section.PageSetup.HeaderDistance = Unit.FromCentimeter(1);
+            var topHeader = section.Headers.Primary.AddTable();
+            topHeader.AddColumn(Unit.FromCentimeter(2));
+            topHeader.AddColumn(Unit.FromCentimeter(5.75));
+            topHeader.AddColumn(Unit.FromCentimeter(3.75));
+            topHeader.AddColumn(Unit.FromCentimeter(6));
 
-            var headerRow = headerTable.AddRow();
+            var headerRow = topHeader.AddRow();
 
             var titleCell = headerRow.Cells[0];
             titleCell.MergeRight = 2;
-
-            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS";
+            
+            //var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS";
+            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS TRADING";
             var titleParagraph = titleCell.AddParagraph(comp);
             titleParagraph.Format = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Left,
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 10, Bold = true }
+                Font = new Font { Size = 14, Bold = true }
             };
+
+            Unit FontSize = 10;
 
             var pageCell = headerRow.Cells[3];
             var pageParagraph = pageCell.AddParagraph();
@@ -523,9 +559,14 @@ namespace GMGInventory.Controllers
             {
                 Alignment = ParagraphAlignment.Right,
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8 }
+                Font = new Font { Size = FontSize }
             };
 
+            var headerTable = section.AddTable();
+            headerTable.AddColumn(Unit.FromCentimeter(2));
+            headerTable.AddColumn(Unit.FromCentimeter(5.75));
+            headerTable.AddColumn(Unit.FromCentimeter(3.75));
+            headerTable.AddColumn(Unit.FromCentimeter(6));
             var subtitleRow = headerTable.AddRow();
             var subtitleCell = subtitleRow.Cells[0];
             subtitleCell.MergeRight = 3;
@@ -533,28 +574,28 @@ namespace GMGInventory.Controllers
             subtitleParagraph1.Format = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Center,
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8, Bold = true }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize, Bold = true }
             };
             var subtitleParagraph2 = subtitleCell.AddParagraph($"From: {details.DateFrom2} To: {details.DateTo2}, SOA No.: {string.Format("{0:##00000}", details.SOACRNumber)}, Agent: {details.AgentCode}");
             subtitleParagraph2.Format = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Center,
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8 }
+                Font = new Font { Size = FontSize }
             };
 
             var row1 = headerTable.AddRow();
             row1.Cells[0].AddParagraph("Customer:").Format = new ParagraphFormat
             {
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8 }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize }
             };
             var row1Cell = row1.Cells[1];
             row1Cell.AddParagraph($"{details.CustomerCode} - {details.CustomerName}").Format = new ParagraphFormat
             {
-                LineSpacingRule = LineSpacingRule.Single,
-                Font = new Font { Size = 8, Bold = true }
+                LineSpacingRule = LineSpacingRule.OnePtFive,
+                Font = new Font { Size = FontSize, Bold = true }
             };
             row1Cell.MergeRight = 2;
 
@@ -562,20 +603,20 @@ namespace GMGInventory.Controllers
             row2.Cells[0].AddParagraph("Terms:").Format = new ParagraphFormat
             {
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8 }
+                Font = new Font { Size = FontSize }
             };
             var row2Cell = row2.Cells[1];
             row2Cell.AddParagraph(details.CreditTerm).Format = new ParagraphFormat
             {
                 LineSpacingRule = LineSpacingRule.Double,
-                Font = new Font { Size = 8, Bold = true }
+                Font = new Font { Size = FontSize, Bold = true }
             };
             row2Cell.MergeRight = 2;
 
-            var tableHeader = section.Headers.Primary.AddTable();
+            var tableHeader = section.AddTable();
             tableHeader.Borders.Bottom.Width = 0.75;
 
-            var columnWidth = new double[] { 2.5, 2.5, 1.0, 2.5, 2.5, 2.5, 2.5 };
+            var columnWidth = new double[] { 2.75, 2.75, 1.0, 2.75, 2.75, 2.75, 2.75 };
 
             foreach (var w in columnWidth)
             {
@@ -590,9 +631,12 @@ namespace GMGInventory.Controllers
                 chcell.Format = new ParagraphFormat
                 {
                     Alignment = chctr < 3 || chctr == 4 ? ParagraphAlignment.Center : ParagraphAlignment.Right,
-                    Font = new Font { Size = 8, Bold = true }
+                    Font = new Font { Size = FontSize, Bold = true }
                 };
             }
+
+            var space = section.AddParagraph(" ");
+            space.Format.Font.Size = 5;
 
             var table = section.AddTable();
 
@@ -607,13 +651,13 @@ namespace GMGInventory.Controllers
                 {
                     Alignment = ParagraphAlignment.Center,
                     LineSpacingRule = LineSpacingRule.OnePtFive,
-                    Font = new Font { Size = 8 }
+                    Font = new Font { Size = FontSize }
                 };
                 var cellFormatRight = new ParagraphFormat
                 {
                     Alignment = ParagraphAlignment.Right,
                     LineSpacingRule = LineSpacingRule.OnePtFive,
-                    Font = new Font { Size = 8 }
+                    Font = new Font { Size = FontSize }
                 };
                 var row = table.AddRow();
                 row.Cells[0].AddParagraph(item.InvoiceDate2).Format = cellFormatCenter.Clone();
@@ -621,18 +665,23 @@ namespace GMGInventory.Controllers
                 row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
                 row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
                 row.Cells[4].AddParagraph(item.FreightReferenceNumber + "").Format = cellFormatCenter.Clone();
-                row.Cells[5].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
+                row.Cells[5].AddParagraph(item.FreightCharge).Format = cellFormatRight.Clone();
                 row.Cells[6].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
             }
+            var cellFormatLeftBold = new ParagraphFormat
+            {
+                Alignment = ParagraphAlignment.Left,
+                Font = new Font { Size = FontSize, Bold = true }
+            };
             var cellFormatRightBold = new ParagraphFormat
             {
                 Alignment = ParagraphAlignment.Right,
-                Font = new Font { Size = 8, Bold = true }
+                Font = new Font { Size = FontSize, Bold = true }
             };
             var footerRow = table.AddRow();
             footerRow.Borders.Top.Width = 0.75;
-            footerRow.Cells[0].AddParagraph("").Format = cellFormatRightBold.Clone();
-            footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[0].MergeRight = 1;
+            footerRow.Cells[0].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatLeftBold.Clone();
             footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
             footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
             footerRow.Cells[4].AddParagraph("").Format = cellFormatRightBold.Clone();
@@ -654,6 +703,220 @@ namespace GMGInventory.Controllers
 
             Response.Headers["Content-Disposition"] = "inline; filename=PDFSOADetails.pdf";
             return File(stream.ToArray(), "application/pdf");
+        }
+
+        public async Task<IActionResult> DownloadCR(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var details = await soaRepository.PrintCRDetails(Id);
+
+            if (details == null || details.Contents == null) return NotFound();
+
+            using (XLWorkbook wb = new())
+            {
+                var ws = wb.Worksheets.Add("CR");
+
+                ws.Range(1, 1, 1, 6).Merge().Value = "Counter Receipt";
+                ws.Range(2, 1, 2, 6).Merge().Value = "CR No. " + details.SOACRNumber;
+
+                ws.Range("A1:F2").Style
+                                 .Font.SetBold()
+                                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                                 .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+                ws.Range(4, 1, 4, 3).Merge().Value = "Customer Code: " + details.CustomerCode;
+                ws.Range(4, 4, 4, 6).Merge().Value = "Counter Receipt Date: " + DateTime.Today.ToString("MM/dd/yyyy");
+
+                ws.Range(5, 1, 5, 3).Merge().Value = "Customer Name: " + details.CustomerName;
+                ws.Range(5, 4, 5, 6).Merge().Value = "Date to be Collected: ";
+
+                ws.Range("A4:F5").Style
+                                 .Font.SetBold()
+                                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left)
+                                 .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+                ws.Cell(7, 1).Value = "Invoice Date";
+                ws.Cell(7, 2).Value = "Invoice Number";
+                ws.Cell(7, 3).Value = "Trans Code";
+                ws.Cell(7, 4).Value = "Open Amount";
+                ws.Cell(7, 5).Value = "Freight Cost";
+                ws.Cell(7, 6).Value = "Total";
+
+                ws.Range("A7:F7").Style
+                                 .Font.SetBold()
+                                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                                 .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+                ws.SheetView.FreezeRows(7);
+
+                ws.Row(7).Style.Border.BottomBorder = XLBorderStyleValues.Medium;
+                ws.Row(7).Style.Border.BottomBorderColor = XLColor.Black;
+
+                var currentRow = 8;
+                foreach (var item in details.Contents)
+                {
+                    ws.Cell(currentRow, 1).Value = item.InvoiceDate;
+                    ws.Cell(currentRow, 2).Value = item.ControlNumber;
+                    ws.Cell(currentRow, 3).Value = item.InvoiceType;
+                    ws.Cell(currentRow, 4).Value = item.InvoiceAmountD;
+                    ws.Cell(currentRow, 5).Value = item.FreightChargeD;
+                    ws.Cell(currentRow, 6).Value = item.BalanceD;
+                    currentRow++;
+                }
+
+                ws.Cell(currentRow, 3).Value = "Total";
+                ws.Cell(currentRow, 4).Value = details.TotalInvoiceAmountD;
+                ws.Cell(currentRow, 5).Value = details.TotalFreightCostD;
+                ws.Cell(currentRow, 6).Value = details.TotalBalanceD;
+
+                ws.Range($"C{currentRow}:F{currentRow}").Style
+                                                        .Font.SetBold()
+                                                        .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right)
+                                                        .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+                ws.Row(currentRow).Style.Border.TopBorder = XLBorderStyleValues.Medium;
+                ws.Row(currentRow).Style.Border.TopBorderColor = XLColor.Black;
+
+
+                ws.Columns().AdjustToContents();
+
+                using MemoryStream stream = new();
+                wb.SaveAs(stream);
+                return File(stream.ToArray(),
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            SystemFormat.ToValidFileName("CR " + details.SOACRNumber + ".xlsx"));
+            }
+        }
+        public async Task<IActionResult> DownloadSOA(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var details = await soaRepository.PrintSOADetails(Id);
+
+            if (details == null || details.Contents == null) return NotFound();
+
+            using (XLWorkbook wb = new())
+            {
+                var ws = wb.Worksheets.Add("SOA");
+
+                ws.Range(1, 1, 1, 7).Merge().Value = "Customer Statement of Accounts";
+                ws.Range(2, 1, 2, 7).Merge().Value = $"From: {details.DateFrom2} To: {details.DateTo2}, SOA No.: {string.Format("{0:##00000}", details.SOACRNumber)}, Agent: {details.AgentCode}";
+
+                ws.Range(4, 1, 4, 7).Merge().Value = $"Customer: {details.CustomerCode} - {details.CustomerName}";
+
+                ws.Range(5, 1, 5, 7).Merge().Value = "Terms: " + details.CreditTerm;
+
+                ws.Cell(7, 1).Value = "Invoice Date";
+                ws.Cell(7, 2).Value = "Invoice No.";
+                ws.Cell(7, 3).Value = "Type";
+                ws.Cell(7, 4).Value = "Trans Amount";
+                ws.Cell(7, 5).Value = "Waybill No";
+                ws.Cell(7, 6).Value = "Freight Cost";
+                ws.Cell(7, 7).Value = "Total";
+
+                ws.Range("A1:G7").Style
+                                 .Font.SetBold()
+                                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                                 .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+                ws.SheetView.FreezeRows(7);
+
+                ws.Row(7).Style.Border.BottomBorder = XLBorderStyleValues.Medium;
+                ws.Row(7).Style.Border.BottomBorderColor = XLColor.Black;
+
+                var currentRow = 8;
+                foreach (var item in details.Contents)
+                {
+                    ws.Cell(currentRow, 1).Value = item.InvoiceDate;
+                    ws.Cell(currentRow, 2).Value = item.ControlNumber;
+                    ws.Cell(currentRow, 3).Value = item.InvoiceType;
+                    ws.Cell(currentRow, 4).Value = item.InvoiceAmountD;
+                    ws.Cell(currentRow, 5).Value = item.FreightReferenceNumber + "";
+                    ws.Cell(currentRow, 6).Value = item.FreightChargeD;
+                    ws.Cell(currentRow, 7).Value = item.BalanceD;
+                    currentRow++;
+                }
+
+                ws.Range($"A{currentRow}:B{currentRow}").Merge().Value = "# of Invoice(s): " + details.Contents.Count;
+                ws.Cell(currentRow, 3).Value = "Total";
+                ws.Cell(currentRow, 4).Value = details.TotalInvoiceAmountD;
+                ws.Cell(currentRow, 6).Value = details.TotalFreightCostD;
+                ws.Cell(currentRow, 7).Value = details.TotalBalanceD;
+
+                ws.Range($"A{currentRow}:B{currentRow}").Style
+                                                        .Font.SetBold()
+                                                        .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left)
+                                                        .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+                ws.Range($"C{currentRow}:G{currentRow}").Style
+                                                        .Font.SetBold()
+                                                        .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right)
+                                                        .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+                ws.Row(currentRow).Style.Border.TopBorder = XLBorderStyleValues.Medium;
+                ws.Row(currentRow).Style.Border.TopBorderColor = XLColor.Black;
+
+
+                ws.Columns().AdjustToContents();
+
+                using MemoryStream stream = new();
+                wb.SaveAs(stream);
+                return File(stream.ToArray(),
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            SystemFormat.ToValidFileName("SOA " + details.SOACRNumber + ".xlsx"));
+            }
+        }
+
+        public async Task<IActionResult> Download(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SOACR, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var details = await soaRepository.GetSOACRDetails(Id, true);
+
+            if (details == null || details.Items == null) return NotFound();
+
+            DataTable dt = new DataTable((details.Type + " Details").Trim());
+            dt.Columns.AddRange(new DataColumn[10] {
+                new DataColumn("Invoice Date"),
+                new DataColumn("Invoice Number"),
+                new DataColumn("BIR Invoice Number"),
+                new DataColumn("Invoice Amount"),
+                new DataColumn("TBR"),
+                new DataColumn("Credit"),
+                new DataColumn("Debit"),
+                new DataColumn("Paid Amount"),
+                new DataColumn("Freight Charge"),
+                new DataColumn("Balance")
+            });
+
+            foreach (var item in details!.Items)
+            {
+                dt.Rows.Add(item.InvoiceDate,
+                            item.InvoiceNumber,
+                            item.ControlNumber,
+                            item.InvoiceAmount,
+                            item.TBR,
+                            item.Credit,
+                            item.Debit,
+                            item.PaidAmount,
+                            item.FreightCharge,
+                            item.Balance);
+            }
+
+            using (XLWorkbook wb = new())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        SystemFormat.ToValidFileName(details.Type + " " + details.Id + " (" + details.Customer + ").xlsx"));
+                }
+            }
         }
 
         [HttpPost]

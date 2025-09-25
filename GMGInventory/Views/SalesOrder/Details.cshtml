@@ -28,7 +28,7 @@
                 }
                 else
                 {
-                    <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="top-left" role="tooltip">
+                    <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-print"></span> Print
                     </button>
                 }
@@ -45,10 +45,10 @@
                     }
                     else
                     {
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="top-left" role="tooltip">
+                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
                             <span class="fas fa-check"></span> Approve
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="top-left" role="tooltip">
+                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
                             <span class="fas fa-times"></span> Disapprove
                         </button>
                     }
@@ -67,10 +67,10 @@
                     }
                     else
                     {
-                        <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                        <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
                             <span class="fas fa-save"></span> Save as Draft
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                        <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
                             <span class="fas fa-save"></span> Submit
                         </button>
                     }
@@ -96,7 +96,7 @@
                         }
                         else
                         {
-                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
                                 <span class="fas fa-edit"></span> Update to Resubmit
                             </button>
                         }
@@ -424,6 +424,7 @@
                                 <thead>
                                     <tr>
                                         <th></th>
+                                        <th>#</th>
                                         <th>Quantity</th>
                                         <th>Unit</th>
                                         <th>Item Code</th>
@@ -440,7 +441,7 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
-                                        <th class="text-end">Total</th>
+                                        <th colspan="2" class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
                                         <th colspan="7"></th>
                                         <th class="total-gross-price">0.00</th>
@@ -661,26 +662,7 @@
                     return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
                 },
                 ajax: {
-                    url: "@Url.Action("GetOptions2", "Agent")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                    url: "@Url.Action("GetOptions2", "Agent")"
                 }
             });
 
@@ -712,26 +694,12 @@
                 },
                 ajax: {
                     url: "@Url.Action("GetByAgentOptions", "Customer")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
                     data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1,
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
                             agent: $("#order-agent-code").val()
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                        });
+                    }
                 }
             });
 
@@ -768,6 +736,7 @@
                 url: "@Url.Action("GetOptions", "Forwarder")",
                 success: function (data, status, xhr) {
                     $("#order-forwarder").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         //minimumResultsForSearch: Infinity
                     });
@@ -871,26 +840,7 @@
                     "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Item")"
             },
             dropdownParent: $("#addModal")
         });
@@ -977,6 +927,7 @@
             } else {
                 itemDT.row.add({
                     itemId: $("#add-code").select2("data")[0].id,
+                    lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                     itemCode: $("#add-code").select2("data")[0].text,
                     itemName: $("#add-code").select2("data")[0].name,
                     inventoryCount: $("#add-code").select2("data")[0].inventoryCount,
@@ -995,7 +946,7 @@
                     serverQuantityD: 0,
                     unservedQuantity: 0,
                     unservedQuantityD: 0
-                }).draw();
+                }).order([1, 'asc']).draw();
                 clearItemForm();
 
                 toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Sales Order Item(s)", "Success");
@@ -1020,14 +971,17 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        var actions = '';
+                        var actions = '<div class="btn-group" role="group">';
                         if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
                         }
-                        return actions;
+                        return actions + '</div>';
                     },
                     className: "form-cell"
                 },
+                { data: "lineNumber", name: "LineNumber", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
                         if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
@@ -1042,7 +996,7 @@
                 { data: "unit", name: "Unit", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return '<nobr>' + data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span></nobr>';
                     },
                     name: "ItemCode",
                     className: "form-cell"
@@ -1099,7 +1053,7 @@
                         var actions = '';
                         if (data.quantityD != data.servedQuantityD + data.unservedQuantityD || data.unservedQuantityD != 0) {
                             if (user_access.canEdit) {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-update-serve" data-microtip-title="Update Served Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-update-serve" data-microtip-title="Update Served Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                             }
                         }
                         return actions;
@@ -1107,14 +1061,14 @@
                     className: "form-cell"
                 }
             ],
-            order: [[0, "asc"]],
+            order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
-                columnDTTotalInteger(api, 1);
-                columnDTTotalDecimal(api, 9);
-                columnDTTotalInteger(api, 10);
+                columnDTTotalInteger(api, 2);
+                columnDTTotalDecimal(api, 10);
                 columnDTTotalInteger(api, 11);
+                columnDTTotalInteger(api, 12);
             }
         });
 
@@ -1122,19 +1076,19 @@
             //if (so_details.status.toLowerCase().includes("submitted")) {
             if (so_details.status.toLowerCase().includes("draft")) {
                 itemDT.column(0).visible(true); // remove button
-                itemDT.column(10).visible(false); // served quantity
-                itemDT.column(11).visible(false); // unserved quantity
-                itemDT.column(12).visible(false); // update served quantity button
+                itemDT.column(11).visible(false); // served quantity
+                itemDT.column(12).visible(false); // unserved quantity
+                itemDT.column(13).visible(false); // update served quantity button
             // } else if (so_details.status.toLowerCase().includes("approved")) {
             //     itemDT.column(0).visible(false);
-            //     itemDT.column(10).visible(true);
             //     itemDT.column(11).visible(true);
-            //     itemDT.column(12).visible(false);//true dati
+            //     itemDT.column(12).visible(true);
+            //     itemDT.column(13).visible(false);//true dati
             } else {
                 itemDT.column(0).visible(false);
-                itemDT.column(10).visible(true);//false dati
                 itemDT.column(11).visible(true);//false dati
-                itemDT.column(12).visible(false);
+                itemDT.column(12).visible(true);//false dati
+                itemDT.column(13).visible(false);
             }
 
             hideLoader();
@@ -1183,6 +1137,66 @@
                     $("#served-unserved").data("prime", itemdata.unservedQuantity);
                     $("#servedModal").modal("show");
                 });
+
+                if(so_details.status.toLowerCase().includes("draft")) {
+                    itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                        var rowData = this.data();
+                        if (rowData.lineNumber == 1)
+                            $(this.node()).find(".btn-up-item").hide();
+                        else
+                            $(this.node()).find(".btn-up-item").show();
+
+                        if (rowData.lineNumber == Math.max.apply(Math, itemDT.column(1).data().toArray()))
+                            $(this.node()).find(".btn-down-item").hide();
+                        else
+                            $(this.node()).find(".btn-down-item").show();
+                    });
+
+                    $(".btn-up-item").off("click").on("click", function () {
+                        var row = $(this).parents('tr');
+                        var rowData = itemDT.row(row).data();
+
+                        var currentLineNumber = rowData.lineNumber;
+                        var newLineNumber = currentLineNumber - 1;
+
+                        var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
+                            return itemDT.row(index).data().lineNumber == newLineNumber;
+                        });
+
+                        if (targetRowIndex != undefined) {
+                            var targetRowData = itemDT.row(targetRowIndex).data();
+                            targetRowData.lineNumber = currentLineNumber;
+                            itemDT.row(targetRowIndex).data(targetRowData);
+                        }
+
+                        rowData.lineNumber = newLineNumber;
+                        itemDT.row(row).data(rowData);
+
+                        itemDT.order([1, 'asc']).draw();
+                    });
+
+                    $(".btn-down-item").off("click").on("click", function () {
+                        var row = $(this).parents('tr');
+                        var rowData = itemDT.row(row).data();
+                        var currentLineNumber = rowData.lineNumber;
+                        var newLineNumber = currentLineNumber + 1;
+
+                        var targetRowIndex = itemDT.rows().indexes().toArray().find(function (index) {
+                            return itemDT.row(index).data().lineNumber == newLineNumber;
+                        });
+
+                        if (targetRowIndex != undefined) {
+                            var targetRowData = itemDT.row(targetRowIndex).data();
+                            targetRowData.lineNumber = currentLineNumber;
+                            itemDT.row(targetRowIndex).data(targetRowData);
+                        }
+
+                        rowData.lineNumber = newLineNumber;
+                        itemDT.row(row).data(rowData);
+
+                        itemDT.order([1, 'asc']).draw();
+                    });
+                }
             }
         });
 
@@ -1244,14 +1258,15 @@
         }
 
         function GetItemsToOrder() {
-            var item_to_replenish = [];
+            var item_to_order = [];
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var row_data = this.data();
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
                 var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
-                item_to_replenish.push({
+                item_to_order.push({
+                    lineNumber: row_data.lineNumber,
                     item: row_data.itemId,
                     quantity: row_quantity,
                     unitPrice: row_unitprice,
@@ -1259,7 +1274,7 @@
                     discount2: row_discount2
                 });
             });
-            return item_to_replenish;
+            return item_to_order;
         }
 
         if (user_access.canApproveDisapprove) {

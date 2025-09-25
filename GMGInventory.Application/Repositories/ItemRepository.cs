@@ -127,11 +127,11 @@ namespace GMGInventory.Application.Repositories
                                         .Where(s => s.ItemId == item.Id
                                                  && s.Warehouse.IsMain == true)
                                         .Sum(s => s.Quantity)
-                        let requests = context.PurchaseRequestLineItems
-                                              .Where(s => s.SalesOrderId == soitem.SalesOrderId
-                                                       && s.ItemId == soitem.ItemId
-                                                       && s.PurchaseRequest.Status.Name.ToLower() == "approved")
-                                              .Sum(s => (int?)s.Quantity) ?? 0
+                        //let requests = context.PurchaseRequestLineItems
+                        //                      .Where(s => s.SalesOrderId == soitem.SalesOrderId
+                        //                               && s.ItemId == soitem.ItemId
+                        //                               && s.PurchaseRequest.Status.Name.ToLower() == "approved")
+                        //                      .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
                            && soitem.SalesOrderId == SalesOrderId
                            && (string.IsNullOrWhiteSpace(search)
@@ -150,7 +150,8 @@ namespace GMGInventory.Application.Repositories
                             OldCode = item.OldCode,
                             PartNumber = item.PartNumber + "",
                             NetPriceD = price.NetSellingPrice,
-                            QuantityD = Math.Max(0, soitem.Quantity - (ii + requests)),
+                            //QuantityD = Math.Max(0, soitem.Quantity - (ii + requests)), // removed, corrected as so quantity - stock quantity
+                            QuantityD = Math.Max(0, soitem.Quantity - ii),
                             RetailPriceD = price.RetailSellingPrice,
                             UnitId = item.Unit.Id,
                             Unit = item.Unit.Code
@@ -872,7 +873,7 @@ namespace GMGInventory.Application.Repositories
                               select new ItemDetailPurchaseVM
                               {
                                   ConversionFactorD = poli.PurchaseOrder.CurrencyRate,
-                                  Currency = poli.PurchaseOrder.Currency.Code,
+                                  Currency = poli.PurchaseOrder.Currency.Name,
                                   PurchaseNumber = poli.PurchaseOrder.DocumentNumber,
                                   QuantityD = poli.Quantity,
                                   ReplenishBy = user.FirstName + " " + user.LastName,
@@ -1017,7 +1018,8 @@ namespace GMGInventory.Application.Repositories
                               QuantityD = sitem.Quantity,
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
-                              UnservedQuantityD = sitem.Quantity - inventory > 0 ? sitem.Quantity - inventory : 0
+                              //UnservedQuantityD = sitem.Quantity - inventory > 0 ? sitem.Quantity - inventory : 0
+                              UnservedQuantityD = Math.Max(0, sitem.Quantity - inventory)
                           };
             return await salesVM.ToListAsync();
         }

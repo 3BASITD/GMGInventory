@@ -37,7 +37,8 @@
                     <span>Customer Code:</span>
                     <strong>@Model.CustomerCode</strong>
                     <span>Counter Receipt Date:</span>
-                    <strong>@Model.DateFrom</strong>
+                    @* <strong>@Model.DateFrom</strong> *@
+                    <strong>@DateTime.Today.ToString("MMMM d, yyyy")</strong>
                 </td>
             </tr>
             <tr>
@@ -45,7 +46,8 @@
                     <span>Customer Name:</span>
                     <strong>@Model.CustomerName</strong>
                     <span>Date to be Collected:</span>
-                    <strong>@Model.DateTo</strong>
+                    @* <strong>@Model.DateTo</strong> *@
+                    <strong></strong>
                 </td>
             </tr>
             <tr>

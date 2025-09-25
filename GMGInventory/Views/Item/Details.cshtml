@@ -674,10 +674,12 @@
             url: "@Url.Action("GetOptions", "Unit")",
             success: function (data, status, xhr) {
                 $("#add-unit").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#addModal")
                 });
                 $("#edit-unit").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -695,10 +697,12 @@
             url: "@Url.Action("GetOptions", "Unit")",
             success: function (data, status, xhr) {
                 $("#add-equivalent-unit").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     dropdownParent: $("#addModal")
                 });
                 $("#edit-equivalent-unit").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -731,26 +735,7 @@
                     "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Item")"
             },
             dropdownParent: $("#addModal")
         });
@@ -776,26 +761,7 @@
                     "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Item")"
             }
         });
 
@@ -860,6 +826,7 @@
                                 data: { includeId: data.equivalentUnitId },
                                 success: function (data, status, xhr) {
                                     $("#add-unit").select2({
+                                        ajax: null, //already fetched outside
                                         data: data,
                                         allowClear: true,
                                         placeholder: {
@@ -924,7 +891,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a data-id="' + data.id + '" class="btn btn-danger btn-xs deleteLocationBtn" data-microtip-title="Delete Location" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></a>';
+                        actions += '<a data-id="' + data.id + '" class="btn btn-danger btn-xs deleteLocationBtn" data-microtip-title="Delete Location" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></a>';
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
                     }
@@ -952,6 +919,7 @@
                         data: { itemId: @Model?.Id },
                         success: function (data, status, xhr) {
                             $("#create-location").select2({
+                                ajax: null, //already fetched outside
                                 data: data,
                                 allowClear: true,
                                 placeholder: {
@@ -1056,10 +1024,10 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         if (user_access.canEdit) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                         }
                         if (user_access.canDelete) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
 
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
@@ -1143,26 +1111,7 @@
                                     "</small>");
                             },
                             ajax: {
-                                url: "@Url.Action("GetOptions", "Item")",
-                                dataType: 'json',
-                                type: "POST",
-                                delay: 500,
-                                data: function (params) {
-                                    return {
-                                        search: params.term,
-                                        page: params.page || 1
-                                    };
-                                },
-                                processResults: function (data, params) {
-                                    params.page = params.page || 1;
-                                    return {
-                                        results: data.items,
-                                        pagination: {
-                                            more: (params.page * 50) < data.total_count
-                                        }
-                                    };
-                                },
-                                cache: true
+                                url: "@Url.Action("GetOptions", "Item")"
                             },
                             dropdownParent: $("#editModal")
                         });
@@ -1352,7 +1301,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                             if (user_access.canEdit) {
-                                actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="top-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                                actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="bottom-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
                             }
                         return actions;
                     }

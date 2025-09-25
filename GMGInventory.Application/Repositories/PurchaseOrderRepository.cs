@@ -50,19 +50,6 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<JsonCurrencyOptionModel>> GetCurrencyOptions(int? IncludeId)
-        {
-            return await context.Currencies
-                                .Select(s => new JsonCurrencyOptionModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
-                                    Selected = IncludeId != null && IncludeId == s.Id,
-                                    Rate = s.Rate
-                                })
-                                .ToListAsync();
-        }
-
         public async Task<PurchaseOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
             var orderVM = (from order in context.PurchaseOrders
@@ -76,7 +63,7 @@ namespace GMGInventory.Application.Repositories
                            {
                                Address1 = order.Supplier.AddressLine1,
                                Address2 = order.Supplier.AddressLine2,
-                               Currency = order.Currency.Code,
+                               Currency = order.Currency.Name,
                                CurrencyId = order.CurrencyId,
                                CurrencyRateD = order.CurrencyRate,
                                DateCreatedD = order.DateCreated,

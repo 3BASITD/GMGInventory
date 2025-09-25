@@ -35,6 +35,7 @@ namespace GMGInventory.Data
         public virtual PurchaseOrderDeliveryMode DeliveryMode { get; set; }
 
         public DateTime OrderDate { get; set; }
+        public DateTime? DueDate { get; set; }
 
         [ForeignKey("DeliveryAddressId")]
         public int DeliveryAddressId { get; set; }

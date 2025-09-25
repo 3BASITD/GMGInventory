@@ -13,7 +13,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<PackItemVM>> GetItemsAsync(int packId);
         Task<IList<PackItemVM>> GetItemsWithPriceAsync(int packId);
         Task<ForDataTables<PackItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int packId);
-        Task<string?> CheckItemAsync(PackFormVM form);
+        string? CheckItem(PackFormVM form);
         Task<int> SaveAsync(PackFormVM form);
         Task<int> UpdateAsync(PackFormVM form);
     }

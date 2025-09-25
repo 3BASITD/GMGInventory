@@ -46,6 +46,7 @@ namespace GMGInventory.Application.Repositories
             s.OfficeTelNo == supplierVM.OfficeTelNo &&
             s.ContactPerson == supplierVM.ContactPerson &&
             s.MobileNumber == supplierVM.MobileNumber &&
+            s.CountryName == supplierVM.RegionName &&
             s.RegionName == supplierVM.RegionName &&
             s.Term == supplierVM.Term &&
             s.CurrencyName == supplierVM.CurrencyName &&
@@ -58,8 +59,8 @@ namespace GMGInventory.Application.Repositories
             return await context.Suppliers
                                 .Where(s => (s.IsActive || s.Id == IncludeId)
                                          && (
-                                            (IsLocal == null || (IsLocal == true && s.Currency.Name.ToLower().Contains("peso")))
-                                         || (IsForeign == null || (IsForeign == true && !s.Currency.Name.ToLower().Contains("peso")))
+                                            (IsLocal == null || (IsLocal == true && s.Currency.Name.ToLower().Contains("php")))
+                                         || (IsForeign == null || (IsForeign == true && !s.Currency.Name.ToLower().Contains("php")))
                                          ))
                                 .Select(s => new JsonSupplierOptionsModel
                                 {
@@ -70,8 +71,8 @@ namespace GMGInventory.Application.Repositories
                                     Address1 = s.AddressLine1,
                                     Address2 = s.AddressLine2,
                                     CurrencyId = s.Currency.Id,
-                                    Currency = s.Currency.Code,
-                                    CurrencyRateD = s.Currency.Rate
+                                    Currency = s.Currency.Name,
+                                    CurrencyRateD = 0
                                 })
                                 .OrderBy(s => s.Text)
                                 .ToListAsync();
@@ -81,8 +82,8 @@ namespace GMGInventory.Application.Repositories
         {
             var suppliers =  await context.Suppliers
                                           .Where(s => (s.IsActive || s.Id == includeId)
-                                                   && ((isLocal == null || (isLocal == true && s.Currency.Name.ToLower().Contains("peso")))
-                                                   || (isForeign == null || (isForeign == true && !s.Currency.Name.ToLower().Contains("peso"))))
+                                                   && ((isLocal == null || (isLocal == true && s.Currency.Name.ToLower().Contains("php")))
+                                                   || (isForeign == null || (isForeign == true && !s.Currency.Name.ToLower().Contains("php"))))
                                                    && (string.IsNullOrWhiteSpace(search) || s.Code.ToLower().Contains(search.ToLower()) || s.Name.ToLower().Contains(search.ToLower()))
                                                 )
                                           .Select(s => new JsonSupplierOptionsModel
@@ -94,8 +95,8 @@ namespace GMGInventory.Application.Repositories
                                               Address1 = s.AddressLine1,
                                               Address2 = s.AddressLine2,
                                               CurrencyId = s.Currency.Id,
-                                              Currency = s.Currency.Code,
-                                              CurrencyRateD = s.Currency.Rate
+                                              Currency = s.Currency.Name,
+                                              CurrencyRateD = 0
                                           })
                                           .OrderBy(s => s.Text)
                                           .ToListAsync();
@@ -112,8 +113,8 @@ namespace GMGInventory.Application.Repositories
         {
             var suppliers = await context.Suppliers
                                          .Where(s => (s.IsActive || s.Id == includeId)
-                                                  && ((isLocal == null || (isLocal == true && s.Currency.Name.ToLower().Contains("peso")))
-                                                  || (isForeign == null || (isForeign == true && !s.Currency.Name.ToLower().Contains("peso"))))
+                                                  && ((isLocal == null || (isLocal == true && s.Currency.Name.ToLower().Contains("php")))
+                                                  || (isForeign == null || (isForeign == true && !s.Currency.Name.ToLower().Contains("php"))))
                                                   && (string.IsNullOrWhiteSpace(search) || s.Code.ToLower().Contains(search.ToLower()) || s.Name.ToLower().Contains(search.ToLower()))
                                                )
                                          .Select(s => new JsonSupplierOptionsModel
@@ -125,8 +126,8 @@ namespace GMGInventory.Application.Repositories
                                              Address1 = s.AddressLine1,
                                              Address2 = s.AddressLine2,
                                              CurrencyId = s.Currency.Id,
-                                             Currency = s.Currency.Code,
-                                             CurrencyRateD = s.Currency.Rate
+                                             Currency = s.Currency.Name,
+                                             CurrencyRateD = 0
                                          })
                                          .OrderBy(s => s.Text)
                                          .ToListAsync();
@@ -144,10 +145,6 @@ namespace GMGInventory.Application.Repositories
         {
 
             var suppliers = from supplier in context.Suppliers
-                            join region in context.Regions
-                                      on supplier.RegionId equals region.Id
-                            //join currency in context.Currencies
-                            //          on supplier.CurrencyId equals currency.Id
                             join userc in userManager.Users on supplier.UserCreated equals userc.Id
                             join userm in userManager.Users on supplier.UserModified equals userm.Id into m
                             from userm in m.DefaultIfEmpty()
@@ -163,15 +160,17 @@ namespace GMGInventory.Application.Repositories
                                 OfficeTelNo = supplier.OfficeTelNo,
                                 ContactPerson = supplier.ContactPerson,
                                 MobileNumber = supplier.MobileNumber,
-                                RegionName = region.Name,
-                                RegionId = supplier.RegionId,
+                                CountryName = supplier.Country.Name,
+                                CountryId = supplier.Country.Id,
+                                RegionName = supplier.Region == null ? null : supplier.Region.Name,
+                                RegionId = supplier.Region == null ? null : supplier.Region.Id,
                                 Term = supplier.Term.Name,
                                 TermId = supplier.TermId,
                                 CurrencyId = supplier.CurrencyId,
                                 CurrencyName = supplier.Currency.Name,
                                 BusinessStyleId = supplier.BusinessStyleId,
                                 BusinessStyleName = supplier.BusinessStyle.Name,
-                                VAT = supplier.VAT,
+                                VAT = supplier.VAT + "",
                                 IsActive = supplier.IsActive,
                                 DateCreatedD = supplier.DateCreated,
                                 DateModifiedD = supplier.DateModified,
@@ -293,11 +292,12 @@ namespace GMGInventory.Application.Repositories
                                   OfficeTelNo = supplier.OfficeTelNo,
                                   ContactPerson = supplier.ContactPerson,
                                   MobileNumber = supplier.MobileNumber,
+                                  CountryName = supplier.Country.Name,
                                   RegionName = supplier.Region.Name,
                                   Term = supplier.Term.Name,
                                   CurrencyName =  supplier.Currency.Name,
                                   BusinessStyleName =  supplier.BusinessStyle.Name,
-                                  VAT =  supplier.VAT,
+                                  VAT =  supplier.VAT + "",
                                   IsActive = supplier.IsActive,
                                   UserCreated = userc.FirstName + " " + userc.LastName,
                                   DateCreatedD = supplier.DateCreated,
@@ -376,6 +376,7 @@ namespace GMGInventory.Application.Repositories
                 OfficeTelNo = supplierVM.OfficeTelNo,
                 ContactPerson = supplierVM.ContactPerson,
                 MobileNumber = supplierVM.MobileNumber,
+                CountryId = supplierVM.CountryId,
                 RegionId = supplierVM.RegionId,
                 TermId = supplierVM.TermId,
                 CurrencyId = supplierVM.CurrencyId,
@@ -406,6 +407,7 @@ namespace GMGInventory.Application.Repositories
             supplier.OfficeTelNo = supplierVM.OfficeTelNo;
             supplier.ContactPerson = supplierVM.ContactPerson;
             supplier.MobileNumber = supplierVM.MobileNumber;
+            supplier.CountryId = supplierVM.CountryId;
             supplier.RegionId = supplierVM.RegionId;
             supplier.TermId = supplierVM.TermId;
             supplier.CurrencyId = supplierVM.CurrencyId;
@@ -430,7 +432,7 @@ namespace GMGInventory.Application.Repositories
                                   Item = prli.Item.Code,
                                   ItemDescription = prli.ItemDescription,
                                   ConversionFactorD = poli.PurchaseOrder.CurrencyRate,
-                                  Currency = poli.PurchaseOrder.Currency.Code,
+                                  Currency = poli.PurchaseOrder.Currency.Name,
                                   QuantityD = poli.Quantity,
                                   ReplenishBy = user.FirstName + " " + user.LastName,
                                   ReplenishDateD = poli.PurchaseOrder.DateCreated,

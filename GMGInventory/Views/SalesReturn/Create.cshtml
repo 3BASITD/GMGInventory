@@ -78,10 +78,10 @@
                         <div class="card-header bg-light">
                             <span class="card-title">Sales Return Item(s)</span>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right btn-tbr ml-2" data-microtip-title="(To Be Returned) Add Item selection from All Items" data-microtip-position="top-left" role="tooltip">
+                                <button type="button" class="btn btn-primary btn-sm float-right btn-tbr ml-2" data-microtip-title="(To Be Returned) Add Item selection from All Items" data-microtip-position="bottom-left" role="tooltip">
                                     <span class="fas fa-plus"></span> TBR
                                 </button>
-                                <button type="button" class="btn btn-primary btn-sm float-right btn-invoice ml-2" data-microtip-title="Add Item selection from Invoice" data-microtip-position="top-left" role="tooltip">
+                                <button type="button" class="btn btn-primary btn-sm float-right btn-invoice ml-2" data-microtip-title="Add Item selection from Invoice" data-microtip-position="bottom-left" role="tooltip">
                                     <span class="fas fa-file-invoice-dollar"></span> Invoice
                                 </button>
                             </div>
@@ -267,26 +267,7 @@
                 return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Customer")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Customer")"
             }
         });
 
@@ -314,26 +295,7 @@
                 return $("<strong>" + repo.text + "</strong><br /><small>Invoice(s): " + repo.invoices + "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetSalesOrderInvoicedOptions", "SalesOrder")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetSalesOrderInvoicedOptions", "SalesOrder")"
             }
         });
 
@@ -364,6 +326,11 @@
             $("#invoice-invoice").select2({
                 minimumInputLength: -1,
                 placeholder: '<empty>',
+                language: {
+                    noResults: function () {
+                        return "No invoice record on selected invoiced sales order";
+                    }
+                },
                 templateResult: function (repo) {
                     if (repo.loading) {
                         return repo.text;
@@ -372,31 +339,12 @@
                 },
                 ajax: {
                     url: "@Url.Action("GetInvoiceBySalesOrder", "SalesInvoice")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    language: {
-                        noResults: function () {
-                            return "No invoice record on selected invoiced sales order";
-                        }
-                    },
                     data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1,
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
                             salesOrderId: $("#return-sales-order").select2("data")[0].id
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                        });
+                    }
                 },
                 dropdownParent: $("#invoiceModal")
             });
@@ -412,9 +360,10 @@
                 if (($.fn.select2 && current_defective_option.hasClass("select2-hidden-accessible")) == false) {
                         $.ajax({
                             type: "POST",
-                        url: "@Url.Action("GetOptionsJson", "ReasonsOfReturn")",
+                            url: "@Url.Action("GetOptionsJson", "ReasonsOfReturn")",
                             success: function (data, status, xhr) {
-                            current_defective_option.select2({
+                                current_defective_option.select2({
+                                    ajax: null, //already fetched outside
                                     data: data
                                 });
                             }
@@ -464,26 +413,7 @@
                     "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Item")"
             },
             dropdownParent: $("#tbrModal")
         });
@@ -632,7 +562,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (user_access.canEdit) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-minus"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-minus"></i></button>';
                         }
                         return actions;
                     }

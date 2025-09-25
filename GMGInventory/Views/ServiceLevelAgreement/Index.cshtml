@@ -1,0 +1,448 @@
+﻿@model IEnumerable<ServiceLevelAgreementVM>
+
+@{
+    ViewData["Title"] = "Service Level Agreements";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanAdd)
+            {
+                <button class="btn btn-primary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <span class="fas fa-plus"></span>New Service Level Agreement
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-sla">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Prior Availability</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Service Level Agreement Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Name</dt>
+                    <dd class="col-sm-7 details-name"></dd>
+                    <dt class="col-sm-5">Prior Availability</dt>
+                    <dd class="col-sm-7 details-availability"></dd>
+                    <dt class="col-sm-5">Created By</dt>
+                    <dd class="col-sm-7 details-created-by"></dd>
+                    <dt class="col-sm-5">Date Created</dt>
+                    <dd class="col-sm-7 details-created-date"></dd>
+                    <dt class="col-sm-5">Modified By</dt>
+                    <dd class="col-sm-7 details-modified-by"></dd>
+                    <dt class="col-sm-5">Date Modified</dt>
+                    <dd class="col-sm-7 details-modified-date"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (userAccess.CanAdd)
+{
+    <div class="modal fade" id="addModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Service Level Agreement</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="add-name" class="form-label mb-0">Name</label>
+                                    <input type="text" id="add-name" name="Name" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label mb-0">Prior Availability</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="add-days" class="form-label mb-0">Day</label>
+                                    <select id="add-days" name="Days" style="width:100%">
+                                        <option value="0">Today</option>
+                                        <option value="1">Tommorow</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="add-hour" class="form-label mb-0">Hour</label>
+                                    <input type="number" min="0" max="23" id="add-hour" name="Hour" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label form="add-minute" class="form-label mb-0">Minutes</label>
+                                    <input type="number" min="0" max="59" id="add-minute" name="Minute" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (userAccess.CanEdit)
+{
+    <div class="modal fade" id="editModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Service Level Agreement</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="edit-name" class="form-label mb-0">Name</label>
+                                    <input type="text" id="edit-name" name="Name" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label mb-0">Prior Availability</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-days" class="form-label mb-0">Day</label>
+                                    <select id="edit-days" name="Days" style="width:100%">
+                                        <option value="0">Today</option>
+                                        <option value="1">Tommorow</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-hour" class="form-label mb-0">Hour</label>
+                                    <input type="number" min="0" max="23" id="edit-hour" name="Hour" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label form="edit-minute" class="form-label mb-0">Minutes</label>
+                                    <input type="number" min="0" max="59" id="edit-minute" name="Minute" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        $("#add-days").select2({
+            ajax: null,
+            minimumResultsForSearch: -1,
+            dropdownParent: $("#addModal")
+        });
+
+        var serviceLevelAgreementDT = $('.table-sla').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetServiceLevelAgreementsDT")",
+                type: "POST"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "fleetPlateNumber", name: "FleetPlateNumber" },
+                { data: "serviceLevelAgreementType", name: "ServiceLevelAgreementType" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateRegistered || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "DateRegistered"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateExpiration || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "DateExpiration"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<button type="button" class="btn btn-info btn-xs btn-details" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        if (data.isActive == true) {
+                            if (user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit ServiceLevelAgreement" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            }
+
+                            if (user_access.canDelete) {
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete ServiceLevelAgreement" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            }
+                        } else {
+                            if (user_access.canAdd || user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate" data-microtip-title="Reactivate ServiceLevelAgreement" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            }
+                        }
+                        actions += '</div>';
+                        return actions;
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        serviceLevelAgreementDT.on("draw", function () {
+            hideLoader();
+
+            $('.btn-details').click(function (e) {
+                var data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
+
+                $(".details-number").html(data.fleetPlateNumber);
+                $(".details-type").html(data.serviceLevelAgreementType);
+                $(".details-registered").html(data.dateRegistered || '<em class="text-muted">n/a</em>');
+                $(".details-expiration").html(data.dateExpiration || '<em class="text-muted">n/a</em>');
+                $(".details-created-by").html(data.userCreated);
+                $(".details-created-date").html(data.dateCreated);
+                $(".details-modified-by").html(data.userModified || '<em class="text-muted">n/a</em>');
+                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">n/a</em>');
+
+                $("#detailsModal").modal("show");
+            });
+
+            if (user_access.canEdit) {
+                $(".btn-edit").click(function (e) {
+                    var data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
+
+                    $("#edit-number").data("Id", data.id);
+                    $("#edit-number").val(data.fleetPlateNumber);
+                    $("#edit-type").val(data.serviceLevelAgreementType);
+                    $("#edit-registered").val(data.dateRegistered3);
+                    $("#edit-expiration").val(data.dateExpiration3);
+
+                    $("#editModal").modal("show");
+                });
+            }
+
+            if (user_access.canDelete) {
+                $('.btn-delete').click(function (e) {
+                    swal({
+                        title: "Delete / Deactivate ServiceLevelAgreement",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("DeleteOrDeactivateServiceLevelAgreement")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        serviceLevelAgreementDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.btn-reactivate').click(function (e) {
+                    swal({
+                        title: "Reactivate ServiceLevelAgreement",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("ReactivateServiceLevelAgreement")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        serviceLevelAgreementDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        if(user_access.canAdd){
+            $("#addForm").validate({
+                rules: {
+                    Number: { required: true, maxlength: 100 },
+                    Type: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    Number: { required: "Fleet Number / Plate Number is required", maxlength: "Number must not exceed 100 characters." },
+                    Type: { required: "ServiceLevelAgreement Type is required", maxlength: "ServiceLevelAgreement Type must not exceed 100 characters." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoAdd();
+                }
+            });
+
+            function DoAdd() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("AddServiceLevelAgreement")",
+                    data: {
+                        FleetPlateNumber: $("#add-number").val(),
+                        ServiceLevelAgreementType: $("#add-type").val(),
+                        DateRegisteredD: $("#add-registered").val(),
+                        DateExpirationD: $("#add-expiration").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            $("#add-number").val("");
+                            $("#add-type").val("");
+                            $("#add-registered").val("");
+                            $("#add-expiration").val("");
+
+                            toastr.success(data.message, "Success");
+                            $("#addModal").modal("hide");
+                            serviceLevelAgreementDT.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+        if (user_access.canEdit) {
+            $("#editForm").validate({
+                rules: {
+                    Number: { required: true, maxlength: 100 },
+                    Type: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    Number: { required: "Fleet Number / Plate Number is required", maxlength: "Number must not exceed 100 characters." },
+                    Type: { required: "ServiceLevelAgreement Type is required", maxlength: "ServiceLevelAgreement Type must not exceed 100 characters." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoEdit();
+                }
+            });
+
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateServiceLevelAgreement")",
+                    data: {
+                        Id: $("#edit-number").data("Id"),
+                        FleetPlateNumber: $("#edit-number").val(),
+                        ServiceLevelAgreementType: $("#edit-type").val(),
+                        DateRegisteredD: $("#edit-registered").val(),
+                        DateExpirationD: $("#edit-expiration").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            serviceLevelAgreementDT.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

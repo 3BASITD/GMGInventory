@@ -118,16 +118,16 @@ namespace GMGInventory.Controllers
 
             ResponseModel<int> responseModel = new ResponseModel<int>();
 
-            if (form.SavingAs == "post")
-            {
-                var checkItems = await packRepository.CheckItemAsync(form);
+            //if (form.SavingAs == "post")
+            //{
+                var checkItems = packRepository.CheckItem(form);
                 if (checkItems != null)
                 {
                     responseModel.Status = "Error2";
                     responseModel.Message = checkItems;
                     return Json(responseModel);
                 }
-            }
+            //}
 
             var orderId = await packRepository.SaveAsync(form);
             if (orderId == -1)
@@ -154,7 +154,7 @@ namespace GMGInventory.Controllers
 
             if (form.SavingAs == "post")
             {
-                var checkItems = await packRepository.CheckItemAsync(form);
+                var checkItems = packRepository.CheckItem(form);
                 if (checkItems != null)
                 {
                     responseModel.Status = "Error2";

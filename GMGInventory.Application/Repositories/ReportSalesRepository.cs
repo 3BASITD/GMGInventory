@@ -270,7 +270,8 @@ namespace GMGInventory.Application.Repositories
                                  invoice.ItemCode,
                                  invoice.ItemName,
                                  invoice.PartNumber,
-                                 invoice.Unit
+                                 invoice.Unit,
+                                 invoice.UnitPriceD
                              } into i
                              select new BestSellingItemRVM
                              {
@@ -282,7 +283,7 @@ namespace GMGInventory.Application.Repositories
                                  PartNumber = i.Key.PartNumber,
                                  QuantityD = filter.Basis == "Quantity" ? i.Sum(s => s.QuantityD) : 0,
                                  Unit = i.Key.Unit,
-                                 UnitPriceD = filter.Basis == "Amount" ? i.Sum(s => s.UnitPriceD) : 0
+                                 UnitPriceD = filter.Basis == "Amount" ? i.Key.UnitPriceD : 0
                              };
             return grpinvoice.ToList();
         }
@@ -1027,7 +1028,9 @@ namespace GMGInventory.Application.Repositories
                                  AgentName = i.Key.AgentName,
                                  Area = i.Key.Area,
                                  SalesD = i.Sum(s => s.SalesD),
-                                 PercentSalesD = (i.Sum(s => s.SalesD) / total) * 100,
+                                 //PercentSalesD = (i.Sum(s => s.SalesD) / total) * 100, // why 0 total
+                                 //PercentSalesD = (i.Sum(s=>s.SalesD) / (total < 1 ? 1 : total)) * 100,
+                                 PercentSalesD = i.Sum(s => s.SalesD) > 0 && total > 0 ? ((i.Sum(s => s.SalesD) / total) * 100) : 0,
                                  AgentTotalSalesD = total
                              };
             return grpinvoice.ToList();
@@ -1351,7 +1354,8 @@ namespace GMGInventory.Application.Repositories
                               ItemCode = soline.Item.Code,
                               ItemName = soline.Item.Name,
                               //PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
-                              PendingD = soline.Quantity - inventory > 0 ? soline.Quantity - inventory : 0,
+                              //PendingD = soline.Quantity - inventory > 0 ? soline.Quantity - inventory : 0,
+                              PendingD = Math.Max(0, soline.Quantity - inventory),
                               ReplenishDateD = soline.DateCreated
                           };
             var solineslist = await solines.ToListAsync();

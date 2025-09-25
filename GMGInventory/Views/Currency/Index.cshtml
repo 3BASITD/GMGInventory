@@ -1,0 +1,91 @@
+﻿@using GMGInventory.Data
+@model IEnumerable<Currency>
+
+@{
+    ViewData["Title"] = "Currencies";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-info mr-3"></span>To add or remove a currency from the list, update it in HashMicro and then sync this list.
+</div>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanUploadDownload)
+            {
+                <button class="btn btn-primary btn-sm float-right ml-2 btn-sync-hashmicro">
+                    <span class="fas fa-sync"></span>Sync Data from HashMicro
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-currencies">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var currencyDT = $('.table-currencies').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetCurrenciesDT")",
+                type: "POST"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "name", name: "Name" }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        currencyDT.on("draw", function () {
+            hideLoader();
+        });
+
+        if (user_access.canUploadDownload) {
+            $('.btn-sync-hashmicro').click(function (e) {
+                swal({
+                    title: "Sync Currency from HashMicro",
+                    text: "This will get all active Currency from HashMicro. Are you sure you want to reactivate this record?",
+                    icon: "info",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("UpdateList")",
+                            type: "POST",
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    swal.close();
+                                    currencyDT.ajax.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    </script>
+}

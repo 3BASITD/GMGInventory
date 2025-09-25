@@ -38,8 +38,14 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
-                <label for="invoice-date" class="form-label fw-normal mb-0">Invoice Date</label>
+                        <label for="invoice-date" class="form-label fw-normal mb-0">Invoice Date</label>
                         <input type="date" id="invoice-date" class="form-control form-control-sm" name="InvoiceDate" value="" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label for="invoice-due-date" class="form-label fw-normal mb-0">Invoice Due Date</label>
+                        <input type="date" id="invoice-due-date" class="form-control form-control-sm" name="InvoiceDueDate" value="" />
                     </div>
                 </div>
             </div>
@@ -191,26 +197,7 @@
             minimumInputLength: 1,
             placeholder: '@Model?.PackNumber',
             ajax: {
-                url: "@Url.Action("GetOptions", "Pack")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Pack")"
             }
         });
 
@@ -224,6 +211,7 @@
             url: "@Url.Action("GetInvoiceTypeOptions")",
             success: function (data, status, xhr) {
                 $("#invoice-invoice-type").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     minimumResultsForSearch: -1
                 });
@@ -266,14 +254,14 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (user_access.canAdd) {
-                            actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-plus"></i></button>';
+                            actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-plus"></i></button>';
                         }
                         return actions;
                     }
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
                     },
                     name: "ItemCode"
                 },
@@ -344,7 +332,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
                     },
                     name: "ItemCode",
                     className: "form-cell"
@@ -460,6 +448,7 @@
                         BIRInvoiceNumber: $("#invoice-control-number").val(),
                         InvoiceType: $("#invoice-invoice-type").val(),
                         InvoiceDate: $("#invoice-date").val(),
+                        DueDate: $("#invoice-due-date").val(),
                         Remarks: $("#invoice-remarks").val(),
                         Items: itemsToInvoice,
                         SavingAs: saving_as

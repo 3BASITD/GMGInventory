@@ -1,0 +1,494 @@
+﻿@model IEnumerable<DriverVM>
+
+@{
+    ViewData["Title"] = "Drivers";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanAdd)
+            {
+                <button class="btn btn-primary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <span class="fas fa-plus"></span>New Driver
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-drivers">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>License Number</th>
+                    <th>Restriction Code</th>
+                    <th>License Expiration</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Driver Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-5">First Name</dt>
+                    <dd class="col-sm-7 details-firstname"></dd>
+                    <dt class="col-sm-5">Last Name</dt>
+                    <dd class="col-sm-7 details-lastname"></dd>
+                    <dt class="col-sm-5">Nickname</dt>
+                    <dd class="col-sm-7 details-nickname"></dd>
+                    <dt class="col-sm-5">License Number</dt>
+                    <dd class="col-sm-7 details-number"></dd>
+                    <dt class="col-sm-5">Restriction Code</dt>
+                    <dd class="col-sm-7 details-restriction"></dd>
+                    <dt class="col-sm-5">License Expiration</dt>
+                    <dd class="col-sm-7 details-expiration"></dd>
+                    <dt class="col-sm-5">Created By</dt>
+                    <dd class="col-sm-7 details-created-by"></dd>
+                    <dt class="col-sm-5">Date Created</dt>
+                    <dd class="col-sm-7 details-created-date"></dd>
+                    <dt class="col-sm-5">Modified By</dt>
+                    <dd class="col-sm-7 details-modified-by"></dd>
+                    <dt class="col-sm-5">Date Modified</dt>
+                    <dd class="col-sm-7 details-modified-date"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (userAccess.CanAdd)
+{
+    <div class="modal fade" id="addModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Driver</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="add-first" class="form-label mb-0">First Name</label>
+                                    <input type="text" id="add-firstname" name="FirstName" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="add-last" class="form-label mb-0">Last Name</label>
+                                    <input type="text" id="add-lastname" name="LastName" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="add-nickname" class="form-label mb-0">Nickname</label>
+                                    <input type="text" id="add-nickname" name="Nickname" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="add-number" class="form-label mb-0">License Number</label>
+                                    <input type="text" id="add-number" name="LicenseNumber" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="add-restriction" class="form-label mb-0">Restriction</label>
+                                    <input type="text" id="add-restriction" name="Restriction" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label form="add-expiration" class="form-label mb-0">License Expiration</label>
+                                    <input type="date" id="add-expiration" name="Expiration" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (userAccess.CanEdit)
+{
+    <div class="modal fade" id="editModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Driver</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-firstname" class="form-label mb-0">First Name</label>
+                                    <input type="text" id="edit-firstname" name="FirstName" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-lastname" class="form-label mb-0">Last Name</label>
+                                    <input type="text" id="edit-lastname" name="LastName" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-nickname" class="form-label mb-0">Nickname</label>
+                                    <input type="text" id="edit-nickname" name="Nickname" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-number" class="form-label mb-0">License Number</label>
+                                    <input type="text" id="edit-number" name="LicenseNumber" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="edit-restriction" class="form-label mb-0">Restriction</label>
+                                    <input type="text" id="edit-restriction" name="Restriction" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label form="edit-expiration" class="form-label mb-0">License Expiration</label>
+                                    <input type="date" id="edit-expiration" name="Expiration" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var driverDT = $('.table-drivers').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetDriversDT")",
+                type: "POST"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    data: function (data, type, dataToSet) {
+                        return `${data.lastName}, ${data.firstName} (${data.nickname})`;
+                    },
+                    name: "Name"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.licenseNumber || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "LicenseNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.restriction || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "Restriction"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.licenseDateExpiration || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "LicenseDateExpiration"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<button type="button" class="btn btn-info btn-xs btn-details" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        if (data.isActive == true) {
+                            if (user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Driver" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            }
+
+                            if (user_access.canDelete) {
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete Driver" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            }
+                        } else {
+                            if (user_access.canAdd || user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate" data-microtip-title="Reactivate Driver" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                            }
+                        }
+                        actions += '</div>';
+                        return actions;
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        driverDT.on("draw", function () {
+            hideLoader();
+
+            $('.btn-details').click(function (e) {
+                var data = driverDT.row($(this).parents('tr')).data();
+
+                $(".details-firstname").html(data.firstName);
+                $(".details-lastname").html(data.lastName);
+                $(".details-nickname").html(data.nickname);
+                $(".details-number").html(data.licenseNumber || '<em class="text-muted">n/a</em>');
+                $(".details-restriction").html(data.restriction || '<em class="text-muted">n/a</em>');
+                $(".details-expiration").html(data.licenseDateExpiration || '<em class="text-muted">n/a</em>');
+                $(".details-created-by").html(data.userCreated);
+                $(".details-created-date").html(data.dateCreated);
+                $(".details-modified-by").html(data.userModified || '<em class="text-muted">n/a</em>');
+                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">n/a</em>');
+
+                $("#detailsModal").modal("show");
+            });
+
+            if (user_access.canEdit) {
+                $(".btn-edit").click(function (e) {
+                    var data = driverDT.row($(this).parents('tr')).data();
+
+                    $("#edit-firstname").data("Id", data.id);
+                    $("#edit-firstname").val(data.firstName);
+                    $("#edit-lastname").val(data.lastName);
+                    $("#edit-nickname").val(data.nickname);
+                    $("#edit-number").val(data.licenseNumber);
+                    $("#edit-restriction").val(data.restriction);
+                    $("#edit-expiration").val(data.licenseDateExpiration3);
+
+                    $("#editModal").modal("show");
+                });
+            }
+
+            if (user_access.canDelete) {
+                $('.btn-delete').click(function (e) {
+                    swal({
+                        title: "Delete / Deactivate Driver",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = driverDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("DeleteOrDeactivateDriver")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        driverDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.btn-reactivate').click(function (e) {
+                    swal({
+                        title: "Reactivate Driver",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = driverDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("ReactivateDriver")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        driverDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        if(user_access.canAdd){
+            $("#addForm").validate({
+                rules: {
+                    FirstName: { required: true, minlength: 2, maxlength: 100 },
+                    LastName: { required: true, minlength: 2, maxlength: 100 },
+                    Nickname: { required: true, minlength: 2, maxlength: 100 },
+                    LicenseNumber: { minlength: 7, maxlength: 100 },
+                    Restriction: { maxlength: 100 }
+                },
+                messages: {
+                    FirstName: { required: "First Name is required", minlength: "First Name must be atleast 2 characters.", maxlength: "First Name must not exceed 100 characters." },
+                    LastName: { required: "Last Name is required", minlength: "Last Name must be atleast 2 characters.", maxlength: "Last Name must not exceed 100 characters." },
+                    Nickname: { required: "Nickname is required", minlength: "Nickname must be atleast 2 characters.", maxlength: "Nickname must not exceed 100 characters." },
+                    LicenseNumber: { minlength: "License Number must be atleast 7 characters.", maxlength: "License Number must not exceed 100 characters." },
+                    Restriction: { maxlength: "Restriction Code must not exceed 100 characters." },
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoAdd();
+                }
+            });
+
+            function DoAdd() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("AddDriver")",
+                    data: {
+                        FirstName: $("#add-firstname").val(),
+                        LastName: $("#add-lastname").val(),
+                        Nickname: $("#add-nickname").val(),
+                        LicenseNumber: $("#add-number").val(),
+                        Restriction: $("#add-restriction").val(),
+                        LicenseDateExpirationD: $("#add-expiration").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            $("#add-firstname").val("");
+                            $("#add-lastname").val("");
+                            $("#add-nickname").val("");
+                            $("#add-number").val("");
+                            $("#add-restriction").val(""); 
+                            $("#add-expiration").val("");
+
+                            toastr.success(data.message, "Success");
+                            $("#addModal").modal("hide");
+                            driverDT.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+        if (user_access.canEdit) {
+            $("#editForm").validate({
+                rules: {
+                    FirstName: { required: true, minlength: 2, maxlength: 100 },
+                    LastName: { required: true, minlength: 2, maxlength: 100 },
+                    Nickname: { required: true, minlength: 2, maxlength: 100 },
+                    LicenseNumber: { minlength: 7, maxlength: 100 },
+                    Restriction: { maxlength: 100 }
+                },
+                messages: {
+                    FirstName: { required: "First Name is required", minlength: "First Name must be atleast 2 characters.", maxlength: "First Name must not exceed 100 characters." },
+                    LastName: { required: "Last Name is required", minlength: "Last Name must be atleast 2 characters.", maxlength: "Last Name must not exceed 100 characters." },
+                    Nickname: { required: "Nickname is required", minlength: "Nickname must be atleast 2 characters.", maxlength: "Nickname must not exceed 100 characters." },
+                    LicenseNumber: { minlength: "License Number must be atleast 7 characters.", maxlength: "License Number must not exceed 100 characters." },
+                    Restriction: { maxlength: "Restriction Code must not exceed 100 characters." },
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoEdit();
+                }
+            });
+
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateDriver")",
+                    data: {
+                        Id: $("#edit-firstname").data("Id"),
+                        FirstName: $("#edit-firstname").val(),
+                        LastName: $("#edit-lastname").val(),
+                        Nickname: $("#edit-nickname").val(),
+                        LicenseNumber: $("#edit-number").val(),
+                        Restriction: $("#edit-restriction").val(),
+                        LicenseDateExpirationD: $("#edit-expiration").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            driverDT.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

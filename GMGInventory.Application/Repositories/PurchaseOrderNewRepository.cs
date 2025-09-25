@@ -117,11 +117,11 @@ namespace GMGInventory.Application.Repositories
                                                   .Where(a => a.RequestItem.ItemId == prli.ItemId
                                                            && a.PurchaseOrder.Status.Name.ToLower() == "approved")
                                                   .OrderByDescending(a => a.DateCreated)
-                                                  .Select(a=> new
+                                                  .Select(a => new
                                                   {
                                                       Cost = a.UnitCost,
-                                                      Currency = a.PurchaseOrder.Currency.Code,
-                                                      CurrencyRate = a.PurchaseOrder.Currency.Rate
+                                                      Currency = a.PurchaseOrder.Currency.Name,
+                                                      CurrencyRate = a.PurchaseOrder.CurrencyRate
                                                   })
                                                   .FirstOrDefault()
                            where prli.PurchaseRequestId == RequestId
@@ -281,8 +281,8 @@ namespace GMGInventory.Application.Repositories
                               RegionId = firstrequest.SalesOrderId == null ? (int?)null : firstrequest.SalesOrder.Customer.Area.Region.Id,
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
-                              SupplierContactPerson = order.Supplier.ContactPerson,
-                              SupplierContactNumber = order.Supplier.OfficeTelNo,
+                              SupplierContactPerson = order.Supplier.ContactPerson + "",
+                              SupplierContactNumber = order.Supplier.OfficeTelNo + "",
                               SupplierAddress = order.Supplier.AddressLine1,
                               Term = order.Term.Name,
                               TermId = order.Term.Id,
@@ -299,7 +299,7 @@ namespace GMGInventory.Application.Repositories
                               Discount2D = order.Discount2,
                               Discount3D = order.Discount3,
                               IsVATIncluded = order.IsVATIncluded ? "Yes" : "No",
-                              Currency = order.Currency.Code,
+                              Currency = order.Currency.Name,
                               CurrencyId = order.Currency.Id,
                               CurrencyRateD = order.CurrencyRate,
                               Remarks = order.Remarks,
@@ -435,107 +435,100 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel<int>> AddAsync(PurchaseOrderSaveVM form, IList<PurchaseOrderLineItemVM> Items)
         {
-            var response = new ResponseModel<int>();
-
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-            var type = await context.PurchaseOrderTypes.Where(s => s.Id == form.TypeId).FirstOrDefaultAsync();
-            if (type == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid type.";
-                response.NewRow = -1;
-            }
-            else
-            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
-                var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
-                if (status == null)
+                var type = await context.PurchaseOrderTypes.Where(s => s.Id == form.TypeId).FirstOrDefaultAsync();
+                if (type == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Invalid status.";
-                    response.NewRow = -1;
+                    return new ResponseModel<int> { Status = "Error", Message = "Invalid type", NewRow = -1 };
                 }
                 else
                 {
-                    var previousOrder = await context.PurchaseOrderNews
-                                                     .Where(s => s.Id == form.ResubmitId)
-                                                     .FirstOrDefaultAsync();
 
-                    var docNumber = previousOrder == null
-                                  ? await GetNewDocumentNumber(form.TypeId)
-                                  : previousOrder.DocumentNumber;
-
-                    var order = new PurchaseOrderNew
+                    var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
+                    if (status == null)
                     {
-                        DocumentNumber = docNumber,
-                        TypeId = form.TypeId,
-                        SupplierId = form.SupplierId,
-                        TermId = form.TermsId,
-                        CurrencyId = form.CurrencyId,
-                        CurrencyRate = form.CurrencyRate,
-                        DeliveryModeId = form.DeliveryModeId,
-                        DeliveryAddressId = form.DeliveryAddressId,
-                        OrderDate = form.DateOrdered,
-                        CanvasSummaryReference = form.Reference + "",
-                        Remarks = form.Remarks,
-                        StatusId = status.Id,
-                        Discount1 = form.Discount1,
-                        Discount2 = form.Discount2,
-                        Discount3 = form.Discount3,
-                        IsVATIncluded = form.IsVATIncluded
-                    };
-                    await context.PurchaseOrderNews.AddAsync(order);
-                    await context.SaveChangesAsync(currentUserId);
-
-                    if (previousOrder != null)
-                    {
-                        var statusResubmitted = await context.PurchaseStatuses
-                                                             .Where(s => s.Name.ToLower() == "resubmitted")
-                                                             .FirstOrDefaultAsync();
-                        previousOrder.ResubmitId = order.Id;
-                        if (statusResubmitted != null)
-                        {
-                            previousOrder.StatusId = statusResubmitted.Id;
-                        }
-                        context.PurchaseOrderNews.Update(previousOrder);
-                        await context.SaveChangesAsync(currentUserId);
+                        return new ResponseModel<int> { Status = "Error", Message = "Invalid status", NewRow = -1 };
                     }
+                    else
+                    {
+                        var previousOrder = await context.PurchaseOrderNews
+                                                         .Where(s => s.Id == form.ResubmitId)
+                                                         .FirstOrDefaultAsync();
 
-                    await SaveItemsAsync(Items, order.Id);
+                        var docNumber = previousOrder == null
+                                      ? await GetNewDocumentNumber(form.TypeId)
+                                      : previousOrder.DocumentNumber;
 
-                    response.Status = "Success";
-                    response.Message = form.Status.ToLower() == "draft" ? "Purchase order saved as draft." : "Purchase order successfully submitted.";
-                    response.NewRow = order.Id;
+                        var order = new PurchaseOrderNew
+                        {
+                            DocumentNumber = docNumber,
+                            TypeId = form.TypeId,
+                            SupplierId = form.SupplierId,
+                            TermId = form.TermsId,
+                            CurrencyId = form.CurrencyId,
+                            CurrencyRate = form.CurrencyRate,
+                            DeliveryModeId = form.DeliveryModeId,
+                            DeliveryAddressId = form.DeliveryAddressId,
+                            OrderDate = form.DateOrdered,
+                            CanvasSummaryReference = form.Reference + "",
+                            Remarks = form.Remarks,
+                            StatusId = status.Id,
+                            Discount1 = form.Discount1,
+                            Discount2 = form.Discount2,
+                            Discount3 = form.Discount3,
+                            IsVATIncluded = form.IsVATIncluded
+                        };
+                        await context.PurchaseOrderNews.AddAsync(order);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        if (previousOrder != null)
+                        {
+                            var statusResubmitted = await context.PurchaseStatuses
+                                                                 .Where(s => s.Name.ToLower() == "resubmitted")
+                                                                 .FirstOrDefaultAsync();
+                            previousOrder.ResubmitId = order.Id;
+                            if (statusResubmitted != null)
+                            {
+                                previousOrder.StatusId = statusResubmitted.Id;
+                            }
+                            context.PurchaseOrderNews.Update(previousOrder);
+                            await context.SaveChangesAsync(currentUserId);
+                        }
+
+                        await SaveItemsAsync(Items, order.Id);
+
+                        return new ResponseModel<int> { Status = "Success", Message = form.Status.ToLower() == "draft" ? "Purchase order saved as draft." : "Purchase order successfully submitted.", NewRow = order.Id };
+                    }
                 }
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel<int> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex), NewRow = -1 };
+            }
         }
 
         public async Task<ResponseModel> SaveItemsAsync(IList<PurchaseOrderLineItemVM> Items, int orderId, string? status = null)
         {
-            var response = new ResponseModel();
-
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-            var order = await context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefaultAsync();
-
-            if (order == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase order";
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(status))
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                var order = await context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefaultAsync();
+
+                if (order == null)
                 {
-                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
-                    order.StatusId = statusId;
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase order" };
                 }
-
-                try
+                else
                 {
+                    if (!string.IsNullOrWhiteSpace(status))
+                    {
+                        int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
+                        order.StatusId = statusId;
+                    }
                     foreach (var rename in Items)
                     {
                         var i = context.PurchaseRequestLineItems.Where(s => s.Id == rename.RequestItemId).FirstOrDefault();
@@ -588,91 +581,84 @@ namespace GMGInventory.Application.Repositories
 
                     await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "Order item(s) successfully saved";
-                }
-                catch (Exception ex)
-                {
-                    response.Status = "Error";
-                    response.Message = SystemFormat.GetInnermostExceptionMessage(ex);
+                    return new ResponseModel { Status = "Success", Message = "Order item(s) successfully saved" };
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> UpdateCostAsync(POItemCostVM cost)
         {
-            var response = new ResponseModel();
-
-            if (cost.OldCostD == cost.NewCostD)
+            try
             {
-                response.Status = "Error";
-                response.Message = "No change for cost, nothing so save";
-            }
-            else
-            {
-                var poitem = await context.PurchaseOrderNewLineItems
-                                          .Include(s => s.RequestItem)
-                                          .Where(s => s.Id == cost.POItemId)
-                                          .FirstOrDefaultAsync();
-
-                if (poitem == null)
+                if (cost.OldCostD == cost.NewCostD)
                 {
-                    response.Status = "Error";
-                    response.Message = "Invalid Item Record";
-                }
-                else if (poitem.UnitCost != cost.OldCostD)
-                {
-                    response.Status = "Error";
-                    response.Message = "Invalid old cost. The old cost should be " + poitem.UnitCost + ", but you are saving it as " + cost.OldCostD + ". Please reload the page and try again.";
-
+                    return new ResponseModel { Status = "Error", Message = "No change for cost, nothing so save" };
                 }
                 else
                 {
-                    var po = await context.PurchaseOrderNews
-                                          .Include(s => s.Status)
-                                          .Where(s => s.Id == poitem.PurchaseOrderId)
-                                          .FirstOrDefaultAsync();
-                    if (po == null)
+                    var poitem = await context.PurchaseOrderNewLineItems
+                                              .Include(s => s.RequestItem)
+                                              .Where(s => s.Id == cost.POItemId)
+                                              .FirstOrDefaultAsync();
+
+                    if (poitem == null)
                     {
-                        response.Status = "Error";
-                        response.Message = "Invalid Record";
+                        return new ResponseModel { Status = "Error", Message = "Invalid Item Record" };
                     }
-                    else if (po.Status.Name.ToLower() != "approved")
+                    else if (poitem.UnitCost != cost.OldCostD)
                     {
-                        response.Status = "Error";
-                        response.Message = "This function is only available for approved PO";
-                    }
-                    else if (await context.PurchaseOrderNewLineItemNewCosts
-                                          .Where(s => s.OrderItemId == poitem.Id)
-                                          .CountAsync() >= 3)
-                    {
-                        response.Status = "Error";
-                        response.Message = "You are only allowed to update the cost for a maximum of 3 times only.";
+                        return new ResponseModel { Status = "Error", Message = "Invalid old cost. The old cost should be " + poitem.UnitCost + ", but you are saving it as " + cost.OldCostD + ". Please reload the page and try again." };
                     }
                     else
                     {
-                        var newcost = new PurchaseOrderNewLineItemNewCost
+                        var po = await context.PurchaseOrderNews
+                                              .Include(s => s.Status)
+                                              .Where(s => s.Id == poitem.PurchaseOrderId)
+                                              .FirstOrDefaultAsync();
+                        if (po == null)
                         {
-                            OrderItemId = poitem.Id,
-                            PreviousCost = poitem.UnitCost,
-                            NewCost = cost.NewCostD,
-                            Remarks = cost.Remarks
-                        };
-                        string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                        await context.PurchaseOrderNewLineItemNewCosts.AddAsync(newcost);
-                        await context.SaveChangesAsync(currentUserId);
+                            return new ResponseModel { Status = "Error", Message = "Invalid Record" };
+                        }
+                        else if (po.Status.Name.ToLower() != "approved")
+                        {
+                            return new ResponseModel { Status = "Error", Message = "This function is only available for approved PO" };
+                        }
+                        else if (await context.PurchaseOrderNewLineItemNewCosts
+                                              .Where(s => s.OrderItemId == poitem.Id)
+                                              .CountAsync() >= 3)
+                        {
+                            return new ResponseModel { Status = "Error", Message = "You are only allowed to update the cost for a maximum of 3 times only." };
+                        }
+                        else
+                        {
+                            var newcost = new PurchaseOrderNewLineItemNewCost
+                            {
+                                OrderItemId = poitem.Id,
+                                PreviousCost = poitem.UnitCost,
+                                NewCost = cost.NewCostD,
+                                Remarks = cost.Remarks
+                            };
+                            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                            await context.PurchaseOrderNewLineItemNewCosts.AddAsync(newcost);
+                            await context.SaveChangesAsync(currentUserId);
 
-                        poitem.UnitCost = cost.NewCostD;
-                        context.PurchaseOrderNewLineItems.Update(poitem);
-                        await context.SaveChangesAsync(currentUserId);
+                            poitem.UnitCost = cost.NewCostD;
+                            context.PurchaseOrderNewLineItems.Update(poitem);
+                            await context.SaveChangesAsync(currentUserId);
 
-                        response.Status = "Success";
-                        response.Message = "Unit cost for " + poitem.RequestItem.ItemDescription + " is now changed to " + cost.NewCost;
+                            return new ResponseModel { Status = "Success", Message = "Unit cost for " + poitem.RequestItem.ItemDescription + " is now changed to " + cost.NewCost };
+                        }
                     }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
 
@@ -696,77 +682,74 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> UpdateQuantityAsync(POItemQuantityVM quantity)
         {
-            var response = new ResponseModel();
-
-            if (quantity.OldQuantity == quantity.NewQuantity)
+            try
             {
-                response.Status = "Error";
-                response.Message = "No change for quantity, nothing so save";
-            }
-            else
-            {
-                var poitem = await context.PurchaseOrderNewLineItems
-                                          .Include(s => s.RequestItem)
-                                          .Where(s => s.Id == quantity.POItemId)
-                                          .FirstOrDefaultAsync();
-                if (poitem == null)
+                if (quantity.OldQuantity == quantity.NewQuantity)
                 {
-                    response.Status = "Error";
-                    response.Message = "Invalid Item Record";
-                }
-                else if (poitem.Quantity != quantity.OldQuantity)
-                {
-                    response.Status = "Error";
-                    response.Message = "Invalid Old Quantity";
+                    return new ResponseModel { Status = "Error", Message = "No change for quantity, nothing so save" };
                 }
                 else
                 {
-                    var po = await context.PurchaseOrderNews
-                                          .Include(s => s.Status)
-                                          .Where(s => s.Id == poitem.PurchaseOrderId)
-                                          .FirstOrDefaultAsync();
-                    if (po == null)
+                    var poitem = await context.PurchaseOrderNewLineItems
+                                              .Include(s => s.RequestItem)
+                                              .Where(s => s.Id == quantity.POItemId)
+                                              .FirstOrDefaultAsync();
+                    if (poitem == null)
                     {
-                        response.Status = "Error";
-                        response.Message = "Invalid Record";
+                        return new ResponseModel { Status = "Error", Message = "Invalid Item Record" };
                     }
-                    else if (po.Status.Name.ToLower() != "approved")
+                    else if (poitem.Quantity != quantity.OldQuantity)
                     {
-                        response.Status = "Error";
-                        response.Message = "This function is only available for approved PO";
-                    }
-                    else if (await context.PurchaseOrderNewLineItemNewQuantities
-                                          .Where(s => s.OrderItemId == poitem.Id)
-                                          .CountAsync() >= 3)
-                    {
-                        response.Status = "Error";
-                        response.Message = "You are only allowed to update the quantity for a maximum of 3 times only.";
+                        return new ResponseModel { Status = "Error", Message = "Invalid Old Quantity" };
                     }
                     else
                     {
-                        var qty = new PurchaseOrderNewLineItemNewQuantity
+                        var po = await context.PurchaseOrderNews
+                                              .Include(s => s.Status)
+                                              .Where(s => s.Id == poitem.PurchaseOrderId)
+                                              .FirstOrDefaultAsync();
+                        if (po == null)
                         {
-                            OrderItemId = poitem.Id,
-                            PreviousQuantity = poitem.Quantity,
-                            NewQuantity = quantity.NewQuantity,
-                            Remarks = quantity.Remarks
-                        };
-                        string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                        await context.PurchaseOrderNewLineItemNewQuantities.AddAsync(qty);
-                        await context.SaveChangesAsync(currentUserId);
+                            return new ResponseModel { Status = "Error", Message = "Invalid Record" };
+                        }
+                        else if (po.Status.Name.ToLower() != "approved")
+                        {
+                            return new ResponseModel { Status = "Error", Message = "This function is only available for approved PO" };
+                        }
+                        else if (await context.PurchaseOrderNewLineItemNewQuantities
+                                              .Where(s => s.OrderItemId == poitem.Id)
+                                              .CountAsync() >= 3)
+                        {
+                            return new ResponseModel { Status = "Error", Message = "You are only allowed to update the quantity for a maximum of 3 times only." };
+                        }
+                        else
+                        {
+                            var qty = new PurchaseOrderNewLineItemNewQuantity
+                            {
+                                OrderItemId = poitem.Id,
+                                PreviousQuantity = poitem.Quantity,
+                                NewQuantity = quantity.NewQuantity,
+                                Remarks = quantity.Remarks
+                            };
+                            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                            await context.PurchaseOrderNewLineItemNewQuantities.AddAsync(qty);
+                            await context.SaveChangesAsync(currentUserId);
 
-                        var itemId = poitem.RequestItem.ItemId;
+                            var itemId = poitem.RequestItem.ItemId;
 
-                        poitem.Quantity = quantity.NewQuantity;
-                        context.PurchaseOrderNewLineItems.Update(poitem);
-                        await context.SaveChangesAsync(currentUserId);
+                            poitem.Quantity = quantity.NewQuantity;
+                            context.PurchaseOrderNewLineItems.Update(poitem);
+                            await context.SaveChangesAsync(currentUserId);
 
-                        response.Status = "Success";
-                        response.Message = "Quantity for " + poitem.RequestItem.ItemDescription + " is now changed to " + quantity.NewQuantity;
+                            return new ResponseModel { Status = "Success", Message = "Quantity for " + poitem.RequestItem.ItemDescription + " is now changed to " + quantity.NewQuantity };
+                        }
                     }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<IList<POItemQuantityVM>> GetQuantityUpdateListAsync(int orderItemId)
@@ -788,80 +771,79 @@ namespace GMGInventory.Application.Repositories
         }
         public async Task<ResponseModel> ApproveAsync(int orderId)
         {
-            var response = new ResponseModel();
-
-            var order = context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefault();
-            if (order == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase order";
-            }
-            else
-            {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
-
-                if (!string.IsNullOrWhiteSpace(order.ApproverId))
+                var order = context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefault();
+                if (order == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase order already approved.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase order" };
                 }
                 else
                 {
-                    order.ApproverId = currentUserId;
-                    order.StatusId = statusId;
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
 
-                    context.PurchaseOrderNews.Update(order);
-                    await context.SaveChangesAsync(currentUserId);
+                    if (!string.IsNullOrWhiteSpace(order.ApproverId))
+                    {
+                        return new ResponseModel { Status = "Error", Message = "Purchase order already approved." };
+                    }
+                    else
+                    {
+                        order.ApproverId = currentUserId;
+                        order.StatusId = statusId;
 
-                    response.Status = "Success";
-                    response.Message = "Purchase order successfully approved.";
+                        context.PurchaseOrderNews.Update(order);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Success", Message = "Purchase order successfully approved." };
+                    }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> DisapproveAsync(int orderId, string? reason)
         {
-            var response = new ResponseModel();
-
-
-            var order = context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefault();
-            if (order == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase order";
-            }
-            else
-            {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
-
-                if (!string.IsNullOrWhiteSpace(order.DisapproverId))
+                var order = context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefault();
+                if (order == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase order already disapproved.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase order" };
                 }
                 else
                 {
-                    order.DisapproverId = currentUserId;
-                    order.DisapprovedReason = reason;
-                    order.StatusId = statusId;
+                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
-                    context.PurchaseOrderNews.Update(order);
-                    await context.SaveChangesAsync(currentUserId);
+                    if (!string.IsNullOrWhiteSpace(order.DisapproverId))
+                    {
+                        return new ResponseModel { Status = "Error", Message = "Purchase order already disapproved." };
+                    }
+                    else
+                    {
+                        order.DisapproverId = currentUserId;
+                        order.DisapprovedReason = reason;
+                        order.StatusId = statusId;
 
-                    response.Status = "Success";
-                    response.Message = "Purchase order successfully disapproved.";
+                        context.PurchaseOrderNews.Update(order);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Success", Message = "Purchase order successfully disapproved." };
+                    }
                 }
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> DeleteAsync(int requestId)
         {
-            var response = new ResponseModel();
             try
             {
                 var existingRequest = await context.PurchaseRequests
@@ -870,13 +852,11 @@ namespace GMGInventory.Application.Repositories
 
                 if (existingRequest == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase request not found.";
+                    return new ResponseModel { Status = "Error", Message = "Purchase request not found." };
                 }
                 else if (existingRequest.Status.Name.ToLower() != "draft")
                 {
-                    response.Status = "Error";
-                    response.Message = "Only draft can be deleted.";
+                    return new ResponseModel { Status = "Error", Message = "Only draft can be deleted." };
                 }
                 else
                 {
@@ -893,17 +873,13 @@ namespace GMGInventory.Application.Repositories
                     context.PurchaseRequests.Remove(existingRequest);
                     await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "Purchase request successfully deleted.";
+                    return new ResponseModel { Status = "Success", Message = "Purchase request successfully deleted." };
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                response.Status = "Error";
-                response.Message = "An error occurred while deleting the purchase request.";
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
             }
-
-            return response;
         }
     }
 }

@@ -23,5 +23,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string? Restriction { get; set; }
         public DateTime? LicenseDateExpiration { get; set; }
+        public bool IsActive { get; set; }
     }
 }

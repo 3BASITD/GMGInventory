@@ -197,26 +197,7 @@
                     return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
-                    url: "@Url.Action("GetOptions", "Customer")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                    url: "@Url.Action("GetOptions", "Customer")"
                 },
                 dropdownParent: $("#filterModal")
             });
@@ -248,26 +229,7 @@
                     return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
-                    url: "@Url.Action("GetOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                    url: "@Url.Action("GetOptions", "Item")"
                 },
                 dropdownParent: $("#filterModal")
             });
@@ -318,26 +280,7 @@
                     return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
                 },
                 ajax: {
-                    url: "@Url.Action("GetOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                    url: "@Url.Action("GetOptions", "Item")"
                 },
                 dropdownParent: $("#filterModal")
             });
@@ -370,6 +313,7 @@
                 url: "@Url.Action("GetOptions", "Category")",
                 success: function (data, status, xhr) {
                     $("#filter-category").select2({
+                        ajax: null, //already fetched outside
                         tags: true,
                         data: data,
                         allowClear: true,
@@ -391,6 +335,7 @@
                 url: "@Url.Action("GetOptions", "ItemType")",
                 success: function (data, status, xhr) {
                     $("#filter-item-type").select2({
+                        ajax: null, //already fetched outside
                         tags: true,
                         data: data,
                         allowClear: true,
@@ -412,6 +357,7 @@
                 url: "@Url.Action("GetOptions", "Brand")",
                 success: function (data, status, xhr) {
                     $("#filter-brand").select2({
+                        ajax: null, //already fetched outside
                         tags: true,
                         data: data,
                         allowClear: true,

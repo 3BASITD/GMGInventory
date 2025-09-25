@@ -168,6 +168,7 @@ namespace GMGInventory.Application.Repositories
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
                                  InvoiceDateD = invoice.InvoiceDate,
+                                 InvoiceDueDateD = invoice.DueDate,
                                  InvoiceNumber = invoice.InvoiceNumber,
                                  InvoiceType = invoice.InvoiceType.Name,
                                  InvoiceTypeId = invoice.InvoiceType.Id,
@@ -216,6 +217,7 @@ namespace GMGInventory.Application.Repositories
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
                                  InvoiceDateD = invoice.InvoiceDate,
+                                 InvoiceDueDateD = invoice.DueDate,
                                  InvoiceNumber = invoice.InvoiceNumber,
                                  InvoiceType = invoice.InvoiceType.Name,
                                  InvoiceTypeId = invoice.InvoiceTypeId,
@@ -290,6 +292,7 @@ namespace GMGInventory.Application.Repositories
                                Customer = inv.SalesOrder.Customer.Name,
                                Id = inv.Id,
                                InvoiceDateD = inv.InvoiceDate,
+                               InvoiceDueDateD = inv.DueDate == null ? inv.InvoiceDate : inv.DueDate.Value,
                                InvoiceNumber = inv.InvoiceNumber,
                                InvoiceType = inv.InvoiceType.Code,
                                PackNumber = inv.PackId,
@@ -703,6 +706,7 @@ namespace GMGInventory.Application.Repositories
                     invoice.ControlNumber = form.BIRInvoiceNumber;
                     invoice.InvoiceTypeId = form.InvoiceType;
                     invoice.InvoiceDate = form.InvoiceDate;
+                    invoice.DueDate = form.DueDate;
                     invoice.Remarks = form.Remarks;
                     context.Invoices.Update(invoice);
                     await context.SaveChangesAsync(currentUserId);

@@ -160,26 +160,7 @@
                 return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
             ajax: {
-                url: "@Url.Action("GetOptionsWithOrder", "Customer")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptionsWithOrder", "Customer")"
             },
             dropdownParent: $("#generateSOA")
         });
@@ -206,28 +187,14 @@
             },
             ajax: {
                 url: "@Url.Action("GetOptionsWithOrder", "Agent")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
                 data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1,
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
                         CustomerId: $("#soa-customer").val(),
                         DateFrom: $("#soa-from").val(),
                         DateTo: $("#soa-to").val()
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                    });
+                }
             },
             dropdownParent: $("#generateSOA")
         });
@@ -274,7 +241,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         return actions;
                     }
                 }

@@ -82,6 +82,7 @@
             url: "@Url.Action("GetRolesOptions", "Access")",
             success: function (data, status, xhr) {
                 $("#Role").select2({
+                    ajax: null, //already fetched outside
                     data: data
                 });
             }

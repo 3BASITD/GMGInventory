@@ -208,7 +208,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (user_access.canEdit) {
                             if (data.isActive != true) {
                                 actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-warehouse" data-microtip-title="Reactivate Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-check"></i></button>';

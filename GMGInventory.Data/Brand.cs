@@ -7,6 +7,7 @@ namespace GMGInventory.Data
         public Brand()
         {
             this.Items = new HashSet<Item>();
+            this.CustomerBrandDiscounts = new HashSet<CustomerBrandDiscount>();
         }
 
         [Column(TypeName = "nvarchar(10)")]
@@ -22,5 +23,6 @@ namespace GMGInventory.Data
         public bool IsActive { get; set; }
 
         public ICollection<Item> Items { get; set; }
+        public ICollection<CustomerBrandDiscount> CustomerBrandDiscounts { get; set; }
     }
 }

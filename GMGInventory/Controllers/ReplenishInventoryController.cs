@@ -17,11 +17,6 @@ namespace GMGInventory.Controllers
             return Json(await purchaseOrderRepository.GetOptions(search, page));
         }
 
-        public async Task<IActionResult> GetCurrencyOptions(int? IncludeId)
-        {
-            return Json(await purchaseOrderRepository.GetCurrencyOptions(IncludeId));
-        }
-
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ReplenishInventory, AccessTypes.View);

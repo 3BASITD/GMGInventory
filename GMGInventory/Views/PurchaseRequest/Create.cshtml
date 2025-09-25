@@ -288,7 +288,7 @@
                     },
                     className: "form-cell"
                 },
-                { data: "lineNumber", name: "LineNumber", className: "form-cell" },
+                { data: "lineNumber", name: "LineNumber", className: "form-cell" }, 
                 { data: "salesOrderNumber", name: "SalesOrderNumber", className: "form-cell" },
                 { data: "customer", name: "Customer", className: "form-cell" },
                 {
@@ -296,7 +296,7 @@
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
+                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
                         }
                     },
                     name: "ItemCode",
@@ -416,7 +416,7 @@
                 rowData.lineNumber = newLineNumber;
                 itemDT.row(row).data(rowData);
 
-                itemDT.draw();
+                itemDT.order([1, 'asc']).draw();
             });
 
             $(".btn-down-item").off("click").on("click", function () {
@@ -438,7 +438,7 @@
                 rowData.lineNumber = newLineNumber;
                 itemDT.row(row).data(rowData);
 
-                itemDT.draw();
+                itemDT.order([1, 'asc']).draw();
             });
 
             ComputeTotalQuantity();
@@ -460,6 +460,7 @@
                     },
                     success: function (data, status, xhr) {
                         $("#request-type").select2({
+                            ajax: null, //already fetched outside
                             data: data,
                             minimumResultsForSearch: -1
                         }).on("change", function () {
@@ -490,6 +491,7 @@
                     },
                     success: function (data) {
                         $("#request-purpose").select2({
+                            ajax: null, //already fetched outside
                             data: data,
                             minimumResultsForSearch: -1
                         }).on("change", function () {
@@ -510,6 +512,7 @@
             url: "@Url.Action("GetOptions", "Region")",
             success: function (data, status, xhr) {
                 $("#request-region").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     minimumResultsForSearch: -1
                 }).on("change", function () {
@@ -648,25 +651,6 @@
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true,
                     complete: AssignItemEvent
                 },
                 dropdownParent: $("#addModal")
@@ -711,26 +695,12 @@
                 },
                 ajax: {
                     url: "@Url.Action("GetUnservedOptions", "Item")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
                     data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1,
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
                             SalesOrderId: $("#add-so-number").val()
-                        };
+                        });
                     },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true,
                     complete: AssignItemEvent
                 },
                 dropdownParent: $("#addModal")
@@ -785,13 +755,9 @@
             },
             ajax: {
                 url: "@Url.Action("GetSalesOrderUnservedOnlyOptions", "SalesOrder")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
                 data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1,
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
                         regionId: function () {
                             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
                             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
@@ -799,18 +765,8 @@
 
                             return selectedRegion;
                         }
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                    });
+                }
             },
             dropdownParent: $("#addModal")
         });
@@ -823,6 +779,7 @@
             url: "@Url.Action("GetOptions", "Unit")",
             success: function (data, status, xhr) {
                 $("#add-unit2").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     minimumResultsForSearch: -1,
                     placeholder: "<empty>",

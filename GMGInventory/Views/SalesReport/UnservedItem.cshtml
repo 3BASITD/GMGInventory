@@ -129,6 +129,7 @@
             url: "@Url.Action("GetOptions", "Brand")",
             success: function (data, status, xhr) {
                 $("#filter-brand").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {

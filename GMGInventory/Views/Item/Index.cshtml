@@ -376,6 +376,7 @@
                 loadselect2loaded = true;
 
                 $('.select2filter').select2({
+                    ajax: null, //already fetched outside
                     allowClear: true,
                     placeholder: {
                         id: "",
@@ -393,6 +394,7 @@
                         success: function (data, status, xhr) {
                             if (user_access.canAdd) {
                                 $("#create-unit").select2({
+                                    ajax: null, //already fetched outside
                                     data: data,
                                     dropdownParent: $("#createModal")
                                 });
@@ -400,6 +402,7 @@
 
                             if (user_access.canEdit) {
                                 $("#edit-unit").select2({
+                                    ajax: null, //already fetched outside
                                     data: data,
                                     dropdownParent: $("#editModal")
                                 });
@@ -413,14 +416,16 @@
                         url: "@Url.Action("GetOptions", "Category")",
                         success: function (data, status, xhr) {
                             if (user_access.canAdd) {
-                            $("#create-category").select2({
-                                data: data,
-                                dropdownParent: $("#createModal")
+                                $("#create-category").select2({
+                                    ajax: null, //already fetched outside
+                                    data: data,
+                                    dropdownParent: $("#createModal")
                                 });
                             }
 
                             if (user_access.canEdit) {
                                 $("#edit-category").select2({
+                                    ajax: null, //already fetched outside
                                     data: data,
                                     dropdownParent: $("#editModal")
                                 });
@@ -435,6 +440,7 @@
                         success: function (data, status, xhr) {
                             if (user_access.canAdd) {
                             $("#create-item-type").select2({
+                                ajax: null, //already fetched outside
                                 data: data,
                                 //theme: "bootstrap-5",
                                 dropdownParent: $("#createModal")
@@ -443,6 +449,7 @@
 
                             if (user_access.canEdit) {
                                 $("#edit-item-type").select2({
+                                    ajax: null, //already fetched outside
                                     data: data,
                                     //theme: "bootstrap-5",
                                     dropdownParent: $("#editModal")
@@ -458,6 +465,7 @@
                         success: function (data, status, xhr) {
                             if (user_access.canAdd) {
                             $("#create-brand").select2({
+                                ajax: null, //already fetched outside
                                 data: data,
                                 dropdownParent: $("#createModal")
                                 });
@@ -465,6 +473,7 @@
 
                             if (user_access.canEdit) {
                                 $("#edit-brand").select2({
+                                    ajax: null, //already fetched outside
                                     data: data,
                                     dropdownParent: $("#editModal")
                                 });
@@ -515,7 +524,7 @@
                     { data: "netPrice", name: "NetPrice", className: "text-end", visible: user_access.canView },
                     {
                         data: function (data, type, dataToSet) {
-                            //return '<span data-microtip-title="[Inventory:' + FormatStringInteger(data.quantityInventoryD) + ']+[Served:' + FormatStringInteger(data.quantityServedD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityServedD) + ']-[Invoiced:' + FormatStringInteger(data.quantityInvoiceD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityInvoiceD) + ']" data-microtip-position="top-left" role="tooltip">' + data.quantity + '</span>';
+                            //return '<span data-microtip-title="[Inventory:' + FormatStringInteger(data.quantityInventoryD) + ']+[Served:' + FormatStringInteger(data.quantityServedD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityServedD) + ']-[Invoiced:' + FormatStringInteger(data.quantityInvoiceD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityInvoiceD) + ']" data-microtip-position="bottom-left" role="tooltip">' + data.quantity + '</span>';
                             return data.quantity;
                         },
                         name: "Quantity",
@@ -526,17 +535,17 @@
                         data: function (data, type, dataToSet) {
                             var actions = '<div class="btn-group" role="group">';
                             if (data.giveAction) { // check if first item specially for multiple warehouse
-                                actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                                actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                                     if (data.isActive) {
                                         if (user_access.canEdit) {
-                                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                                         }
                                         if (user_access.canDelete) {
-                                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                                         }
                                     } else {
                                         if (user_access.canAdd || user_access.canEdit) {
-                                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
                                         }
                                     }
                             }

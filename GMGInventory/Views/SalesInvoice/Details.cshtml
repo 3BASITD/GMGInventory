@@ -17,17 +17,20 @@
             <div class="card-tools">
                 @if (Model.Status.ToLower() != "cancelled")
                 {
-                    @if (Model.HashMicroMoveId != null)
+                    @if(hashMicroUserAccess.CanUploadDownload)
                     {
-                        <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="ViewHashMicro()" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-cloud"></span>
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="MoveToHashMicro()">
-                            <span class="fas fa-upload"></span> Move to HashMicro
-                        </button>
+                        @if (Model.HashMicroMoveId != null)
+                        {
+                            <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="ViewHashMicro()" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-cloud"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="MoveToHashMicro()">
+                                <span class="fas fa-upload"></span> Move to HashMicro
+                            </button>
+                        }
                     }
                     @if (userAccess.CanDelete)
                     {
@@ -37,7 +40,7 @@
                     }
                     else
                     {
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="top-left" role="tooltip">
+                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
                             <span class="fas fa-trash"></span> Cancel
                         </button>
                     }
@@ -64,7 +67,7 @@
                     }
                     else
                     {
-                        <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="top-left" role="tooltip">
+                        <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
                             <span class="fas fa-print"></span> Print
                         </button>
                     }
@@ -78,7 +81,7 @@
                         }
                         else
                         {
-                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
                                 <span class="fas fa-save"></span> Update
                             </button>
                         }
@@ -96,10 +99,10 @@
                         }
                         else
                         {
-                            <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                            <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
                                 <span class="fas fa-save"></span> Save as Draft
                             </button>
-                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="top-left" role="tooltip">
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
                                 <span class="fas fa-paper-plane"></span> Post
                             </button>
                         }
@@ -149,6 +152,26 @@
                             </span>
                             <b class="d-block form-gayahin">
                                 @Model.InvoiceDate1
+                            </b>
+                        }
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        @*@if (Model.Status.ToLower() == "draft")
+                        {*@
+                        @if (Model.Status.ToLower() != "cancelled")
+                        {
+                            <label for="invoice-due-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.InvoiceDueDate1)</label>
+                            <input type="date" id="invoice-due-date" class="form-control form-control-sm" value="@(Model.InvoiceDueDate3)" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.InvoiceDueDate1)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model.InvoiceDueDate1
                             </b>
                         }
                     </p>
@@ -497,26 +520,7 @@
                 return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
             ajax: {
-                url: "@Url.Action("GetOptions2", "Agent")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions2", "Agent")"
             }
         });
 
@@ -526,6 +530,7 @@
             url: "@Url.Action("GetInvoiceTypeOptions")",
             success: function (data, status, xhr) {
                 $("#invoice-invoice-type").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     minimumResultsForSearch: -1
                 });
@@ -561,14 +566,14 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (user_access.canAdd) {
-                            actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="top-left" role="tooltip"><i class="fas fa-plus"></i></button>';
+                            actions += '<button type="button" class="btn btn-success btn-xs btn-add-item" data-microtip-title="Add Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-plus"></i></button>';
                         }
                         return actions;
                     }
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
                     },
                     name: "ItemCode"
                 },
@@ -660,7 +665,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="top-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
                     },
                     name: "ItemCode",
                     className: "form-cell"
@@ -827,6 +832,7 @@
                         BIRInvoiceNumber: $("#invoice-control-number").val(),
                         InvoiceType: $("#invoice-invoice-type").val(),
                         InvoiceDate: $("#invoice-date").val(),
+                        DueDate: $("#invoice-due-date").val(),
                         Agent: $("#invoice-agent").val(),
                         Remarks: $("#invoice-remarks").val(),
                         SavingAs: $("#invoice-status").data("saving-as"),

@@ -21,7 +21,7 @@ namespace GMGInventory.Application.Contracts
         #endregion
 
         #region for SOACR/Details
-        Task<SOACRDetailsVM?> GetSOACRDetails(int? id);
+        Task<SOACRDetailsVM?> GetSOACRDetails(int? id, bool loadItems = false);
         Task<ForDataTables<SOACRItemsVM>> GetSOACRItemsDTAsync(DataTablesRequestForm form, int id);
         Task UpdateSOACRInvoiceAsync(SOACRItemsForm soaVM);
         Task<bool> IsSOACRLineItemIdExist(int id); 

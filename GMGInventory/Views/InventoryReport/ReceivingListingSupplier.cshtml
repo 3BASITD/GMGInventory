@@ -142,6 +142,7 @@
             url: "@Url.Action("GetOptions", "Supplier")",
             success: function (data, status, xhr) {
                 $("#filter-supplier").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {

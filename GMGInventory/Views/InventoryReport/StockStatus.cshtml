@@ -149,26 +149,7 @@
                     "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Item")",
-                dataType: 'json',
-                type: "POST",
-                delay: 500,
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 50) < data.total_count
-                        }
-                    };
-                },
-                cache: true
+                url: "@Url.Action("GetOptions", "Item")"
             },
             dropdownParent: $("#filterModal")
         });
@@ -187,6 +168,7 @@
             url: "@Url.Action("GetOptions", "Brand")",
             success: function (data, status, xhr) {
                 $("#filter-brand").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -204,6 +186,7 @@
             url: "@Url.Action("GetOptions", "Warehouse")",
             success: function (data, status, xhr) {
                 $("#filter-warehouse").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {

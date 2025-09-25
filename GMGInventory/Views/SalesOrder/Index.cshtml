@@ -195,26 +195,7 @@
                     return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
                 },
                 ajax: {
-                    url: "@Url.Action("GetOptions2", "Agent")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                    url: "@Url.Action("GetOptions2", "Agent")"
                 },
                 dropdownParent: $("#filterModal")
             });
@@ -239,26 +220,7 @@
                     return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
                 },
                 ajax: {
-                    url: "@Url.Action("GetOptions", "Customer")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                    url: "@Url.Action("GetOptions", "Customer")"
                 },
                 dropdownParent: $("#filterModal")
             });
@@ -277,6 +239,7 @@
                 url: "@Url.Action("GetOptions", "Region")",
                 success: function (data, status, xhr) {
                     $("#filter-region").select2({
+                        ajax: null, //already fetched outside
                         allowClear: true,
                         placeholder: '<All>',
                         data: data,
@@ -291,6 +254,7 @@
                 url: "@Url.Action("GetOptions", "Forwarder")",
                 success: function (data, status, xhr) {
                     $("#delivery-forwarder").select2({
+                        ajax: null, //already fetched outside
                         data: data,
                         allowClear: true,
                         placeholder: {
@@ -308,6 +272,7 @@
                 url: "@Url.Action("GetStatusOptions")",
                 success: function (data, status, xhr) {
                     $("#filter-status").select2({
+                        ajax: null, //already fetched outside
                         allowClear: true,
                         placeholder: '<All>',
                         data: data,
@@ -364,13 +329,13 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '"  data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '"  data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
                         if (data.status.toLowerCase() == "submitted" && data.orderBy == $("#current-user-nickname").val() && user_access.canDelete) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="top-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
                         }
                         if  (user_access.canAdd &&  data.isAllPacked != true && data.status.toLowerCase() != "draft" && data.status.toLowerCase() != "submitted" && data.status.toLowerCase() != "disapproved") {
-                            //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></button>';
-                            actions += '<a href="@Url.Action("Create", "Pack")/' + data.id + '?page=SalesOrder" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="top-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
+                            //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-box-open"></i></button>';
+                            actions += '<a href="@Url.Action("Create", "Pack")/' + data.id + '?page=SalesOrder" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-box-open"></i></a>';
                         }
                         return actions + "</div>";
                     }

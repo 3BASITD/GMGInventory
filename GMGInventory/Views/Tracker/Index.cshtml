@@ -183,7 +183,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Update New Task</h5>
+                    <h5 class="modal-title">Update Task</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -282,6 +282,7 @@
         ];
 
         $('#filter-status').select2({
+            ajax: null,
             allowClear: true,
             placeholder: 'ALL',
             data: statusOptions,
@@ -310,6 +311,7 @@
         ];
 
         $('#filter-priority').select2({
+            ajax: null,
             allowClear: true,
             placeholder: 'ALL',
             data: priorityOptions,
@@ -335,6 +337,7 @@
         if (user_access.canEdit) SetPriorityOption("#edit-priority", "#editModal");
         function SetPriorityOption(element, modal) {
             $(element).select2({
+                ajax: null,
                 data: priorityOptions,
                 minimumResultsForSearch: -1,
                 templateResult: function (repo) {
@@ -367,26 +370,7 @@
                             : ""));
                 },
                 ajax: {
-                    url: "@Url.Action("GetOptions2", "User")",
-                    dataType: 'json',
-                    type: "POST",
-                    delay: 500,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                            page: params.page || 1
-                        };
-                    },
-                    processResults: function (data, params) {
-                        params.page = params.page || 1;
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: (params.page * 50) < data.total_count
-                            }
-                        };
-                    },
-                    cache: true
+                    url: "@Url.Action("GetOptions2", "User")"
                 },
                 dropdownParent: $(modal)
             });
@@ -480,7 +464,10 @@
         const priorityLookup = Object.fromEntries(priorityOptions.map(opt => [opt.id, opt]));
         const statusLookup = Object.fromEntries(statusOptions.map(opt => [opt.id, opt]));
 
-        var appliedFilters;
+        var appliedFilters = {
+            status: '',
+            priority: ''
+        };
 
         var taskDT = $('.table-tasks').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -536,22 +523,22 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="top-left" role="tooltip"><span class="emoji">🔍</span></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">🔍</span></a>';
                         if (data.modifyExpiration && data.status.toLowerCase() == "open") {
                             if (user_access.canEdit) {
-                                actions += '<button class="btn btn-warning btn-xs" type="button" onclick="ShowEditTask(this)" data-microtip-title="Edit Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="top-left" role="tooltip"><span class="emoji">✏️</span></button>';
+                                actions += '<button class="btn btn-warning btn-xs" type="button" onclick="ShowEditTask(this)" data-microtip-title="Edit Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">✏️</span></button>';
                             }
                             if (user_access.canDelete) {
-                                actions += '<button class="btn btn-danger btn-xs" type="button" onclick="DeleteTask(this)" data-microtip-title="Delete Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="top-left" role="tooltip"><span class="emoji">🗑️</span></button>';
+                                actions += '<button class="btn btn-danger btn-xs" type="button" onclick="DeleteTask(this)" data-microtip-title="Delete Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">🗑️</span></button>';
                             }
                         }
                         if (data.status.toLowerCase() == "open" || data.status.toLowerCase() == "doing" || data.status.toLowerCase() == "incomplete") {
                             if (user_access.canEdit) {
                                 if(data.priority.toLowerCase() != "low") {
-                                    actions += '<button class="btn btn-light text-dark btn-xs" type="button" onclick="DecreasePriority(this)" data-microtip-title="Decrease Priority.\nButton is only available for task with Open, Doing or Incomplete status." data-microtip-position="top-left" role="tooltip"><span class="emoji">▼</span></button>';
+                                    actions += '<button class="btn btn-light text-dark btn-xs" type="button" onclick="DecreasePriority(this)" data-microtip-title="Decrease Priority.\nButton is only available for task with Open, Doing or Incomplete status." data-microtip-position="bottom-left" role="tooltip"><span class="emoji">▼</span></button>';
                                 }
                                 if(data.priority.toLowerCase() != "high") {
-                                    actions += '<button class="btn btn-light text-dark btn-xs" type="button" onclick="IncreasePriority(this)" data-microtip-title="Increase Priority.\nButton is only available for task with Open, Doing or Incomplete status." data-microtip-position="top-left" role="tooltip"><span class="emoji">▲</span></button>';
+                                    actions += '<button class="btn btn-light text-dark btn-xs" type="button" onclick="IncreasePriority(this)" data-microtip-title="Increase Priority.\nButton is only available for task with Open, Doing or Incomplete status." data-microtip-position="bottom-left" role="tooltip"><span class="emoji">▲</span></button>';
                                 }
                             }
                         }

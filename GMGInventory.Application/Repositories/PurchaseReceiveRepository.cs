@@ -172,7 +172,7 @@ namespace GMGInventory.Application.Repositories
                               Status = receive.Status.Code,
                               ReceiveDateD = receive.ReceiveDate,
                               Remarks = receive.Remarks,
-                              Currency = receive.PurchaseOrder.Currency.Code,
+                              Currency = receive.PurchaseOrder.Currency.Name,
                               CurrencyId = receive.PurchaseOrder.Currency.Id,
                               CurrencyRateD = receive.PurchaseOrder.CurrencyRate,
                               ApprovedBy = receive.ApproverId == null ? null : SystemFormat.Name(receive.Approver.FirstName, receive.Approver.LastName, receive.Approver.Nickname),

@@ -15,6 +15,7 @@ namespace GMGInventory.Controllers
     public class SupplierController(IAccessRepository accessRepository
                              , ISupplierRepository supplierRepository
                              , ICurrencyRepository currencyRepository
+                             , ICountryRepository countryRepository
                              , IRegionRepository regionRepository
                              , IBusinessStyleRepository businessStyleRepository
                              , ICreditTermRepository creditTermRepository) : BaseController(accessRepository)
@@ -124,7 +125,7 @@ namespace GMGInventory.Controllers
             }
            // supplierVM.Areas = new SelectList(await areaRepository.GetAllActiveAreaAsync(supplierVM.AreaId), "Id", "Name", supplierVM.AreaId);
             supplierVM.Currencies = new SelectList(await currencyRepository.GetAllActiveCurrencyAsync(supplierVM.CurrencyId), "Id", "Name", supplierVM.CurrencyId);
-            supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(supplierVM.RegionId), "Id", "Name", supplierVM.RegionId);
+            supplierVM.Regions = new SelectList(await regionRepository.GetAllActiveRegionAsync(supplierVM?.RegionId ?? 0), "Id", "Name", supplierVM.RegionId);
             return View(supplierVM);
         }
 
@@ -222,11 +223,12 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Supplier");
-            dt.Columns.AddRange(new DataColumn[14] {
+            dt.Columns.AddRange(new DataColumn[15] {
                 new DataColumn("Code"),
                 new DataColumn("Name"),
                 new DataColumn("Address Line 1"),
                 new DataColumn("Address Line 2"),
+                new DataColumn("Country"),
                 new DataColumn("Region"),
                 new DataColumn("Contact Person"),
                 new DataColumn("Office Tel No"),
@@ -246,6 +248,7 @@ namespace GMGInventory.Controllers
                     suppliers.Name,
                     suppliers.AddressLine1,
                     suppliers.AddressLine2,
+                    suppliers.CountryName,
                     suppliers.RegionName,
                     suppliers.ContactPerson,
                     suppliers.OfficeTelNo,
@@ -290,12 +293,18 @@ namespace GMGInventory.Controllers
             }
             else
             {
+                int? CountryId = await countryRepository.GetIdAsync(supplierVM.CountryName);
                 int? RegionId = await regionRepository.GetIdAsync(supplierVM.RegionName);
                 int? CurrencyId = await currencyRepository.GetIdAsync(supplierVM.CurrencyName);
                 int? BusinessStyleId = await businessStyleRepository.GetIdAsync(supplierVM.BusinessStyleName);
                 int? TermId = await creditTermRepository.GetIdAsync(supplierVM.Term);
 
-                if (RegionId == null)
+                if (CountryId == null)
+                {
+                    responseModel.Status = "Error";
+                    responseModel.Message = "Unknown Country";
+                }
+                else if (RegionId == null)
                 {
                     responseModel.Status = "Error";
                     responseModel.Message = "Unknown Area";
@@ -307,6 +316,7 @@ namespace GMGInventory.Controllers
                 }
                 else
                 {
+                    supplierVM.CountryId = CountryId.Value;
                     supplierVM.RegionId = RegionId.Value;
                     supplierVM.CurrencyId = CurrencyId.Value;
                     supplierVM.BusinessStyleId = BusinessStyleId.Value;

@@ -31,7 +31,6 @@ namespace GMGInventory.Application.Repositories
         {
             try
             {
-
                 var soacr = from soa in context.SOACRs
                             select new SOACRVM
                             {
@@ -418,7 +417,7 @@ namespace GMGInventory.Application.Repositories
         #endregion
 
         #region SOACR/Detail
-        public async Task<SOACRDetailsVM?> GetSOACRDetails(int? id)
+        public async Task<SOACRDetailsVM?> GetSOACRDetails(int? id, bool loadItems = false)
         {
             var soaVM = from soa in context.SOACRs
                         where soa.Id == id
@@ -431,7 +430,13 @@ namespace GMGInventory.Application.Repositories
                             DateFromD = soa.SOAFrom,
                             DateToD = soa.SOATo
                         };
-            return await soaVM.FirstOrDefaultAsync();
+
+            var details = await soaVM.FirstOrDefaultAsync();
+            if (details != null && loadItems)
+            {
+                details.Items = (await GetSOACRItemsAsync(id!.Value)).ToList();
+            }
+            return details;
         }
 
         private async Task<IList<SOACRItemsVM>> GetSOACRItemsAsync(int id)
@@ -454,7 +459,7 @@ namespace GMGInventory.Application.Repositories
                       select new SOACRItemsVM
                       {
                           Id = sl.Id,
-                          InvoiceDateD = sl.Invoice.DateCreated,
+                          InvoiceDateD = sl.Invoice.InvoiceDate,
                           InvoiceNumber = sl.Invoice.InvoiceNumber,
                           ControlNumber = sl.Invoice.ControlNumber,
                           InvoiceAmountD = inv,
@@ -684,7 +689,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<SOACRDetailsPVM> PrintCRDetails(int id)
         {
-            var items = (await GetSOACRItemsAsync(id)).OrderByDescending(s => s.InvoiceDateD).ToList();
+            var items = (await GetSOACRItemsAsync(id)).OrderBy(s => s.InvoiceDateD).ToList();
 
             var soacrVM = from soacr in context.SOACRs
                           where soacr.Id == id
@@ -701,7 +706,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<SOACRDetailsPVM> PrintSOADetails(int id)
         {
-            var items = (await GetSOACRItemsAsync(id)).OrderByDescending(s => s.InvoiceDateD).ToList();
+            var items = (await GetSOACRItemsAsync(id)).OrderBy(s => s.InvoiceDateD).ToList();
 
             var soacrVM = from soacr in context.SOACRs
                           let litems = soacr.SOACRLineItems.Where(s => s.SOACRId == id).ToList()
@@ -744,7 +749,8 @@ namespace GMGInventory.Application.Repositories
             var invoices = from ret in context.SalesReturnLineItems
                            let tbr = context.SOACRLineItemTBRs.Where(s => s.SalesReturnLineItemId == ret.Id).ToList()
                            where (string.IsNullOrWhiteSpace(search) || ret.InvoiceLineItem!.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) || ("tbr".Contains(search.ToLower()) && ret.InvoiceLineItemId == null))
-                           && ret.SalesReturn.Customer!.Id == CustomerId
+                           && ((ret.SalesReturn.SalesOrder == null && ret.SalesReturn.Customer!.Id == CustomerId)
+                           || (ret.SalesReturn.SalesOrder != null && ret.SalesReturn.SalesOrder.Customer.Id == CustomerId))
                            let discount1 = (100 - ret.Discount1) / 100
                            let discount2 = (100 - ret.Discount2) / 100
                            select new SOACRInvoiceTBRVM

@@ -39,10 +39,13 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string? MobileNumber { get; set; }
 
-        [Required]
         [ForeignKey("RegionId")]
-        public int RegionId { get; set; }
+        public int? RegionId { get; set; }
         public Region Region { get; set; }
+
+        [ForeignKey("CountryId")]
+        public int CountryId { get; set; }
+        public Country Country { get; set; }
 
         [ForeignKey("BusinessStyleId")]
         public int BusinessStyleId { get; set; }

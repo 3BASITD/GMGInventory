@@ -145,6 +145,12 @@ namespace GMGInventory.Common.Models
         public bool Selected { get; set; } = false;
     }
 
+    public class JsonCountryOptionsModel : JsonOptionsModel
+    {
+        public string Alpha2 { get; set; }
+        public string Alpha3 { get; set; }
+    }
+
     public class JsonOrderTypeOptionsModel
     {
         public string Id { get; set; }
@@ -175,9 +181,9 @@ namespace GMGInventory.Common.Models
         public string? PreviousCost => PreviousCurrency == null || PreviousCurrencyRateD == null || PreviousCostD == null
                                      ? null
                                      : (PreviousCurrency.Split('/')[0].Trim() + " " + string.Format(SystemFormat.StringDecimalComma, PreviousCostD)
-                                      + (PreviousCurrency.Split('/')[0].Trim() == "PH₱"
+                                      + (PreviousCurrency.Split('/')[0].Trim() == "PHP"
                                        ? ""
-                                       : " = PH₱ " + string.Format(SystemFormat.StringDecimalComma, Math.Round(PreviousCostD.Value / PreviousCurrencyRateD.Value, 2))));
+                                       : " = PHP " + string.Format(SystemFormat.StringDecimalComma, Math.Round(PreviousCostD.Value / PreviousCurrencyRateD.Value, 2))));
         public string? PreviousCurrency { get; set; }
         public decimal? PreviousCurrencyRateD { get; set; }
         public decimal? PreviousCostD { get; set; }
@@ -240,13 +246,9 @@ namespace GMGInventory.Common.Models
 
     }
 
-    public class JsonCurrencyOptionModel
+    public class JsonCurrencyOptionModel : JsonOptionsModel
     {
-        public string Id { get; set; }
-        public string Text { get; set; }
-        public bool Selected { get; set; }
         public decimal Rate { get; set; }
-        public string Abbreviation { get; set; }
     }
 
     public class Select2Model<T>

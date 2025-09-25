@@ -156,10 +156,10 @@ namespace GMGInventory.Application.Services
                 partner_name = invoice.Pack.SalesOrder.Customer.Name,
                 partner_country = "PH",
                 invoice_date = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
-                invoice_date_due = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
+                invoice_date_due = (invoice.DueDate == null ? invoice.InvoiceDate : invoice.DueDate.Value).ToString("yyyy-MM-dd"),
                 currency_code = "PHP",
                 post = invoice.Status.Code.ToLower() == "invoiced",
-                origin = "S/" + invoice.PackId + "/" + invoice.Pack.SalesOrder.SalesOrderNumber,
+                origin = "S/" + invoice.InvoiceNumber + "/" + invoice.ControlNumber,
                 invoice_line_ids = from ili in invoice.InvoiceLineItems
                                    join sli in context.SalesOrderLineItems on new { ili.ItemId, ili.Invoice.Pack.SalesOrderId }
                                                                        equals new { sli.ItemId, sli.SalesOrderId }
@@ -240,10 +240,10 @@ namespace GMGInventory.Application.Services
                     partner_name = invoice.Pack.SalesOrder.Customer.Name,
                     partner_country = "PH",
                     invoice_date = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
-                    invoice_date_due = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
+                    invoice_date_due = (invoice.DueDate == null ? invoice.InvoiceDate : invoice.DueDate.Value).ToString("yyyy-MM-dd"),
                     currency_code = "PHP",
                     post = invoice.Status.Code.ToLower() == "invoiced",
-                    origin = "M/" + invoice.PackId + "/" + invoice.Pack.SalesOrder.SalesOrderNumber,
+                    origin = "M/" + invoice.InvoiceNumber + "/" + invoice.ControlNumber,
                     invoice_line_ids = from ili in invoice.InvoiceLineItems
                                        join sli in context.SalesOrderLineItems on new { ili.ItemId, ili.Invoice.Pack.SalesOrderId }
                                                                            equals new { sli.ItemId, sli.SalesOrderId }
@@ -331,13 +331,13 @@ namespace GMGInventory.Application.Services
             {
                 partner_code = preceiving.PurchaseOrder.Supplier.Code,
                 partner_name = preceiving.PurchaseOrder.Supplier.Name,
-                partner_country = "PH",
+                partner_country = preceiving.PurchaseOrder.Supplier.Country.Alpha2,
                 invoice_date = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
                 invoice_date_due = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
-                currency_code = "PHP",
+                currency_code = preceiving.PurchaseOrder.Currency.Name,
                 post = preceiving.Status.Code.ToLower() == "approved",
                 origin = "S/" + preceiving.PurchaseOrder.DocumentNumber,
-                type = "PO_TYPE",
+                type = "?",
                 invoice_line_ids = from prli in preceiving.PurchaseReceivingLineItems
                                    join poli in context.PurchaseOrderNewLineItems on prli.OrderItemId equals poli.Id
                                    let discount1 = (100 - poli.PurchaseOrder.Discount1) / 100
@@ -421,13 +421,13 @@ namespace GMGInventory.Application.Services
                 {
                     partner_code = preceiving.PurchaseOrder.Supplier.Code,
                     partner_name = preceiving.PurchaseOrder.Supplier.Name,
-                    partner_country = "PH",
+                    partner_country = preceiving.PurchaseOrder.Supplier.Country.Alpha2,
                     invoice_date = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
                     invoice_date_due = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
-                    currency_code = "PHP",
+                    currency_code = preceiving.PurchaseOrder.Currency.Name,
                     post = preceiving.Status.Code.ToLower() == "approved",
                     origin = "S/" + preceiving.PurchaseOrder.DocumentNumber,
-                    type = "PO_TYPE",
+                    type = "?",
                     invoice_line_ids = from prli in preceiving.PurchaseReceivingLineItems
                                        join poli in context.PurchaseOrderNewLineItems on prli.OrderItemId equals poli.Id
                                        let discount1 = (100 - poli.PurchaseOrder.Discount1) / 100
@@ -485,6 +485,66 @@ namespace GMGInventory.Application.Services
                 }
             }
             return responses;
+        }
+
+        public async Task<ResponseModel<APIHM_SuccessResponse>> GetTaxes(string Host, string User, string Password)
+        {
+            var access = await AccessAsync(Host, User, Password);
+
+            if (access == null)
+                return new ResponseModel<APIHM_SuccessResponse> { Status = "Error", Message = "Cannot make connection to Hash Micro" };
+
+            if (access.Status == "Error")
+                return new ResponseModel<APIHM_SuccessResponse> { Status = access.Status, Message = access.Message };
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{Host}/api/accounting/get/tax");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", access.NewRow.oauth_token);
+
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            if (json.Contains("\"error\""))
+            {
+                var errorResponse = JsonSerializer.Deserialize<APIHM_ErrorResponse>(json)!;
+                return new ResponseModel<APIHM_SuccessResponse> { Status = "Error", Message = $"Moving to HashMicro return an error with message \"{errorResponse.error.data.message}\"" };
+            }
+            else
+            {
+                var successResponse = JsonSerializer.Deserialize<APIHM_SuccessResponse>(json)!;
+
+                return new ResponseModel<APIHM_SuccessResponse> { Status = "Success", Message = "HashMicro: " + successResponse.message, NewRow = successResponse };
+            }
+        }
+
+        public async Task<ResponseModel<APIHM_SuccessResponse>> GetCurrencies(string Host, string User, string Password)
+        {
+            var access = await AccessAsync(Host, User, Password);
+
+            if (access == null)
+                return new ResponseModel<APIHM_SuccessResponse> { Status = "Error", Message = "Cannot make connection to Hash Micro" };
+
+            if (access.Status == "Error")
+                return new ResponseModel<APIHM_SuccessResponse> { Status = access.Status, Message = access.Message };
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{Host}/api/accounting/get/currency");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", access.NewRow.oauth_token);
+
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            if (json.Contains("\"error\""))
+            {
+                var errorResponse = JsonSerializer.Deserialize<APIHM_ErrorResponse>(json)!;
+                return new ResponseModel<APIHM_SuccessResponse> { Status = "Error", Message = $"Moving to HashMicro return an error with message \"{errorResponse.error.data.message}\"" };
+            }
+            else
+            {
+                var successResponse = JsonSerializer.Deserialize<APIHM_SuccessResponse>(json)!;
+
+                return new ResponseModel<APIHM_SuccessResponse> { Status = "Success", Message = "HashMicro: " + successResponse.message, NewRow = successResponse };
+            }
         }
     }
 }

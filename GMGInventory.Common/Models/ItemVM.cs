@@ -243,8 +243,8 @@ namespace GMGInventory.Common.Models
         public string Currency { get; set; }
         public string ConversionFactor => string.Format(SystemFormat.StringDecimalComma, ConversionFactorD);
         public decimal ConversionFactorD { get; set; }
-        public string ConvertedTotalCost => "PH₱ " + string.Format(SystemFormat.StringDecimalComma, ConvertedTotalCostD);
-        public decimal ConvertedTotalCostD => Math.Round(TotalCostD / ConversionFactorD, 2);
+        public string ConvertedTotalCost => "PHP " + string.Format(SystemFormat.StringDecimalComma, ConvertedTotalCostD);
+        public decimal ConvertedTotalCostD => Math.Round(TotalCostD * ConversionFactorD, 2);
         public string ReplenishDate => ReplenishDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReplenishDateD { get; set; }
         public string ReplenishBy { get; set; }

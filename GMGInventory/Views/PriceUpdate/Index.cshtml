@@ -190,6 +190,7 @@
             url: "@Url.Action("GetOptions", "Category")",
             success: function (data, status, xhr) {
                 $("#filter-category").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -207,6 +208,7 @@
             url: "@Url.Action("GetOptions", "ItemType")",
             success: function (data, status, xhr) {
                 $("#filter-item-type").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -224,6 +226,7 @@
             url: "@Url.Action("GetOptions", "Brand")",
             success: function (data, status, xhr) {
                 $("#filter-brand").select2({
+                    ajax: null, //already fetched outside
                     data: data,
                     allowClear: true,
                     placeholder: {
@@ -272,7 +275,7 @@
                         var actions = '';
                         if (data.isLatest) {
                             if (user_access.canEdit) {
-                                actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-microtip-title="Update Price" data-microtip-position="top-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button class="btn btn-warning btn-xs btn-update" data-bs-toggle="modal" data-bs-target="#updateModal" data-microtip-title="Update Price" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
                             }
                         }
                         return actions;
