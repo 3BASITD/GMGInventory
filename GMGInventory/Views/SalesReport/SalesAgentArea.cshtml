@@ -259,7 +259,7 @@
                         .append('<td colspan="3">Total for <strong>' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data()[0].agentTotalSales + '</td>')
                         .append('<td></td>')
-                        .append('<td><button class="btn btn-warning btn-xs btn-chart" data-bs-toggle="modal" data-bs-target="#chartModal" data-agent-id="' + rows.data()[0].agentId + '" data-agent-name="' + rows.data()[0].agentName + '" data-microtip-title="Show Chart" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-chart-pie"></i></button></td>');
+                        .append('<td><button class="btn btn-warning btn-xs btn-chart" data-bs-toggle="modal" data-bs-target="#chartModal" data-agent-id="' + rows.data()[0].agentId + '" data-agent-name="' + rows.data()[0].agentName + '" data-microtip-title="Show Chart" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-chart-pie"></span></button></td>');
                 },
                 dataSrc: function (data) {
                     if (data.agentCode.trim() == data.agentName.trim()) {

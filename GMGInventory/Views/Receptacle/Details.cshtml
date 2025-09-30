@@ -169,7 +169,7 @@
                 { data: "packTypeName", name: "PackTypeName", visible: false },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
                     },
                     name: "ItemCode"
                 },
@@ -189,7 +189,7 @@
                     tr += '<td colspan="2"><strong>Package ' + group + '</strong></td>';
                     tr += '<td class="text-end">';
                     tr += '<div class="btn-group" role="group">';
-                    tr += '<button type="button" class="btn btn-info btn-xs" disabled="disabled"><i class="fas fa-print"></i></button>';
+                    tr += '<button type="button" class="btn btn-info btn-xs" disabled="disabled"><span class="fas fa-print"></span></button>';
                     tr += '<button type="button" class="btn btn-info btn-xs btn-print" data-company="GMG" data-box-number="' + rows.data()[0].boxNumber + '" data-microtip-title="Print as GMG" data-microtip-position="top-right" role="tooltip">GMG</button>';
                     tr += '<button type="button" class="btn btn-info btn-xs btn-print" data-company="BAS" data-box-number="' + rows.data()[0].boxNumber + '" data-microtip-title="Print as GMG" data-microtip-position="top-right" role="tooltip">BAS</button>';
                     tr += '</div>';

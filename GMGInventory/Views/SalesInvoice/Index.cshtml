@@ -235,12 +235,12 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
                         if (hashmicro_user_access.canUploadDownload && (data.status.toLowerCase() == "draft" || data.status.toLowerCase() == "invoiced")) {
                             if(data.hashMicroMoveId) {
-                                actions += '<button type="button" class="btn btn-secondary btn-xs" onclick="ViewHashMicro(this)" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-cloud"></i></button>';
+                                actions += '<button type="button" class="btn btn-secondary btn-xs" onclick="ViewHashMicro(this)" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-cloud"></span></button>';
                             } else {
-                                actions += '<button type="button" class="btn  btn-light text-dark btn-xs" onclick="MoveToHashMicro(this)" data-microtip-title="Move to HashMicro" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-upload"></i></button>';
+                                actions += '<button type="button" class="btn  btn-light text-dark btn-xs" onclick="MoveToHashMicro(this)" data-microtip-title="Move to HashMicro" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-upload"></span></button>';
                             }
                         }
                         return actions + "</div>";

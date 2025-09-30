@@ -1,4 +1,5 @@
 
+
 @media only screen and (min-width: 992px) {
     /*.text-sm, .input-group-sm > .btn, .input-group-sm > .form-control, .input-group-sm > .form-select, .input-group-sm > .input-group-text {
         font-size: .86rem !important;
@@ -540,7 +541,10 @@ a.btn-details-print {
 }
 
 .emoji {
-    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+    font-family: 'Apple Color Emoji', /* macOS / iOS */
+    'Segoe UI Emoji', /* Windows */
+    'Noto Color Emoji', /* fallback */
+    sans-serif;
     font-variant-emoji: emoji; /* browsers that support it */
     line-height: 1;
     display: inline-block;

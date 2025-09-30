@@ -281,9 +281,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
-                        actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
-                        actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
+                        actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><span class="fas fa-minus"></span></button>';
+                        actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><span class="fas fa-arrow-up"></span></button>';
+                        actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><span class="fas fa-arrow-down"></span></button>';
                         return actions + '</div>';
                     },
                     className: "form-cell"
@@ -296,7 +296,7 @@
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
+                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
                         }
                     },
                     name: "ItemCode",

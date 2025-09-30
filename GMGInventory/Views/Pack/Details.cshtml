@@ -314,14 +314,14 @@
                             }
                         }
                         if(data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
-                            actions += '<strong data-microtip-title="Empty inventory, nothing to pack" data-microtip-position="right" role="tooltip"><i class="fas fa-exclamation"></i></strong>';
+                            actions += '<strong data-microtip-title="Empty inventory, nothing to pack" data-microtip-position="right" role="tooltip"><span class="fas fa-exclamation"></span></strong>';
                         }
                         return actions;
                     }
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
                     },
                     name: "ItemCode"
                 },
@@ -513,7 +513,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if ($("#pack-status").val().toLowerCase() == "draft" && user_access.canEdit) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><i class="fas fa-minus"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top-right" role="tooltip"><span class="fas fa-minus"></span></button>';
                         }
                         return actions;
                     }
@@ -522,7 +522,7 @@
                 { data: "packTypeName", name: "PackTypeName", visible: false },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>'
+                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
                     },
                     name: "ItemCode"
                 },

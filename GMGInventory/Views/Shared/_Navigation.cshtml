@@ -5,7 +5,7 @@
         <input class="form-control form-control-sidebar form-control-sm" type="search" placeholder="Search Menu" aria-label="Search">
         <div class="input-group-append input-group-sm">
             <button class="btn btn-sidebar">
-                <i class="fas fa-search fa-fw"></i>
+                <span class="fas fa-search fa-fw"></span>
             </button>
         </div>
     </div>
@@ -23,52 +23,52 @@
 
             <li class="nav-item @(navSalesActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navSalesActive ? "active" : "")">
-                    <i class="nav-icon fas fa-chart-line"></i>
+                    <span class="nav-icon fas fa-chart-line"></span>
                     <p>
                         SALES
-                        <i class="fas fa-angle-left right"></i>
+                        <span class="fas fa-angle-left right"></span>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "CustomerPurchaseHistory" ? "active" : "")"
                            asp-area="" asp-controller="CustomerPurchaseHistory" asp-action="Index">
-                            <i class="nav-icon fas fa-user-clock"></i>
+                            <span class="nav-icon fas fa-user-clock"></span>
                             <p>Customer Purchase History</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Pack" ? "active" : "")"
                            asp-area="" asp-controller="Pack" asp-action="Index">
-                            <i class="nav-icon fas fa-cubes"></i>
+                            <span class="nav-icon fas fa-cubes"></span>
                             <p>Pack Listing</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "SalesInvoice" ? "active" : "")"
                            asp-area="" asp-controller="SalesInvoice" asp-action="Index">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                            <span class="nav-icon fas fa-file-invoice-dollar"></span>
                             <p>Sales Invoice</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "SalesOrder" ? "active" : "")"
                            asp-area="" asp-controller="SalesOrder" asp-action="Index">
-                            <i class="nav-icon fas fa-file-invoice"></i>
+                            <span class="nav-icon fas fa-file-invoice"></span>
                             <p>Sales Order</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "SalesOrderDelivery" ? "active" : "")"
                            asp-area="" asp-controller="SalesOrderDelivery" asp-action="Index">
-                            <i class="nav-icon fas fa-truck"></i>
+                            <span class="nav-icon fas fa-truck"></span>
                             <p>Sales Order Delivery</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "SalesReturn" ? "active" : "")"
                            asp-area="" asp-controller="SalesReturn" asp-action="Index">
-                            <i class="nav-icon fas fa-undo"></i>
+                            <span class="nav-icon fas fa-undo"></span>
                             <p>Sales Return</p>
                         </a>
                     </li>
@@ -82,35 +82,35 @@
                     <i class="nav-icon fas fa-box"></i>
                     <p>
                         INVENTORY
-                        <i class="fas fa-angle-left right"></i>
+                        <span class="fas fa-angle-left right"></span>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Item" ? "active" : "")"
                            asp-area="" asp-controller="Item" asp-action="Index">
-                            <i class="nav-icon fas fa-shapes"></i>
+                            <span class="nav-icon fas fa-shapes"></span>
                             <p>Item</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "PriceList" ? "active" : "")"
                            asp-area="" asp-controller="PriceList" asp-action="Index">
-                            <i class="nav-icon fas fa-money-check-alt"></i>
+                            <span class="nav-icon fas fa-money-check-alt"></span>
                             <p>Price List</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "PriceUpdate" ? "active" : "")"
                            asp-area="" asp-controller="PriceUpdate" asp-action="Index">
-                            <i class="nav-icon fas fa-money-bill-wave"></i>
+                            <span class="nav-icon fas fa-money-bill-wave"></span>
                             <p>Price Update</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "PurchaseReturn" ? "active" : "")"
                            asp-area="" asp-controller="PurchaseReturn" asp-action="Index">
-                            <i class="nav-icon fas fa-shapes"></i>
+                            <span class="nav-icon fas fa-shapes"></span>
                             <p>Purchase Return</p>
                         </a>
                     </li>
@@ -118,7 +118,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "PurchaseOrder" ? "active" : "")"
                            asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
-                            <i class="nav-icon fas fa-shapes"></i>
+                            <span class="nav-icon fas fa-shapes"></span>
                             <p>Replenish Inventory</p>
                         </a>
                     </li>
@@ -126,14 +126,14 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Warehouse" ? "active" : "")"
                            asp-area="" asp-controller="Warehouse" asp-action="Index">
-                            <i class="nav-icon fas fa-warehouse"></i>
+                            <span class="nav-icon fas fa-warehouse"></span>
                             <p>Warehouse</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Transfer" ? "active" : "")"
                            asp-area="" asp-controller="Transfer" asp-action="Index">
-                            <i class="nav-icon fas fa-truck-loading"></i>
+                            <span class="nav-icon fas fa-truck-loading"></span>
                             <p>Warehouse Transfer</p>
                         </a>
                     </li>
@@ -141,7 +141,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "UnservedItem" ? "active" : "")"
                            asp-area="" asp-controller="UnservedItem" asp-action="Index">
-                            <i class="nav-icon fas fa-shapes"></i>
+                            <span class="nav-icon fas fa-shapes"></span>
                             <p>Unserved Item</p>
                         </a>
                     </li>
@@ -156,21 +156,21 @@
                     <i class="nav-icon fas fa-coins"></i>
                     <p>
                         CREDITS &amp; COLLECTIONS
-                        <i class="fas fa-angle-left right"></i>
+                        <span class="fas fa-angle-left right"></span>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Customer" ? "active" : "")"
                            asp-area="" asp-controller="Customer" asp-action="Index">
-                            <i class="nav-icon fas fa-users"></i>
+                            <span class="nav-icon fas fa-users"></span>
                             <p>Customer</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Payment" ? "active" : "")"
                            asp-area="" asp-controller="Payment" asp-action="Index">
-                            <i class="nav-icon fas fa-money-check"></i>
+                            <span class="nav-icon fas fa-money-check"></span>
                             <p>Payment</p>
                         </a>
                     </li>
@@ -178,7 +178,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Soacr" ? "active" : "")"
                            asp-area="" asp-controller="Soacr" asp-action="Index">
-                            <i class="nav-icon fas fa-receipt"></i>
+                            <span class="nav-icon fas fa-receipt"></span>
                             <p>SOA / Counter Receipt</p>
                         </a>
                     </li>
@@ -193,70 +193,70 @@
                     <i class="nav-icon fas fa-cogs"></i>
                     <p>
                         ADMINISTRATION
-                        <i class="fas fa-angle-left right"></i>
+                        <span class="fas fa-angle-left right"></span>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Agent" ? "active" : "")"
                            asp-area="" asp-controller="Agent" asp-action="Index">
-                            <i class="nav-icon fas fa-user-secret"></i>
+                            <span class="nav-icon fas fa-user-secret"></span>
                             <p>Agents</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Area" ? "active" : "")"
                            asp-area="" asp-controller="Area" asp-action="Index">
-                            <i class="nav-icon fas fa-map-marker-alt"></i>
+                            <span class="nav-icon fas fa-map-marker-alt"></span>
                             <p>Areas</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Brand" ? "active" : "")"
                            asp-area="" asp-controller="Brand" asp-action="Index">
-                            <i class="nav-icon fas fa-trademark"></i>
+                            <span class="nav-icon fas fa-trademark"></span>
                             <p>Brands</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Category" ? "active" : "")"
                            asp-area="" asp-controller="Category" asp-action="Index">
-                            <i class="nav-icon fas fa-network-wired"></i>
+                            <span class="nav-icon fas fa-network-wired"></span>
                             <p>Categories</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Forwarder" ? "active" : "")"
                            asp-area="" asp-controller="Forwarder" asp-action="Index">
-                            <i class="nav-icon fas fa-shipping-fast"></i>
+                            <span class="nav-icon fas fa-shipping-fast"></span>
                             <p>Forwarder</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "ItemType" ? "active" : "")"
                            asp-area="" asp-controller="ItemType" asp-action="Index">
-                            <i class="nav-icon fas fa-keyboard"></i>
+                            <span class="nav-icon fas fa-keyboard"></span>
                             <p>Item Types</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "User" ? "active" : "")"
                            asp-area="" asp-controller="User" asp-action="Index">
-                            <i class="nav-icon fas fa-user-cog"></i>
+                            <span class="nav-icon fas fa-user-cog"></span>
                             <p>Users</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Supplier" ? "active" : "")"
                            asp-area="" asp-controller="Supplier" asp-action="Index">
-                            <i class="nav-icon fas fa-handshake"></i>
+                            <span class="nav-icon fas fa-handshake"></span>
                             <p>Suppliers</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "AuditLog" ? "active" : "")"
                            asp-area="" asp-controller="AuditLog" asp-action="Index">
-                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <span class="nav-icon fas fa-clipboard-list"></span>
                             <p>Audit Logs</p>
                         </a>
                     </li>
@@ -269,10 +269,10 @@
 
             <li class="nav-item @(navSalesReportActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navSalesReportActive ? "active": "")">
-                    <i class="nav-icon fas fa-file-invoice"></i>
+                    <span class="nav-icon fas fa-file-invoice"></span>
                     <p>
                         SALES REPORTS
-                        <i class="fas fa-angle-left right"></i>
+                        <span class="fas fa-angle-left right"></span>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
@@ -289,14 +289,14 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "BrandSales" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="BrandSales">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Brand Sales Report</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "BestSellingItem" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="BestSellingItem">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Best Selling Items</p>
                         </a>
                     </li>
@@ -304,7 +304,7 @@
                 <li class="nav-item">
                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "BestSellingItemInvoice" ? "active" : "")"
                 asp-area="" asp-controller="SalesReport" asp-action="BestSellingItemInvoice">
-                <i class="nav-icon fas fa-file"></i>
+                <span class="nav-icon fas fa-file"></span>
                 <p>Best Selling Items (Invoice)</p>
                 </a>
                 </li>
@@ -314,7 +314,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "Commission" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="Commission">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Commission Report</p>
                         </a>
                     </li>
@@ -322,7 +322,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSalesRanking" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesRanking">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Customer Sales Ranking Report</p>
                         </a>
                     </li>
@@ -330,7 +330,7 @@
                 <li class="nav-item">
                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "CustomerSalesAnalysis" ? "active" : "")"
                 asp-area="" asp-controller="SalesReport" asp-action="CustomerSalesAnalysis">
-                <i class="nav-icon fas fa-file"></i>
+                <span class="nav-icon fas fa-file"></span>
                 <p>Customer Sales Analysis Report</p>
                 </a>
                 </li>
@@ -339,14 +339,14 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && (currentAction == "CustomerSales" || currentAction == "CustomerSalesCompare") ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="CustomerSales">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Customer Sales Report</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySales" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="DailySales">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Daily Sales Report</p>
                         </a>
                     </li>
@@ -354,7 +354,7 @@
                 <li class="nav-item">
                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "DailySalesMargin" ? "active" : "")"
                 asp-area="" asp-controller="SalesReport" asp-action="DailySalesMargin">
-                <i class="nav-icon fas fa-file"></i>
+                <span class="nav-icon fas fa-file"></span>
                 <p>Daily Sales Margin Report</p>
                 </a>
                 </li>
@@ -362,7 +362,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesInvoice" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="SalesInvoice">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Sales Invoice Listing Report</p>
                         </a>
                     </li>
@@ -370,7 +370,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesAgentArea" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="SalesAgentArea">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Sales by Agent/Area</p>
                         </a>
                     </li>
@@ -378,7 +378,7 @@
                 <li class="nav-item">
                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesMarginItem" ? "active" : "")"
                 asp-area="" asp-controller="SalesReport" asp-action="SalesMarginItem">
-                <i class="nav-icon fas fa-file"></i>
+                <span class="nav-icon fas fa-file"></span>
                 <p>Sales Margin by Item</p>
                 </a>
                 </li>
@@ -387,7 +387,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesReportBasis" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="SalesReportBasis">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Sales Report by Basis</p>
                         </a>
                     </li>
@@ -395,7 +395,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "SalesReturn" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="SalesReturn">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Sales Return Listing Report</p>
                         </a>
                     </li>
@@ -404,7 +404,7 @@
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "UnservedItem" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="UnservedItem">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Unserved Item</p>
                         </a>
                     </li>
@@ -415,59 +415,59 @@
 
             <li class="nav-item @(navInventoryReportActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navInventoryReportActive ? "active" : "")">
-                    <i class="nav-icon fas fa-file-invoice"></i>
+                    <span class="nav-icon fas fa-file-invoice"></span>
                     <p>
                         INVENTORY REPORTS
-                        <i class="fas fa-angle-left right"></i>
+                        <span class="fas fa-angle-left right"></span>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="InventoryReport" && currentAction == "BelowMaintainingItem" ? "active" : "")"
                            asp-area="" asp-controller="InventoryReport" asp-action="BelowMaintainingItem">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Below Maintaining Items</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="InventoryReport" && currentAction == "ReceivingListing" ? "active" : "")"
                            asp-area="" asp-controller="InventoryReport" asp-action="ReceivingListing">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Receiving Listing</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="InventoryReport" && currentAction == "ReceivingListingSupplier" ? "active" : "")"
                            asp-area="" asp-controller="InventoryReport" asp-action="ReceivingListingSupplier">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Receiving Listing by Supplier</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="InventoryReport" && currentAction == "ReceivingSummary" ? "active" : "")"
                            asp-area="" asp-controller="InventoryReport" asp-action="ReceivingSummary">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Receiving Summary</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="InventoryReport" && currentAction == "StockCard" ? "active" : "")"
                            asp-area="" asp-controller="InventoryReport" asp-action="StockCard">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Stock Card</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="InventoryReport" && currentAction == "StockStatus" ? "active" : "")"
                            asp-area="" asp-controller="InventoryReport" asp-action="StockStatus">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Stock Status Report</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="InventoryReport" && currentAction == "SupplierPurchase" ? "active" : "")"
                            asp-area="" asp-controller="InventoryReport" asp-action="SupplierPurchase">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Supplier Purchase History</p>
                         </a>
                     </li>
@@ -479,24 +479,24 @@
 
             <li class="nav-item @(navAccountingReportActive ? "menu-open" : "")">
                 <a href="#" class="nav-link @(navAccountingReportActive ? "active" : "")">
-                    <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                    <span class="nav-icon fas fa-file-invoice-dollar"></span>
                     <p>
                         ACCOUNTING REPORTS
-                        <i class="fas fa-angle-left right"></i>
+                        <span class="fas fa-angle-left right"></span>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="AccountingReport" && currentAction == "CreditMemo" ? "active" : "")"
                            asp-area="" asp-controller="AccountingReport" asp-action="CreditMemo">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Credit Memo Listing Report</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="AccountingReport" && currentAction == "DebitMemo" ? "active" : "")"
                            asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">
-                            <i class="nav-icon fas fa-file"></i>
+                            <span class="nav-icon fas fa-file"></span>
                             <p>Debit Memo Listing Report</p>
                         </a>
                     </li>
@@ -508,31 +508,31 @@
 
         <li class="nav-item @(navManagementReportsActive ? "menu-open" : "")">
         <a href="#" class="nav-link @(navManagementReportsActive ? "active": "")">
-        <i class="nav-icon fas fa-file-invoice"></i>
+        <span class="nav-icon fas fa-file-invoice"></span>
         <p>
         MANAGEMENT REPORTS
-        <i class="fas fa-angle-left right"></i>
+        <span class="fas fa-angle-left right"></span>
         </p>
         </a>
         <ul class="nav nav-treeview">
         <li class="nav-item">
         <a class="nav-link @(currentController=="ManagementReport" && currentAction == "CheckRegisterDate" ? "active" : "")"
         asp-area="" asp-controller="ManagementReport" asp-action="CheckRegisterDate">
-        <i class="nav-icon fas fa-file"></i>
+        <span class="nav-icon fas fa-file"></span>
         <p>Check Register by Date</p>
         </a>
         </li>
         <li class="nav-item">
         <a class="nav-link @(currentController=="ManagementReport" && currentAction == "CheckRegisterCustomer" ? "active" : "")"
         asp-area="" asp-controller="ManagementReport" asp-action="CheckRegisterCustomer">
-        <i class="nav-icon fas fa-file"></i>
+        <span class="nav-icon fas fa-file"></span>
         <p>Check Register by Customer</p>
         </a>
         </li>
         <li class="nav-item">
         <a class="nav-link @(currentController=="ManagementReport" && currentAction == "CheckRegisterSummary" ? "active" : "")"
         asp-area="" asp-controller="ManagementReport" asp-action="CheckRegisterSummary">
-        <i class="nav-icon fas fa-file"></i>
+        <span class="nav-icon fas fa-file"></span>
         <p>Check Register Summary</p>
         </a>
         </li>

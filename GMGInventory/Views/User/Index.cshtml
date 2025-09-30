@@ -82,23 +82,23 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <a class="btn btn-info btn-xs" asp-action="Details" asp-route-id="@item.UserId" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip">
-                                        <i class="fas fa-info-circle"></i>
+                                        <span class="fas fa-info-circle"></span>
                                     </a>
                                     @if (item.IsActive)
                                     {
                                         @if (userAccess.CanEdit)
                                         {
                                             <a class="btn btn-warning btn-xs" asp-action="Edit" asp-route-id="@item.UserId" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip">
-                                                <i class="fas fa-pencil-alt"></i>
+                                                <span class="fas fa-pencil-alt"></span>
                                             </a>
                                             <a class="btn btn-secondary btn-xs" asp-action="Password" asp-route-id="@item.UserId" data-microtip-title="Reset Password" data-microtip-position="bottom-left" role="tooltip">
-                                                <i class="fas fa-key"></i>
+                                                <span class="fas fa-key"></span>
                                             </a>
                                         }
                                         @if (userAccess.CanDelete)
                                         {
                                             <button data-id="@item.UserId" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate User" data-microtip-position="bottom-left" role="tooltip">
-                                                <i class="far fa-trash-alt"></i>
+                                                <span class="far fa-trash-alt"></span>
                                             </button>
                                         }
                                     }
@@ -107,7 +107,7 @@
                                         @if (userAccess.CanAdd || userAccess.CanEdit)
                                         {
                                             <button data-id="@item.UserId" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate User" data-microtip-position="bottom-left" role="tooltip">
-                                                <i class="fas fa-check"></i>
+                                                <span class="fas fa-check"></span>
                                             </button>
                                         }
                                     }

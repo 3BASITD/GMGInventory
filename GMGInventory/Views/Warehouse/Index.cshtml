@@ -12,7 +12,7 @@
             @if (userAccess.CanAdd)
             {
                 <button type="button" class="btn btn-primary btn-sm float-right btn-add-warehouse">
-                    <i class="fas fa-plus"></i> New Warehouse
+                    <span class="fas fa-plus"></span> New Warehouse
                 </button>
             }
         </div>
@@ -177,7 +177,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         if (data.isMain == true) {
-                            return '<span class="text-success" data-microtip-title="Main Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-home"></i></span>';
+                            return '<span class="text-success" data-microtip-title="Main Warehouse" data-microtip-position="top" role="tooltip"><span class="fas fa-home"></span></span>';
                         } else {
                             return '';
                         }
@@ -208,19 +208,19 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
                         if (user_access.canEdit) {
                             if (data.isActive != true) {
-                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-warehouse" data-microtip-title="Reactivate Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-warehouse" data-microtip-title="Reactivate Warehouse" data-microtip-position="top" role="tooltip"><span class="fas fa-check"></span></button>';
                             } else {
                                 if (data.isMain != true) {
-                                    actions += '<button type="button" class="btn btn-success btn-xs btn-main-warehouse" data-microtip-title="Set Main Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-home"></i></button>';
+                                    actions += '<button type="button" class="btn btn-success btn-xs btn-main-warehouse" data-microtip-title="Set Main Warehouse" data-microtip-position="top" role="tooltip"><span class="fas fa-home"></span></button>';
                                 }
-                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-warehouse" data-microtip-title="Update Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-edit"></i></button>';
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-warehouse" data-microtip-title="Update Warehouse" data-microtip-position="top" role="tooltip"><span class="fas fa-edit"></span></button>';
                             }
                         }
                         if (user_access.canDelete && data.isActive == true && data.isMain != true) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-warehouse" data-microtip-title="Delete / Deactivate Warehouse" data-microtip-position="top" role="tooltip"><i class="fas fa-trash-alt"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-warehouse" data-microtip-title="Delete / Deactivate Warehouse" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
                         }
                         return actions + '</div>';
                     },

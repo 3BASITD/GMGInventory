@@ -92,9 +92,9 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (data.isActive == true) {
-                            return '<i class="fas fa-check text-success"></i>';
+                            return '<span class="fas fa-check text-success"></span>';
                         } else {
-                            return '<i class="fas fa-times text-danger"></i>';
+                            return '<span class="fas fa-times text-danger"></span>';
                         }
                     }, name: "IsActive"
                 },
@@ -106,17 +106,17 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></button>';
                         if (data.isActive) {
                             if (user_access.canEdit) {
-                                actions += '<button class="btn btn-warning btn-xs editBtn" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button class="btn btn-warning btn-xs editBtn" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                             }
                             if (user_access.canDelete) {
-                                actions += '<button class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Role & Access" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                actions += '<button class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete / Deactivate Role & Access" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                             }
                         } else {
                             if (user_access.canAdd || user_access.canEdit) {
-                                actions += '<button class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Role & Access" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button class="btn btn-success btn-xs reactivateBtn" data-microtip-title="Reactivate Role & Access" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
                             }
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';

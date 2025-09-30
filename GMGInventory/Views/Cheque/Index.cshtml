@@ -546,9 +546,9 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
-                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
-                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Cheque" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                        actions += '<button class="btn btn-info btn-xs detailsBtn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></button>';
+                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                        actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Cheque" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
                     }

@@ -114,7 +114,7 @@
                         <b class="d-block form-gayahin">
                             @(string.IsNullOrWhiteSpace(Model?.LocationCodes) ? "N/A" : Model?.LocationCodes)
                         </b>
-                        <button class="btn btn-warning btn-xs locationCodeBtn ml-2" data-bs-toggle="modal" data-bs-target="#addLocationCodeModal" data-microtip-title="Edit Location Codes"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn btn-warning btn-xs locationCodeBtn ml-2" data-bs-toggle="modal" data-bs-target="#addLocationCodeModal" data-microtip-title="Edit Location Codes"><span class="fas fa-pencil-alt"></span></button>
                     </div>
                 </p>
             </div>
@@ -891,7 +891,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a data-id="' + data.id + '" class="btn btn-danger btn-xs deleteLocationBtn" data-microtip-title="Delete Location" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></a>';
+                        actions += '<a data-id="' + data.id + '" class="btn btn-danger btn-xs deleteLocationBtn" data-microtip-title="Delete Location" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></a>';
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
                     }
@@ -1024,10 +1024,10 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         if (user_access.canEdit) {
-                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                         }
                         if (user_access.canDelete) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                         }
 
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
@@ -1301,7 +1301,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                             if (user_access.canEdit) {
-                                actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="bottom-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><i class="fas fa-pencil-alt"></i></button></div>';
+                                actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="bottom-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><span class="fas fa-pencil-alt"></span></button></div>';
                             }
                         return actions;
                     }

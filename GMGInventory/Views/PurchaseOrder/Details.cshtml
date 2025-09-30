@@ -781,9 +781,9 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         if (po_data.status.toLowerCase() == "draft") {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><i class="fas fa-minus"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="top" role="tooltip"><span class="fas fa-minus"></span></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><span class="fas fa-arrow-up"></span></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><span class="fas fa-arrow-down"></span></button>';
                         }
                         return actions + '</div>';
                     },
@@ -796,7 +796,7 @@
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span>';
+                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
                         }
                     },
                     name: "ItemCode",
@@ -874,14 +874,14 @@
                         var actions = '<div class="btn-group" role="group">';
                         if (po_data.status.toLowerCase() == "approved") {
                             if(!user_access.canEdit || data.quantityUpdateCount > 2) {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-history-quantity" data-microtip-title="Update Quantity History" data-microtip-position="left" role="tooltip"><i class="fas fa-history"></i></button>';
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-history-quantity" data-microtip-title="Update Quantity History" data-microtip-position="left" role="tooltip"><span class="fas fa-history"></span></button>';
                             } else {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-update-quantity" data-microtip-title="Update Quantity" data-microtip-position="left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-update-quantity" data-microtip-title="Update Quantity" data-microtip-position="left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                             }
                             if(!user_access.canEdit || data.costUpdateCount > 2) {
-                                actions += '<button type="button" class="btn btn-info btn-xs btn-history-cost ml-2" data-microtip-title="Update Cost History" data-microtip-position="left" role="tooltip"><i class="fas fa-history"></i></button>';
+                                actions += '<button type="button" class="btn btn-info btn-xs btn-history-cost ml-2" data-microtip-title="Update Cost History" data-microtip-position="left" role="tooltip"><span class="fas fa-history"></span></button>';
                             } else {
-                                actions += '<button type="button" class="btn btn-info btn-xs btn-update-cost ml-2" data-microtip-title="Update Cost" data-microtip-position="left" role="tooltip"><i class="fas fa-money-bill-wave"></i></button>';
+                                actions += '<button type="button" class="btn btn-info btn-xs btn-update-cost ml-2" data-microtip-title="Update Cost" data-microtip-position="left" role="tooltip"><span class="fas fa-money-bill-wave"></span></button>';
                             }
                         }
                         return actions + '</div>';

@@ -268,18 +268,18 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<button type="button" class="btn btn-info btn-xs btn-details" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></button>';
+                        actions += '<button type="button" class="btn btn-info btn-xs btn-details" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></button>';
                         if (data.isActive == true) {
                             if (user_access.canEdit) {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Driver" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Driver" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                             }
 
                             if (user_access.canDelete) {
-                                actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete Driver" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete Driver" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                             }
                         } else {
                             if (user_access.canAdd || user_access.canEdit) {
-                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate" data-microtip-title="Reactivate Driver" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate" data-microtip-title="Reactivate Driver" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
                             }
                         }
                         actions += '</div>';

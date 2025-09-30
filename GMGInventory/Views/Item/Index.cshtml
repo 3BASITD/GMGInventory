@@ -176,7 +176,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="create-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><i class="fas fa-info-circle"></i></small></label>
+                                        <label for="create-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
                                         <input type="number" step="0.01" min="0" max="1999999.99" name="BeginningCost" id="create-beginning-cost" class="form-control form-control-sm" />
                                     </div>
                                 </div>
@@ -301,7 +301,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="edit-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><i class="fas fa-info-circle"></i></small></label>
+                                    <label for="edit-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
                                     <input type="number" step="0.01" min="0" max="1999999.99" name="BeginningCost" id="edit-beginning-cost" class="form-control form-control-sm empty-if-zero" />
                                 </div>
                             </div>
@@ -535,17 +535,17 @@
                         data: function (data, type, dataToSet) {
                             var actions = '<div class="btn-group" role="group">';
                             if (data.giveAction) { // check if first item specially for multiple warehouse
-                                actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-info-circle"></i></a>';
+                                actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
                                     if (data.isActive) {
                                         if (user_access.canEdit) {
-                                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                            actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                                         }
                                         if (user_access.canDelete) {
-                                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                                         }
                                     } else {
                                         if (user_access.canAdd || user_access.canEdit) {
-                                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-check"></i></button>';
+                                            actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs reactivateBtn" type="button" data-microtip-title="Reactivate Item" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
                                         }
                                     }
                             }

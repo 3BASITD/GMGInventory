@@ -973,9 +973,9 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-minus"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-up"></i></button>';
-                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><i class="fas fa-arrow-down"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-item" data-microtip-title="Remove Item" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-minus"></span></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-up-item" data-microtip-title="Move Up Item" data-microtip-position="top" role="tooltip"><span class="fas fa-arrow-up"></span></button>';
+                            actions += '<button type="button" class="btn btn-info btn-xs btn-down-item" data-microtip-title="Move Down Item" data-microtip-position="top" role="tooltip"><span class="fas fa-arrow-down"></span></button>';
                         }
                         return actions + '</div>';
                     },
@@ -996,7 +996,7 @@
                 { data: "unit", name: "Unit", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<nobr>' + data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><i class="fas fa-info-circle text-info"></i></span></nobr>';
+                        return '<nobr>' + data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span></nobr>';
                     },
                     name: "ItemCode",
                     className: "form-cell"
@@ -1053,7 +1053,7 @@
                         var actions = '';
                         if (data.quantityD != data.servedQuantityD + data.unservedQuantityD || data.unservedQuantityD != 0) {
                             if (user_access.canEdit) {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-update-serve" data-microtip-title="Update Served Item" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-update-serve" data-microtip-title="Update Served Item" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                             }
                         }
                         return actions;

@@ -924,7 +924,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         if (data.isDefault == true) {
-                            return '<span class="text-success" data-microtip-title="Default Address" data-microtip-position="top" role="tooltip"><i class="fas fa-star"></i></span>';
+                            return '<span class="text-success" data-microtip-title="Default Address" data-microtip-position="top" role="tooltip"><span class="fas fa-star"></span></span>';
                         } else {
                             return '';
                         }
@@ -940,16 +940,16 @@
                         var actions = '<div class="btn-group" role="group">';
                         if (user_access.canEdit) {
                             if (data.isActive != true) {
-                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-shipping" data-microtip-title="Reactivate Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-check"></i></button>';
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-shipping" data-microtip-title="Reactivate Shipping Address" data-microtip-position="top" role="tooltip"><span class="fas fa-check"></span></button>';
                             } else {
                                 if (data.isDefault != true) {
-                                    actions += '<button type="button" class="btn btn-info btn-xs btn-default-shipping" data-microtip-title="Set Default Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-star"></i></button>';
+                                    actions += '<button type="button" class="btn btn-info btn-xs btn-default-shipping" data-microtip-title="Set Default Shipping Address" data-microtip-position="top" role="tooltip"><span class="fas fa-star"></span></button>';
                                 }
-                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-shipping" data-microtip-title="Update Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-edit"></i></button>';
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-shipping" data-microtip-title="Update Shipping Address" data-microtip-position="top" role="tooltip"><span class="fas fa-edit"></span></button>';
                             }
                         }
                         if (user_access.canDelete && data.isActive == true) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-shipping" data-microtip-title="Delete / Deactivate Shipping Address" data-microtip-position="top" role="tooltip"><i class="fas fa-trash-alt"></i></button>';
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-shipping" data-microtip-title="Delete / Deactivate Shipping Address" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
                         }
                         return actions + '</div>';
                     },

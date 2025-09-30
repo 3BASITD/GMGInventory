@@ -639,12 +639,12 @@
                         var actions = '';
                         if (data.isPaid == false) {
                             if (user_access.canEdit) {
-                                actions += '<button class="btn btn-info btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-pencil-alt"></i></button>';
+                                actions += '<button class="btn btn-info btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Invoice" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                             }
-                            actions += '<button class="btn btn-warning btn-xs tbrBtn" data-bs-toggle="modal" data-bs-target="#tbrModal" data-microtip-title="TBR" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-exchange-alt"></i></button>';
+                            actions += '<button class="btn btn-warning btn-xs tbrBtn" data-bs-toggle="modal" data-bs-target="#tbrModal" data-microtip-title="TBR" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-exchange-alt"></span></button>';
                             if ($(".SoacrType").text().trim() == "Counter Receipt"/* && data.invoiceAmount == data.balance*/) {
                                 if (user_access.canDelete) {
-                                    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="bottom-left" role="tooltip"><i class="far fa-trash-alt"></i></button>';
+                                    actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Invoice" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                                 }
                             }
                             actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
@@ -1088,7 +1088,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '';
                         if (user_access.canEdit) {
-                            actions += '<button class="btn btn-danger btn-xs btn-remove-check" data-microtip-title="Remove Check" data-microtip-position="bottom-left" role="tooltip"><i class="fas fa-trash"></i></button>';
+                            actions += '<button class="btn btn-danger btn-xs btn-remove-check" data-microtip-title="Remove Check" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-trash"></span></button>';
                         }
                         return actions;
                     }
