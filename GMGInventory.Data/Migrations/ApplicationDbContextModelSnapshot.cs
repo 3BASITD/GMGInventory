@@ -955,6 +955,30 @@ namespace GMGInventory.Data.Migrations
                             PageId = 73,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 74,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 74,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 75,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 75,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -8006,13 +8030,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7c520851-ed36-4431-949f-180e9d612166",
+                            ConcurrencyStamp = "7eb780a7-7484-4cdd-9dae-5a81d6d79062",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMiowsa3G2zgOYsGlL80yBvRKclnF4kBPmzSxXAY/5BS2emweGQo2Zwe0ydq8H7mag==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHEEhO4kcs7xyfWovrzpUxSPHwxqcwq0TJVZI0D70PpYk8GfT1mxUXBKgWWkXojI9A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d42a3eac-ad8e-4f15-8c1e-2ccea0b0419a",
+                            SecurityStamp = "031661a6-a958-46ba-9305-5d5bdd6069cf",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8027,13 +8051,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "59d5d044-1e9b-4580-b481-8bd130dc7c35",
+                            ConcurrencyStamp = "a09f212e-c99c-4427-8ff6-4c94d69c93e8",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEB8IycWOqoQh5XOqkTwEAl4IS4Mi2nYWvxxcPx9j/V6oz1jE4ZZjCWCigDZlXNpQpw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOLOgbKq36oSW/UKkGVSg4BK/Mxnl9+T13K89q9hcduvqyoasV+5ezauVFTLbgk0eQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ea429ba7-9e76-4920-b8d7-de015945f74f",
+                            SecurityStamp = "bc38614b-d499-4f72-808a-b8c55df8f937",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

@@ -26,13 +26,6 @@
                     <th></th>
                 </tr>
             </thead>
-            <tfoot>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tfoot>
         </table>
     </div>
 </div>
@@ -93,30 +86,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label class="form-label mb-0">Prior Availability</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="add-days" class="form-label mb-0">Day</label>
-                                    <select id="add-days" name="Days" style="width:100%">
-                                        <option value="0">Today</option>
-                                        <option value="1">Tommorow</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="add-hour" class="form-label mb-0">Hour</label>
-                                    <input type="number" min="0" max="23" id="add-hour" name="Hour" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label form="add-minute" class="form-label mb-0">Minutes</label>
-                                    <input type="number" min="0" max="59" id="add-minute" name="Minute" class="form-control form-control-sm" />
+                                    <label for="add-prior" class="form-label mb-0">Prior Availability <small class="text-info" data-microtip-title="Available until this time" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
+                                    <input type="time" id="add-prior" name="Prior" class="form-control form-control-sm" />
                                 </div>
                             </div>
                         </div>
@@ -159,30 +130,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label class="form-label mb-0">Prior Availability</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="edit-days" class="form-label mb-0">Day</label>
-                                    <select id="edit-days" name="Days" style="width:100%">
-                                        <option value="0">Today</option>
-                                        <option value="1">Tommorow</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="edit-hour" class="form-label mb-0">Hour</label>
-                                    <input type="number" min="0" max="23" id="edit-hour" name="Hour" class="form-control form-control-sm" />
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label form="edit-minute" class="form-label mb-0">Minutes</label>
-                                    <input type="number" min="0" max="59" id="edit-minute" name="Minute" class="form-control form-control-sm" />
+                                    <label for="edit-prior" class="form-label mb-0">Prior Availability <small class="text-info" data-microtip-title="Available until this time" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
+                                    <input type="time" id="edit-prior" name="Prior" class="form-control form-control-sm" />
                                 </div>
                             </div>
                         </div>
@@ -226,20 +175,8 @@
                 return: true,
             },
             columns: [
-                { data: "fleetPlateNumber", name: "FleetPlateNumber" },
-                { data: "serviceLevelAgreementType", name: "ServiceLevelAgreementType" },
-                {
-                    data: function (data, type, dataToSet) {
-                        return data.dateRegistered || '<em class="text-muted">n/a</em>';
-                    },
-                    name: "DateRegistered"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        return data.dateExpiration || '<em class="text-muted">n/a</em>';
-                    },
-                    name: "DateExpiration"
-                },
+                { data: "name", name: "Name" },
+                { data: "priorAvailability", name: "PriorAvailability" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -247,15 +184,15 @@
                         actions += '<button type="button" class="btn btn-info btn-xs btn-details" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></button>';
                         if (data.isActive == true) {
                             if (user_access.canEdit) {
-                                actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit ServiceLevelAgreement" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Service Level Agreement" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                             }
 
                             if (user_access.canDelete) {
-                                actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete ServiceLevelAgreement" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete Service Level Agreement" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                             }
                         } else {
                             if (user_access.canAdd || user_access.canEdit) {
-                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate" data-microtip-title="Reactivate ServiceLevelAgreement" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate" data-microtip-title="Reactivate Service Level Agreement" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
                             }
                         }
                         actions += '</div>';
@@ -272,10 +209,8 @@
             $('.btn-details').click(function (e) {
                 var data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
 
-                $(".details-number").html(data.fleetPlateNumber);
-                $(".details-type").html(data.serviceLevelAgreementType);
-                $(".details-registered").html(data.dateRegistered || '<em class="text-muted">n/a</em>');
-                $(".details-expiration").html(data.dateExpiration || '<em class="text-muted">n/a</em>');
+                $(".details-name").html(data.name);
+                $(".details-availability").html(data.priorAvailability);
                 $(".details-created-by").html(data.userCreated);
                 $(".details-created-date").html(data.dateCreated);
                 $(".details-modified-by").html(data.userModified || '<em class="text-muted">n/a</em>');
@@ -288,11 +223,9 @@
                 $(".btn-edit").click(function (e) {
                     var data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
 
-                    $("#edit-number").data("Id", data.id);
-                    $("#edit-number").val(data.fleetPlateNumber);
-                    $("#edit-type").val(data.serviceLevelAgreementType);
-                    $("#edit-registered").val(data.dateRegistered3);
-                    $("#edit-expiration").val(data.dateExpiration3);
+                    $("#edit-name").data("Id", data.id);
+                    $("#edit-name").val(data.name);
+                    $("#edit-prior").val(data.priorAvailability3);
 
                     $("#editModal").modal("show");
                 });
@@ -301,7 +234,7 @@
             if (user_access.canDelete) {
                 $('.btn-delete').click(function (e) {
                     swal({
-                        title: "Delete / Deactivate ServiceLevelAgreement",
+                        title: "Delete / Deactivate Service Level Agreement",
                         text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
                         icon: "warning",
                         buttons: true,
@@ -332,7 +265,7 @@
             if (user_access.canAdd || user_access.canEdit) {
                 $('.btn-reactivate').click(function (e) {
                     swal({
-                        title: "Reactivate ServiceLevelAgreement",
+                        title: "Reactivate Service Level Agreement",
                         text: "Are you sure you want to reactivate this record?",
                         icon: "info",
                         buttons: true,
@@ -364,12 +297,12 @@
         if(user_access.canAdd){
             $("#addForm").validate({
                 rules: {
-                    Number: { required: true, maxlength: 100 },
-                    Type: { required: true, maxlength: 100 }
+                    Name: { required: true, maxlength: 100 },
+                    Prior: { required: true }
                 },
                 messages: {
-                    Number: { required: "Fleet Number / Plate Number is required", maxlength: "Number must not exceed 100 characters." },
-                    Type: { required: "ServiceLevelAgreement Type is required", maxlength: "ServiceLevelAgreement Type must not exceed 100 characters." }
+                    Number: { required: "Name is required", maxlength: "Name must not exceed 100 characters." },
+                    Type: { required: "Prior Availability is required" }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -382,19 +315,15 @@
                     type: "POST",
                     url: "@Url.Action("AddServiceLevelAgreement")",
                     data: {
-                        FleetPlateNumber: $("#add-number").val(),
-                        ServiceLevelAgreementType: $("#add-type").val(),
-                        DateRegisteredD: $("#add-registered").val(),
-                        DateExpirationD: $("#add-expiration").val()
+                        Name: $("#add-name").val(),
+                        PriorAvailabilityD: $("#add-prior").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
-                            $("#add-number").val("");
-                            $("#add-type").val("");
-                            $("#add-registered").val("");
-                            $("#add-expiration").val("");
+                            $("#add-name").val("");
+                            $("#add-prior").val("");
 
                             toastr.success(data.message, "Success");
                             $("#addModal").modal("hide");
@@ -408,12 +337,12 @@
         if (user_access.canEdit) {
             $("#editForm").validate({
                 rules: {
-                    Number: { required: true, maxlength: 100 },
-                    Type: { required: true, maxlength: 100 }
+                    Name: { required: true, maxlength: 100 },
+                    Prior: { required: true }
                 },
                 messages: {
-                    Number: { required: "Fleet Number / Plate Number is required", maxlength: "Number must not exceed 100 characters." },
-                    Type: { required: "ServiceLevelAgreement Type is required", maxlength: "ServiceLevelAgreement Type must not exceed 100 characters." }
+                    Number: { required: "Name is required", maxlength: "Name must not exceed 100 characters." },
+                    Type: { required: "Prior Availability is required" }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -426,11 +355,9 @@
                     type: "POST",
                     url: "@Url.Action("UpdateServiceLevelAgreement")",
                     data: {
-                        Id: $("#edit-number").data("Id"),
-                        FleetPlateNumber: $("#edit-number").val(),
-                        ServiceLevelAgreementType: $("#edit-type").val(),
-                        DateRegisteredD: $("#edit-registered").val(),
-                        DateExpirationD: $("#edit-expiration").val()
+                        Id: $("#edit-name").data("Id"),
+                        Name: $("#edit-name").val(),
+                        PriorAvailabilityD: $("#edit-prior").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {

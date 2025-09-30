@@ -840,6 +840,24 @@ else
                             </a>
                         </li>
                     }
+                    @if (navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
+                               asp-area="" asp-controller="ServiceLevelAgreement" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">🕒</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-clock"></span>
+                                }
+                                Service Level Agreements
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.Suppliers.ToEnumString()))
                     {
                         <li>
