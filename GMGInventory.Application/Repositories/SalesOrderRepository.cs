@@ -384,7 +384,18 @@ namespace GMGInventory.Application.Repositories
                                                 .FirstOrDefault() ?? "",
                                ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate,
-                               IsAllPacked = !orderIncompletePack.Contains(order.Id)
+                               IsAllPacked = !orderIncompletePack.Contains(order.Id),
+                               PurchaseRequestDetail = string.Join(",",
+                                                       context.PurchaseRequestLineItems
+                                                       .Where(prli => prli.SalesOrderId == order.Id)
+                                                       .Join(context.PurchaseRequests,
+                                                           prli => prli.PurchaseRequestId,
+                                                           pr => pr.Id,
+                                                           (prli, pr) => new { pr, prli })
+                                                       .Select(x => $"{x.pr.DocumentNumber}-[{x.pr.Status.Name}]")
+                                                       .Distinct()
+                                                       )
+
                            });
             return await orderVM.ToListAsync();
         }
@@ -408,6 +419,7 @@ namespace GMGInventory.Application.Repositories
                                     || x.Region.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Area.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.PurchaseRequestDetail.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Forwarder.ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
@@ -429,6 +441,7 @@ namespace GMGInventory.Application.Repositories
                         case "Area": data = data.OrderBy(s => s.Area); break;
                         case "RequiredDeliveryDate": data = data.OrderBy(s => s.RequiredDeliveryDateD); break;
                         case "Forwarder": data = data.OrderBy(s => s.Forwarder); break;
+                        case "PurchaseRequestDetail": data = data.OrderBy(s => s.Forwarder); break;
                         default: break;
                     }
                 }
@@ -446,6 +459,7 @@ namespace GMGInventory.Application.Repositories
                         case "Area": data = data.OrderByDescending(s => s.Area); break;
                         case "RequiredDeliveryDate": data = data.OrderByDescending(s => s.RequiredDeliveryDateD); break;
                         case "Forwarder": data = data.OrderByDescending(s => s.Forwarder); break;
+                        case "PurchaseRequestDetail": data = data.OrderByDescending(s => s.Forwarder); break;
                         default: break;
                     }
                 }

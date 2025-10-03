@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Common.Constants;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Common.Models
@@ -47,6 +48,9 @@ namespace GMGInventory.Common.Models
         public string ApprovedDisapprovedDate => ApprovedDisapprovedDateD == null ? "-" : ApprovedDisapprovedDateD.Value.ToString(SystemFormat.StringDate);
         public DateTime? ApprovedDisapprovedDateD { get; set; }
         public bool IsAllPacked { get; set; }
+
+        [Display(Name = "Purchase Request")]
+        public string PurchaseRequestDetail { get; set; }
     }
 
     public class SalesOrderFilterVM : ListFilterCommonModel
