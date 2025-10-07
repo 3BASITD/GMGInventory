@@ -37,5 +37,6 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<ItemDetailPriceVM>> GetItemPriceDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailTransferVM>> GetItemTransferDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailReturnVM>> GetItemReturnDTAsync(DataTablesRequestForm form, int id);
+        Task<ResponseModel> SaveImageAsync(ItemImageFormVM form);
     }
 }

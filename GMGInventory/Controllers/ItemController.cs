@@ -601,5 +601,15 @@ namespace GMGInventory.Controllers
             responseModel.Message = "Item location successfully added";
             return Json(responseModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveImageAsync(ItemImageFormVM form)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await itemRepository.SaveImageAsync(form);
+            return Json(response);
+        }
     }
 }

@@ -173,7 +173,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<ResponseModel> SaveAsync(HomeImageFormVM form)
         {
             try
-            {
+            { 
                 if (form.File == null || form.File.Length == 0)
                 {
                     return new ResponseModel { Status = "Error", Message = "Invalid file" };

@@ -44,6 +44,7 @@
 .fa-battery-full::before { content: "🔋"; }
 .fa-battery-quarter::before { content: "🔋"; }
 .fa-battery-three-quarters::before { content: "🔋"; }
+.fa-border-all::before { content: "📅"; }
 .fa-box::before { content: "📦"; }
 .fa-box-open::before { content: "📭"; }
 .fa-calendar-day::before { content: "📅"; }
@@ -59,6 +60,7 @@
 .fa-cog::before, .fa-cogs::before { content: "⚙️"; }
 .fa-coins::before { content: "💰"; }
 .fa-columns::before { content: "📊"; }
+.fa-compact-disc::before { content: "💿"; }
 .fa-cubes::before { content: "📦"; }
 .fa-dolly-flatbed::before { content: "🍽️"; }
 .fa-download::before { content: "📥"; }
@@ -106,6 +108,7 @@
 .fa-sign-out-alt::before { content: "🚪"; }
 .fa-star::before { content: "⭐"; }
 .fa-sync::before { content: "🔄"; }
+.fa-table::before { content: "🗒️"; }
 .fa-thumbs-up::before { content: "👍"; }
 .fa-times::before { content: "❌"; }
 .fa-tools::before { content: "🛠️"; }

@@ -202,7 +202,7 @@
                 },
                 success: function (data, status, xhr) {
                     $("#receive-docNumber").val(data.documentNumber);
-                    $("#receive-poNumber").val(data.poNumber);
+                    //$("#receive-poNumber").val(data.poNumber);
                     $("#receive-supplier").val(data.supplier);
                     $("#receive-warehouse").val(data.warehouse);
                     $("#receive-term").val(data.term);
@@ -213,7 +213,7 @@
                     $("#receive-discount3").val(data.discount3);
                     $("#receive-isVATIncluded").val(data.isVATIncluded);
 
-                    loadPONumberOptions(data.poId);
+                    loadPONumberOptions(data.poId, data.poNumber);
                 },
                 complete: function (xhr, status) {
                     $.ajax({
@@ -233,7 +233,7 @@
         } else {
             $("#receive-poNumber").prop('disabled', false);
             loadDocumentNumber();
-            loadPONumberOptions(-1);
+            loadPONumberOptions(-1, null);
         }
 
         var itemDT = $('.table-item').DataTable({
@@ -390,44 +390,56 @@
             }
         }
 
-        function loadPONumberOptions(selectedOrder) {
+        function loadPONumberOptions(selectedOrder, orderNumber) {
             // Load Select2 Purchase Order
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetPurchaseOrderOptions")",
-                data: {
-                    SelectedId:  selectedOrder
-                },
-                success: function (data, status, xhr) {
-                    $("#receive-poNumber").select2({
-                        ajax: null, //already fetched outside
-                        data: data,
-                        minimumInputLength: -1,
-                        placeholder: "<empty>"
-                    }).off("select2:select").on("select2:select", function () {
-                        loadPODetails();
-                    }).off("select2:unselecting").on("select2:unselecting", function () {
-                        $("#receive-supplier").val("");
-                        $("#receive-warehouse").val("");
-                        $("#receive-term").val("");
-                        $("#receive-currency").val("");
-                        $("#receive-currencyRate").val("0");
-                        $("#receive-discount1").val("0");
-                        $("#receive-discount2").val("0");
-                        $("#receive-discount3").val("0");
-                        $("#receive-isVATIncluded").val("");
-
-                        $("#add-orderItem").val("").trigger("change");
-
-                        itemDT.clear().draw();
-                    });
-                    if (selectedOrder == -1) {
-                        $("#receive-poNumber").val(null).trigger('change');
-                    } else {
-                        loadPODetails();
+            $("#receive-poNumber").select2({
+                placeholder: "<empty>",
+                ajax: {
+                    url: "@Url.Action("GetPurchaseOrderOptions2")",
+                    data: function (params) {
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
+                        SelectedId:  selectedOrder
+                        });
                     }
-                } 
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $(
+                        "<strong>" + repo.text + "</strong><br />" +
+                        "<small>" +
+                        "Order count: " + repo.totalQuantity + "<br />" +
+                        (!repo.disabled ? "Pending count: " + repo.totalIncompleteQuantity + "<br />" : "") +
+                        (repo.alreadyOn ? "Received on: " + repo.alreadyOn : "") +
+                        "</small>"
+                    );
+                }
+            }).off("select2:select").on("select2:select", function () {
+                loadPODetails();
+            }).off("select2:unselecting").on("select2:unselecting", function () {
+                $("#receive-supplier").val("");
+                $("#receive-warehouse").val("");
+                $("#receive-term").val("");
+                $("#receive-currency").val("");
+                $("#receive-currencyRate").val("0");
+                $("#receive-discount1").val("0");
+                $("#receive-discount2").val("0");
+                $("#receive-discount3").val("0");
+                $("#receive-isVATIncluded").val("");
+
+                $("#add-orderItem").val("").trigger("change");
+
+                itemDT.clear().draw();
             });
+            if (selectedOrder == -1) {
+                $("#receive-poNumber").val(null).trigger('change');
+            } else {
+                var selectedOption = new Option(orderNumber, selectedOrder, true, true);
+                $("#receive-poNumber").append(selectedOption).trigger('change');
+                loadPODetails();
+            }
         }
      
         function loadPODetails() {

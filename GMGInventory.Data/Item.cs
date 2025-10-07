@@ -68,6 +68,9 @@ namespace GMGInventory.Data
         public bool IsActive { get; set; }
         //public bool IsDeleted { get; set; }
 
+        [Column(TypeName = "nvarchar(MAX)")]
+        public string? Image { get; set; }
+
         public ICollection<InvoiceLineItem> InvoiceLineItems { get; set; }
         public ICollection<ItemInventory> ItemInventories { get; set; }
         public ICollection<ItemPrice> ItemPrices { get; set; }

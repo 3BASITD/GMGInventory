@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Common.Constants;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
@@ -32,6 +33,7 @@ namespace GMGInventory.Common.Models
         public string? ModelNumber { get; set; }
         public string? Size { get; set; }
         public bool ActiveOnly { get; set; } = false;
+        public bool? IsTable { get; set; }
     }
 
     public class ItemCommonVM
@@ -98,6 +100,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
         public bool GiveAction { get; set; }
+        public string? Image { get; set; }
     }
 
     public class ItemVM
@@ -162,6 +165,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Date Modified")]
         public string DateModified { get; set; }
+
+        [Display(Name = "Image")]
+        public string? Image { get; set; }
     }
 
     public class ItemViewVM : ItemVM
@@ -357,5 +363,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Location Name")]
         public string LocationName { get; set; }
 
+    }
+
+    public class ItemImageFormVM
+    {
+
+        public int? Id { get; set; }
+        public IFormFile File { get; set; }
     }
 }
