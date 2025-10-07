@@ -35,6 +35,9 @@
                         @Html.DisplayNameFor(model => model.SONumber)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.PurchaseRequestDetail)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Customer)
                     </th>
                     <th>
@@ -316,6 +319,7 @@
             },
             columns: [
                 { data: "soNumber", name: "SONumber" },
+                { data: "purchaseRequestDetail", name: "PurchaseRequestDetail" },
                 { data: "customer", name: "Customer" },
                 { data: "customerAddress", name: "CustomerAddress" },
                 { data: "area", name: "Area" },

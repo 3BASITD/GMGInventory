@@ -28,6 +28,9 @@
                         @Html.DisplayNameFor(model => model.SalesOrderDate)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.PONumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.SONumber)
                     </th>
                     <th>
@@ -35,6 +38,18 @@
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.CustomerName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerAddress)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesOrderStatus)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateReceive)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.DatePickup)
@@ -49,26 +64,16 @@
                         @Html.DisplayNameFor(model => model.WaybillNumber)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Remarks)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PONumber)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ServiceLevelAgreement)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.SalesOrderStatus)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
-                    </th>
-                    <th>
                         @Html.DisplayNameFor(model => model.Representative)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.DateReceive)
+                        @Html.DisplayNameFor(model => model.Remarks)
                     </th>
+                    
+                    
+                    
+                    
+                    
                     <th></th>
                 </tr>
             </thead>
@@ -471,9 +476,24 @@
             },
             columns: [
                 { data: "salesOrderDate", name: "SalesOrderDate" },
+                {
+                  data: function (data, type, dataToSet) {
+                        return data.poNumber == null ? "N/A" : data.poNumber;
+                  },
+                  name: "PONumber"
+                },
                 { data: "soNumber", name: "SONumber" },
                 { data: "customerCode", name: "CustomerCode" },
                 { data: "customerName", name: "CustomerName" },
+                { data: "CustomerAddress", name: "CustomerAddress" },
+                { data: "salesOrderStatus", name: "SalesOrderStatus" },
+                { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateReceive == null ? "N/A" : data.dateReceive;
+                    },
+                    name: "DateReceive"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         return data.datePickup == null ? "N/A" : data.datePickup;
@@ -499,35 +519,15 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.remarks == null ? "N/A" : data.remarks;
-                    },
-                    name: "Remarks"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        return data.poNumber == null ? "N/A" : data.poNumber;
-                    },
-                    name: "PONumber"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        return data.serviceLevelAgreement == null ? "N/A" : data.serviceLevelAgreement;
-                    },
-                    name: "ServiceLevelAgreement"
-                },
-                { data: "salesOrderStatus", name: "SalesOrderStatus" },
-                { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
-                {
-                    data: function (data, type, dataToSet) {
                         return data.representative == null ? "N/A" : data.representative;
                     },
                     name: "Representative"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.dateReceive == null ? "N/A" : data.dateReceive;
+                        return data.remarks == null ? "N/A" : data.remarks;
                     },
-                    name: "DateReceive"
+                    name: "Remarks"
                 },
                 {
                     orderable: false,

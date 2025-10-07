@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Unserved Item";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
@@ -11,6 +12,13 @@
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
+
+             @if (userAccess.CanUploadDownload)
+             {
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+             }
         </div>
     </div>
     <div class="card-body">
@@ -107,6 +115,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -205,5 +215,21 @@
         dataTable.on("draw", function () {
             hideLoader();
         });
+
+        
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+                if ($("#filter-region").val()) { urlQuery.push("Region=" + $("#filter-region").val()); }
+
+                urlQuery.push("StartDate=" + $("#filter-from").val());
+                urlQuery.push("EndDate=" + $("#filter-to").val());
+               
+
+
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            });
+        
+
+       
     </script>
     }
