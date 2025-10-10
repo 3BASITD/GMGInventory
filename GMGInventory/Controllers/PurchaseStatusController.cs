@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
     public class PurchaseStatusController(IAccessRepository accessRepository
                                       , IPurchaseStatusRepository statusRepository) : BaseController(accessRepository)
     {

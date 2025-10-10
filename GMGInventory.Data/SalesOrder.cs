@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using GMGInventory.Common.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -34,6 +35,23 @@ namespace GMGInventory.Data
 
         public DateTime RequiredDeliveryDate { get; set; }
         public DateTime SalesOrderDate { get; set; }
+
+        public decimal OverallDiscount { get; set; }
+
+
+        [ForeignKey("ServiceLevelAgreementId")]
+        public int? ServiceLevelAgreementId { get; set; }
+        public ServiceLevelAgreement ServiceLevelAgreement { get; set; }
+
+        public bool WithLP { get; set; }
+        public bool WithREYCONonDefective { get; set; }
+
+        [ForeignKey("WithREYCOJITLPDeliveryId")]
+        public int? WithREYCOJITLPDeliveryId { get; set; }
+        public DeliveryTime WithREYCOJITLPDelivery { get; set; }
+
+        [Column(TypeName = "nvarchar(250)")]
+        public string? SpecialInstruction { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         public string? ApprovedBy { get; set; }

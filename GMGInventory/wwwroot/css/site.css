@@ -174,12 +174,35 @@
     background-color: #3f474e;
 }
 
-.text-sm .select2-container--default .select2-selection--single .select2-selection__arrow,
-select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow,
-.text-sm .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow,
-select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
-    top: 0.12rem;
+select, .form-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 10px 5px;
+    padding-right: 1.5rem;
 }
+
+    select:focus, .form-select:focus {
+        border-color: #ced4da;
+        outline: inherit;
+        box-shadow: inherit;
+    }
+
+.dark-mode select:focus, .dark-mode .form-select:focus {
+    border-color: #6c757d;
+}
+    
+
+
+    .text-sm .select2-container--default .select2-selection--single .select2-selection__arrow,
+    select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow,
+    .text-sm .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow,
+    select.form-control-sm ~ .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 0.12rem;
+    }
 
 .select2-container--default .select2-selection--single,
 .select2-container--bootstrap-5 .select2-selection--single {
@@ -411,7 +434,7 @@ pre {
     display: inline-block;
 }
 
-p.text-sm {
+p.text-sm, div.text-sm {
     margin-bottom: 0.5rem;
 }
 

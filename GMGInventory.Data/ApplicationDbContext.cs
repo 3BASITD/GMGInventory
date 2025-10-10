@@ -24,6 +24,7 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new SOACRTypeSeedConfiguration());
             builder.ApplyConfiguration(new StatusSeedConfiguration());
             builder.ApplyConfiguration(new UnitSeedConfiguration());
+            builder.ApplyConfiguration(new DeliveryTimeSeedConfiguration());
 
             builder.ApplyConfiguration(new UserSeedConfiguration());
             builder.ApplyConfiguration(new RoleSeedConfiguration());
@@ -31,7 +32,6 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new PageGroupSeedConfiguration());
             builder.ApplyConfiguration(new AccessSeedConfiguration());
             builder.ApplyConfiguration(new UserRoleSeedConfiguration());
-
 
             builder.ApplyConfiguration(new PurchaseOrderDeliveryModeSeedConfiguration());
             builder.ApplyConfiguration(new PurchaseOrderTypeSeedConfiguration());
@@ -167,6 +167,7 @@ namespace GMGInventory.Data
         public DbSet<CustomerPayment> CustomerPayments { get; set; }
         public DbSet<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public DbSet<CustomerType> CustomerTypes { get; set; }
+        public DbSet<DeliveryTime> DeliveryTimes { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Forwarder> Forwarders { get; set; }
         public DbSet<HomeImage> HomeImages { get; set; }

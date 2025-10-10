@@ -88,6 +88,7 @@
 .fa-layer-group::before { content: "📶"; }
 .fa-link::before, .fa-unlink::before { content: "⛓️"; }
 .fa-map-marker-alt::before { content: "📍"; }
+.fa-minus::before { content: "➖"; }
 .fa-money-bill-alt::before { content: "💵"; }
 .fa-money-bill-wave::before { content: "💸"; }
 .fa-money-check::before, .fa-money-check-alt::before { content: "💳"; }

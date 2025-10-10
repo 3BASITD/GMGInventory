@@ -24,23 +24,45 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetOptions2(string search, int page)
+        {
+            var timeNow = DateTime.Now.TimeOfDay;
+            var midNight = new TimeSpan(0, 0, 0);
+            var SLAs = from sla in context.ServiceLevelAgreements
+                       where sla.IsActive == true
+                       && (sla.PriorAvailability >= timeNow || sla.PriorAvailability == midNight)
+                       && (string.IsNullOrWhiteSpace(search) || sla.Name.ToLower().Contains(search.ToLower()))
+                       select new JsonOptionsModel
+                       {
+                           Id = sla.Id.ToString(),
+                           Text = sla.Name
+                       };
+            var filteredSLAs = await SLAs.Skip((page - 1) * 50).Take(50).ToListAsync();
+
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = filteredSLAs,
+                total_count = SLAs.Count()
+            };
+        }
+
         public async Task<IList<ServiceLevelAgreementVM>> GetServiceLevelAgreements()
         {
             var serviceLevelAgreements = from serviceLevelAgreement in context.ServiceLevelAgreements
-                           join userc in userManager.Users on serviceLevelAgreement.UserCreated equals userc.Id
-                           join userm in userManager.Users on serviceLevelAgreement.UserModified equals userm.Id into m
-                           from userm in m.DefaultIfEmpty()
-                           select new ServiceLevelAgreementVM
-                           {
-                               Id = serviceLevelAgreement.Id,
-                               Name = serviceLevelAgreement.Name,
-                               PriorAvailabilityD = TimeSpan.FromTicks(serviceLevelAgreement.PriorAvailability),
-                               IsActive = serviceLevelAgreement.IsActive,
-                               UserCreated = userc.FirstName + " " + userc.LastName,
-                               DateCreatedD = serviceLevelAgreement.DateCreated,
-                               UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
-                               DateModifiedD = serviceLevelAgreement.DateModified
-                           };
+                                         join userc in userManager.Users on serviceLevelAgreement.UserCreated equals userc.Id
+                                         join userm in userManager.Users on serviceLevelAgreement.UserModified equals userm.Id into m
+                                         from userm in m.DefaultIfEmpty()
+                                         select new ServiceLevelAgreementVM
+                                         {
+                                             Id = serviceLevelAgreement.Id,
+                                             Name = serviceLevelAgreement.Name,
+                                             PriorAvailabilityD = serviceLevelAgreement.PriorAvailability,
+                                             IsActive = serviceLevelAgreement.IsActive,
+                                             UserCreated = userc.FirstName + " " + userc.LastName,
+                                             DateCreatedD = serviceLevelAgreement.DateCreated,
+                                             UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                                             DateModifiedD = serviceLevelAgreement.DateModified
+                                         };
             return await serviceLevelAgreements.ToListAsync();
         }
 
@@ -66,7 +88,7 @@ namespace GMGInventory.Application.Repositories
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                    data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
+                data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
             }
 
             //pagination
@@ -86,13 +108,13 @@ namespace GMGInventory.Application.Repositories
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
-                if(context.ServiceLevelAgreements.Any(s=>s.Name.ToLower() == serviceLevelAgreement.Name.ToLower()))
-                    return new ResponseModel { Status = "Error", Message = "Name already exist"};
+                if (context.ServiceLevelAgreements.Any(s => s.Name.ToLower() == serviceLevelAgreement.Name.ToLower()))
+                    return new ResponseModel { Status = "Error", Message = "Name already exist" };
 
                 var newServiceLevelAgreement = new ServiceLevelAgreement
                 {
                     Name = serviceLevelAgreement.Name,
-                    PriorAvailability = serviceLevelAgreement.PriorAvailabilityD.Ticks,
+                    PriorAvailability = serviceLevelAgreement.PriorAvailabilityD,
                     IsActive = true
                 };
                 await context.ServiceLevelAgreements.AddAsync(newServiceLevelAgreement);
@@ -114,19 +136,19 @@ namespace GMGInventory.Application.Repositories
                                               .Where(s => s.Id == serviceLevelAgreement.Id)
                                               .FirstOrDefaultAsync();
                 if (oldServiceLevelAgreement == null)
-                    return new ResponseModel  { Status = "Error", Message = "Invalid Service Level Agreement, failed to update" };
+                    return new ResponseModel { Status = "Error", Message = "Invalid Service Level Agreement, failed to update" };
 
                 if (context.ServiceLevelAgreements.Any(s => s.Id != serviceLevelAgreement.Id && s.Name.ToLower() == serviceLevelAgreement.Name.ToLower()))
                     return new ResponseModel { Status = "Error", Message = "Name already exist" };
 
                 if (Equals(oldServiceLevelAgreement.Name, serviceLevelAgreement.Name)
-                 && Equals(oldServiceLevelAgreement.PriorAvailability, serviceLevelAgreement.PriorAvailabilityD.Ticks))
+                 && Equals(oldServiceLevelAgreement.PriorAvailability, serviceLevelAgreement.PriorAvailabilityD))
                     return new ResponseModel { Status = "Error", Message = "Nothing to update" };
 
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
                 oldServiceLevelAgreement.Name = serviceLevelAgreement.Name;
-                oldServiceLevelAgreement.PriorAvailability = serviceLevelAgreement.PriorAvailabilityD.Ticks;
+                oldServiceLevelAgreement.PriorAvailability = serviceLevelAgreement.PriorAvailabilityD;
 
                 context.ServiceLevelAgreements.Update(oldServiceLevelAgreement);
                 await context.SaveChangesAsync(currentUserId);

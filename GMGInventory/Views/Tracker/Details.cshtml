@@ -66,6 +66,8 @@
                     @RenderActionButton("Edit", "✏️", "btn-info ml-2", taskUserAccess.CanEdit, "Button expires in " + Model.ModifyExpiration, "Edit access is required.", "EditTask()")
                     @RenderActionButton("Delete", "🗑️", "btn-danger ml-2", taskUserAccess.CanDelete, "Button expires in " + Model.ModifyExpiration, "Delete access is required.", "DeleteTask()")
                 } *@
+                @RenderActionButton("Edit", "✏️", "btn-info ml-2", taskUserAccess.CanEdit, null, "Edit access is required.", "EditTask()")
+                @RenderActionButton("Delete", "🗑️", "btn-danger ml-2", taskUserAccess.CanDelete, null, "Delete access is required.", "DeleteTask()")
                 @RenderActionButton("Start Doing", "🔄", "btn-primary ml-2", taskUserAccess.CanEdit, null, "Edit access is required.", "StartTask()")
             }
             else if (Model.Status.Equals("doing", StringComparison.OrdinalIgnoreCase))
@@ -850,6 +852,8 @@
                         //     $tools.append(JSRenderActionButton("Edit", "✏️", "btn-info ml-2", task_user_access.canEdit, "Button expires in " + data.modifyExpiration, "Edit access is required.", null));
                         //     $tools.append(JSRenderActionButton("Delete", "🗑️", "btn-danger ml-2", task_user_access.canDelete, "Button expires in " + data.modifyExpiration, "Delete access is required.", null));
                         // }
+                        $tools.append(JSRenderActionButton("Edit", "✏️", "btn-info ml-2", task_user_access.canEdit, null, "Edit access is required.", null));
+                        $tools.append(JSRenderActionButton("Delete", "🗑️", "btn-danger ml-2", task_user_access.canDelete, null, "Delete access is required.", null));
                         $tools.append(JSRenderActionButton("Start Doing", "🔄", "btn-primary ml-2", task_user_access.canEdit, null, "Edit access is required.", () => StartTask()));
                     } else if (data.status.toLowerCase() == "doing") {
                         $(".card-for-task").addClass("card-primary");
@@ -869,10 +873,10 @@
                     }
 
                     $tools.append(`
-                    <a href="Tracker/Details/${data.nextTaskId}" class="btn btn-light text-dark btn-sm float-right ml-2">
+                    <a href="/Tracker/Details/${data.nextTaskId}" class="btn btn-light text-dark btn-sm float-right ml-2">
                         <span class="emoji">⏵</span>
                     </a>
-                    <a href="Tracker/Details/${data.previousTaskId}" class="btn btn-light text-dark btn-sm float-right ml-2">
+                    <a href="/Tracker/Details/${data.previousTaskId}" class="btn btn-light text-dark btn-sm float-right ml-2">
                         <span class="emoji">⏴</span>
                     </a>
                     <a href="@Url.Action("Index", "Tracker")" class="btn btn-light text-dark btn-sm float-right ml-2">
@@ -1515,7 +1519,7 @@
                     buttons: true
                 }).then((confirm) => {
                     if (confirm) {
-                        var text = $('#issue-fixed-resolution').summernote('code');
+                        var text = $($('#issue-fixed-resolution').summernote('code')).text();
                         var date = document.getElementById("issue-fixed-date").value;
 
                         if (!text || text === "<p><br></p>" || !date) {

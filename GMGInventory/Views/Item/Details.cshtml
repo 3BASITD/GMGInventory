@@ -161,11 +161,11 @@
             <div class="col-3">
                 @if (string.IsNullOrWhiteSpace(Model.Image))
                 {
-                    <img src="/images/no_image.png" alt="No Image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
+                    <img src="/images/no_image.png" alt="Cannot load image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
                 }
                 else
                 {
-                    <img src="/images/Items/@Model.Image" alt="@Model.Image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
+                    <img src="/images/Items/@Model.Image" alt="Cannot load image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
                 }
             </div>
         </div>
@@ -296,6 +296,9 @@
                                 </table>
                             </div>
                             <div class="tab-pane fade" id="nav-count" role="tabpanel" aria-labelledby="nav-count-tab">
+                                <a href="@Url.Action("DownloadCounts", new {Id = Model.Id})" class="btn btn-secondary btn-sm float-right ml-2">
+                                    <span class="fas fa-download"></span> Download
+                                </a>
                                 <table class="table table-head-fixed table-striped table-hover table-count">
                                     <thead>
                                         <tr>

@@ -33,7 +33,7 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-12 col-md-4 col-sm-6">
+                <div class="col-12 col-lg-3 col-md-6">
                     <div class="form-group">
                         <label for="order-agent-code" class="form-label mb-0">Agent Code</label>
                         <select id="order-agent-code" name="AgentCode" style="width: 100%"></select>
@@ -55,7 +55,7 @@
                         <input type="text" id="order-customer-address" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
-                <div class="col-12 col-md-4 col-sm-6">
+                <div class="col-12 col-lg-3 col-md-6">
                     <div class="form-group">
                         <label for="order-customer-balance" class="form-label mb-0">Outstanding Balance</label>
                         <input type="text" id="order-customer-balance" class="form-control form-control-sm" readonly="readonly" />
@@ -77,7 +77,7 @@
                         <input type="text" id="order-purchase-number" name="PurchaseNumber" class="form-control form-control-sm" />
                     </div>
                 </div>
-                <div class="col-12 col-md-4 col-sm-6">
+                <div class="col-12 col-lg-3 col-md-6">
                     <div class="form-group">
                         <label for="order-forwarder" class="form-label mb-0">Forwarder</label>
                         <select id="order-forwarder" style="width: 100%"></select>
@@ -93,6 +93,41 @@
                     <div class="form-group">
                         <label for="order-delivery-date" class="form-label mb-0">Required Delivery Date</label>
                         <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-sla" class="form-label mb-0">Service Level Agreement</label>
+                        <select id="order-sla" name="SLA" style="width: 100%"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="order-discount" class="form-label mb-0">Overall Discount</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">PHP</span>
+                            <input type="number" value="0" step="0.01" min="0" max="100" id="order-discount" name="Discount" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-with-lp" class="form-label mb-0">With L/P</label>
+                        <select id="order-with-lp" class="form-select form-select-sm">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-with-nondefect" class="form-label mb-0">With REYCO Non-Defective</label>
+                        <select id="order-with-nondefect" class="form-select form-select-sm">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-with-jitlpdelivery" class="form-label mb-0">With REYCO JIT L/P Delivery</label>
+                        <select id="order-with-jitlpdelivery" style="width: 100%"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-instruction" class="form-label mb-0">Special Instruction</label>
+                        <input type="text" id="order-instruction" name="Instruction" class="form-control form-control-sm" />
                     </div>
                 </div>
             </div>
@@ -294,6 +329,33 @@
             }
         });
 
+        // Load service level agreement data for select2
+        $("#order-sla").select2({
+            minimumResultsForSearch: -1,
+            placeholder: '<empty>',
+            ajax: {
+                url: "@Url.Action("GetOptions2", "ServiceLevelAgreement")"
+            }
+        });
+
+        // Load service level agreement data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "DeliveryTime")",
+            data: { selectedId: null },
+            success: function (data, status, xhr) {
+                $("#order-with-jitlpdelivery").select2({
+                    minimumResultsForSearch: -1,
+                    ajax: null,
+                    data: data,
+                    placeholder: {
+                        id: "",
+                        text: "<empty>"
+                    }
+                });
+            }
+        });
+
         $("#order-customer-code").on("select2:select", function () {
             $("#order-customer-name").val($(this).select2("data")[0].name);
             $("#order-customer-address").val($(this).select2("data")[0].address);
@@ -469,13 +531,11 @@
                 },
                 success: function (data, status, xhr) {
                     var agentOption = new Option(data.agentCode, data.agentId, true, true);
-                    $("#order-agent-code").append(agentOption);
-                    $("#order-agent-code").trigger('change');
+                    $("#order-agent-code").append(agentOption).trigger('change');
                     $("#order-agent-name").val(data.agentName);
 
                     var customerOption = new Option(data.customerCode, data.customerId, true, true);
-                    $("#order-customer-code").append(customerOption);
-                    $("#order-customer-code").trigger('change');
+                    $("#order-customer-code").append(customerOption).trigger('change');
                     $("#order-customer-code").select2("data")[0].name = data.customerName;
                     $("#order-customer-code").select2("data")[0].outstandingBalanceD = data.outstandingBalanceD;
                     $("#order-customer-code").select2("data")[0].customerStatus = data.accountStatus;
@@ -488,12 +548,26 @@
                     $("#order-delivery-date").val(data.requiredDeliveryDate3);
 
                     var forwarderOption = new Option(data.forwarder, data.forwarderId, true, true);
-                    $("#order-forwarder").append(forwarderOption);
-                    $("#order-forwarder").trigger('change');
+                    $("#order-forwarder").append(forwarderOption).trigger('change');
 
                     $("#order-remarks").val(data.remarks);
                     $("#order-date").val(data.orderDate3);
                     $("#order-customer-status").val(data.accountStatus);
+
+                    $("#order-instruction").val(data.specialInstruction);
+
+                    if(data.serviceLevelAgreement) {
+                        var slaOption = new Option(data.serviceLevelAgreement, data.serviceLevelAgreementId, true, true);
+                        $("#order-sla").append(slaOption).trigger('change');
+                    } else {
+                        $("#order-sla").append(null).trigger('change');
+                    }
+
+                    $("#order-discount").val(data.overallDiscount);
+                    $("#order-with-lp").val(data.withLP + "");
+                    $("#order-with-nondefect").val(data.withREYCONonDefective + "");
+
+                    $("#order-with-jitlpdelivery").val(data.withREYCOJITLPDeliveryId).trigger('change');
                 }
             });
 
@@ -739,7 +813,9 @@
                 AgentCode: { required: true },
                 OrderDate: { required: true },
                 DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" },
-                Remarks: { maxlength: 500 }
+                Remarks: { maxlength: 500 },
+                Instruction: { maxlength: 250 },
+                SLA: { required: true }
             },
             messages: {
                 CustomerCode: { required: "Please select customer" },
@@ -749,7 +825,9 @@
                     required: "Please select date of delivery",
                     greaterThanOrEqualDate: "Required delivery date must be on or after the order date"
                 },
-                Remarks: { maxlength: "Remarks must not exceed 500 characters." }
+                Remarks: { maxlength: "Remarks must not exceed 500 characters." },
+                Instruction: { maxlength: "Remarks must not exceed 250 characters." },
+                SLA: { required: "Please select sla" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -759,8 +837,14 @@
 
         function SaveOrder() {
             var itemsToOrder = GetItemsToOrder();
+            var total_gross_price = 0
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",", ""));
+            });
             if (itemsToOrder.length == 0) {
                 toastr.warning("No item to order. Add an item to the list to continue", "Warning");
+            } else if (total_gross_price < parseFloat($("#order-discount").val())) {
+                toastr.warning("Overall discount cannot be higher than total extended price", "Warning");
             } else if (itemsToOrder.filter(s => parseInt(s.quantity) === 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't order an item with 0 quantity", "Warning");
                 // } else if ($("#order-customer-code").select2("data")[0].outstandingBalanceD > 0) {
@@ -825,6 +909,12 @@
                     Remarks: $("#order-remarks").val(),
                     Status: $("#action-type").val(),
                     DeliveryDate: $("#order-delivery-date").val(),
+                    SericeLevelAgreement: $("#order-sla").val(),
+                    OverallDiscount: $("#order-discount").val(),
+                    WithLP: $("#order-with-lp").val(),
+                    WithREYCONonDefective: $("#order-with-nondefect").val(),
+                    WithREYCOJITLPDelivery: $("#order-with-jitlpdelivery").val(),
+                    SpecialInstruction: $("#order-instruction").val(),
                     Items: GetItemsToOrder(),
                     ResubmitId: "@(TempData["SalesOrderId"])"
                 },

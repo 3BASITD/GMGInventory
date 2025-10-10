@@ -459,28 +459,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId)
         {
-            //var orders = from orderItems in context.PurchaseOrderNewLineItems
-            //             let receivingItems = orderItems.PurchaseReceivingLineItems
-            //                            .Where(a => a.PurchaseReceiving.Status.Name.ToLower() == "approved")
-            //                            .Select(a => (int?)a.Quantity)
-            //                            .Sum() ?? 0
-            //             where receivingItems != orderItems.Quantity
-            //             select orderItems.PurchaseOrderId;
-
-
-            //return await context.PurchaseOrderNews
-            //                    .Include(s => s.Status)
-            //                    .Where(s => s.Status.Name.ToLower() == "approved"
-            //                             && orders.Contains(s.Id))
-            //                    .Select(s => new JsonOptionsModel
-            //                    {
-            //                        Id = s.Id.ToString(),
-            //                        Text = s.DocumentNumber,
-            //                        Selected = SelectedId != null && s.Id == SelectedId
-            //                    })
-            //                    .OrderBy(s => s.Text)
-            //                    .ToListAsync();
-
             var incompleteOrders = (from poli in context.PurchaseOrderNewLineItems
                                     let recq = (from prli in context.PurchaseReceivingLineItems
                                                 where prli.OrderItemId == poli.Id
@@ -507,7 +485,7 @@ namespace GMGInventory.Application.Repositories
         }
 
         public async Task<Select2Model<JsonPurchaseOptionModel>> GetPurchaseOrderOptions2(string search, int page)
-        {// 1. Base query with only fields EF can handle cleanly
+        {
             var orders =
                 from poli in context.PurchaseOrderNewLineItems
                 where poli.PurchaseOrder.Status.Name.ToLower() == "approved"
@@ -526,31 +504,32 @@ namespace GMGInventory.Application.Repositories
                 .Take(50)
                 .ToListAsync();
 
-            // 2. Post-process in memory
-            var filteredOrdersOn = filteredOrders.Select(r =>
+            var filteredOrdersOn = filteredOrders.Select(s =>
             {
                 var recq = context.PurchaseReceivingLineItems
-                    .Where(prli => prli.OrderItem.PurchaseOrder.Id == r.Id)
-                    .Sum(prli => (int?)prli.Quantity) ?? 0;
+                                  .Where(prli => prli.OrderItem.PurchaseOrder.Id == s.Id
+                                              && prli.PurchaseReceiving.Status.Name.ToLower() == "approved")
+                                  .Sum(prli => (int?)prli.Quantity) ?? 0;
 
                 var retq = context.PurchaseReturnNewLineItems
-                    .Where(prli => prli.ReceivingItem.OrderItem.PurchaseOrder.Id == r.Id)
-                    .Sum(prli => (int?)prli.Quantity) ?? 0;
+                                  .Where(prli => prli.ReceivingItem.OrderItem.PurchaseOrder.Id == s.Id
+                                              && prli.PurchaseReturn.Status.Name.ToLower() == "approved")
+                                  .Sum(prli => (int?)prli.Quantity) ?? 0;
 
-                var alreadyOn = string.Join(", ",
-                    context.PurchaseReceivingLineItems
-                        .Where(prli => prli.OrderItem.PurchaseOrder.Id == r.Id)
-                        .Select(prli => prli.PurchaseReceiving.DocumentNumber)
-                        .Distinct()
-                        .ToList());
+                var alreadyOn = string.Join(", ", context.PurchaseReceivingLineItems
+                                                         .Where(prli => prli.OrderItem.PurchaseOrder.Id == s.Id 
+                                                                     && prli.PurchaseReceiving.Status.Name.ToLower() == "approved")
+                                                         .Select(prli => prli.PurchaseReceiving.DocumentNumber)
+                                                         .Distinct()
+                                                         .ToList());
 
                 return new JsonPurchaseOptionModel
                 {
-                    Id = r.Id.ToString(),
-                    Text = r.DocumentNumber,
-                    TotalQuantity = r.TotalQuantity,
-                    TotalIncompleteQuantity = r.TotalQuantity - recq + retq,
-                    Disabled = (r.TotalQuantity - recq + retq) <= 0,
+                    Id = s.Id.ToString(),
+                    Text = s.DocumentNumber,
+                    TotalQuantity = s.TotalQuantity,
+                    TotalIncompleteQuantity = s.TotalQuantity - recq + retq,
+                    Disabled = (s.TotalQuantity - recq + retq) <= 0,
                     AlreadyOn = alreadyOn
                 };
             }).ToList();

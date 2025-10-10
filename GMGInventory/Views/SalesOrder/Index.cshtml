@@ -190,7 +190,7 @@
             $("#filter-agent").select2({
                 minimumInputLength: 1,
                 allowClear: true,
-                placeholder: '<empty>',
+                placeholder: '<All>',
                 templateResult: function (repo) {
                     if (repo.loading) {
                         return repo.text;
@@ -293,6 +293,45 @@
         var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.AgentId = $('#filter-agent').val();
+                data.AgentCode = $('#filter-agent option:selected').text();
+                data.AgentName = $('#filter-agent-name').val();
+                data.CustomerId = $('#filter-customer').val();
+                data.CustomerCode = $('#filter-customer option:selected').text();
+                data.CustomerName = $('#filter-customer-name').val();
+                data.RegionId = $('#filter-region').val();
+                data.DateFrom = $("#filter-from").val();
+                data.DateTo = $("#filter-to").val();
+                data.Status = $("#filter-status").val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.AgentId) {
+                    var agentOption = new Option(data.AgentCode, data.AgentId, true, true);
+                    $(agentOption).data('data', {
+                        id: data.AgentId,
+                        text: data.AgentCode,
+                        name: data.AgentName
+                    });
+                    $("#filter-agent").append(agentOption).trigger('change');
+                    $("#filter-agent-name").val(data.AgentName);
+                }
+                if(data.CustomerId) {
+                    var customerOption = new Option(data.CustomerCode, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.CustomerCode,
+                        name: data.CustomerName
+                    });
+                    $("#filter-customer").append(customerOption).trigger('change');
+                    $("#filter-customer-name").val(data.CustomerName);
+                }
+                $('#filter-region').val(data.RegionId);
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').val(data.DateTo);
+                $('#filter-status').val(data.Status);
+            },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 data: function (data) {
@@ -319,7 +358,15 @@
             },
             columns: [
                 { data: "soNumber", name: "SONumber" },
-                { data: "purchaseRequestDetail", name: "PurchaseRequestDetail" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if(data.purchaseRequestDetail)
+                            return data.purchaseRequestDetail;
+                        else
+                            return '<em class="text-muted">N/A</em>';
+                    }, 
+                    name: "PurchaseRequestDetail"
+                },
                 { data: "customer", name: "Customer" },
                 { data: "customerAddress", name: "CustomerAddress" },
                 { data: "area", name: "Area" },
@@ -334,8 +381,8 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '"  data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
-                        if (data.status.toLowerCase() == "submitted" && data.orderBy == $("#current-user-nickname").val() && user_access.canDelete) {
-                            actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button"  data-microtip-title="Delete Sales Order" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
+                        if (data.status.toLowerCase() == "draft" && user_access.canDelete) {
+                            actions += '<button type="button" data-id="' + data.id + '" class="btn btn-danger btn-xs" onclick="DeleteDraft(this)" data-microtip-title="Delete Sales Order" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                         }
                         if  (user_access.canAdd &&  data.isAllPacked != true && data.status.toLowerCase() != "draft" && data.status.toLowerCase() != "submitted" && data.status.toLowerCase() != "disapproved") {
                             //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-box-open"></span></button>';
@@ -352,34 +399,39 @@
             hideLoader();
 
             LoadFilterSelect2();
+        });
 
-            $('.deleteBtn').click(function (e) {
+        if (user_access.canDelete) {
+            function DeleteDraft(elem) {
+                var row = $(elem).parents("tr");
+                var rowData = orderDT.row(row).data();
+
                 swal({
-                    title: "Delete Draft",
-                    text: "Are you sure you want to delete this order?",
-                    icon: "warning",
+                    title: "Delete Draft Sales Order",
+                    text: "Are you sure you want to permanently delete this draft sales order?",
+                    icon: "success",
                     buttons: true,
-                    dangerMode: true
+                    successMode: true
                 }).then((confirm) => {
                     if (confirm) {
                         $.ajax({
                             type: "POST",
-                            url: "@Url.Action("DeleteJson")",
+                            url: "@Url.Action("DeleteDraft")",
                             data: {
-                                Id: $(this).data("id")
+                                Id: rowData.id
                             },
                             success: function (data, status, xhr) {
                                 if (data.status == "Error") {
                                     toastr.error(data.message, "Error");
                                 } else {
-                                    orderDT.ajax.reload();
+                                    window.location.reload();
                                 }
                             }
                         });
                     }
                 });
-            });
-        });
+            };
+        }
 
         if (user_access.canUploadDownload) {
             $(".downloadBtn").click(function (e) {

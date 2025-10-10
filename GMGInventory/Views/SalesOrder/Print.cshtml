@@ -95,15 +95,31 @@
                                 <span>Purchase Order #:</span>
                                 <strong class="detail">@(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)</strong>
                             </div>
+                            <div class="label">
+                                <span>With L/P:</span>
+                                <strong class="detail">@Model.WithLP</strong>
+                            </div>
+                            <div class="label">
+                                <span>With REYCO Non-Defective:</span>
+                                <strong class="detail">@Model.WithREYCONonDefective</strong>
+                            </div>
+                            <div class="label">
+                                <span>With REYCO JIT L/P Delivery:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.WithREYCOJITLPDelivery) ? "N/A" : Model.WithREYCOJITLPDelivery)</strong>
+                            </div>
                         </div>
                         <div class="sub-col w-50pc">
                             <div class="label">
                                 <span>Ship To:</span>
-                                <strong class="detail">?</strong>
+                                <strong class="detail"></strong>
                             </div>
                             <div class="label">
                                 <span>Address:</span>
-                                <strong class="detail">?</strong>
+                                <strong class="detail"></strong>
+                            </div>
+                            <div class="label">
+                                <span>Agent Code:</span>
+                                <strong class="detail">@Model.AgentCode</strong>
                             </div>
                             <div class="label">
                                 <span>Agent Name:</span>
@@ -121,8 +137,32 @@
                                 <span>RDD:</span>
                                 <strong class="detail">@Model.RequiredDeliveryDate</strong>
                             </div>
+                            <div class="label">
+                                <span>SLA:</span>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.ServiceLevelAgreement) ? "N/A" : Model.ServiceLevelAgreement)</strong>
+                            </div>
+                            <div class="label">
+                                <span>Overall Discount:</span>
+                                <strong class="detail">@Model.OverallDiscount</strong>
+                            </div>
                         </div>
                     </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="9">
+                    <dl>
+                        <dt>Remarks:</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(Model?.Remarks) ? "N/A" : Model.Remarks)</dd>
+                    </dl>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="9">
+                    <dl>
+                        <dt>Special Instruction:</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(Model?.SpecialInstruction) ? "N/A" : Model.SpecialInstruction)</dd>
+                    </dl>
                 </td>
             </tr>
             <tr>
@@ -167,9 +207,9 @@
                 <td></td>
                 <td></td>
             </tr>
-            @if (itemCount < 21)
+            @if (itemCount < 20)
             {
-                for (var ctr = 2; ctr <= 21 - itemCount; ctr++)
+                for (var ctr = 2; ctr <= 20 - itemCount; ctr++)
                 {
                     <tr>
                         <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
@@ -194,14 +234,6 @@
                 <th></th>
                 <th></th>
                 <th class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></th>
-            </tr>
-            <tr>
-                <td colspan="9">
-                    <dl>
-                        <dt>Remarks:</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(Model?.Remarks) ? "N/A" : Model.Remarks)</dd>
-                    </dl>
-                </td>
             </tr>
             <tr>
                 <td colspan="9">

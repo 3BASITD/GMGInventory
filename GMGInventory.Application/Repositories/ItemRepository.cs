@@ -1134,7 +1134,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        private async Task<IList<ItemDetailCountVM>> GetItemCountAsync(int id)
+        public async Task<IList<ItemDetailCountVM>> GetItemCountAsync(int id)
         {
             var counstsVM = from count in context.PhysicalCountHistories
                                                  .Include(s => s.Warehouse)

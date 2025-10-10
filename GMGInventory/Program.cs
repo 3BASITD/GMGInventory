@@ -53,6 +53,7 @@ builder.Services.AddScoped(typeof(ICustomerAccountStatusRepository), typeof(Cust
 builder.Services.AddScoped(typeof(ICustomerPurchaseRepository), typeof(CustomerPurchaseRepository));
 builder.Services.AddScoped(typeof(ICustomerRepository), typeof(CustomerRepository));
 builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeRepository));
+builder.Services.AddScoped(typeof(IDeliveryTimeRepository), typeof(DeliveryTimeRepository));
 builder.Services.AddScoped(typeof(IDriverRepository), typeof(DriverRepository));
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
 builder.Services.AddScoped(typeof(IHomeImageRepository), typeof(HomeImageReporitory));

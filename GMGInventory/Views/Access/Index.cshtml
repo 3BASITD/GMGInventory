@@ -230,8 +230,10 @@
                             if (data.status == "Success") {
                                 $("#saveModal").modal("hide");
                                 dataTable.ajax.reload();
+                                toastr.success(data.message, data.status);
+                            } else {
+                                ToastrAndConsoleError(data.status, data.message);
                             }
-                            toastr.success(data.message, data.status);
                         }
                     });
                 });
