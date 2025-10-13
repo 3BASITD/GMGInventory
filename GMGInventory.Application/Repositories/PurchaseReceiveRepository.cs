@@ -2,16 +2,11 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
-using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
-using System.Threading.Tasks.Dataflow;
-using static Humanizer.On;
+using System.Linq;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -464,27 +459,88 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId)
         {
-            var orders = from orderItems in context.PurchaseOrderNewLineItems
-                         let receivingItems = orderItems.PurchaseReceivingLineItems
-                                        .Where(a => a.PurchaseReceiving.Status.Name.ToLower() == "approved")
-                                        .Select(a => (int?)a.Quantity)
-                                        .Sum() ?? 0
-                         where receivingItems != orderItems.Quantity
-                         select orderItems.PurchaseOrderId;
+            var incompleteOrders = (from poli in context.PurchaseOrderNewLineItems
+                                    let recq = (from prli in context.PurchaseReceivingLineItems
+                                                where prli.OrderItemId == poli.Id
+                                                select (int?)prli.Quantity).Sum() ?? 0
+                                    let retq = (from prli in context.PurchaseReturnNewLineItems
+                                                where prli.ReceivingItem.OrderItemId == poli.Id
+                                                select (int?)prli.Quantity).Sum() ?? 0
+                                    where poli.Quantity - recq + retq > 0
+                                    select new
+                                    {
+                                        Id = poli.PurchaseOrder.Id,
+                                        Text = poli.PurchaseOrder.DocumentNumber
+                                    })
+                                    .Distinct()
+                                    .OrderBy(s => s.Text)
+                                    .Select(x => new JsonOptionsModel
+                                    {
+                                        Id = x.Id.ToString(),
+                                        Text = x.Text,
+                                        Selected = SelectedId != null && x.Id == SelectedId
+                                    });
+
+            return await incompleteOrders.ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonPurchaseOptionModel>> GetPurchaseOrderOptions2(string search, int page)
+        {
+            var orders =
+                from poli in context.PurchaseOrderNewLineItems
+                where poli.PurchaseOrder.Status.Name.ToLower() == "approved"
+                   && (string.IsNullOrWhiteSpace(search) || poli.PurchaseOrder.DocumentNumber.Contains(search))
+                group poli by new { poli.PurchaseOrder.Id, poli.PurchaseOrder.DocumentNumber } into g
+                orderby g.Key.Id ascending
+                select new
+                {
+                    g.Key.Id,
+                    g.Key.DocumentNumber,
+                    TotalQuantity = g.Sum(s => s.Quantity)
+                };
+
+            var filteredOrders = await orders
+                .Skip((page - 1) * 50)
+                .Take(50)
+                .ToListAsync();
+
+            var filteredOrdersOn = filteredOrders.Select(s =>
+            {
+                var recq = context.PurchaseReceivingLineItems
+                                  .Where(prli => prli.OrderItem.PurchaseOrder.Id == s.Id
+                                              && prli.PurchaseReceiving.Status.Name.ToLower() == "approved")
+                                  .Sum(prli => (int?)prli.Quantity) ?? 0;
+
+                var retq = context.PurchaseReturnNewLineItems
+                                  .Where(prli => prli.ReceivingItem.OrderItem.PurchaseOrder.Id == s.Id
+                                              && prli.PurchaseReturn.Status.Name.ToLower() == "approved")
+                                  .Sum(prli => (int?)prli.Quantity) ?? 0;
+
+                var alreadyOn = string.Join(", ", context.PurchaseReceivingLineItems
+                                                         .Where(prli => prli.OrderItem.PurchaseOrder.Id == s.Id 
+                                                                     && prli.PurchaseReceiving.Status.Name.ToLower() == "approved")
+                                                         .Select(prli => prli.PurchaseReceiving.DocumentNumber)
+                                                         .Distinct()
+                                                         .ToList());
+
+                return new JsonPurchaseOptionModel
+                {
+                    Id = s.Id.ToString(),
+                    Text = s.DocumentNumber,
+                    TotalQuantity = s.TotalQuantity,
+                    TotalIncompleteQuantity = s.TotalQuantity - recq + retq,
+                    Disabled = (s.TotalQuantity - recq + retq) <= 0,
+                    AlreadyOn = alreadyOn
+                };
+            }).ToList();
 
 
-            return await context.PurchaseOrderNews
-                                .Include(s => s.Status)
-                                .Where(s => s.Status.Name.ToLower() == "approved"
-                                         && orders.Contains(s.Id))
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.DocumentNumber,
-                                    Selected = SelectedId != null && s.Id == SelectedId
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
+            return new Select2Model<JsonPurchaseOptionModel>
+            {
+                //incomplete_results = false,
+                items = filteredOrdersOn,
+                total_count = orders.Count()
+            };
         }
 
         public async Task<ResponseModel> ApproveAsync(int receivingId)

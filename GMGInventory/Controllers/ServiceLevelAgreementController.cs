@@ -4,6 +4,7 @@ using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Humanizer.On;
 
 namespace GMGInventory.Controllers
 {
@@ -12,6 +13,11 @@ namespace GMGInventory.Controllers
     public class ServiceLevelAgreementController(IAccessRepository accessRepository
                                  , IServiceLevelAgreementRepository serviceLevelAgreementRepository) : BaseController(accessRepository)
     {
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await serviceLevelAgreementRepository.GetOptions2(search, page));
+        }
+        
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ServiceLevelAgreement, AccessTypes.View);

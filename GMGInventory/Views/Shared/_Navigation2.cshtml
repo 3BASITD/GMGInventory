@@ -579,14 +579,17 @@ else
             || navPages.Contains(PageNames.Brands.ToEnumString())
             || navPages.Contains(PageNames.Categories.ToEnumString())
             || navPages.Contains(PageNames.Currency.ToEnumString())
+            || navPages.Contains(PageNames.Driver.ToEnumString())
             || navPages.Contains(PageNames.Forwarders.ToEnumString())
             || navPages.Contains(PageNames.HomeImage.ToEnumString())
             || navPages.Contains(PageNames.ItemTypes.ToEnumString())
             || navPages.Contains(PageNames.LocationCodes.ToEnumString())
             || navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString())
             || navPages.Contains(PageNames.Regions.ToEnumString())
+            || navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString())
             || navPages.Contains(PageNames.Suppliers.ToEnumString())
             || navPages.Contains(PageNames.Users.ToEnumString())
+            || navPages.Contains(PageNames.Vehicle.ToEnumString())
             || navPages.Contains(PageNames.AuditLogs.ToEnumString()))
         {
             var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "HomeImage", "AuditLog" }).Contains(currentController ?? "");
@@ -843,7 +846,7 @@ else
                     @if (navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
+                            <a class="dropdown-item @(currentController == "ServiceLevelAgreement" ? "active" : "")"
                                asp-area="" asp-controller="ServiceLevelAgreement" asp-action="Index">
                                 @if (newIcon)
                                 {

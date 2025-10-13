@@ -179,6 +179,22 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> DeleteDraft(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await salesOrderRepository.DeleteDraft(Id);
+
+            if(response.Status == "Success")
+            {
+                TempData["SuccessMessage"] = response.Message;
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> ApproveJson(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.ApproveDisapprove);

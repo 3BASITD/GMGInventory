@@ -84,8 +84,6 @@ namespace GMGInventory.Controllers
 
         public async Task<IActionResult> DetailsJson(int Id)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.View);
-            if (redirectResult != null) return redirectResult;
 
             var request = await orderRepository.GetDetails(Id);
             if (request == null)

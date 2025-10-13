@@ -160,6 +160,18 @@ namespace GMGInventory.Common.Models
         public bool Selected { get; set; } = false;
     }
 
+    public class JsonPurchaseOptionModel
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public int TotalQuantity { get; set; }
+        public int TotalIncompleteQuantity { get; set; }
+        public bool Selected { get; set; } = false;
+        public string? AlreadyOn { get; set; }
+        public bool Disabled { get; set; }
+
+    }
+
     public class JsonPurchaseItemOptionsModel
     {
         public string Id { get; set; }

@@ -23,6 +23,10 @@ namespace GMGInventory.Controllers
         {
             return Json(await receiveRepository.GetPurchaseOrderOptions(SelectedId));
         }
+        public async Task<IActionResult> GetPurchaseOrderOptions2(string search, int page)
+        {
+            return Json(await receiveRepository.GetPurchaseOrderOptions2(search, page));
+        }
 
         public async Task<IActionResult> Index()
         {

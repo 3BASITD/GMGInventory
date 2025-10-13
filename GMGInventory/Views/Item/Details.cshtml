@@ -26,7 +26,7 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-4">
+            <div class="col-3">
                 <p class="text-sm">
                     <label for="item-code" class="text-muted fw-normal mb-0">
                         @Html.DisplayNameFor(model => model.Code)
@@ -73,7 +73,7 @@
                     </b>
                 </p>
             </div>
-            <div class="col-4">
+            <div class="col-3">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Category)
@@ -118,7 +118,7 @@
                     </div>
                 </p>
             </div>
-            <div class="col-4">
+            <div class="col-3">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.UnitCode)
@@ -135,25 +135,37 @@
                         @Model?.Size
                     </b>
                 </p>
-                @if(userAccess.CanView) {
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.RetailPrice)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.RetailPrice
-                    </b>
-                </p>
+                @if (userAccess.CanView)
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.RetailPrice)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.RetailPrice
+                        </b>
+                    </p>
                 }
-                @if(userAccess.CanView) {
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.NetPrice)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.NetPrice
-                    </b>
-                </p>
+                @if (userAccess.CanView)
+                {
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.NetPrice)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.NetPrice
+                        </b>
+                    </p>
+                }
+            </div>
+            <div class="col-3">
+                @if (string.IsNullOrWhiteSpace(Model.Image))
+                {
+                    <img src="/images/no_image.png" alt="Cannot load image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
+                }
+                else
+                {
+                    <img src="/images/Items/@Model.Image" alt="Cannot load image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
                 }
             </div>
         </div>
@@ -169,15 +181,16 @@
                                     @*<br />*@Warehouse Details
                                 </a>
                             </li>
-                @if(userAccess.CanView) {
-                            <li class="nav-item">
-                                <a class="nav-link" id="nav-purchase-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-purchase"
-                                   aria-controls="nav-purchase" aria-selected="true">
-                                    Cost@*<br />*@ History
-                                </a>
-                            </li>
-                }
+                            @if (userAccess.CanView)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" id="nav-purchase-tab" role="tab"
+                                       data-bs-toggle="tab" data-bs-target="#nav-purchase"
+                                       aria-controls="nav-purchase" aria-selected="true">
+                                        Cost@*<br />*@ History
+                                    </a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-sales-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-sales"
@@ -199,15 +212,16 @@
                                     @*<br />*@Conversion Details
                                 </a>
                             </li>
-                @if(userAccess.CanView) {
-                            <li class="nav-item">
-                                <a class="nav-link" id="nav-price-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-price"
-                                   aria-controls="nav-price" aria-selected="true">
-                                    @*<br />*@Price History
-                                </a>
-                            </li>
-                }
+                            @if (userAccess.CanView)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" id="nav-price-tab" role="tab"
+                                       data-bs-toggle="tab" data-bs-target="#nav-price"
+                                       aria-controls="nav-price" aria-selected="true">
+                                        @*<br />*@Price History
+                                    </a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-transfer-tab" role="tab"
                                    data-bs-toggle="tab" data-bs-target="#nav-transfer"
@@ -222,7 +236,7 @@
                                     Sales Return@*<br />*@ History
                                 </a>
                             </li>
-                           
+
                         </ul>
                     </div>
                     <div class="card-body">
@@ -244,23 +258,24 @@
                             {
                                 <div class="tab-pane fade" id="nav-purchase" role="tabpanel" aria-labelledby="nav-purchase-tab">
                                     <table class="table table-head-fixed table-striped table-hover table-purchase">
-                                    <thead>
-                                        <tr>
-                                            <th>PO Number</th>
-                                            <th>Warehouse</th>
-                                            <th>Supplier</th>
-                                            <th>Quantity</th>
-                                            <th>Unit Cost</th>
-                                            <th>Total Cost</th>
-                                            <th>Conversion Factor</th>
-                                            <th>Converted Total Cost</th>
-                                            <th>Replenish Date</th>
-                                            <th>Replenish By</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>}
+                                        <thead>
+                                            <tr>
+                                                <th>PO Number</th>
+                                                <th>Warehouse</th>
+                                                <th>Supplier</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Cost</th>
+                                                <th>Total Cost</th>
+                                                <th>Conversion Factor</th>
+                                                <th>Converted Total Cost</th>
+                                                <th>Replenish Date</th>
+                                                <th>Replenish By</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            }
                             <div class="tab-pane fade" id="nav-sales" role="tabpanel" aria-labelledby="nav-sales-tab">
                                 <table class="table table-head-fixed table-striped table-hover table-sales">
                                     <thead>
@@ -281,6 +296,9 @@
                                 </table>
                             </div>
                             <div class="tab-pane fade" id="nav-count" role="tabpanel" aria-labelledby="nav-count-tab">
+                                <a href="@Url.Action("DownloadCounts", new {Id = Model.Id})" class="btn btn-secondary btn-sm float-right ml-2">
+                                    <span class="fas fa-download"></span> Download
+                                </a>
                                 <table class="table table-head-fixed table-striped table-hover table-count">
                                     <thead>
                                         <tr>
@@ -303,7 +321,6 @@
                                     </button>
                                 </div>
                                 <table class="table table-head-fixed table-striped table-hover table-conversion">
-                         
                                 </table>
                             </div>
                             @if (userAccess.CanView)
@@ -585,7 +602,7 @@
 
                                     <select name="LocationCode" id="create-location" class="form-control" style="width: 100%">
                                     </select>
-                                   
+
                                 </div>
                             </div>
                         </div>
@@ -663,6 +680,40 @@
     </div>
 </div>
 
+<div class="modal fade" id="pictureModal" role="dialog" aria-labelledby="pictureModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Item Image</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="picForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="add-image2-preview">
+                                <img id="item-image-selected" src="images/no_image.png" class="elevation-2 w-100 rounded" alt="Item Image">
+                            </div>
+                            <div class="input-group mt-3">
+                                <div class="custom-file">
+                                    <input type="file" id="item-image" class="custom-file-input" name="ItemImage" accept="image/*" onchange="imagePreview(this, 'add-image2-preview', 'elevation-2 w-100 rounded', 'item-image-selected')" />
+                                    <label class="custom-file-label" for="item-image">Choose image</label>
+                                </div>
+                            </div>
+                            <em class="d-block text-muted text-center">Image that are too large will be automatically adjusted upon saving</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><span class="fas fa-save mr-2"></span>Save</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="Close"><span class="fas fa-times mr-2"></span>Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -740,7 +791,7 @@
             dropdownParent: $("#addModal")
         });
 
-      
+
 
         $("#item-code").select2({
             minimumInputLength: 1,
@@ -788,7 +839,7 @@
             }
         });
 
-     
+
 
         function clearItemForm() {
             $("#add-quantity").val("0");
@@ -800,7 +851,7 @@
             $("#add-item-quantity").val("0");
         }
 
-        function getLastConversion() { 
+        function getLastConversion() {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetItemConversionVM", "Item")",
@@ -839,7 +890,7 @@
                             });
                         }
 
-                        
+
                         if(data.subItemId != null){
                             $(".divItem").show();
                             $(".divConversion").hide();
@@ -865,7 +916,7 @@
             if (selectedTab == "#nav-return") returnDT.ajax.reload();
         });
 
-        
+
         // Item Location
         var locationDT = $('.table-location').on('preXhr.dt', function (e, settings, data) {
               showBatchLoader("location");
@@ -989,8 +1040,8 @@
                 });
             }
          });
-        
-        
+
+
 
         //Conversion Details
         var conversionDT = $('.table-conversion').on('preXhr.dt', function (e, settings, data) {
@@ -1072,7 +1123,7 @@
                     });
                 });
             }
-          
+
             if (user_access.canEdit) {
                 // Actions upon Display Edit Modal
                 $(".editBtn").click(function (e) {
@@ -1153,7 +1204,7 @@
                         url: "@Url.Action("EditConversionJson")",
                         data: {
                             Id: $("#edit-id").val(),
-                            SubItemId: $("#edit-item").val(),  
+                            SubItemId: $("#edit-item").val(),
                             ItemId: @Model?.Id,
                             Quantity: $("#edit-item-hidden").val() != "" ? $("#edit-item-quantity").val() : $("#edit-quantity").val(),
                             UnitId: $("#edit-unit").val(),
@@ -1201,7 +1252,7 @@
 
                         // if (data.subItemId == null || data.equivalentUnitId != null) {
                         //     debugger;
-                        //    // document.getElementById("add-unit").setAttribute("disabled", "disabled"); 
+                        //    // document.getElementById("add-unit").setAttribute("disabled", "disabled");
                         // }
 
                         getLastConversion();
@@ -1249,13 +1300,13 @@
                                 toastr.success(data.message, "Success");
                                 $("#addModal").modal("hide");
 
-                                if ($("#add-item").val() != "") { 
+                                if ($("#add-item").val() != "") {
                                     for (var i = 2; i < 5; i++) {
                                         conversionDT.column(i).visible(false, false);
                                     }
                                     conversionDT.column(0).visible(true, true);
                                 }
-                                else {  
+                                else {
                                     conversionDT.column(0).visible(false, false);
                                 }
 
@@ -1576,6 +1627,55 @@
             order: [[5, "desc"]]
         }).on("draw.dt", function () {
             hideBatchLoader("return");
+        });
+
+        function DisplayImage() {
+            $("#item-image-selected").attr("src", $(".item-image").attr("src"));
+            $("#item-image").val("");
+            $("#pictureModal button[type=submit]").prop("disabled", true);
+            $("label.custom-file-label[for='item-image']").text("Select image");
+
+            $("#pictureModal").modal("show");
+        }
+
+        $("#item-image").on("change", function () {
+            if ($("#item-image").val() == "") {
+                $("#pictureModal button[type=submit]").prop("disabled", true);
+                $("label.custom-file-label[for='item-image']").text("Select image");
+            } else {
+                $("#pictureModal button[type=submit]").prop("disabled", false);
+                $("label.custom-file-label[for='item-image']").text($("#item-image").val().split("\\").slice(-1));
+            }
+        });
+
+        $("#picForm").submit(function (evt) {
+            evt.preventDefault();
+
+            var formData = new FormData();
+            formData.append("File", $("#item-image")[0].files[0]);
+            formData.append("Id", @Model.Id);
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveImage")",
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                enctype: "multipart/form-data",
+                processData: false,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        $("#pictureModal").modal("hide");
+                        $(".item-image").attr("src", $("#item-image-selected").attr("src"));
+                        toastr.success(data.message, "Success");
+                    }
+                }
+            });
+
+            return false;
         });
     </script>
 }

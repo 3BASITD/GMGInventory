@@ -13,6 +13,7 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> SaveItemsAsync(IList<PurchaseReceiveLineItemVM> Items, int receiveId, string? status = null);
         Task<ResponseModel<int>> AddAsync(PurchaseReceiveSaveVM form, List<PurchaseReceiveLineItemVM> Items);
         Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId);
+        Task<Select2Model<JsonPurchaseOptionModel>> GetPurchaseOrderOptions2(string search, int page);
         Task<ResponseModel> ApproveAsync(int requestId);
         Task<ResponseModel> DisapproveAsync(int requestId, string? reason);
         Task<string> GetNewDocumentNumber();

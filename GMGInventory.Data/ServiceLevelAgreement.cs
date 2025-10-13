@@ -6,11 +6,13 @@ namespace GMGInventory.Data
     {
         public ServiceLevelAgreement()
         {
+            this.SalesOrders = new HashSet<SalesOrder>();
         }
 
         [Column(TypeName = "nvarchar(100)")]
         public string Name { get; set; }
-        public long PriorAvailability { get; set; }
+        public TimeSpan PriorAvailability { get; set; }
         public bool IsActive { get; set; }
+        public ICollection<SalesOrder> SalesOrders { get; set; }
     }
 }

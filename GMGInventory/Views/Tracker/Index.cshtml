@@ -524,12 +524,15 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">🔍</span></a>';
-                        if (data.modifyExpiration && data.status.toLowerCase() == "open") {
+                        //if (data.modifyExpiration && data.status.toLowerCase() == "open") {
+                        if (data.status.toLowerCase() == "open") {
                             if (user_access.canEdit) {
-                                actions += '<button class="btn btn-warning btn-xs" type="button" onclick="ShowEditTask(this)" data-microtip-title="Edit Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">✏️</span></button>';
+                                //actions += '<button class="btn btn-warning btn-xs" type="button" onclick="ShowEditTask(this)" data-microtip-title="Edit Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">✏️</span></button>';
+                                actions += '<button class="btn btn-warning btn-xs" type="button" onclick="ShowEditTask(this)" data-microtip-title="Edit Task.\nButton is only available for task with Open status." data-microtip-position="bottom-left" role="tooltip"><span class="emoji">✏️</span></button>';
                             }
                             if (user_access.canDelete) {
-                                actions += '<button class="btn btn-danger btn-xs" type="button" onclick="DeleteTask(this)" data-microtip-title="Delete Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">🗑️</span></button>';
+                                //actions += '<button class="btn btn-danger btn-xs" type="button" onclick="DeleteTask(this)" data-microtip-title="Delete Task.\nButton is only available for task with Open status.\nButton will expire in 5 days (remaining: ' + data.modifyExpiration + ')" data-microtip-position="bottom-left" role="tooltip"><span class="emoji">🗑️</span></button>';
+                                actions += '<button class="btn btn-danger btn-xs" type="button" onclick="DeleteTask(this)" data-microtip-title="Delete Task.\nButton is only available for task with Open status." data-microtip-position="bottom-left" role="tooltip"><span class="emoji">🗑️</span></button>';
                             }
                         }
                         if (data.status.toLowerCase() == "open" || data.status.toLowerCase() == "doing" || data.status.toLowerCase() == "incomplete") {
@@ -616,8 +619,8 @@
             function AddTask() {
                 var a_module = $("#add-module").val();
                 var a_summary = $("#add-summary").val();
-                var a_function = $('#add-function').summernote('code');
-                var a_behavior = $('#add-behavior').summernote('code');
+                var a_function = $($('#add-function').summernote('code')).text();
+                var a_behavior = $($('#add-behavior').summernote('code')).text();
                 var a_access = $("#add-access").val();
                 var a_priority = $('#add-priority').val();
                 var a_assignee = $("#add-assignee").val();
@@ -691,8 +694,8 @@
             function EditTask() {
                 var e_module = $("#edit-module").val();
                 var e_summary = $("#edit-summary").val();
-                var e_function = $('#edit-function').summernote('code');
-                var e_behavior = $('#edit-behavior').summernote('code');
+                var e_function = $($('#edit-function').summernote('code')).text();
+                var e_behavior = $($('#edit-behavior').summernote('code')).text();
                 var e_access = $("#edit-access").val();
                 var e_priority = $('#edit-priority').val();
                 var e_assignee = $("#edit-assignee").val();

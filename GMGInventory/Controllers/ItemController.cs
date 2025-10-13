@@ -1,10 +1,12 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PdfSharp.Quality;
 using System.Data;
 
 namespace GMGInventory.Controllers
@@ -430,6 +432,46 @@ namespace GMGInventory.Controllers
             return Json(await itemRepository.GetItemCountDTAsync(form, id));
         }
 
+
+        public async Task<IActionResult> DownloadCounts(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var details = itemRepository.GetItemViewVM(id);
+
+            DataTable dt = new("Physical Count Adjustment");
+            dt.Columns.AddRange([
+                new DataColumn("Warehouse"),
+                new DataColumn("Quantity From"),
+                new DataColumn("Quantity To"),
+                new DataColumn("Quantity Adjusted"),
+                new DataColumn("Adjustment Date"),
+                new DataColumn("Adjustment By"),
+                new DataColumn("Remarks")
+            ]);
+            var pcas = await itemRepository.GetItemCountAsync(id);
+            foreach (var pca in pcas)
+            {
+                dt.Rows.Add(pca.Warehouse,
+                            pca.QuantityFromD,
+                            pca.QuantityToD,
+                            pca.QuantityAdjustedD,
+                            pca.AdjustmentDate,
+                            pca.AdjustmentBy,
+                            pca.Remarks
+                            );
+            }
+
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        SystemFormat.ToValidFileName(DateTime.Now.ToString("yyyyMMdd") + " " + details!.Name + " Physical Count Adjustment.xlsx"));
+        }
+
         [HttpPost]
         public async Task<IActionResult> GetPricesJson(int id)
         {
@@ -600,6 +642,16 @@ namespace GMGInventory.Controllers
             responseModel.Status = "Success";
             responseModel.Message = "Item location successfully added";
             return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveImageAsync(ItemImageFormVM form)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await itemRepository.SaveImageAsync(form);
+            return Json(response);
         }
     }
 }

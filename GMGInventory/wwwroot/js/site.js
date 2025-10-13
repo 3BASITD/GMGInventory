@@ -295,6 +295,8 @@ function reloadInputNumberRule() {
 var startTime;
 
 function showLoader(msg) {
+    hideReloader();
+
     $.LoadingOverlay("show", {
         image: "",
         fontawesome: "fa fa-cog fa-spin",
@@ -341,6 +343,10 @@ function displayReloader() {
             $(".reloader").slideDown(1000);
         }
     }, 1000);
+}
+
+function hideReloader() {
+    $(".reloader").slideUp(100);
 }
 
 // Use for tabs with datatables content
@@ -553,4 +559,27 @@ function getDTParams(table) {
         PageSize: pageSize,
         PageSkip: skip
     };
+}
+
+function imagePreview(that, previewerId, className, idName) {
+    var cls = className || "";
+    var id = idName || "";
+    let files = that.files;
+    document.getElementById(previewerId).innerHTML = '';
+
+    for (let i = 0; i < files.length; i++) {
+        let imager = document.createElement("img");
+        imager.src = URL.createObjectURL(files[i]);
+        imager.classList.add("w-100");
+        imager.classList.add("mt-2");
+        imager.classList.add("mb-2");
+
+        var classNames = cls.split(" ");
+        classNames.forEach((classN) => {
+            imager.classList.add(classN);
+        });
+
+        imager.setAttribute("id", id);
+        document.getElementById(previewerId).append(imager);
+    }
 }

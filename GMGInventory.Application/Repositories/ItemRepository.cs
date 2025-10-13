@@ -2,14 +2,14 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
-using Humanizer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 using System.Xml.Linq;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -18,14 +18,17 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly IHostingEnvironment hostingEnvironment;
 
         public ItemRepository(ApplicationDbContext context
-             , IHttpContextAccessor httpContextAccessor
-             , UserManager<User> userManager)
+                            , IHttpContextAccessor httpContextAccessor
+                            , UserManager<User> userManager
+                            , IHostingEnvironment hostingEnvironment)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            this.hostingEnvironment = hostingEnvironment;
         }
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetOptions(string search, int page)
@@ -139,7 +142,7 @@ namespace GMGInventory.Application.Repositories
                            || item.Name.ToLower().Contains(search.ToLower())
                            || (item.OldCode + "").ToLower().Contains(search.ToLower())
                            || (item.PartNumber + "").ToLower().Contains(search.ToLower()))
-                           //&& soitem.Quantity > (ii + requests)
+                        //&& soitem.Quantity > (ii + requests)
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
@@ -336,45 +339,78 @@ namespace GMGInventory.Application.Repositories
             // Code, Name,  PartNumber, InterchangeNumber, Warehouse, GrossPrice, NetPrice, QuantityOnHand
 
             // Code, Name, PartNumber, InterchangeNumber, Warehouse, ModelNumber, Category, ItemType, Brand, Size, Unit, Quantity
-
-            var itemsVM = from item in context.Items
-                          join inventory in context.ItemInventories on item.Id equals inventory.ItemId
-                          let price = item.ItemPrices
-                                          .Where(s => s.DateCreated.Date <= DateTime.Now)
-                                          .OrderByDescending(s => s.DateCreated)
-                                          .FirstOrDefault()
-                          where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
-                              && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
-                              && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
-                              && (filter.BrandId == null || filter.BrandId == item.BrandId)
-                              && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
-                          select new ItemCommonVM
-                          {
-                              Id = item.Id,
-                              Code = item.Code.Replace("\n", "").Replace("\r", "").Trim(),
-                              Name = item.Name.Replace("\n", "").Replace("\r", "").Trim(),
-                              OldCode = item.OldCode == null ? null : item.OldCode.Replace("\n", "").Replace("\r", "").Trim(),
-                              PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
-                              InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
-                              ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
-                              BeginningCostD = item.BeginningCost,
-                              Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
-                              CategoryId = item.CategoryId,
-                              ItemType = item.ItemType.Name.Replace("\n", "").Replace("\r", "").Trim(),
-                              ItemTypeId = item.ItemTypeId,
-                              Brand = item.Brand.Name.Replace("\n", "").Replace("\r", "").Trim(),
-                              BrandId = item.BrandId,
-                              Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
-                              Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
-                              UnitId = item.UnitId,
-                              QuantityD = inventory.Quantity,
-                              RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
-                              NetPriceD = price == null ? 0 : price.NetSellingPrice,
-                              Warehouse = inventory.Warehouse.Name,
-                              WarehouseId = inventory.WarehouseId,
-                              IsActive = item.IsActive
-                          };
-            return await itemsVM.ToListAsync();
+            if (filter.IsTable != false)
+            {
+                var itemsVM = from item in context.Items
+                              join inventory in context.ItemInventories on item.Id equals inventory.ItemId
+                              let price = item.ItemPrices
+                                              .Where(s => s.DateCreated.Date <= DateTime.Now)
+                                              .OrderByDescending(s => s.DateCreated)
+                                              .FirstOrDefault()
+                              where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                                  && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
+                                  && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
+                                  && (filter.BrandId == null || filter.BrandId == item.BrandId)
+                                  && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
+                              select new ItemCommonVM
+                              {
+                                  Id = item.Id,
+                                  Code = item.Code.Replace("\n", "").Replace("\r", "").Trim(),
+                                  Name = item.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  OldCode = item.OldCode == null ? null : item.OldCode.Replace("\n", "").Replace("\r", "").Trim(),
+                                  PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                                  InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                                  ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                                  BeginningCostD = item.BeginningCost,
+                                  Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  CategoryId = item.CategoryId,
+                                  ItemType = item.ItemType.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  ItemTypeId = item.ItemTypeId,
+                                  Brand = item.Brand.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  BrandId = item.BrandId,
+                                  Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
+                                  Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  UnitId = item.UnitId,
+                                  QuantityD = inventory.Quantity,
+                                  RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
+                                  NetPriceD = price == null ? 0 : price.NetSellingPrice,
+                                  Warehouse = inventory.Warehouse.Name,
+                                  WarehouseId = inventory.WarehouseId,
+                                  IsActive = item.IsActive,
+                                  Image = item.Image
+                              };
+                return await itemsVM.ToListAsync();
+            } else
+            {
+                var itemsVM = from item in context.Items
+                              where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                                  && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
+                                  && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
+                                  && (filter.BrandId == null || filter.BrandId == item.BrandId)
+                              select new ItemCommonVM
+                              {
+                                  Id = item.Id,
+                                  Code = item.Code.Replace("\n", "").Replace("\r", "").Trim(),
+                                  Name = item.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  OldCode = item.OldCode == null ? null : item.OldCode.Replace("\n", "").Replace("\r", "").Trim(),
+                                  PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                                  InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                                  ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                                  BeginningCostD = item.BeginningCost,
+                                  Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  CategoryId = item.CategoryId,
+                                  ItemType = item.ItemType.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  ItemTypeId = item.ItemTypeId,
+                                  Brand = item.Brand.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  BrandId = item.BrandId,
+                                  Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
+                                  Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  UnitId = item.UnitId,
+                                  IsActive = item.IsActive,
+                                  Image = item.Image
+                              };
+                return await itemsVM.ToListAsync();
+            }
         }
 
         public async Task<ForDataTables<ItemCommonVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter)
@@ -470,7 +506,8 @@ namespace GMGInventory.Application.Repositories
                                    Warehouse = j.Warehouse,
                                    WarehouseId = j.WarehouseId,
                                    IsActive = j.IsActive,
-                                   GiveAction = i == 0
+                                   GiveAction = i == 0,
+                                   Image = j.Image
                                }))
                                .ToList();
 
@@ -517,8 +554,9 @@ namespace GMGInventory.Application.Repositories
                               Size = item.Size,
                               UnitCode = item.Unit.Name,
                               Warehouse = inventory.Warehouse.Name,
-                              LocationCodes =  string.Join(",", locationCodes.Select(s => s.Id)),
-                              OldCode = item.OldCode
+                              LocationCodes = string.Join(",", locationCodes.Select(s => s.Id)),
+                              OldCode = item.OldCode,
+                              Image = item.Image
                           }).FirstOrDefault();
             return itemVM;
         }
@@ -1096,7 +1134,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        private async Task<IList<ItemDetailCountVM>> GetItemCountAsync(int id)
+        public async Task<IList<ItemDetailCountVM>> GetItemCountAsync(int id)
         {
             var counstsVM = from count in context.PhysicalCountHistories
                                                  .Include(s => s.Warehouse)
@@ -1407,6 +1445,67 @@ namespace GMGInventory.Application.Repositories
                 RecordsFiltered = filterRecord,
                 Data = pageList
             };
+        }
+
+        public async Task<ResponseModel> SaveImageAsync(ItemImageFormVM form)
+        {
+            try
+            {
+                if (form.File == null || form.File.Length == 0)
+                    return new ResponseModel { Status = "Error", Message = "Invalid file" };
+
+                var item = await context.Items.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+                if (item == null)
+                    return new ResponseModel { Status = "Error", Message = "Item not found" };
+
+                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\Items");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(form.File.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                //using (var fileStream = new FileStream(filePath, FileMode.Create))
+                //{
+                //    await form.File.CopyToAsync(fileStream);
+                //}
+
+                var resized = "";
+
+                using (var image = await Image.LoadAsync(form.File.OpenReadStream()))
+                {
+                    if (image.Width > 500 || image.Height > 500)
+                    {
+                        var originalSize = $"{image.Width}x{image.Height}";
+                        double ratioX = (double)500 / image.Width;
+                        double ratioY = (double)500 / image.Height;
+                        double ratio = Math.Min(ratioX, ratioY);
+
+                        int newWidth = (int)(image.Width * ratio);
+                        int newHeight = (int)(image.Height * ratio);
+
+                        image.Mutate(x => x.Resize(newWidth, newHeight));
+
+                        resized = $" Image is too large, or larger than 500x500. Image is resized from {originalSize} to {newWidth}x{newHeight}";
+                    }
+
+                    await image.SaveAsync(filePath);
+                }
+
+                var savedFile = Path.Combine("images\\Items", uniqueFileName);
+
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                item.Image = uniqueFileName;
+                context.Items.Update(item);
+                await context.SaveChangesAsync(currentUserId);
+
+                return new ResponseModel { Status = "Success", Message = "Successfully updated item's image." + resized };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
     }
 }

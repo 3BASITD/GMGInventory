@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Common.Constants;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Common.Models
 {
@@ -58,6 +59,7 @@ namespace GMGInventory.Common.Models
         public int? AgentId { get; set; }
         public int? CustomerId { get; set; }
         public int? RegionId { get; set; }
+        public string? FiledBy { get; set; }
     }
 
     public class SalesOrderDetailsVM
@@ -66,7 +68,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
-        
+
         public int CustomerId { get; set; }
 
         [Display(Name = "Customer Code")]
@@ -76,13 +78,13 @@ namespace GMGInventory.Common.Models
         public string CustomerName { get; set; }
 
         [Display(Name = "Customer Address")]
-        public string CustomerAddress { get; set; }
+        public string? CustomerAddress { get; set; }
 
         [Display(Name = "Customer Contact Number")]
-        public string CustomerContactNumber { get; set; }
+        public string? CustomerContactNumber { get; set; }
 
         [Display(Name = "Customer Contact Person")]
-        public string CustomerContactPerson { get; set; }
+        public string? CustomerContactPerson { get; set; }
 
         [Display(Name = "Outstanding Balance")]
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
@@ -132,6 +134,28 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Status")]
         public string Status { get; set; }
         public bool IsAllPacked { get; set; }
+
+
+        [Display(Name = "Overall Discount")]
+        public string OverallDiscount => string.Format(SystemFormat.StringDecimalComma, OverallDiscountD);
+        public decimal OverallDiscountD { get; set; }
+
+        [Display(Name = "Service Level Agreement")]
+        public string? ServiceLevelAgreement { get; set; }
+        public int? ServiceLevelAgreementId { get; set; }
+
+        [Display(Name = "With L/P")]
+        public bool WithLP { get; set; }
+
+        [Display(Name = "With REYCO Non-Defective")]
+        public bool WithREYCONonDefective { get; set; }
+
+        [Display(Name = "With REYCO JIT L/P Delivery")]
+        public string? WithREYCOJITLPDelivery { get; set; }
+        public int? WithREYCOJITLPDeliveryId { get; set; }
+
+        [Display(Name = "Special Instruction")]
+        public string? SpecialInstruction { get; set; }
 
         [Display(Name = "Approved By")]
         public string ApprovedBy { get; set; }
@@ -302,6 +326,12 @@ namespace GMGInventory.Common.Models
         public decimal DeclaredValue { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime DeliveryDate { get; set; }
+        public int SericeLevelAgreement { get; set; }
+        public decimal OverallDiscount { get; set; }
+        public bool WithLP { get; set; }
+        public bool WithREYCONonDefective { get; set; }
+        public int WithREYCOJITLPDelivery { get; set; }
+        public string SpecialInstruction { get; set; }
         public string Remarks { get; set; }
         public int? ResubmitId { get; set; }
         public string Status { get; set; }

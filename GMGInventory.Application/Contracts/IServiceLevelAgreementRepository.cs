@@ -4,6 +4,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IServiceLevelAgreementRepository
     {
+        Task<Select2Model<JsonOptionsModel>> GetOptions2(string search, int page);
         Task<IList<ServiceLevelAgreementVM>> GetServiceLevelAgreements();
         Task<ForDataTables<ServiceLevelAgreementVM>> GetServiceLevelAgreementsDT(DataTablesRequestForm form);
         Task<ResponseModel> AddServiceLevelAgreement(ServiceLevelAgreementVM ServiceLevelAgreement);

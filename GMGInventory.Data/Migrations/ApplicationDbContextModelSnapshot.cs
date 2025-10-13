@@ -3349,6 +3349,47 @@ namespace GMGInventory.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.DeliveryTime", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeliveryTimes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "AM",
+                            Name = "AM"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "PM",
+                            Name = "PM"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "AM NEXT DAY",
+                            Name = "AM NEXT DAY"
+                        });
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Driver", b =>
                 {
                     b.Property<int>("Id")
@@ -3681,6 +3722,9 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(MAX)");
 
                     b.Property<string>("InterchangeNumber")
                         .HasColumnType("nvarchar(200)");
@@ -6409,6 +6453,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("DisapprovedReason")
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<decimal>("OverallDiscount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("PurchaseOrder")
                         .HasColumnType("nvarchar(max)");
 
@@ -6428,6 +6475,12 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("ServiceLevelAgreementId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SpecialInstruction")
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
@@ -6438,6 +6491,15 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("WithLP")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("WithREYCOJITLPDeliveryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("WithREYCONonDefective")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AgentId");
@@ -6446,7 +6508,11 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasIndex("ResubmitId");
 
+                    b.HasIndex("ServiceLevelAgreementId");
+
                     b.HasIndex("StatusId");
+
+                    b.HasIndex("WithREYCOJITLPDeliveryId");
 
                     b.ToTable("SalesOrders");
                 });
@@ -6690,8 +6756,8 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<long>("PriorAvailability")
-                        .HasColumnType("bigint");
+                    b.Property<TimeSpan>("PriorAvailability")
+                        .HasColumnType("time");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -8044,13 +8110,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c8b587e7-ccf9-49bb-bfc1-94a0a50d0c0a",
+                            ConcurrencyStamp = "24d0f3e3-6ff1-41e0-a6a8-59b886934560",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEK+EuDRPuzyoAvQ8Z3TUKo2xfR8+PJ1RDYOzjUC5a2uYJlFJhb8zI004wuvs/xNM4Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOqzyH5dH8J9S0uNdtyZgbArHnt93fkRjvYlxHCSI2aAPqzZmwNKdRU763kNu9v5rg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c159d929-96f9-400d-b774-d55c735eca66",
+                            SecurityStamp = "81d7ff52-558e-48d5-b08e-3feff478e813",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8065,13 +8131,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b4c85237-0250-4d24-9abd-f17787c227b2",
+                            ConcurrencyStamp = "6e3b3d1a-6acc-4937-9921-b3c01f3710dd",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDTwSr85gdNI2OUJDVTTSnmS3zjdeu5TqOS0tl5Ju883tkb9T0sybN+fBNSf8EMm0A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENf8WcwqD2niSlhgq76o8dZPEt86CJmNiJKP/pIcvkVRYph5315goAv10cd34DJVjg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "35ade42d-1a7a-4453-a40e-0c4e442a6094",
+                            SecurityStamp = "dcb1bf8e-0486-4021-9ed7-60640dc84d44",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9033,11 +9099,19 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("SalesOrderResubmits")
                         .HasForeignKey("ResubmitId");
 
+                    b.HasOne("GMGInventory.Data.ServiceLevelAgreement", "ServiceLevelAgreement")
+                        .WithMany("SalesOrders")
+                        .HasForeignKey("ServiceLevelAgreementId");
+
                     b.HasOne("GMGInventory.Data.Status", "Status")
                         .WithMany("SalesOrders")
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.DeliveryTime", "WithREYCOJITLPDelivery")
+                        .WithMany("SalesOrders")
+                        .HasForeignKey("WithREYCOJITLPDeliveryId");
 
                     b.Navigation("Agent");
 
@@ -9045,7 +9119,11 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("Resubmit");
 
+                    b.Navigation("ServiceLevelAgreement");
+
                     b.Navigation("Status");
+
+                    b.Navigation("WithREYCOJITLPDelivery");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderDeliveryMonitoring", b =>
@@ -9501,6 +9579,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Customers");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.DeliveryTime", b =>
+                {
+                    b.Navigation("SalesOrders");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Forwarder", b =>
                 {
                     b.Navigation("SalesOrderDeliveryMonitorings");
@@ -9730,6 +9813,11 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
                 {
                     b.Navigation("SalesReturnLineItems");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ServiceLevelAgreement", b =>
+                {
+                    b.Navigation("SalesOrders");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ShippingAddress", b =>
