@@ -209,8 +209,20 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-branch" class="control-label mb-0 d-block">Branch</label>
+                                    <input type="text" name="Branch" id="create-branch" class="form-control form-control-sm" />
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="create-priorities" class="control-label mb-0 d-block">Priorities</label>
+                                    <input type="text" name="Priorities" id="create-priorities" class="form-control form-control-sm" />
+                                </div>
+                            </div>
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label for="create-remarks" class="control-label mb-0 d-block">Remarks</label>
@@ -642,6 +654,8 @@
                 $("#create-usearearate").val("");
                 $("#create-credit-limit").val("");
                 $("#create-account-status").prop("selectedIndex", 0).trigger("change");
+                $("#create-branch").val("");
+                $("#create-priorities").val("");
                 $("#create-remarks").val("");
             });
         }
@@ -656,6 +670,8 @@
                 Email: { maxlength: 50 },
                 Address: { required: true },
                 CreditLimit: { required: true, range: [0, 1999999.99] },
+                Branch: { maxlength: 250 },
+                Priorities: { maxlength: 250 },
                 Remarks: { maxlength: 500 }
             },
             messages: {
@@ -667,6 +683,8 @@
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 Address: { required: "Please enter address." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
+                Branch: { maxlength: "Branch must not exceed 250 characters." },
+                Priorities: { maxlength: "Priorities must not exceed 250 characters." },
                 Remarks: { maxlength: "Remarks must not exceed 500 characters." }
 
             },
@@ -699,6 +717,8 @@
                     CreditTermId: $("#create-credit-term").val(),
                     CreditLimitD: $("#create-credit-limit").val(),
                     CustomerAccountStatusId: $("#create-account-status").val(),
+                    Branch: $("#create-branch").val(),
+                    Priorities: $("#create-priorities").val(),
                     Remarks: $("#create-remarks").val()
                 },
                 success: function (data, status, xhr) {

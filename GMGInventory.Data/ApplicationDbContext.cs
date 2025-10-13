@@ -164,6 +164,7 @@ namespace GMGInventory.Data
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerAccountStatus> CustomerAccountStatuses { get; set; }
+        public DbSet<CustomerBrandDiscount> CustomerBrandDiscount { get; set; } 
         public DbSet<CustomerPayment> CustomerPayments { get; set; }
         public DbSet<CustomerPaymentDetail> CustomerPaymentDetails { get; set; }
         public DbSet<CustomerType> CustomerTypes { get; set; }

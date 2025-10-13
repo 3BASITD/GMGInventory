@@ -35,10 +35,15 @@ namespace GMGInventory.Application.Contracts
         Task<int?> GetIdByCodeAsync(string? Code);
 
         Task<ForDataTables<CustomerShippingVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<CustomerBrandDiscountVM>> GetCustomerBrandDiscountDTAsync(DataTablesRequestForm form, int id);
+        Task<IList<CustomerBrandDiscountVM>> GetCustomerBrandDiscountAsync(int id);
         Task<ResponseModel> SaveShippingAsync(CustomerShippingVM shippingVM);
+        Task<ResponseModel> SaveDiscountAsync(CustomerBrandDiscountVM brandDiscountVM);
         Task<ResponseModel> SetDefaultShippingAsync(int Id);
         Task<ResponseModel> DeleteOrDeactivateShippingAsync(int Id);
+        Task<ResponseModel> DeleteOrDeactivateDiscountAsync(int Id);
         Task<ResponseModel> ReactivateShippingAsync(int Id);
+        Task<ResponseModel> ReactivateDiscountAsync(int Id);
 
         //Task<ForDataTables<CustomerVM>> GetCustomerForwarderDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerPaymentDTAsync(DataTablesRequestForm form, int id);

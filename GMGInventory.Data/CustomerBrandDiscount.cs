@@ -18,6 +18,8 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount { get; set; }
+        
+        public bool IsActive { get; set; }
 
     }
 }

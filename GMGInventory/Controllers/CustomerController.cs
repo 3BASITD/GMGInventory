@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -7,6 +8,7 @@ using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PdfSharp.Quality;
 using System.Data;
 
 namespace GMGInventory.Controllers
@@ -19,7 +21,11 @@ namespace GMGInventory.Controllers
                                   , IAgentRepository agentRepository
                                   , ICustomerTypeRepository customertypeRepository
                                   , ICreditTermRepository credittermRepository) : BaseController(accessRepository)
-        {
+        
+    
+    {
+        private readonly ControllerHelper chelper = new();
+
         public async Task<IActionResult> GetOptions(string search, int page)
         {
             return Json(await customerRepository.GetOptions(search, page));
@@ -159,12 +165,33 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetDiscountJson(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
+            return Json(await customerRepository.GetCustomerBrandDiscountDTAsync(form, id));
+        }
+
+        [HttpPost]
         public async Task<IActionResult> SaveShippingJson(CustomerShippingVM shippingVM)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
             var response = await customerRepository.SaveShippingAsync(shippingVM);
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveDiscountJson(CustomerBrandDiscountVM brandDiscountVM)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.SaveDiscountAsync(brandDiscountVM);
 
             return Json(response);
         }
@@ -192,12 +219,34 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> DeleteOrDeactivateDiscountJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.DeleteOrDeactivateDiscountAsync(Id);
+
+            return Json(response);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> ReactivateShippingJson(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
             var response = await customerRepository.ReactivateShippingAsync(Id);
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReactivateDiscountJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.ReactivateDiscountAsync(Id);
 
             return Json(response);
         }
@@ -308,6 +357,40 @@ namespace GMGInventory.Controllers
             return File(stream.ToArray(),
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             DateTime.Now.ToString("yyyyMMdd") + " Customers.xlsx");
+        }
+
+        public async Task<IActionResult> DownloadDiscountFile(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Customer Brand Discount");
+            dt.Columns.AddRange([
+
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("CustomerName")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("BrandName")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("Discount")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("CreatedBy")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("IsActive"))
+            ]);
+            var cbds = await customerRepository.GetCustomerBrandDiscountAsync(id);
+            foreach (var cbd in cbds)
+            {
+                dt.Rows.Add(cbd.CustomerName,
+                            cbd.BrandName,
+                            cbd.DiscountRate,
+                            cbd.CreatedBy,
+                            cbd.IsActive
+                            );
+            }
+
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " BrandDiscount.xlsx");
         }
 
         [HttpPost]

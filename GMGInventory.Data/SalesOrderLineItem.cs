@@ -28,5 +28,10 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount2 { get; set; }
+
+        [ForeignKey("CustomerBrandDiscountId")]
+        public int? CustomerBrandDiscountId { get; set; }
+        public CustomerBrandDiscount CustomerBrandDiscount { get; set; }
+
     }
 }

@@ -378,6 +378,8 @@ namespace GMGInventory.Application.Repositories
                                   RegionName = cust.Area.Region.Name,
                                   TIN = cust.TIN,
                                   VAT = cust.VAT,
+                                  Branch = cust.Branch,
+                                  Priorities = cust.Priorities,
                                   Remarks = cust.Remarks,
                                   IsActive = cust.IsActive,
                                   CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
@@ -616,6 +618,8 @@ namespace GMGInventory.Application.Repositories
             cust.Remarks = custVM.Remarks;
             cust.TIN = custVM.TIN;
             cust.VAT = custVM.VAT;
+            cust.Branch = custVM.Branch;
+            cust.Priorities = custVM.Priorities;
             //cust.Address = custVM.Address;
             //cust.ContactNumber = custVM.ContactNumber;
             //cust.ContactPerson = custVM.ContactPerson;
@@ -646,7 +650,9 @@ namespace GMGInventory.Application.Repositories
                 Email = custVM.Email,
                 Remarks = custVM.Remarks,
                 TIN = custVM.TIN,
-                VAT = custVM.VAT
+                VAT = custVM.VAT,
+                Branch = custVM.Branch,
+                Priorities = custVM.Priorities
                 //Address = custVM.Address,
                 //ContactNumber = custVM.ContactNumber,
                 //ContactPerson = custVM.ContactPerson,
@@ -694,6 +700,8 @@ namespace GMGInventory.Application.Repositories
                                  Remarks = cust.Remarks,
                                  TIN = cust.TIN,
                                  VAT = cust.VAT,
+                                 Branch = cust.Branch,
+                                 Priorities = cust.Priorities
                                  //Address = cust.ShippingAddresses
                                  //              .Where(a => a.IsDefault == true)
                                  //              .Select(a => a.Address)
@@ -787,6 +795,33 @@ namespace GMGInventory.Application.Repositories
             return await customerVM.ToListAsync();
         }
 
+        public async Task<IList<CustomerBrandDiscountVM>> GetCustomerBrandDiscountAsync(int id)
+        {
+            var customerVM = from brandDiscount in context.CustomerBrandDiscount
+                             join brand in context.Brands on brandDiscount.BrandId equals brand.Id
+                             join customer in context.Customers on brandDiscount.CustomerId equals customer.Id
+                             join userc in userManager.Users on brandDiscount.UserCreated equals userc.Id
+                             join userm in userManager.Users on brandDiscount.UserModified equals userm.Id into um
+                             from userm in um.DefaultIfEmpty()
+                             where brandDiscount.CustomerId == id 
+                             select new CustomerBrandDiscountVM
+                             {
+                                 Id = brandDiscount.Id,
+                                 CustomerId = id,
+                                 CustomerName = customer.Name,
+                                 Discount = brandDiscount.Discount,
+                                 BrandName = brand.Name,
+                                 BrandId = brand.Id,
+                                 DateCreatedD = brandDiscount.DateCreated,
+                                 DateModifiedD = brandDiscount.DateModified,
+                                 CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                                 IsActive = brandDiscount.IsActive
+
+                             };
+            return await customerVM.ToListAsync();
+        }
+
         public async Task<ForDataTables<CustomerShippingVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id)
         {
             int totalRecord = 0;
@@ -833,6 +868,60 @@ namespace GMGInventory.Application.Repositories
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<CustomerShippingVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        public async Task<ForDataTables<CustomerBrandDiscountVM>> GetCustomerBrandDiscountDTAsync(DataTablesRequestForm form, int id)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetCustomerBrandDiscountAsync(id)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.BrandName.ToString().Contains(form.SearchValue)
+                                    || x.Discount.ToString().Contains(form.SearchValue)
+                                    || x.DateCreated.ToString().Contains(form.SearchValue)
+                                    || x.CreatedBy.ToString().Contains(form.SearchValue));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "BrandName": data = data.OrderBy(s => s.BrandName); break;
+                        case "Discount": data = data.OrderBy(s => s.Discount); break;
+                        case "DateCreated": data = data.OrderBy(s => s.DateCreated); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "BrandName": data = data.OrderByDescending(s => s.BrandName); break;
+                        case "Discount": data = data.OrderByDescending(s => s.Discount); break;
+                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreated); break;
+                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<CustomerBrandDiscountVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
@@ -896,6 +985,62 @@ namespace GMGInventory.Application.Repositories
 
                     response.Status = "Success";
                     response.Message = "Address successfully updated";
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> SaveDiscountAsync(CustomerBrandDiscountVM brandDiscountVM)
+        {
+            ResponseModel response = new();
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var checkDiscount = await context.CustomerBrandDiscount.Where(s => (brandDiscountVM.Id == null || (brandDiscountVM.Id != null && brandDiscountVM.Id != s.Id)) 
+                                                                               && (s.CustomerId == brandDiscountVM.CustomerId && s.BrandId == brandDiscountVM.BrandId && s.IsActive)).FirstOrDefaultAsync();
+            if (checkDiscount != null)
+            {
+                if (checkDiscount.CustomerId == brandDiscountVM.CustomerId)
+                {
+                    response.Status = "Error";
+                    response.Message = "Brand already added";
+                }
+                
+            }
+            else
+            {
+
+                var brandDiscount = await context.CustomerBrandDiscount.Where(s => s.Id == brandDiscountVM.Id).FirstOrDefaultAsync();
+                if (brandDiscount == null)
+                {
+                    brandDiscount = new CustomerBrandDiscount
+                    {
+                        CustomerId = brandDiscountVM.CustomerId,
+                        BrandId = brandDiscountVM.BrandId,
+                        Discount = brandDiscountVM.Discount,
+                        IsActive = true
+
+
+                    };
+
+                    await context.CustomerBrandDiscount.AddAsync(brandDiscount);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Discount successfully added";
+                }
+                else
+                {
+                    brandDiscount.CustomerId = brandDiscountVM.CustomerId;
+                    brandDiscount.BrandId = brandDiscountVM.BrandId;
+                    brandDiscount.Discount = brandDiscountVM.Discount;
+                    
+
+                    context.CustomerBrandDiscount.Update(brandDiscount);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Discount successfully updated";
                 }
             }
 
@@ -985,6 +1130,50 @@ namespace GMGInventory.Application.Repositories
             return response;
         }
 
+        public async Task<ResponseModel> DeleteOrDeactivateDiscountAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var discount = await context.CustomerBrandDiscount.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (discount == null)
+            {
+                response.Status = "Error";
+                response.Message = "Discount is invalid";
+            }
+            
+            else
+            {
+                
+                    if (await context.SalesOrderLineItems.AnyAsync(s => s.CustomerBrandDiscountId == discount.Id))
+                    {
+
+                        discount.IsActive = false;
+                        context.CustomerBrandDiscount.Update(discount);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "Discount successfully deactivated";
+
+
+                    }
+                    else
+                    {
+                        context.CustomerBrandDiscount.Remove(discount);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "Address successfully deleted";
+
+
+                    }
+                   
+                
+                
+            }
+
+            return response;
+        }
+
         public async Task<ResponseModel> ReactivateShippingAsync(int Id)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
@@ -1004,6 +1193,29 @@ namespace GMGInventory.Application.Repositories
 
                 response.Status = "Success";
                 response.Message = "Address successfully reactivated";
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> ReactivateDiscountAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var discount = await context.CustomerBrandDiscount.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (discount == null)
+            {
+                response.Status = "Error";
+                response.Message = "Discount is invalid";
+            }
+            else
+            {
+                discount.IsActive = true;
+                context.CustomerBrandDiscount.Update(discount);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Discount successfully reactivated";
             }
 
             return response;

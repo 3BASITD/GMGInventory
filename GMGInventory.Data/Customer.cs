@@ -67,6 +67,12 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(50)")]
         public string? VAT { get; set; }
 
+        [Column(TypeName = "nvarchar(250)")]
+        public string? Branch { get; set; }
+
+        [Column(TypeName = "nvarchar(250)")]
+        public string? Priorities { get; set; }
+
         //[Column(TypeName = "nvarchar(MAX)")]
         //public string Address { get; set; }
 

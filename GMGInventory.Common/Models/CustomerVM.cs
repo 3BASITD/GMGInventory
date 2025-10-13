@@ -1,6 +1,7 @@
 ﻿using GMGInventory.Common.Constants;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Common.Models
 {
@@ -180,6 +181,13 @@ namespace GMGInventory.Common.Models
         public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
         public decimal? TotalInvoiceAmountD { get; set; }
 
+        [MaxLength(250)]
+        [Display(Name = "Branch")]
+        public string? Branch { get; set; }
+
+        [MaxLength(250)]
+        [Display(Name = "Priorities")]
+        public string? Priorities { get; set; }
 
         [Display(Name = "Date Created")]
         public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDate);
@@ -216,6 +224,45 @@ namespace GMGInventory.Common.Models
 
         public bool IsDefault { get; set; }
         public bool IsActive { get; set; }
+    }
+
+    public class CustomerBrandDiscountVM
+    {
+        public int? Id { get; set; }
+
+        public int CustomerId { get; set; }
+
+        [Display(Name = "Customer")]
+        public string CustomerName { get; set; }
+
+        [Display(Name = "Brand")]
+        public string BrandName { get; set; }
+
+        public int BrandId { get; set; }
+
+        [Display(Name = "Discount")]
+        public string DiscountRate => string.Format(SystemFormat.StringDecimalComma, Discount) + "%";
+        
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Discount { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDate);
+        public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "Created By")]
+        public string CreatedBy { get; set; }
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD == null ? null : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string? ModifiedBy { get; set; }
+
+        [Display(Name = "Is Active")]
+        public bool? IsActive { get; set; }
+
     }
 
     public class CustomerViewVM : GenericAuditVM

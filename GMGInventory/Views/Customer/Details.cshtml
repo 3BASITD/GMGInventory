@@ -218,6 +218,26 @@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Branch)
+                    </span>
+                    <b class="d-block details-branch">
+                        @(string.IsNullOrWhiteSpace(Model?.Branch) ? "N/A" : Model?.Branch)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Priorities)
+                    </span>
+                    <b class="d-block details-priorities">
+                        @(string.IsNullOrWhiteSpace(Model?.Priorities) ? "N/A" : Model?.Priorities)
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block details-remarks">
@@ -294,7 +314,8 @@
         <li class="nav-item">
         <a class="nav-link" id="nav-payments-tab" role="tab"
         data-bs-toggle="tab" data-bs-target="#nav-payments"
-        aria-controls="nav-payments" aria-selected="true">
+        aria-controls="nav-
+        s" aria-selected="true">
         Payments
         </a>
         </li>
@@ -352,99 +373,167 @@
         </div>
         </div>
         </div>*@
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
 
-                        <span class="card-title">Shipping Address Details</span>
-                        <div class="card-tools">
-                            @if (userAccess.CanAdd)
-                            {
-                                <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
-                                    <span class="fas fa-plus"></span> Add Shipping Details
-                                </button>
-                            }
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-shipping" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Shipping Address</button>
+                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-receivables" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Receivables</button>
+                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-payments" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Payments</button>
+                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-discount" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Brand Discount</button>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-shipping" role="tabpanel" aria-labelledby="nav-home-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-light">
+
+                                <span class="card-title">Shipping Address Details</span>
+                                <div class="card-tools">
+                                    @if (userAccess.CanAdd)
+                                    {
+                                        <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
+                                            <span class="fas fa-plus"></span> Add Shipping Details
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-head-fixed table-striped table-hover table-shipping">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Address</th>
+                                            <th>Contact Person</th>
+                                            <th>Fax Number</th>
+                                            <th>Phone Number</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-head-fixed table-striped table-hover table-shipping">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Address</th>
-                                    <th>Contact Person</th>
-                                    <th>Fax Number</th>
-                                    <th>Phone Number</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                        </table>
+                </div>
+
+            </div>
+            <div class="tab-pane fade" id="nav-receivables" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                Receivables
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-head-fixed table-striped table-hover table-receivables">
+                                    <thead>
+                                        <tr>
+                                            <th>Invoiced Date</th>
+                                            <th>Invoiced Number</th>
+                                            <th>BIR Invoiced Number</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="3" class="text-end">Total</th>
+                                            <th class="text-end">0.00</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane fade" id="nav-payments" role="tabpanel" aria-labelledby="nav-contact-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                Payments
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-head-fixed table-striped table-hover table-payments">
+                                    <thead>
+                                        <tr>
+                                            <th>Collector Receipt #</th>
+                                            <th>SOA No</th>
+                                            <th>Total Invoice Amount</th>
+                                            <th>Amount Paid</th>
+                                            <th>Over Payment</th>
+                                            <th>Transaction Date</th>
+                                            <th>Created By</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2" class="text-end">Total</th>
+                                            <th class="text-end">0.00</th>
+                                            <th class="text-end">0.00</th>
+                                            <th class="text-end">0.00</th>
+                                            <th colspan="3"></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane fade" id="nav-discount" role="tabpanel" aria-labelledby="nav-contact-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-light">
+
+                                <span class="card-title">Brand Discount</span>
+                                <div class="card-tools">
+                                    @if (userAccess.CanUploadDownload)
+                                    {
+                                        <button type="button" class="btn btn-secondary btn-sm float-right downloadDiscountBtn">
+                                            <span class="fas fa-download"></span> Download
+                                        </button>
+                                    }
+
+                                    @if (userAccess.CanAdd)
+                                    {
+                                        <button type="button" class="btn btn-primary btn-sm float-right discountBtn ml-2" data-bs-toggle="modal" data-bs-target="#discountModal">
+                                            <span class="fas fa-plus"></span> Add Discount
+                                        </button>
+                                    }
+
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-head-fixed table-striped table-hover table-discount">
+                                    <thead>
+                                        <tr>
+                                            
+                                            <th>Brand</th>
+                                            <th>Discount</th>
+                                            <th>Date Created</th>
+                                            <th>Created By</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        Receivables
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-head-fixed table-striped table-hover table-receivables">
-                            <thead>
-                                <tr>
-                                    <th>Invoiced Date</th>
-                                    <th>Invoiced Number</th>
-                                    <th>BIR Invoiced Number</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="3" class="text-end">Total</th>
-                                    <th class="text-end">0.00</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        Payments
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-head-fixed table-striped table-hover table-payments">
-                            <thead>
-                                <tr>
-                                    <th>Collector Receipt #</th>
-                                    <th>SOA No</th>
-                                    <th>Total Invoice Amount</th>
-                                    <th>Amount Paid</th>
-                                    <th>Over Payment</th>
-                                    <th>Transaction Date</th>
-                                    <th>Created By</th>
-                                    <th>Remarks</th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="2" class="text-end">Total</th>
-                                    <th class="text-end">0.00</th>
-                                    <th class="text-end">0.00</th>
-                                    <th class="text-end">0.00</th>
-                                    <th colspan="3"></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+
+
+        
+        
+        
     </div>
 </div>
 
@@ -589,6 +678,20 @@
                                 <input type="number" name="CreditLimit" id="edit-credit-limit" class="form-control form-control-sm" />
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="edit-branch" class="control-label mb-0 d-block">Branch</label>
+                                <input name="Branch" id="edit-branch" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="edit-priorities" class="control-label mb-0 d-block">Priorities</label>
+                                <input name="Priorities" id="edit-priorities" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label for="edit-remarks" class="control-label mb-0 d-block">Remarks</label>
@@ -681,6 +784,54 @@
 </div>
 
 
+<!-- Discount Modal -->
+<div class="modal fade" id="discountModal" role="dialog" aria-labelledby="createshippingModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Brand Discount</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="discountForm">
+                <input type="hidden" name="Id" id="save-discount-id" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="save-discount-brand" class="control-label mb-0 d-block">Brand</label>
+                                <select name="Brand" id="save-discount-brand" class="form-control" style="width: 100%">
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="save-discount" class="control-label mb-0 d-block">Discount</label>
+                                <input type="text" name="Discount" id="save-discount" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+
+                    </div>
+                    
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 <!-- Forwarder Modal -->
@@ -899,6 +1050,20 @@
             }
         });
 
+        // Load Select2 Brand Name
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Brand")",
+            success: function (data, status, xhr) {
+
+                $("#save-discount-brand").select2({
+                    ajax: null, //already fetched outside
+                    data: data,
+                    dropdownParent: $("#discountModal")
+                });
+            }
+        });
+
 
 
         //Shipping Details
@@ -1066,6 +1231,142 @@
         });
 
 
+        //Discount Details
+        var discountDT = $('.table-discount').on('preXhr.dt', function (e, settings, data) {
+            ShowLoader("discount");
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetDiscountJson")",
+                type: "POST",
+                data: function (data) {
+                    data.Id = @Model?.Id;
+                }
+            },
+            serverSide: true,
+            filter: false,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+
+                { data: "brandName", name: "Brand" },
+                { data: "discountRate", name: "DiscountRate" },
+                { data: "dateCreated", name: "DateCreated" },
+                { data: "createdBy", name: "CreatedBy" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (data.isActive) {
+                            if (user_access.canEdit) {
+                            
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-discount" data-microtip-title="Update Brand Discount" data-microtip-position="top" role="tooltip"><span class="fas fa-edit"></span></button>';
+                            
+                            }
+                            if (user_access.canDelete) {
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-discount" data-microtip-title="Delete Brand Discount" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
+                            }
+                        } 
+                        
+                        else{
+                            if (user_access.canAdd || user_access.canEdit) {
+                               actions += '<button data-id="' + data.id + '" class="btn btn-success btn-xs btn-reactivate-discount" data-microtip-title="Reactivate Discount" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
+                            }
+                        }
+                        return actions + '</div>';
+                    },
+                    className: "form-cell"
+                }
+
+            ],
+            order: [[0, "asc"]]
+        }).on("draw.dt", function () {
+            HideLoader("discount");
+
+            if (user_access.canDelete) {
+                $('.btn-remove-discount').off("click").on("click", function () {
+                    swal({
+                        title: "Delete Brand Discount",
+                        text: "Are you sure you want to remove this record?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = discountDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("DeleteOrDeactivateDiscountJson")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        discountDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canEdit) {
+
+                $('.btn-reactivate-discount').off("click").on("click", function () {
+                    swal({
+                        title: "Reactivate Discount",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = discountDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("ReactivateDiscountJson")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        discountDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                
+                $('.btn-update-discount').off("click").on("click", function () {
+                    var row_data = discountDT.row($(this).parents('tr')).data();
+
+                    $("#save-discount-id").val(row_data.id);
+                    $("#save-discount-brand").val(row_data.brandId).trigger("change");
+                    $("#save-discount").val(row_data.discount);
+                    
+
+                    $("#discountModal").modal("show");
+                });
+            }
+        });
+
+        $(".discountBtn").click(function (e) {
+            $("#save-shipping-id").val("");
+            $("#save-discount-brand").val(0).trigger("change");
+            $("#save-discount").val("");
+            
+        });
+
         // Forwarder Details
         var forwarderDT = $('.table-forwarder').on('preXhr.dt', function (e, settings, data) {
             ShowLoader("forwarder");
@@ -1218,6 +1519,8 @@
                     $("#edit-vat").val(data.vat);
                     $("#edit-credit-limit").val(data.creditLimit);
                     $("#edit-remarks").val(data.remarks);
+                    $("#edit-branch").val(data.branch);
+                    $("#edit-priorities").val(data.priorities);
                     $("#edit-isactive").val(data.isActive);
                     $("#edit-account-status").val(data.customerAccountStatusId).trigger("change");
                     // $("#edit-address").val(data.address);
@@ -1248,6 +1551,8 @@
                 Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-9999999999.99." },
+                Branch: { maxlength: "Branch must not exceed 250 characters." },
+                Priorities: { maxlength: "Priorities must not exceed 250 characters." },
                 // Address: { required: "Please enter address." },
                 // ContactPerson: { maxlength: "Contact Person must not exceed 150 characters." },
                 // ContactNumber: { maxlength: "Contact Number number must not exceed 100 characters." },
@@ -1283,6 +1588,8 @@
                     CustomerAccountStatusId: $("#edit-account-status").val(),
                     Remarks: $("#edit-remarks").val(),
                     IsActive: $("#edit-isactive").val(),
+                    Branch: $("#edit-branch").val(),
+                    Priorities: $("#edit-priorities").val()
                     // Address: $("#edit-address").val(),
                     // ContactPerson: $("#edit-contact-person").val(),
                     // ContactNumber: $("#edit-contact-number").val(),
@@ -1311,6 +1618,8 @@
                         $(".details-credit-term").text($("#edit-credit-term").select2("data")[0].text);
                         $(".details-commission-rate").text($("#edit-usearearate").prop("checked") ? "N/A" : FormatStringDecimal($("#edit-commission").val()));
                         $(".details-account-status").text($("#edit-account-status").select2("data")[0].text);
+                        $(".details-branch").text($("#edit-branch").val());
+                        $(".details-priorities").text($("#edit-priorities").val());
                         // $(".details-address").text($("#edit-address").val() || "N/A");
                         // $(".details-contact-person").text($("#edit-contact-person").val() || "N/A");
                         // $(".details-contact-number").text($("#edit-contact-number").val() || "N/A");
@@ -1377,6 +1686,70 @@
             });
         }
 
+        var validateDiscount = $("#discountForm").validate({
+            rules: {
+                Brand: { required: true },
+                Discount: { required: true},
+               
+            },
+            messages: {
+                Address: { required: "Brand is required" },
+                ContactPerson: { required: "Discount is required"},
+                
+
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoDiscount();
+            }
+        });
+        //Reactivate Discount
+        //if (user_access.canAdd || user_access.canEdit) {
+                $('.reactivateDiscountBtn').click(function (e) {
+                    swal({
+                        title: "Reactivate Discount",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#reactivateDiscountId').val(id);
+                            $('#reactivateDiscountForm').submit();
+                        }
+                    });
+                });
+          //  }
+
+
+        // Send Brand Discount to Controller
+        function DoDiscount() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveDiscountJson")",
+                data: {
+                    Id: $("#save-discount-id").val(),
+                    CustomerId: @Model?.Id,
+                    BrandId: $("#save-discount-brand").val(),
+                    Discount: $("#save-discount").val(),
+                    
+                },
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#discountModal").modal("hide");
+                        discountDT.ajax.reload();
+
+                        hideLoader()
+                    }
+                }
+            });
+        }
+
 
         // Actions upon Display Forwarder Modal
         $(".forwarderBtn").click(function (e) {
@@ -1434,7 +1807,16 @@
             });
         }
 
+        if (user_access.canUploadDownload) {
+            $(".downloadDiscountBtn").click(function (e) {
+                var urlQuery = [];
+                urlQuery.push("id=" + @Model?.Id);
+                
 
+
+                window.location = "@Url.Action("DownloadDiscountFile")?" + urlQuery.join("&");
+            });
+        }
 
     </script>
 }
