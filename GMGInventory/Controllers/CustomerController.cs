@@ -367,20 +367,19 @@ namespace GMGInventory.Controllers
             DataTable dt = new("Customer Brand Discount");
             dt.Columns.AddRange([
 
-                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("CustomerName")),
-                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("BrandName")),
-                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("Discount")),
-                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("CreatedBy")),
-                new DataColumn(chelper.DisplayName<CustomerBrandDiscountVM>("IsActive"))
+
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("BrandName")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("Discount")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("CreatedBy"))
             ]);
-            var cbds = await customerRepository.GetCustomerBrandDiscountAsync(id);
+            var cbds = await customerRepository.GetCustomerBrandDiscountDownload(id);
             foreach (var cbd in cbds)
             {
-                dt.Rows.Add(cbd.CustomerName,
+                dt.Rows.Add(
                             cbd.BrandName,
                             cbd.DiscountRate,
-                            cbd.CreatedBy,
-                            cbd.IsActive
+                            cbd.CreatedBy
+
                             );
             }
 
@@ -390,7 +389,7 @@ namespace GMGInventory.Controllers
             wb.SaveAs(stream);
             return File(stream.ToArray(),
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " BrandDiscount.xlsx");
+                        DateTime.Now.ToString("yyyyMMdd") +" "+cbds.FirstOrDefault().CustomerName +" BrandDiscount.xlsx");
         }
 
         [HttpPost]

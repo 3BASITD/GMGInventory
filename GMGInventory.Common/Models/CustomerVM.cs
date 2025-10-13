@@ -265,6 +265,45 @@ namespace GMGInventory.Common.Models
 
     }
 
+    public class CustomerBrandDiscountDowloadVM
+    {
+        public int? Id { get; set; }
+
+        public int? CustomerId { get; set; }
+
+        [Display(Name = "Customer")]
+        public string? CustomerName { get; set; }
+
+        [Display(Name = "Brand")]
+        public string? BrandName { get; set; }
+
+        public int? BrandId { get; set; }
+
+        [Display(Name = "Discount")]
+        public string? DiscountRate => string.Format(SystemFormat.StringDecimalComma, Discount) + "%";
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal? Discount { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string? DateCreated => DateCreatedD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? DateCreatedD { get; set; }
+
+        [Display(Name = "Created By")]
+        public string? CreatedBy { get; set; }
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD == null ? null : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string? ModifiedBy { get; set; }
+
+        [Display(Name = "Is Active")]
+        public bool? IsActive { get; set; }
+
+    }
+
     public class CustomerViewVM : GenericAuditVM
     {
         [Display(Name = "Region")]

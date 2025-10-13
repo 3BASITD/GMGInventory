@@ -495,7 +495,7 @@
                                 <div class="card-tools">
                                     @if (userAccess.CanUploadDownload)
                                     {
-                                        <button type="button" class="btn btn-secondary btn-sm float-right downloadDiscountBtn">
+                                        <button type="button" class="btn btn-secondary btn-sm float-right downloadDiscountBtn ml-2">
                                             <span class="fas fa-download"></span> Download
                                         </button>
                                     }
@@ -1540,6 +1540,8 @@
                 Name: { required: true, maxlength: 100 },
                 Email: { maxlength: 50 },
                 CreditLimit: { required: true, range: [0, 9999999999.99] },
+                Branch: { maxlength: 250},
+                Priorities: { maxlength: 250},
                 // Address: { required: true },
                 // ContactPerson: { maxlength: 150 },
                 // ContactNumber: { maxlength: 100 },
@@ -1689,12 +1691,12 @@
         var validateDiscount = $("#discountForm").validate({
             rules: {
                 Brand: { required: true },
-                Discount: { required: true},
+                Discount: { required: true, number : true, max: 100},
                
             },
             messages: {
-                Address: { required: "Brand is required" },
-                ContactPerson: { required: "Discount is required"},
+                Brand: { required: "Brand is required" },
+                Discount: { required: "Discount is required", number: "Please enter a valid number."},
                 
 
             },
@@ -1723,6 +1725,8 @@
                 });
           //  }
 
+
+       
 
         // Send Brand Discount to Controller
         function DoDiscount() {

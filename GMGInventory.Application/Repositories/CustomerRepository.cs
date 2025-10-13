@@ -822,6 +822,42 @@ namespace GMGInventory.Application.Repositories
             return await customerVM.ToListAsync();
         }
 
+        public async Task<IList<CustomerBrandDiscountDowloadVM>> GetCustomerBrandDiscountDownload(int id)
+        {
+            var customerName = context.Customers.Where(c => c.Id == id).Select(c => new
+                                {
+                                    Name = c.Name
+                                }).FirstOrDefault();
+
+            var customerVM = from brand in context.Brands
+                             join brandDiscount in context.CustomerBrandDiscount on brand.Id equals brandDiscount.BrandId into cbd
+                             from brandDiscount in cbd.DefaultIfEmpty()
+                             join customer in context.Customers on brandDiscount.CustomerId equals customer.Id into cust
+                             from customer in cust.DefaultIfEmpty()
+                             join userc in userManager.Users on brandDiscount.UserCreated equals userc.Id into uc
+                             from userc in uc.DefaultIfEmpty()
+                             join userm in userManager.Users on brandDiscount.UserModified equals userm.Id into um
+                             from userm in um.DefaultIfEmpty()
+                             where (customer.Id == id || customer.Id == null)
+                             orderby customer.Name descending, brand.Name ascending
+                             select new CustomerBrandDiscountDowloadVM
+                             {
+                                 Id = brandDiscount == null ? 0 :brandDiscount.Id,
+                                 CustomerId = id,
+                                 CustomerName = customer == null ? customerName.Name : customer.Name,
+                                 Discount = brandDiscount == null || brandDiscount.IsActive == false ? 0 : brandDiscount.Discount,
+                                 BrandName = brand == null ? "" : brand.Name,
+                                 BrandId = brand == null ? 0 : brand.Id,
+                                 DateCreatedD = brandDiscount.DateCreated,
+                                 DateModifiedD = brandDiscount.DateModified,
+                                 CreatedBy = userc == null ? "" : SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                                 ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                                 IsActive = brandDiscount.IsActive
+
+                             };
+            return await customerVM.ToListAsync();
+        }
+
         public async Task<ForDataTables<CustomerShippingVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id)
         {
             int totalRecord = 0;

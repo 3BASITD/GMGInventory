@@ -37,6 +37,7 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<CustomerShippingVM>> GetCustomerShippingDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerBrandDiscountVM>> GetCustomerBrandDiscountDTAsync(DataTablesRequestForm form, int id);
         Task<IList<CustomerBrandDiscountVM>> GetCustomerBrandDiscountAsync(int id);
+        Task<IList<CustomerBrandDiscountDowloadVM>> GetCustomerBrandDiscountDownload(int id);
         Task<ResponseModel> SaveShippingAsync(CustomerShippingVM shippingVM);
         Task<ResponseModel> SaveDiscountAsync(CustomerBrandDiscountVM brandDiscountVM);
         Task<ResponseModel> SetDefaultShippingAsync(int Id);
