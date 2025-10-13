@@ -11,6 +11,7 @@ namespace GMGInventory.Common.Models
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
         public int? StatusId { get; set; }
+        public string? FiledBy { get; set; }
     }
 
     public class PurchaseRequestVM

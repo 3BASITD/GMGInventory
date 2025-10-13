@@ -59,6 +59,7 @@ namespace GMGInventory.Common.Models
         public int? AgentId { get; set; }
         public int? CustomerId { get; set; }
         public int? RegionId { get; set; }
+        public string? FiledBy { get; set; }
     }
 
     public class SalesOrderDetailsVM

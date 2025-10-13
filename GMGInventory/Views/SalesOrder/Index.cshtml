@@ -123,6 +123,15 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-filedby" class="form-label mb-0">Filed By</label>
+                            <select id="filter-filedby" class="form-select form-select-sm">
+                                <option value="everyone">Everyone</option>
+                                <option value="me">Only by Me</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-6">
@@ -302,6 +311,7 @@
                 data.CustomerCode = $('#filter-customer option:selected').text();
                 data.CustomerName = $('#filter-customer-name').val();
                 data.RegionId = $('#filter-region').val();
+                data.FiledBy = $('#filter-filedby').val();
                 data.DateFrom = $("#filter-from").val();
                 data.DateTo = $("#filter-to").val();
                 data.Status = $("#filter-status").val();
@@ -328,6 +338,8 @@
                     $("#filter-customer-name").val(data.CustomerName);
                 }
                 $('#filter-region').val(data.RegionId);
+                if(data.FiledBy != "me") data.FiledBy = "everyone";
+                $('#filter-filedby').val(data.FiledBy);
                 $('#filter-from').val(data.DateFrom);
                 $('#filter-to').val(data.DateTo);
                 $('#filter-status').val(data.Status);
@@ -343,6 +355,7 @@
                     if (customerId) data.CustomerId = customerId;
                     if (regionId) data.RegionId = regionId;
 
+                    data.FiledBy = $("#filter-filedby").val();
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.Status = $("#filter-status").val();

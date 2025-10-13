@@ -47,6 +47,7 @@
 .fa-border-all::before { content: "📅"; }
 .fa-box::before { content: "📦"; }
 .fa-box-open::before { content: "📭"; }
+.fa-broom::before { content: "🧹"; }
 .fa-calendar-day::before { content: "📅"; }
 .fa-cart-arrow-down::before { content: "🛒"; }
 .fa-cart-plus::before { content: "➕"; }

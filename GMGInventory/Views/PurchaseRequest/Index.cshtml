@@ -106,16 +106,26 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-status" class="form-label mb-0">Status</label>
                             <select id="filter-status" style="width:100%"></select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-filedby" class="form-label mb-0">Filed By</label>
+                            <select id="filter-filedby" class="form-select form-select-sm">
+                                <option value="everyone">Everyone</option>
+                                <option value="me">Only by Me</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary" onclick="ResetFilter()"><span class="fas fa-broom"></span> Reset Filter</button>
             </div>
         </div>
     </div>
@@ -124,6 +134,18 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var appliedFilters = {
+            typeId: '',
+            type: '',
+            purposeId: '',
+            purpose: '',
+            regionId: '',
+            filedBy: '',
+            dateFrom: '',
+            dateTo: '',
+            statusId: ''
+        };
 
         SetDateFilter();
         function SetDateFilter() {
@@ -172,7 +194,7 @@
         });
 
         // Load request purpose data for select2
-        function loadPurposeOptions() {
+        function loadPurposeOptions(selectedId) {
             $("#filter-purpose").off("change");
             $("#filter-purpose").empty().trigger('change');
 
@@ -183,7 +205,8 @@
                     type: "POST",
                     url: "@Url.Action("GetPurposeOptions")",
                     data: {
-                        TypeId: $("#filter-type").val()
+                        TypeId: $("#filter-type").val(),
+                        SelectedId: selectedId
                     },
                     beforeSend: function (xhr, error) {
                         showBatchLoader("purpose");
@@ -198,7 +221,7 @@
                         });
                     },
                     complete: function (xhr, status) {
-                        $("#filter-purpose").val(null).trigger("change");
+                        $("#filter-purpose").val(appliedFilters.purposeId).trigger("change");
                         hideBatchLoader("purpose");
                     }
                 });
@@ -224,7 +247,7 @@
                 });
             },
             complete: function (xhr, status) {
-                $("#filter-region").val(null).trigger("change");
+                $("#filter-region").val(appliedFilters.regionId).trigger("change");
                 hideBatchLoader("region");
             }
         });
@@ -246,19 +269,101 @@
                 });
             },
             complete: function (xhr, status) {
-                $("#filter-status").val(null).trigger("change");
+                $("#filter-status").val(appliedFilters.statusId).trigger("change");
                 hideBatchLoader("status");
             }
         });
 
-        $(".btnFilter").on("click", function () {
+
+        function ApplyFilter() {
+            appliedFilters.typeId = $('#filter-type').val();
+            appliedFilters.type = $('#filter-type option:selected').text();
+            appliedFilters.purposeId = $('#filter-purpose').val();
+            appliedFilters.purpose = $('#filter-purpose option:selected').text();
+            appliedFilters.regionId = $('#filter-region').val();
+            appliedFilters.filedBy = $('#filter-filedby').val();
+            appliedFilters.dateFrom = $("#filter-from").val();
+            appliedFilters.dateTo = $("#filter-to").val();
+            appliedFilters.statusId = $("#filter-status").val();
+
             requestDT.ajax.reload();
             $("#filterModal").modal("hide");
-        });
+        };
+
+        function ResetFilter() {
+            $('#filter-type').val(null).trigger('change');
+            $('#filter-purpose').val(null).trigger('change');
+            $('#filter-region').val(null).trigger('change');
+            $('#filter-filedby').val("everyone").trigger('change');
+            $('#filter-from').val(null);
+            $('#filter-to').val(null);
+            $('#filter-status').val(null).trigger('change');
+
+            appliedFilters.typeId = $('#filter-type').val();
+            appliedFilters.type = $('#filter-type option:selected').text();
+            appliedFilters.purposeId = $('#filter-purpose').val();
+            appliedFilters.purpose = $('#filter-purpose option:selected').text();
+            appliedFilters.regionId = $('#filter-region').val();
+            appliedFilters.filedBy = $('#filter-filedby').val();
+            appliedFilters.dateFrom = $("#filter-from").val();
+            appliedFilters.dateTo = $("#filter-to").val();
+            SetDateFilter();
+            appliedFilters.statusId = $("#filter-status").val();
+
+            requestDT.ajax.reload();
+            $("#filterModal").modal("hide");
+        }
 
         var requestDT = $('.table-request').on('preXhr.dt', function (e, settings, data) {
             showBatchLoader("requestdt");
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.customFilters = {
+                    typeIdVal: appliedFilters.typeId,
+                    typeVal: appliedFilters.type,
+                    purposeIdVal: appliedFilters.purposeId,
+                    purposeVal: appliedFilters.purpose,
+                    regionIdVal: appliedFilters.regionId,
+                    filedByVal: appliedFilters.filedBy,
+                    dateFromVal: appliedFilters.dateFrom,
+                    dateToVal: appliedFilters.dateTo,
+                    statusIdVal: appliedFilters.statusId
+                };
+            },
+            stateLoadParams: function (settings, data) {
+                if (data.customFilters) {
+                    if(data.customFilters.typeIdVal) {
+                        var typeOption = new Option(data.customFilters.typeVal, data.customFilters.typeIdVal, true, true);
+                        $("#filter-type").append(typeOption).trigger('change');
+
+                        //$(".filter-purpose-container").toggle(data.customFilters.typeVal.toLowerCase() != "maintenance & repair");
+                    }
+
+                    if(data.customFilters.purposeIdVal) {
+                        var purposeOption = new Option(data.customFilters.purposeVal, data.customFilters.purposeIdVal, true, true);
+                        $("#filter-purpose").append(purposeOption).trigger('change');
+                    }
+                    $('#filter-region').val(data.customFilters.regionIdVal);
+                    if(data.customFilters.filedByVal != "me") data.customFilters.filedByVal = "everyone";
+                    $('#filter-filedby').val(data.customFilters.filedByVal);
+                    $('#filter-from').val(data.customFilters.dateFromVal);
+                    $('#filter-to').val(data.customFilters.dateToVal);
+                    $('#filter-status').val(data.customFilters.statusIdVal).trigger('change');
+
+                    appliedFilters = {
+                        typeId: data.customFilters.typeIdVal,
+                        type: data.customFilters.typeVal,
+                        purposeId: data.customFilters.purposeIdVal,
+                        purpose: data.customFilters.purposeVal,
+                        regionId: data.customFilters.regionIdVal,
+                        filedBy: data.customFilters.filedByVal,
+                        dateFrom: data.customFilters.dateFromVal,
+                        dateTo: data.customFilters.dateToVal,
+                        statusId: data.customFilters.statusIdVal
+                    };
+                }
+            },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
@@ -266,6 +371,7 @@
                     data.TypeId = $("#filter-type").val();
                     data.PurposeId = $("#filter-purpose").val();
                     data.RegionId = $("#filter-region").val();
+                    data.FiledBy = $('#filter-filedby').val();
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.StatusId = $("#filter-status").val();

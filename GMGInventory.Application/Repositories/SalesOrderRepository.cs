@@ -367,6 +367,7 @@ namespace GMGInventory.Application.Repositories
                            && filter.DateFrom <= order.DateCreated.Date
                            && order.DateCreated.Date <= filter.DateTo
                            && (filter.Status == null || filter.Status == order.Status.Id)
+                           && (filter.FiledBy == null || filter.FiledBy.ToLower() != "me" || (filter.FiledBy.ToLower() == "me" && order.UserCreated == currentUserId))
                            select new SalesOrderVM
                            {
                                Customer = order.Customer.Name,

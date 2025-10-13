@@ -67,6 +67,8 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<PurchaseRequestVM>> GetListAsync(PurchaseRequestFilter filter)
         {
+            var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
+            var currentUserId = currentUser.Id;
             var requestVM = from request in context.PurchaseRequests
                             where (filter.TypeId == null || request.TypeId == filter.TypeId)
                             && (filter.PurposeId == null || request.PurposeId == filter.PurposeId)
@@ -74,6 +76,7 @@ namespace GMGInventory.Application.Repositories
                             && (filter.DateFrom == null || filter.DateFrom <= request.RequestDate)
                             && (filter.DateTo == null || request.RequestDate <= filter.DateTo)
                             && (filter.StatusId == null || request.StatusId == filter.StatusId)
+                            && (filter.FiledBy == null || filter.FiledBy.ToLower() != "me" || (filter.FiledBy.ToLower() == "me" && request.UserCreated == currentUserId))
                             let firstitem = request.PurchaseRequestLineItems.FirstOrDefault()
                             select new PurchaseRequestVM
                             {
@@ -209,7 +212,7 @@ namespace GMGInventory.Application.Repositories
                                       into sg
                             from soli in sg.DefaultIfEmpty()
                             let ii = context.ItemInventories
-                                            .Where(s => s.ItemId == request.ItemId 
+                                            .Where(s => s.ItemId == request.ItemId
                                                      && s.Warehouse.IsMain == true)
                                             .Sum(s => (int?)s.Quantity) ?? 0
                             let requests = context.PurchaseRequestLineItems
@@ -290,95 +293,88 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel<int>> AddAsync(PurchaseRequestSaveVM form, List<PurchaseRequestLineItemVM> Items)
         {
-            var response = new ResponseModel<int>();
 
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             var type = await context.PurchaseRequestTypes.Where(s => s.Id == form.TypeId).FirstOrDefaultAsync();
             if (type == null)
+                return new ResponseModel<int> { Status = "Error", Message = "Invalid type", NewRow = -1 };
+
+            var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
+            if (status == null)
+                return new ResponseModel<int> { Status = "Error", Message = "Invalid status", NewRow = -1 };
+
+            var response = new ResponseModel<int>();
+
+            var previousRequest = await context.PurchaseRequests
+                                               .Where(s => s.Id == form.ResubmitId)
+                                               .FirstOrDefaultAsync();
+
+            var docNumber = "";
+            if (previousRequest == null)
             {
-                response.Status = "Error";
-                response.Message = "Invalid type.";
-                response.NewRow = -1;
+                var docNumberPrefix = "";
+                if (form.Status.ToLower() == "draft")
+                    docNumberPrefix = $"D{type.Code}-PR{DateTime.Now.Year}-";
+                else
+                    docNumberPrefix = $"{type.Code}-PR{DateTime.Now.Year}-";
+
+                var lastDocument = await context.PurchaseRequests
+                                                .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
+                                                .OrderByDescending(s => s.DocumentNumber)
+                                                .Select(s => s.DocumentNumber)
+                                                .FirstOrDefaultAsync();
+
+                int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
+                docNumber = $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
             }
             else
             {
+                docNumber = previousRequest.DocumentNumber;
+            }
 
-                var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
-                if (status == null)
+
+            var request = new PurchaseRequest
+            {
+                DocumentNumber = docNumber,
+                TypeId = form.TypeId,
+                PurposeId = form.PurposeId,
+                PurposeDefinition = form.PurposeDefinition,
+                RequestDate = form.DateRequested,
+                Remarks = form.Remarks,
+                StatusId = status.Id
+            };
+            await context.PurchaseRequests.AddAsync(request);
+            await context.SaveChangesAsync(currentUserId);
+
+            if (previousRequest != null)
+            {
+                var statusResubmitted = await context.PurchaseStatuses
+                                                     .Where(s => s.Name.ToLower() == "resubmitted")
+                                                     .FirstOrDefaultAsync();
+                previousRequest.ResubmitId = request.Id;
+                if (statusResubmitted != null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Invalid status.";
-                    response.NewRow = -1;
+                    previousRequest.StatusId = statusResubmitted.Id;
                 }
-                else
-                {
-                    var previousRequest = await context.PurchaseRequests
-                                                       .Where(s => s.Id == form.ResubmitId)
-                                                       .FirstOrDefaultAsync();
+                context.PurchaseRequests.Update(previousRequest);
+                await context.SaveChangesAsync(currentUserId);
+            }
 
-                    var docNumber = "";
-                    if (previousRequest == null)
-                    {
-                        var docNumberPrefix = $"{type.Code}-PR{DateTime.Now.Year}-";
-                        var lastDocument = await context.PurchaseRequests
-                                                        .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
-                                                        .OrderByDescending(s => s.DocumentNumber)
-                                                        .Select(s => s.DocumentNumber)
-                                                        .FirstOrDefaultAsync();
+            ResponseModel itemsResponse = await SaveItemsAsync(Items, request.Id);
+            if (itemsResponse.Status == "Error")
+            {
+                context.PurchaseRequests.Remove(request);
+                await context.SaveChangesAsync();
 
-                        int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
-                        docNumber = $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
-                    }
-                    else
-                    {
-                        docNumber = previousRequest.DocumentNumber;
-                    }
-
-
-                    var request = new PurchaseRequest
-                    {
-                        DocumentNumber = docNumber,
-                        TypeId = form.TypeId,
-                        PurposeId = form.PurposeId,
-                        PurposeDefinition = form.PurposeDefinition,
-                        RequestDate = form.DateRequested,
-                        Remarks = form.Remarks,
-                        StatusId = status.Id
-                    };
-                    await context.PurchaseRequests.AddAsync(request);
-                    await context.SaveChangesAsync(currentUserId);
-
-                    if (previousRequest != null)
-                    {
-                        var statusResubmitted = await context.PurchaseStatuses
-                                                             .Where(s => s.Name.ToLower() == "resubmitted")
-                                                             .FirstOrDefaultAsync();
-                        previousRequest.ResubmitId = request.Id;
-                        if (statusResubmitted != null)
-                        {
-                            previousRequest.StatusId = statusResubmitted.Id;
-                        }
-                        context.PurchaseRequests.Update(previousRequest);
-                        await context.SaveChangesAsync(currentUserId);
-                    }
-
-                    ResponseModel itemsResponse = await SaveItemsAsync(Items, request.Id);
-                    if (itemsResponse.Status == "Error")
-                    {
-                        context.PurchaseRequests.Remove(request);
-                        await context.SaveChangesAsync();
-
-                        response.Status = itemsResponse.Status;
-                        response.Message = itemsResponse.Message;
-                    }
-                    else
-                    {
-                        response.Status = "Success";
-                        response.Message = form.Status.ToLower() == "draft" ? "Purchase request saved as draft." : "Purchase request successfully submitted.";
-                        response.NewRow = request.Id;
-                    }
-                }
+                response.Status = itemsResponse.Status;
+                response.Message = itemsResponse.Message;
+            }
+            else
+            {
+                response.Status = "Success";
+                response.Message = form.Status.ToLower() == "draft" ? "Purchase request saved as draft." : "Purchase request successfully submitted.";
+                response.NewRow = request.Id;
             }
 
             return response;
@@ -390,7 +386,11 @@ namespace GMGInventory.Application.Repositories
 
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
-            var request = await context.PurchaseRequests.Where(s => s.Id == requestId).FirstOrDefaultAsync();
+            var request = await context.PurchaseRequests
+                                       .Include(s => s.Status)
+                                       .Include(s => s.Type)
+                                       .Where(s => s.Id == requestId)
+                                       .FirstOrDefaultAsync();
 
             if (request == null)
             {
@@ -401,8 +401,25 @@ namespace GMGInventory.Application.Repositories
             {
                 if (!string.IsNullOrWhiteSpace(status))
                 {
-                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
-                    request.StatusId = statusId;
+                    int? statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).FirstOrDefault();
+                    if (statusId != null)
+                        request.StatusId = statusId;
+
+                    if (request.DocumentNumber.StartsWith("D") && request.Status.Name.ToLower() == "draft" && status.ToLower() != "draft")
+                    {
+
+                        var docNumberPrefix = $"{request.Type.Code}-PR{DateTime.Now.Year}-";
+
+                        var lastDocument = await context.PurchaseRequests
+                                                        .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
+                                                        .OrderByDescending(s => s.DocumentNumber)
+                                                        .Select(s => s.DocumentNumber)
+                                                        .FirstOrDefaultAsync();
+
+                        int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
+                        request.DocumentNumber = $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
+                        await context.SaveChangesAsync(currentUserId);
+                    }
                 }
 
                 try
