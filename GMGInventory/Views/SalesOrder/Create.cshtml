@@ -254,6 +254,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <input type="hidden" id="add-discount-id" name="BrandDiscountId" class="form-control form-control-sm" />
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary btn-add">
@@ -276,6 +279,8 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var currentCustomer = null;
 
         // Load agent data for select2
         $("#order-agent-code").select2({
@@ -356,32 +361,76 @@
             }
         });
 
+
+        function changingCustomerCode() {
+            var selectedCustomer = $("#order-customer-code").val();
+
+            console.log("Selected:"+selectedCustomer);
+            console.log("Current:"+currentCustomer);
+            //console.log("So_detail:"+so_details.customerId);
+            var customerText = $("#order-customer-code").select2("data")[0]?.text.toLowerCase() || "";
+
+            if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer)) {
+                var changed = "Customer Code"
+
+                swal({
+                    title: "Sales Order Items not empty",
+                    text: "Changing the selected " + changed + " will clear the added items. Do you want to continue?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        swal.close();
+                        itemDT.clear().draw();
+                        clearItemForm();
+                        currentCustomer = selectedCustomer;
+
+                        $(".order-customer-name").text($("#order-customer-code").select2("data")[0].name);
+                        $(".order-customer-address").text($("#order-customer-code").select2("data")[0].address);
+                        $(".order-customer-balance").text($("#order-customer-code").select2("data")[0].outstandingBalance);
+                        $(".order-credit-term").text($("#order-customer-code").select2("data")[0].creditTerm);
+                        $(".order-region").text($("#order-customer-code").select2("data")[0].region);
+                        $(".order-customer-status").text($("#order-customer-code").select2("data")[0].customerStatus);
+
+                        if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
+                            toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
+                        }
+
+                        if ($("#order-agent-code").val() == null) {
+                            var agentId = $("#order-customer-code").select2("data")[0].agentId;
+                            var agentCode = $("#order-customer-code").select2("data")[0].agentCode;
+                            var agentName = $("#order-customer-code").select2("data")[0].agent;
+                            var agentOption = new Option(agentCode, agentId, true, true);
+                            $(agentOption).data('data', {
+                                id: agentId,
+                                text: agentCode,
+                                name: agentName
+                            });
+                            $("#order-agent-code").append(agentOption).trigger("change");
+                            $("#order-agent-name").val(agentName);
+                        }
+                    } else {
+
+                            $("#order-customer-code").val(currentCustomer).trigger("change");
+
+
+                    }
+                        });
+            } else {
+                currentCustomer = selectedCustomer;
+
+            }
+
+
+        }
+
+
         $("#order-customer-code").on("select2:select", function () {
-            $("#order-customer-name").val($(this).select2("data")[0].name);
-            $("#order-customer-address").val($(this).select2("data")[0].address);
-            $("#order-customer-balance").val($(this).select2("data")[0].outstandingBalance);
-            $("#order-credit-term").val($(this).select2("data")[0].creditTerm);
-            $("#order-region").val($(this).select2("data")[0].region);
-            $("#order-customer-status").val($(this).select2("data")[0].customerStatus);
+                changingCustomerCode();
 
-            if (parseFloat($(this).select2("data")[0].outstandingBalanceD) > 0) {
-                toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $(this).select2("data")[0].outstandingBalance, "Outstanding Balance");
-            }
 
-            if ($("#order-agent-code").val() == null) {
-                var agentId = $(this).select2("data")[0].agentId;
-                var agentCode = $(this).select2("data")[0].agentCode;
-                var agentName = $(this).select2("data")[0].agent;
-                var agentOption = new Option(agentCode, agentId, true, true);
-                $(agentOption).data('data', {
-                  id: agentId,
-                  text: agentCode,
-                  name: agentName
-                });
-                $("#order-agent-code").append(agentOption).trigger("change");
-                $("#order-agent-name").val(agentName);
-            }
-        });
+            });
 
         // Load forwarder data for select2
         $.ajax({
@@ -433,6 +482,9 @@
                 $("#add-gross-price").val($("#add-code").select2("data")[0].netPriceD);
                 $(".add-price-source").text("(Net)");
             }
+
+            GetBrandDiscount($("#add-code").select2("data")[0].brandId);
+
             $("#add-unit").val($("#add-code").select2("data")[0].unit);
             $(".add-inventory").text($("#add-code").select2("data")[0].inventoryCount);
             $("#add-quantity").val("1");
@@ -492,6 +544,53 @@
             }
         });
 
+
+        function GetBrandDiscount(brandId){
+                   var custId = currentCustomer;
+                    if (!custId) return;
+                   var brandDiscountId = 0;
+
+                    $.ajax({
+                      url: "@Url.Action("GetBrandDiscount")",
+                      type: "POST",
+                      data: { customerId: custId, brandId: brandId }, // This sends id as a query parameter
+                      success: function (data) {
+
+
+
+                        if(Object.keys(data).length == 0){
+
+                            $("#add-discount1").val("0.00");
+
+                        }
+
+
+                        else{
+                            console.log(data);
+                            $("#add-discount1").val(Round2Decimal(data[0].discount));
+                            $("#add-discount-id").val(data[0].id);
+
+                            brandDiscountId = data[0].id;
+                            console.log(brandDiscountId);
+
+                            var quantity = parseFloat($("#add-quantity").val());
+                            var unit_price = parseFloat($("#add-unit-price").val());
+                            var discount1 = parseFloat($("#add-discount1").val());
+                            var discount2 = parseFloat($("#add-discount2").val());
+
+                            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+
+                        }
+
+                      },
+                      error: function () {
+                        toastr.error(data.message, "Error")
+                      }
+                    });
+            }
+
+
+
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
@@ -514,10 +613,13 @@
                     unitPrice: Round2Decimal($("#add-unit-price").val() || "0.00"),
                     discount1: Round2Decimal($("#add-discount1").val() || "0.00"),
                     discount2: Round2Decimal($("#add-discount2").val() || "0.00"),
-                    grossPrice: Round2Decimal($("#add-gross-price").val() || "0.00")
+                    grossPrice: Round2Decimal($("#add-gross-price").val() || "0.00"),
+                    customerBrandDiscountId: $("#add-discount-id").val() || 0
                 }).order([1, 'asc']).draw();
                 clearItemForm();
                 toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Sales Order Item(s)", "Success");
+
+                $('#addModal').modal('hide')
             }
         }
 
@@ -608,6 +710,12 @@
             $("#order-customer-status").val("");
         }
 
+
+        
+
+        
+        
+        
         var itemDT = $('.table-item').DataTable({
             data: [],
             filter: true,
@@ -790,13 +898,15 @@
                 var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
+                
                 item_to_order.push({
                     lineNumber: row_data.lineNumber,
                     item: row_data.id,
                     quantity: row_quantity,
                     unitPrice: row_unitprice,
                     discount1: row_discount1,
-                    discount2: row_discount2
+                    discount2: row_discount2,
+                    customerBrandDiscountId: row_data.customerBrandDiscountId
                 });
             });
             return item_to_order;

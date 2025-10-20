@@ -118,6 +118,15 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetBrandDiscount(int customerId, int brandId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await salesOrderRepository.GetBrandDiscountAsync(customerId, brandId));
+        }
+
+        [HttpPost]
         public async Task<IActionResult> GetItemsDTJson(int salesOrderId)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);

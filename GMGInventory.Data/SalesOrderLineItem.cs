@@ -33,5 +33,12 @@ namespace GMGInventory.Data
         public int? CustomerBrandDiscountId { get; set; }
         public CustomerBrandDiscount CustomerBrandDiscount { get; set; }
 
+        public decimal? Discount3 { get; set; }
+
+        public decimal? Discount4 { get; set; }
+
+        public decimal? Discount5 { get; set; }
+
+
     }
 }

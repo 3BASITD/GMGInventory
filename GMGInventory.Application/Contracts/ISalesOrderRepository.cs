@@ -14,6 +14,7 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter);
         Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter);
         Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId);
+        Task<IList<CustomerBrandDiscountVM>> GetBrandDiscountAsync(int customerId,int brandId);
         Task<ForDataTables<SalesOrderItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int salesOrderId);
         Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form);
         Task SaveItemsAsync(IList<SalesOrderFormItemVM> Items, int salesOrderId);
