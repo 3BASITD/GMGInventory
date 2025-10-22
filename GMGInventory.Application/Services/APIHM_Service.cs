@@ -312,8 +312,9 @@ namespace GMGInventory.Application.Services
             var preceiving = await context.PurchaseReceivings
                                           .Where(s => s.Id == Id)
                                           .Include(s => s.Status)
-                                          .Include(s=>s.PurchaseOrder).ThenInclude(s=>s.Supplier)
-                                          .Include(s => s.PurchaseReceivingLineItems).ThenInclude(s=>s.OrderItem).ThenInclude(s=>s.RequestItem).ThenInclude(s=>s.Item)
+                                          .Include(s => s.PurchaseOrder).ThenInclude(s => s.Supplier).ThenInclude(s => s.Country)
+                                          .Include(s=>s.PurchaseOrder).ThenInclude(s=>s.Currency)
+                                          .Include(s => s.PurchaseReceivingLineItems).ThenInclude(s => s.OrderItem).ThenInclude(s => s.RequestItem).ThenInclude(s => s.Item)
                                           .FirstOrDefaultAsync();
             if (preceiving == null)
                 return new ResponseModel<string> { Status = "Error", Message = "Invalid Purchase Receiving", NewRow = "PO Id: " + Id };
@@ -345,11 +346,11 @@ namespace GMGInventory.Application.Services
                                    let discount3 = (100 - poli.PurchaseOrder.Discount3) / 100
                                    select new
                                    {
-                                       product_code = prli.OrderItem.RequestItem.Item == null 
-                                                    ? "-" 
+                                       product_code = prli.OrderItem.RequestItem.Item == null
+                                                    ? "-"
                                                     : prli.OrderItem.RequestItem.Item.Code,
-                                       product_name = prli.OrderItem.RequestItem.Item == null 
-                                                    ? prli.OrderItem.RequestItem.ItemDescription 
+                                       product_name = prli.OrderItem.RequestItem.Item == null
+                                                    ? prli.OrderItem.RequestItem.ItemDescription
                                                     : prli.OrderItem.RequestItem.Item.Name,
                                        quantity = prli.Quantity,
                                        price_unit = poli.UnitCost,

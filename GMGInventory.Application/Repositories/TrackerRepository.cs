@@ -46,7 +46,6 @@ namespace GMGInventory.Application.Repositories
                              AssigneeId = task.AssigneeId,
                              Assignee = task.Assignee.FirstName + " " + task.Assignee.LastName,
                              Function = task.Function,
-                             Behavior = task.Behavior,
                              AccessControl = task.AccessControl,
                              DueDateD = task.DueDate,
                              ModifyExpiration = task.DateCreated.AddDays(5) <= DateTime.Now ? null : $"{(int)(task.DateCreated.AddDays(5) - DateTime.Now).Days} day(s) {(int)(task.DateCreated.AddDays(5) - DateTime.Now).Hours} hour(s) {(task.DateCreated.AddDays(5) - DateTime.Now).Minutes} minute(s)",
@@ -176,7 +175,6 @@ namespace GMGInventory.Application.Repositories
                               Module = task.Module,
                               Summary = task.Summary,
                               Function = task.Function,
-                              Behavior = task.Behavior,
                               AccessControl = task.AccessControl,
                               Status = task.Status,
                               Priority = task.Priority,
@@ -287,7 +285,6 @@ namespace GMGInventory.Application.Repositories
                               Module = task.Module,
                               Summary = task.Summary,
                               Function = task.Function,
-                              Behavior = task.Behavior,
                               AccessControl = task.AccessControl,
                               Status = task.Status,
                               Priority = task.Priority,
@@ -415,7 +412,6 @@ namespace GMGInventory.Application.Repositories
                     Module = task.Module,
                     Summary = task.Summary,
                     Function = task.Function,
-                    Behavior = task.Behavior,
                     AccessControl = task.AccessControl,
                     Status = task.Status,
                     Priority = task.Priority,
@@ -455,7 +451,6 @@ namespace GMGInventory.Application.Repositories
                 else if (Equals(oldTask.Module, task.Module)
                       && Equals(oldTask.Summary, task.Summary)
                       && Equals(oldTask.Function, task.Function)
-                      && Equals(oldTask.Behavior, task.Behavior)
                       && Equals(oldTask.AccessControl, task.AccessControl)
                       && Equals(oldTask.Status, task.Status)
                       && Equals(oldTask.Priority, task.Priority)
@@ -478,7 +473,6 @@ namespace GMGInventory.Application.Repositories
                     oldTask.Module = task.Module;
                     oldTask.Summary = task.Summary;
                     oldTask.Function = task.Function;
-                    oldTask.Behavior = task.Behavior;
                     oldTask.AccessControl = task.AccessControl;
                     oldTask.Status = task.Status;
                     if (task.Status.ToLower() == "testing")
@@ -513,8 +507,7 @@ namespace GMGInventory.Application.Repositories
                     var changes = new Dictionary<string, (object? oldVal, object? newVal)>
                     {
                         ["Summary"] = (oldTaskBU.Summary, oldTask.Summary),
-                        ["Function"] = (oldTaskBU.Function, oldTask.Function),
-                        ["Behavior"] = (oldTaskBU.Behavior, oldTask.Behavior),
+                        ["Details"] = (oldTaskBU.Function, oldTask.Function),
                         ["Access Control"] = (oldTaskBU.AccessControl, oldTask.AccessControl),
                         ["Status"] = (oldTaskBU.Status, oldTask.Status),
                         ["Priority"] = (oldTaskBU.Priority, oldTask.Priority),
@@ -527,7 +520,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         if (!Equals(change.Value.oldVal, change.Value.newVal))
                         {
-                            if (change.Key == "Function" || change.Key == "Behavior" || change.Key == "Disapprove Reason")
+                            if (change.Key == "Details" || change.Key == "Behavior" || change.Key == "Disapprove Reason")
                             {
                                 if (change.Value.newVal is string s && !string.IsNullOrWhiteSpace(s))
                                 {

@@ -661,24 +661,40 @@ namespace GMGInventory.Application.Repositories
                     if (previous == null)
                     {
                         var latestOrder = context.SalesOrders
-                                                 .Where(s => s.SalesOrderNumber.StartsWith("SO"))
+                                                 .Where(s => s.SalesOrderNumber.StartsWith("SO")
+                                                          && !s.SalesOrderNumber.Contains("-D"))
                                                  .OrderByDescending(s => s.SalesOrderNumber)
                                                  .Select(s => s.SalesOrderNumber)
                                                  .FirstOrDefault();
-                        var latestOrderNumber = latestOrder == null ? 1 : int.Parse(latestOrder.Replace("SO", ""));
+
+                        if(latestOrder != null && latestOrder.Contains("."))
+                        {
+                            var splitLatestOrder = latestOrder.Split(".");
+                            latestOrder = splitLatestOrder[0];
+                        }
+
+                        var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
                         soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+                    }
+                    else if (!previous.SalesOrderNumber.Contains("-D"))
+                    {
+                        return new ResponseModel<int> { Status = "Error", Message = "Invalid resubmission. The previous sales order number is required to be in the valid format of a deactivated sales order" };
                     }
                     else
                     {
-                        soNumber = previous.SalesOrderNumber;
+                        var tempSalesOrderNumber = previous.SalesOrderNumber.Split("-D");
+                        soNumber = tempSalesOrderNumber[0];
                     }
 
 
-                    if (form.Status.ToLower().Contains("draft")
-                     && await context.SalesOrders.AnyAsync(s => s.StatusId == statusId && s.SalesOrderNumber == soNumber))
-                    {
-                        return new ResponseModel<int> { Status = "Error", Message = "Failed to add. A draft SO with the same SO Number already exists" };
-                    }
+                    //if (form.Status.ToLower().Contains("draft")
+                    // && await context.SalesOrders.AnyAsync(s => s.StatusId == statusId && s.SalesOrderNumber == soNumber))
+                    //{
+                    //    return new ResponseModel<int> { Status = "Error", Message = "Failed to add. A draft SO with the same SO Number already exists" };
+                    //}
+                    var temp = await context.SalesOrders.Where(s => s.SalesOrderNumber == soNumber && (form.ResubmitId == null || s.Id != form.ResubmitId)).ToListAsync();
+                    if (await context.SalesOrders.AnyAsync(s => s.SalesOrderNumber == soNumber && (form.ResubmitId == null || s.Id != form.ResubmitId)))
+                        return new ResponseModel<int> { Status = "Error", Message = "Generated a conflicting Sales Order Number, Please try again. If error persist, consult IT" };
 
                     orderVM = new SalesOrder
                     {
@@ -702,33 +718,37 @@ namespace GMGInventory.Application.Repositories
 
                     if (previous != null)
                     {
-                        var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
-                        if (soLineItems != null)
-                        {
-                            context.SalesOrderLineItems.RemoveRange(soLineItems);
-                            await context.SaveChangesAsync(currentUserId);
-                        }
+                        //var soLineItems = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                        //if (soLineItems != null)
+                        //{
+                        //    context.SalesOrderLineItems.RemoveRange(soLineItems);
+                        //    await context.SaveChangesAsync(currentUserId);
+                        //}
 
-
-                        var soDelivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == previous.Id).ToListAsync();
+                        var soDelivery = await context.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == previous.Id).FirstOrDefaultAsync();
                         if (soDelivery != null)
                         {
-                            context.SalesOrderDeliveryMonitorings.RemoveRange(soDelivery);
+                            context.SalesOrderDeliveryMonitorings.Remove(soDelivery);
                             await context.SaveChangesAsync(currentUserId);
                         }
 
                         context.SalesOrders.Remove(previous);
+
+                        previous.ResubmitId = orderVM.Id;
+                        context.SalesOrders.Update(previous);
                         await context.SaveChangesAsync(currentUserId);
                     }
-
-                    SalesOrderDeliveryMonitoring salesOrderDelivery = new()
+                    else
                     {
-                        ForwarderId = form.Forwarder,
-                        SalesOrderId = orderVM.Id
-                    };
+                        SalesOrderDeliveryMonitoring salesOrderDelivery = new()
+                        {
+                            ForwarderId = form.Forwarder,
+                            SalesOrderId = orderVM.Id
+                        };
 
-                    await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
-                    await context.SaveChangesAsync(currentUserId);
+                        await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
                 }
                 else
                 {
@@ -754,6 +774,20 @@ namespace GMGInventory.Application.Repositories
                     if (salesOrderDelivery != null)
                     {
                         salesOrderDelivery.ForwarderId = form.Forwarder;
+
+                        context.SalesOrderDeliveryMonitorings.Update(salesOrderDelivery);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+                    else
+                    {
+                        salesOrderDelivery = new SalesOrderDeliveryMonitoring()
+                        {
+                            ForwarderId = form.Forwarder,
+                            SalesOrderId = orderVM.Id
+                        };
+
+                        await context.SalesOrderDeliveryMonitorings.AddAsync(salesOrderDelivery);
+                        await context.SaveChangesAsync(currentUserId);
                     }
                 }
 
@@ -882,8 +916,20 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
+                var tempSalesOrderNumber = orderVM.SalesOrderNumber + "-D";
+                var latestDisapprovedOrder = context.SalesOrders
+                                         .Where(s => s.SalesOrderNumber.StartsWith(tempSalesOrderNumber))
+                                         .OrderByDescending(s => s.SalesOrderNumber)
+                                         .Select(s => s.SalesOrderNumber)
+                                         .FirstOrDefault();
+                var latestDisapprovedOrderNumber = latestDisapprovedOrder == null
+                                                 ? 0
+                                                 : int.Parse(latestDisapprovedOrder.Replace(tempSalesOrderNumber, ""));
+                var disapprovedOrderNumber = tempSalesOrderNumber + string.Format("{0:00}", latestDisapprovedOrderNumber + 1);
+
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 int statusId = await context.Statuses.Where(s => s.Name.ToLower() == "sales order disapproved").Select(s => s.Id).FirstAsync();
+                orderVM.SalesOrderNumber = disapprovedOrderNumber;
                 orderVM.ApprovedBy = null;
                 orderVM.ApprovedDate = null;
                 orderVM.DisapprovedBy = currentUserId;

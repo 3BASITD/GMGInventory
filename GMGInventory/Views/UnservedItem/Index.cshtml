@@ -8,17 +8,16 @@
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
-        <div class="card-tools">
+        <div class="card-tools mr-1">
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
-
-             @if (userAccess.CanUploadDownload)
-             {
-                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
-                    <span class="fas fa-download"></span> Download
-                </button>
-             }
         </div>
     </div>
     <div class="card-body">
@@ -27,6 +26,12 @@
                 <tr>
                     <th>
                         @Html.DisplayNameFor(model => model.Item)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OldSKU)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemName)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.OrderDate)
@@ -183,6 +188,8 @@
             },
             columns: [
                 { data: "item", name: "Item" },
+                { data: "oldSKU", name: "OldSKU" },
+                { data: "itemName", name: "ItemName" },
                 { data: "orderDate", name: "OrderDate" },
                 { data: "salesOrderNumber", name: "SalesOrderNumber" },
                 { data: "customer", name: "Customer" },

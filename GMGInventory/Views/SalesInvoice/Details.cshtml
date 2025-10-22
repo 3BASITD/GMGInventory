@@ -17,7 +17,7 @@
             <div class="card-tools">
                 @if (Model.Status.ToLower() != "cancelled")
                 {
-                    @if(hashMicroUserAccess.CanUploadDownload)
+                    @if (hashMicroUserAccess.CanUploadDownload)
                     {
                         @if (Model.HashMicroMoveId != null)
                         {
@@ -34,14 +34,41 @@
                     }
                     @if (userAccess.CanDelete)
                     {
-                        <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
-                            <span class="fas fa-trash"></span> Cancel
-                        </button>
+                        @if (Model.HashMicroMoveId == null)
+                        {
+                            <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="cancel">
+                                <span class="fas fa-times"></span> Cancel
+                            </button>
+                            @if (Model.Status.ToLower() == "draft")
+                            {
+                                <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
+                                    <span class="fas fa-trash"></span> Delete
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Can only Delete Draft" data-microtip-position="bottom-left" role="tooltip">
+                                    <span class="fas fa-trash"></span> Delete
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Cannot Cancel. Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-times"></span> Cancel
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Cannot Delete. Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-trash"></span> Delete
+                            </button>
+                        }
                     }
                     else
                     {
                         <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-trash"></span> Cancel
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
+                            <span class="fas fa-trash"></span> Delete
                         </button>
                     }
                     @if (userAccess.CanPrint)
@@ -171,7 +198,7 @@
                                 @Html.DisplayNameFor(model => model.InvoiceDueDate1)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model.InvoiceDueDate1
+                                @(string.IsNullOrWhiteSpace(Model.InvoiceDueDate1) ? "N/A" : Model.InvoiceDueDate1)
                             </b>
                         }
                     </p>
@@ -786,10 +813,14 @@
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
-                if ($("#invoice-status").data("saving-as") == "delete") {
+                var save_as = $("#invoice-status").data("saving-as");
+                var pc_save_as = save_as == "delete" ? "Delete"
+                               : save_as == "cancel" ? "Cancel"
+                               : save_as;
+                if (save_as == "delete" || save_as == "cancel") {
                     swal({
-                        title: "Cancel Invoice",
-                        text: "Are you sure you want to cancel this record?",
+                        title: pc_save_as + " Invoice",
+                        text: "Are you sure you want to " + save_as + " this record?",
                         icon: "warning",
                         buttons: true,
                         dangerMode: true
@@ -843,16 +874,18 @@
                             if (data.status == "Error") {
                                 toastr.error(data.message, "Error");
                             } else {
-                                if ($("#invoice-invoice-type").val() != invoice_data.invoiceTypeId) {
-                                    window.location.reload();
-                                } else {
-                                    toastr.success(data.message, "Success");
-                                    if (data.newRow == -2) {
-                                        window.location.reload();
-                                    } else if (data.newRow == -3) {
-                                        window.location = "@Url.Action("Index")";
-                                    }
-                                }
+                                // if ($("#invoice-invoice-type").val() != invoice_data.invoiceTypeId) {
+                                //     window.location.reload();
+                                // } else {
+                                //     toastr.success(data.message, "Success");
+                                //     if (data.newRow == -2) {
+                                //         window.location.reload();
+                                //     } else if (data.newRow == -3) {
+                                //         window.location = "@Url.Action("Index")";
+                                //     }
+                                // }
+                                localStorage.setItem("successMessage", data.message);
+                                window.location.reload();
                             }
                         }
                     }
@@ -921,8 +954,8 @@
                             },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
+                                    localStorage.setItem("successMessage", data.message);
                                     window.location.reload();
-                                    toastr.success(data.message, data.status);
                                 } else {
                                     toastr.error(data.message, data.status);
                                 }

@@ -114,17 +114,9 @@
                             </div>
                             <div class="row mb-2 pb-2 border-bottom">
                                 <div class="col-12">
-                                    <span class="text-muted">Function</span>
+                                    <span class="text-muted">Details</span>
                                     <div id="details-function">
                                         @Html.Raw(Model.Function)
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-2 pb-2 border-bottom">
-                                <div class="col-12">
-                                    <span class="text-muted">Behavior</span>
-                                    <div id="details-behavior">
-                                        @Html.Raw(Model.Behavior)
                                     </div>
                                 </div>
                             </div>
@@ -882,7 +874,6 @@
                     </a>`);
 
                     $("#details-function").html(data.function);
-                    $("#details-behavior").html(data.behavior);
                     $("#details-access").html(data.accessControl);
                     $("#details-status").html(data.status);
                     $("#details-priority").html(data.priority.toLowerCase() == "high" ? '<span class="emoji">🟧</span> HIGH'
@@ -965,7 +956,6 @@
                         Module: task_data.module,
                         Summary: task_data.summary,
                         Function: task_data.function,
-                        Behavior: task_data.behavior,
                         AccessControl: task_data.accessControl,
                         Status: options.status,
                         Priority: task_data.priority,

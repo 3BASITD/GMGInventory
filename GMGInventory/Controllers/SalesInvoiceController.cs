@@ -159,23 +159,7 @@ namespace GMGInventory.Controllers
             }
             else
             {
-                var responseId = await invoiceRepository.UpdateAsync(form);
-                if (responseId == -1)
-                {
-                    responseModel.Status = "Error";
-                    responseModel.Message = "Sales Invoice missing. Failed to submit.";
-                }
-                else
-                {
-                    var submitMessage = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted" 
-                                                                       : form.SavingAs == "delete" ? "cancelled" 
-                                                                       : form.SavingAs == "update" ? "updated" 
-                                                                       : "saved");
-                    responseModel.Status = "Success";
-                    responseModel.Message = submitMessage;
-                    TempData["SuccessMessage"] = submitMessage;
-                }
-                responseModel.NewRow = responseId;
+                responseModel = await invoiceRepository.UpdateAsync(form);
             }
             return Json(responseModel);
         }

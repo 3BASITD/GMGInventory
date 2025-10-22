@@ -154,9 +154,10 @@ namespace GMGInventory.Application.Repositories
                              where invoice.Id == Id
                              select new InvoiceDetailsVM
                              {
-                                 Agent = invoice.SalesOrder.Agent.FirstName
-                                       + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
-                                       + " " + invoice.SalesOrder.Agent.LastName,
+                                 //Agent = invoice.SalesOrder.Agent.FirstName
+                                 //      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
+                                 //      + " " + invoice.SalesOrder.Agent.LastName,
+                                 Agent = invoice.SalesOrder.Agent.Code,
                                  ControlNumber = invoice.ControlNumber,
                                  CustomerAddress = invoice.SalesOrder
                                                           .Customer
@@ -203,9 +204,10 @@ namespace GMGInventory.Application.Repositories
                              where invoice.Id == Id
                              select new InvoiceDetailsWithItemsVM
                              {
-                                 Agent = invoice.SalesOrder.Agent.FirstName
-                                       + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
-                                       + " " + invoice.SalesOrder.Agent.LastName,
+                                 //Agent = invoice.SalesOrder.Agent.FirstName
+                                 //      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
+                                 //      + " " + invoice.SalesOrder.Agent.LastName,
+                                 Agent = invoice.SalesOrder.Agent.Code,
                                  ControlNumber = invoice.ControlNumber,
                                  CustomerAddress = invoice.SalesOrder
                                                           .Customer
@@ -253,9 +255,10 @@ namespace GMGInventory.Application.Repositories
                           where pack.Id == Id
                           select new InvoiceDetailsVM
                           {
-                              Agent = pack.SalesOrder.Agent.FirstName
-                                    + (pack.SalesOrder.Agent.MiddleName == null ? "" : " " + pack.SalesOrder.Agent.MiddleName)
-                                    + " " + pack.SalesOrder.Agent.LastName,
+                              //Agent = pack.SalesOrder.Agent.FirstName
+                              //      + (pack.SalesOrder.Agent.MiddleName == null ? "" : " " + pack.SalesOrder.Agent.MiddleName)
+                              //      + " " + pack.SalesOrder.Agent.LastName,
+                              Agent = pack.SalesOrder.Agent.Code,
                               CustomerAddress = pack.SalesOrder
                                                     .Customer
                                                     .ShippingAddresses
@@ -650,12 +653,12 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-        public async Task<int> UpdateAsync(InvoiceFormVM form)
+        public async Task<ResponseModel<int>> UpdateAsync(InvoiceFormVM form)
         {
             var invoice = await context.Invoices.Include(s => s.Status).Where(s => s.Id == form.Id).FirstOrDefaultAsync();
             if (invoice == null)
             {
-                return -1;
+                return new ResponseModel<int> { Status = "Error", Message = "Unknown invoice" };
             }
             else
             {
@@ -664,27 +667,28 @@ namespace GMGInventory.Application.Repositories
                 {
                     if (invoice.Status.Name.ToLower() != "invoice draft")
                     {
-                        await DeleteInvoiceItems(form, false);
-                        int statusId = await context.Statuses
-                                                    .Where(s => s.Name.ToLower() == "cancelled invoice")
-                                                    .Select(s => s.Id)
-                                                    .FirstAsync();
-                        invoice.StatusId = statusId;
-                        context.Invoices.Update(invoice);
-                        await context.SaveChangesAsync(currentUserId);
-                        return -2;
-                    }
-                    else
+                        return new ResponseModel<int> { Status = "Error", Message = "Cannot delete " + invoice.Status.Name };
+                    } else
                     {
                         await DeleteInvoiceItems(form, true);
                         context.Invoices.Remove(invoice);
                         await context.SaveChangesAsync(currentUserId);
-                        return -3;
+                        return new ResponseModel<int> { Status = "Success", Message = "Successfully delete invoice." };
                     }
+                } else if (form.SavingAs == "cancel")
+                {
+                    await DeleteInvoiceItems(form, false);
+                    int statusId = await context.Statuses
+                                                .Where(s => s.Name.ToLower() == "cancelled invoice")
+                                                .Select(s => s.Id)
+                                                .FirstAsync();
+                    invoice.StatusId = statusId;
+                    context.Invoices.Update(invoice);
+                    await context.SaveChangesAsync(currentUserId);
+                    return new ResponseModel<int> { Status = "Success", Message = "Successfully cancelled invoice." };
                 }
                 else
                 {
-                    //await DeleteInvoiceItems(form, true);
                     if (await context.Agents.AnyAsync(s => s.Id == form.Agent))
                     {
                         var so = await context.SalesOrders.Where(s => s.Id == invoice.SalesOrderId).FirstOrDefaultAsync();
@@ -698,7 +702,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         int statusId = await context.Statuses
                                                 .Where(s => ((s.Name.ToLower() == "invoice draft" && form.SavingAs.ToLower() == "save")
-                                                          || (s.Name.ToLower() == "invoice submitted" && form.SavingAs.ToLower() == "post")))
+                                                         || (s.Name.ToLower() == "invoice submitted" && form.SavingAs.ToLower() == "post")))
                                                 .Select(s => s.Id)
                                                 .FirstAsync();
                         invoice.StatusId = statusId;
@@ -750,8 +754,14 @@ namespace GMGInventory.Application.Repositories
                     // remove unavailable items
                     context.InvoiceLineItems.RemoveRange(ritems);
 
-
-                    return form.SavingAs == "post" ? -2 : invoice.Id;
+                    return new ResponseModel<int>
+                    {
+                        Status = "Success",
+                        Message = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted"
+                                                                 : form.SavingAs == "update" ? "updated"
+                                                                 : "saved"),
+                        NewRow = invoice.Id
+                    };
                 }
             }
         }

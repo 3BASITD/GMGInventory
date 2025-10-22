@@ -45,6 +45,8 @@ namespace GMGInventory.Controllers
             DataTable dt = new("Unserved Item");
             dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<UnservedItemVM>("Item")),
+                new DataColumn(chelper.DisplayName<UnservedItemVM>("OldSKU")),
+                new DataColumn(chelper.DisplayName<UnservedItemVM>("ItemName")),
                 new DataColumn(chelper.DisplayName<UnservedItemVM>("OrderDate")),
                 new DataColumn(chelper.DisplayName<UnservedItemVM>("SalesOrderNumber")),
                 new DataColumn(chelper.DisplayName<UnservedItemVM>("Customer")),
@@ -62,6 +64,8 @@ namespace GMGInventory.Controllers
             foreach (var ui in uis)
             {
                 dt.Rows.Add(ui.Item,
+                            ui.OldSKU,
+                            ui.ItemName,
                             ui.OrderDateD,
                             ui.SalesOrderNumber,
                             ui.Customer,

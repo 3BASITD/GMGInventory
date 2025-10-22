@@ -485,7 +485,7 @@
                 { data: "soNumber", name: "SONumber" },
                 { data: "customerCode", name: "CustomerCode" },
                 { data: "customerName", name: "CustomerName" },
-                { data: "CustomerAddress", name: "CustomerAddress" },
+                { data: "customerAddress", name: "CustomerAddress" },
                 { data: "salesOrderStatus", name: "SalesOrderStatus" },
                 { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
                 {
@@ -534,7 +534,7 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<button class="btn btn-primary btn-xs viewBtn" onclick="ShowItemList(' + data.id + ')" data-microtip-title="View Item(s)" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></button>';
-                        if (user_access.canEdit) {
+                        if (user_access.canEdit && data.salesOrderStatus.toLowerCase() != "disapproved") {
                             actions += '<button class="btn btn-warning btn-xs editBtn" onclick="ShowEdit(' + data.id + ')" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                         }
                         actions += '<button class="btn btn-info btn-xs actionBtn" onclick="ShowAction(\'' + data.createdBy + '\', \'' + data.createdDate + '\', \'' + data.modifiedBy + '\', \'' + data.modifiedDate + '\')" data-microtip-title="History" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-history"></span></button>';

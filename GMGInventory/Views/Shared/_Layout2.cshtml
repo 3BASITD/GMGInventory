@@ -33,7 +33,8 @@
     @if (newIcon)
     {
         <link rel="stylesheet" href="~/css/fa-emoji-overwrite.css" asp-append-version="true" />
-    } else
+    }
+    else
     {
         <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.min.css" />
     }
@@ -128,7 +129,7 @@
                             <ol class="breadcrumb float-sm-right">
                                 @if (ViewContext.RouteData.Values["controller"]?.ToString() != "Home"
                                 @*&& ViewContext.RouteData.Values["action"]?.ToString() != "Index"*@)
-                                {
+                                                                {
                                     <li class="breadcrumb-item">
                                         <a asp-controller="Home" asp-action="Index">Home</a>
                                     </li>
@@ -263,6 +264,29 @@
                         toastr.warning(layout_warning_message, "Warning");
                 else if (layout_error_message != null)
                         toastr.error(layout_error_message, "Error");
+            }
+
+            // TempData not working fine on Json, use this instead
+            const local_success_message = localStorage.getItem("successMessage");
+            const local_warning_message = localStorage.getItem("warningMessage");
+            const local_error_message = localStorage.getItem("errorMessage");
+            if (local_success_message != null || local_warning_message != null || local_error_message != null)
+            {
+                if (local_success_message != null){
+                    toastr.success(local_success_message, "Success");
+                    localStorage.removeItem("successMessage");
+                } else if (local_warning_message != null){
+                    toastr.success(local_warning_message, "Warning");
+                    localStorage.removeItem("warningMessage");
+                } else if (local_error_message != null){
+                    toastr.success(local_error_message, "Error");
+                    localStorage.removeItem("errorMessage");
+                }
+
+                /* sample use
+                    localStorage.setItem("successMessage", data.message);
+                    window.location.reload();
+                */
             }
         });
     </script>
