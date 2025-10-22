@@ -515,6 +515,7 @@ namespace GMGInventory.Application.Repositories
                                 {
                                     Discount1D = order.Discount1,
                                     Discount2D = order.Discount2,
+                                    CustomerBrandDiscountId = order.CustomerBrandDiscountId,
                                     Id = order.Id,
                                     InventoryCountD = inventory,
                                     InvoicedQuantityD = invoicedQuantity,
@@ -535,6 +536,23 @@ namespace GMGInventory.Application.Repositories
                                 }).ToListAsync();
 
             return itemVM;
+        }
+
+        public async Task<IList<CustomerBrandDiscountVM>> GetBrandDiscountAsync(int customerId,int brandId)
+        {
+            var brandDiscount = await (from custDiscount in context.CustomerBrandDiscount
+                                       where (customerId == custDiscount.CustomerId && brandId == custDiscount.BrandId && custDiscount.IsActive )
+                                       
+                                       select new CustomerBrandDiscountVM
+                                       {
+                                        Discount = custDiscount.Discount,
+                                        BrandId = brandId,
+                                        CustomerId = customerId,
+                                        Id = custDiscount.Id
+
+                                       }).ToListAsync();
+
+            return brandDiscount;
         }
 
         public async Task<ForDataTables<SalesOrderItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int salesOrderId)
@@ -824,7 +842,8 @@ namespace GMGInventory.Application.Repositories
                                    ItemId = s.Item,
                                    Quantity = s.Quantity,
                                    SalesOrderId = salesOrderId,
-                                   SellingPrice = s.UnitPrice
+                                   SellingPrice = s.UnitPrice,
+                                   CustomerBrandDiscountId = s.CustomerBrandDiscountId
                                });
             context.SalesOrderLineItems.AddRange(itemsVM);
 
@@ -840,6 +859,7 @@ namespace GMGInventory.Application.Repositories
                 dbitem.Discount2 = di.Discount2;
                 dbitem.Quantity = di.Quantity;
                 dbitem.SellingPrice = di.UnitPrice;
+                dbitem.CustomerBrandDiscountId = di.CustomerBrandDiscountId;
 
                 context.SalesOrderLineItems.Update(dbitem);
             }

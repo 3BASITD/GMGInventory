@@ -122,6 +122,8 @@ namespace GMGInventory.Common.Models
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
         public int InventoryCount { get; set; }
+        public int BrandId { get; set; }
+       
     }
 
     public class JsonNameOptionsModel

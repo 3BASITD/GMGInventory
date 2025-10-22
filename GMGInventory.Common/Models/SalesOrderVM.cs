@@ -310,6 +310,20 @@ namespace GMGInventory.Common.Models
         public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
 
+        [Display(Name = "Discount 3")]
+        public string Discount3 => string.Format(SystemFormat.StringDecimalComma, Discount3D);
+        public decimal Discount3D { get; set; }
+
+        [Display(Name = "Discount 4")]
+        public string Discount4 => string.Format(SystemFormat.StringDecimalComma, Discount4D);
+        public decimal Discount4D { get; set; }
+
+        [Display(Name = "Discount 5")]
+        public string Discount5 => string.Format(SystemFormat.StringDecimalComma, Discount5D);
+        public decimal Discount5D { get; set; }
+
+        public int? CustomerBrandDiscountId { get; set; }
+
         [Display(Name = "Extended Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
         public decimal GrossPriceD => Math.Round(QuantityD * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
@@ -347,5 +361,6 @@ namespace GMGInventory.Common.Models
         public decimal Discount1 { get; set; }
         public decimal Discount2 { get; set; }
         public decimal GrossPrice => Math.Round(Quantity * UnitPrice * (100 - Discount1) / 100 * (100 - Discount2) / 100, 2);
+        public int CustomerBrandDiscountId { get; set; }
     }
 }

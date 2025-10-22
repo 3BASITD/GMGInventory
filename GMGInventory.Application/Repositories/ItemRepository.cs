@@ -75,7 +75,8 @@ namespace GMGInventory.Application.Repositories
                             QuantityD = 0,
                             RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
                             UnitId = item.Unit == null ? -1 : item.Unit.Id,
-                            Unit = item.Unit == null ? "" : item.Unit.Code
+                            Unit = item.Unit == null ? "" : item.Unit.Code,
+                            BrandId = item.BrandId
                         };
             var itemsFiltered = await items.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonItemOptionsModel>
