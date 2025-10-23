@@ -1285,6 +1285,81 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        private async Task<IList<ItemPromoVM>> GetItemPromoAsync(int id)
+        {
+            var promoVM = from promo in context.ItemPromo
+                           join user in userManager.Users on promo.UserCreated equals user.Id
+                           where promo.ItemId == id
+                           select new ItemPromoVM
+                           {
+                               PromoPriceD = promo.PromoPrice,
+                               Name = promo.Name,
+                               EffectiveDateD = promo.EffectiveDate,
+                               ExpirationDateD = promo.ExpirationDate,
+                               UpdateBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                               UpdateDateD = promo.DateCreated,
+                               IsActive = promo.IsActive
+                           };
+            return await promoVM.ToListAsync();
+        }
+
+
+        public async Task<ForDataTables<ItemPromoVM>> GetItemPromoDTAsync(DataTablesRequestForm form, int id)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetItemPromoAsync(id)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.PromoPriceD.ToString().Contains(form.SearchValue)
+                                    || x.Name.ToString().Contains(form.SearchValue)
+
+                                    || x.EffectiveDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ExpirationDate.ToLower().Contains(form.SearchValue.ToLower()));
+                                    
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Price": data = data.OrderBy(s => s.PromoPriceD); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "EffectiveDate": data = data.OrderBy(s => s.EffectiveDateD); break;
+                        case "ExpirationDate": data = data.OrderBy(s => s.ExpirationDateD); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Price": data = data.OrderByDescending(s => s.PromoPriceD); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "EffectiveDate": data = data.OrderByDescending(s => s.EffectiveDateD); break;
+                        case "ExpirationDate": data = data.OrderByDescending(s => s.ExpirationDateD); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<ItemPromoVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
         private async Task<IList<ItemDetailTransferVM>> GetItemTransferAsync(int id)
         {
             var transferVM = from titem in context.TransferItemDetails

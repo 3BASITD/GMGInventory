@@ -483,6 +483,16 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetPromoJson(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
+            return Json(await itemRepository.GetItemPromoDTAsync(form, id));
+        }
+
+        [HttpPost]
         public async Task<IActionResult> GetTransfersJson(int id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
