@@ -18,6 +18,6 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsBIRInvoiceNumberInUser(int? invoiceId, string BIRInvoiceNumber);
         Task<bool> IsInvoiceInUse(int? invoiceId);
         Task<int> SaveAsync(InvoiceFormVM form);
-        Task<int> UpdateAsync(InvoiceFormVM form);
+        Task<ResponseModel<int>> UpdateAsync(InvoiceFormVM form);
     }
 }

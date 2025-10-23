@@ -1,8 +1,10 @@
 ﻿using GMGInventory.Common.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
+    [Index(nameof(SalesOrderNumber), IsUnique = true)]
     public class SalesOrder : BaseEntity
     {
         public SalesOrder()

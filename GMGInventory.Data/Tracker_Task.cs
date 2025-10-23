@@ -19,7 +19,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string Summary { get; set; }
         public string Function { get; set; }
-        public string? Behavior { get; set; }
         public string AccessControl { get; set; }
 
         [Column(TypeName = "nvarchar(20)")]

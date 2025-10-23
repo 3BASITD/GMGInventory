@@ -24,7 +24,6 @@ namespace GMGInventory.Common.Models
         public string AssigneeId { get; set; }
         public string Assignee { get; set; }
         public string Function { get; set; }
-        public string? Behavior { get; set; }
         public string AccessControl { get; set; }
         public string? DueDate => DueDateD == null ? null : DueDateD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DueDateD { get; set; }
@@ -104,7 +103,6 @@ namespace GMGInventory.Common.Models
         public string Module { get; set; }
         public string Summary { get; set; }
         public string Function { get; set; }
-        public string? Behavior { get; set; }
         public string AccessControl { get; set; }
         public string Status { get; set; }
         public string Priority { get; set; }

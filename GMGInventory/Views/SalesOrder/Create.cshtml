@@ -649,8 +649,10 @@
                     $("#order-region").val(data.region);
                     $("#order-delivery-date").val(data.requiredDeliveryDate3);
 
-                    var forwarderOption = new Option(data.forwarder, data.forwarderId, true, true);
-                    $("#order-forwarder").append(forwarderOption).trigger('change');
+                    if(data.forwarderId) {
+                        var forwarderOption = new Option(data.forwarder, data.forwarderId, true, true);
+                        $("#order-forwarder").append(forwarderOption).trigger('change');
+                    }
 
                     $("#order-remarks").val(data.remarks);
                     $("#order-date").val(data.orderDate3);

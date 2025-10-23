@@ -7,8 +7,14 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
 
-        [Display(Name = "Item")]
+        [Display(Name = "Item Code")]
         public string Item { get; set; }
+
+        [Display(Name = "Old SKU")]
+        public string? OldSKU { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemName { get; set; }
 
         [Display(Name = "Order Date")]
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);

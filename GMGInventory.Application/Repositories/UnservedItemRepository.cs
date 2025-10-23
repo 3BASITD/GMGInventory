@@ -24,9 +24,10 @@ namespace GMGInventory.Application.Repositories
             var regionSelected = await context.Regions.Where(s => s.Id == filter.Region).Select(s => s.Name).FirstOrDefaultAsync();
             var salesOrder = from l in context.SalesOrderLineItems
                              join user in userManager.Users on l.SalesOrder.UserCreated equals user.Id
-                             let i = context.ItemInventories
-                                            .Where(s => s.ItemId == l.ItemId)
-                                            .Sum(s => (int?)s.Quantity) ?? 0
+                             let i = (from ii in context.ItemInventories
+                                      where ii.ItemId == l.ItemId
+                                      && ii.Warehouse.IsMain == true
+                                      select (int?)ii.Quantity).Sum() ?? 0
                              let packedQuantity = context.PackLineItems
                                                          .Where(s => s.Pack.SalesOrderId == l.SalesOrderId
                                                                   && s.ItemId == l.ItemId)
@@ -50,15 +51,21 @@ namespace GMGInventory.Application.Repositories
                                  Discount2D = l.Discount2,
                                  Id = l.SalesOrder.Id,
                                  Item = l.Item.Code,
+                                 OldSKU = l.Item.OldCode,
+                                 ItemName = l.Item.Name,
                                  OrderDateD = l.SalesOrder.DateCreated,
                                  PackedQuantityD = packedQuantity,
                                  QuantityD = l.Quantity,
-                                 QuantityOnHandD = i + (packedQuantity - returnedQuantity),
+                                 //QuantityOnHandD = i + (packedQuantity - returnedQuantity),
+                                 QuantityOnHandD = i,
                                  SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
                                  UnitPriceD = l.SellingPrice,
-                                 //UnservedQuantityD = l.Quantity - (packedQuantity - returnedQuantity)
+                                 UnservedQuantityD = l.Quantity - (packedQuantity - returnedQuantity) > 0
+                                                   ? l.Quantity - (packedQuantity - returnedQuantity)
+                                                   : 0
+                                 //UnservedQuantityD = Math.Max(0, l.Quantity - (packedQuantity - returnedQuantity))
                                  //UnservedQuantityD = l.Quantity - i > 0 ? l.Quantity - i : 0
-                                 UnservedQuantityD = Math.Max(0, l.Quantity - i)
+                                 //UnservedQuantityD = Math.Max(0, l.Quantity - i)
                              };
             return await salesOrder.ToListAsync();
         }
@@ -79,6 +86,8 @@ namespace GMGInventory.Application.Repositories
                                     || x.Discount1D.ToString().Contains(form.SearchValue)
                                     || x.Discount2D.ToString().Contains(form.SearchValue)
                                     || x.Item.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.OldSKU + "").ToLower().Contains(form.SearchValue.ToLower())
                                     || x.OrderDate.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.PackedQuantityD.ToString().Contains(form.SearchValue)
                                     || x.QuantityD.ToString().Contains(form.SearchValue)
@@ -102,6 +111,8 @@ namespace GMGInventory.Application.Repositories
                         case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
                         case "Item": data = data.OrderBy(s => s.Item); break;
+                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
+                        case "OldSKU": data = data.OrderBy(s => s.OldSKU); break;
                         case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
                         case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantityD); break;
                         case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
@@ -122,6 +133,8 @@ namespace GMGInventory.Application.Repositories
                         case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
                         case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
                         case "Item": data = data.OrderByDescending(s => s.Item); break;
+                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
+                        case "OldSKU": data = data.OrderByDescending(s => s.OldSKU); break;
                         case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
                         case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantityD); break;
                         case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;

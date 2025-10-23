@@ -66,6 +66,7 @@
 .fa-dolly-flatbed::before { content: "🍽️"; }
 .fa-download::before { content: "📥"; }
 .fa-edit::before, .fa-pencil-alt::before { content: "✏️"; }
+.fa-exchange-alt::before { content: "🔁"; }
 .fa-exclamation::before { content: "❗"; }
 .fa-exclamation-triangle::before { content: "⚠️"; }
 .fa-expand-arrows-alt::before { content: "↔️"; }

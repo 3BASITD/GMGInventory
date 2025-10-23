@@ -14,23 +14,26 @@
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                @if (userAccess.CanPrint)
+                @if (Model.Status.ToLower() != "disapproved")
                 {
-                    <div class="dropdown float-right ml-2">
-                        <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                    @if (userAccess.CanPrint)
+                    {
+                        <div class="dropdown float-right ml-2">
+                            <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="fas fa-print"></span> Print
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
+                                <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
+                                <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
                             <span class="fas fa-print"></span> Print
                         </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
-                            <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
-                            <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
-                        </ul>
-                    </div>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-print"></span> Print
-                    </button>
+                    }
                 }
                 @if (Model.Status.ToLower() == "submitted")
                 {
@@ -913,10 +916,23 @@
                 url: "@Url.Action("GetOptions", "Forwarder")",
                 success: function (data, status, xhr) {
                     $("#order-forwarder").select2({
+                        placeholder: '<empty>',
                         ajax: null, //already fetched outside
                         data: data,
                         //minimumResultsForSearch: Infinity
                     });
+                    
+                    if (so_details.forwarderId) {
+                        var exists = data.some(item => item.id == so_details.forwarderId);
+
+                        if (exists) {
+                            $("#order-forwarder").val(so_details.forwarderId).trigger('change');
+                        } else {
+                            $("#order-forwarder").val(null).trigger('change');
+                        }
+                    } else {
+                        $("#order-forwarder").val(null).trigger('change');
+                    }
                 }
             });
 
@@ -938,11 +954,7 @@
                     $("#order-with-jitlpdelivery").select2({
                         minimumResultsForSearch: -1,
                         ajax: null,
-                        data: data,
-                        placeholder: {
-                            id: "",
-                            text: "<empty>"
-                        }
+                        data: data
                     });
                 }
             });
@@ -953,14 +965,19 @@
             var customerOption = new Option(so_details.customerCode, so_details.customerId, true, true);
             $("#order-customer-code").append(customerOption).trigger('change');
 
-            var forwarderOption = new Option(so_details.forwarder, so_details.forwarderId, true, true);
-            $("#order-forwarder").append(forwarderOption).trigger('change');
+            // if (so_details.forwarderId) {
+            //     // var forwarderOption = new Option(so_details.forwarder, so_details.forwarderId, true, true);
+            //     // $("#order-forwarder").append(forwarderOption).trigger('change');
+            //     $("#order-forwarder").val(so_details.forwarderId);//.trigger('change');
+            // } else {
+            //     $("#order-forwarder").val(null).trigger('change');
+            // }
 
-            if(so_details.serviceLevelAgreement) {
+            if (so_details.serviceLevelAgreement) {
                 var slaOption = new Option(so_details.serviceLevelAgreement, so_details.serviceLevelAgreementId, true, true);
                 $("#order-sla").append(slaOption).trigger('change');
             } else {
-                $("#order-sla").append(null).trigger('change');
+                $("#order-sla").val(null).trigger('change');
             }
 
             $("#order-discount").val(so_details.overallDiscount);
