@@ -10,6 +10,7 @@ using System.Linq.Dynamic.Core;
 using System.Xml.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -838,6 +839,114 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
+        public async Task<ResponseModel> ItemPromoAddAsync(ItemPromoVM itemPromoVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            ResponseModel response = new();
+
+            var itemPromo = await context.ItemPromo.Where(s => s.Id == itemPromoVM.Id).FirstOrDefaultAsync();
+            if (itemPromo == null)
+            {
+                itemPromo = new ItemPromo
+                {
+                    ItemId = itemPromoVM.ItemId,
+                    Name = itemPromoVM.Name,
+                    PromoPrice = itemPromoVM.PromoPriceD,
+                    EffectiveDate = itemPromoVM.EffectiveDateD,
+                    ExpirationDate = itemPromoVM.ExpirationDateD,
+                    IsActive = true
+
+
+                };
+
+                await context.ItemPromo.AddAsync(itemPromo);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Item Promo successfully added";
+            }
+            else
+            {
+                itemPromo.Name = itemPromoVM.Name;
+                itemPromo.PromoPrice = itemPromoVM.PromoPriceD;
+                itemPromo.EffectiveDate = itemPromoVM.EffectiveDateD;
+                itemPromo.ExpirationDate = itemPromoVM.ExpirationDateD;
+
+
+
+                context.ItemPromo.Update(itemPromo);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Item Promo successfully updated";
+            }
+            return response;
+        }
+
+        public async Task<ResponseModel> ReactivateItemPromoAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (itemPromo == null)
+            {
+                response.Status = "Error";
+                response.Message = "Item Promo is invalid";
+            }
+            else
+            {
+                itemPromo.IsActive = true;
+                context.ItemPromo.Update(itemPromo);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Item Promo successfully reactivated";
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (itemPromo == null)
+            {
+                response.Status = "Error";
+                response.Message = "Item Promo is invalid";
+            }
+
+            else
+            {
+                if (itemPromo.EffectiveDate > DateTime.Now)
+                {
+
+                    context.ItemPromo.Remove(itemPromo);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Item Promo successfully deleted";
+                }
+
+                else 
+                {
+                    itemPromo.IsActive = false;
+                    context.ItemPromo.Update(itemPromo);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Item Promo successfully deactivated";
+
+                }
+
+
+            }
+
+            return response;
+        }
+
         private async Task<IList<ItemDetailWarehouseVM>> GetItemWarehouseAsync(int id)
         {
             var inventoryVM = from inv in context.ItemInventories
@@ -1292,7 +1401,9 @@ namespace GMGInventory.Application.Repositories
                            where promo.ItemId == id
                            select new ItemPromoVM
                            {
+                               Id = promo.Id,
                                PromoPriceD = promo.PromoPrice,
+                               ItemId = promo.ItemId,
                                Name = promo.Name,
                                EffectiveDateD = promo.EffectiveDate,
                                ExpirationDateD = promo.ExpirationDate,

@@ -24,6 +24,9 @@ namespace GMGInventory.Application.Contracts
         Task DeactivateAsync(int id);
         Task ReactivateAsync(int id);
         Task AddAsync(ItemCommonVM itemVM);
+        Task<ResponseModel> ItemPromoAddAsync(ItemPromoVM itemPromoVM);
+        Task<ResponseModel> ReactivateItemPromoAsync(int Id);
+        Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id);
         Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);
         Task UpdateQuantityAsync(int id, int quantity, string remarks);

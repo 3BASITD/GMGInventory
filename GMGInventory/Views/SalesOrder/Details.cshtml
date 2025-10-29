@@ -1052,7 +1052,8 @@
                             var discount1 = parseFloat($("#add-discount1").val());
                             var discount2 = parseFloat($("#add-discount2").val());
 
-                            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+                            //$("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+                            $("#add-gross-price").val(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
                         
                         }
                             
@@ -1170,8 +1171,11 @@
             var discount1 = parseFloat($("#add-discount1").val());
             var discount2 = parseFloat($("#add-discount2").val());
 
-            $("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
-        });
+            //$("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
+            $("#add-gross-price").val(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
+
+
+        });                           
 
         function clearItemForm() {
             $("#add-code").val("").trigger("change");
@@ -1396,7 +1400,7 @@
             $(".table-item thead th").removeClass("grossprice");
 
             //ComputeTotalQuantity();
-            //ComputeTotalGrossPrice();
+            //ComputeTotalGrossPrice();                                                        
             $(".quantity, .discount1, .discount2, .unitprice").on("input", function () {
                 var row = itemDT.row($(this).closest('tr'));
                 var rowData = row.data();
