@@ -25,6 +25,9 @@ namespace GMGInventory.Application.Contracts
         Task DeactivateAsync(int id);
         Task ReactivateAsync(int id);
         Task AddAsync(ItemCommonVM itemVM);
+        Task<ResponseModel> ItemPromoAddAsync(ItemPromoVM itemPromoVM);
+        Task<ResponseModel> ReactivateItemPromoAsync(int Id);
+        Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id);
         Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);
         Task UpdateQuantityAsync(int id, int quantity, string remarks);
@@ -37,6 +40,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<ItemDetailCountVM>> GetItemCountAsync(int id);
         Task<ForDataTables<ItemDetailCountVM>> GetItemCountDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailPriceVM>> GetItemPriceDTAsync(DataTablesRequestForm form, int id);
+        Task<ForDataTables<ItemPromoVM>> GetItemPromoDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailTransferVM>> GetItemTransferDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailReturnVM>> GetItemReturnDTAsync(DataTablesRequestForm form, int id);
         Task<ResponseModel> SaveImageAsync(ItemImageFormVM form);

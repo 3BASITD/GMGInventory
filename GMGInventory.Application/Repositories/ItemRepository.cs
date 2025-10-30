@@ -10,6 +10,7 @@ using System.Linq.Dynamic.Core;
 using System.Xml.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -860,6 +861,114 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
+        public async Task<ResponseModel> ItemPromoAddAsync(ItemPromoVM itemPromoVM)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            ResponseModel response = new();
+
+            var itemPromo = await context.ItemPromo.Where(s => s.Id == itemPromoVM.Id).FirstOrDefaultAsync();
+            if (itemPromo == null)
+            {
+                itemPromo = new ItemPromo
+                {
+                    ItemId = itemPromoVM.ItemId,
+                    Name = itemPromoVM.Name,
+                    PromoPrice = itemPromoVM.PromoPriceD,
+                    EffectiveDate = itemPromoVM.EffectiveDateD,
+                    ExpirationDate = itemPromoVM.ExpirationDateD,
+                    IsActive = true
+
+
+                };
+
+                await context.ItemPromo.AddAsync(itemPromo);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Item Promo successfully added";
+            }
+            else
+            {
+                itemPromo.Name = itemPromoVM.Name;
+                itemPromo.PromoPrice = itemPromoVM.PromoPriceD;
+                itemPromo.EffectiveDate = itemPromoVM.EffectiveDateD;
+                itemPromo.ExpirationDate = itemPromoVM.ExpirationDateD;
+
+
+
+                context.ItemPromo.Update(itemPromo);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Item Promo successfully updated";
+            }
+            return response;
+        }
+
+        public async Task<ResponseModel> ReactivateItemPromoAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (itemPromo == null)
+            {
+                response.Status = "Error";
+                response.Message = "Item Promo is invalid";
+            }
+            else
+            {
+                itemPromo.IsActive = true;
+                context.ItemPromo.Update(itemPromo);
+                await context.SaveChangesAsync(currentUserId);
+
+                response.Status = "Success";
+                response.Message = "Item Promo successfully reactivated";
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            ResponseModel response = new();
+            var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            if (itemPromo == null)
+            {
+                response.Status = "Error";
+                response.Message = "Item Promo is invalid";
+            }
+
+            else
+            {
+                if (itemPromo.EffectiveDate > DateTime.Now)
+                {
+
+                    context.ItemPromo.Remove(itemPromo);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Item Promo successfully deleted";
+                }
+
+                else 
+                {
+                    itemPromo.IsActive = false;
+                    context.ItemPromo.Update(itemPromo);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Item Promo successfully deactivated";
+
+                }
+
+
+            }
+
+            return response;
+        }
+
         private async Task<IList<ItemDetailWarehouseVM>> GetItemWarehouseAsync(int id)
         {
             var inventoryVM = from inv in context.ItemInventories
@@ -1299,6 +1408,83 @@ namespace GMGInventory.Application.Repositories
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<ItemDetailPriceVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        private async Task<IList<ItemPromoVM>> GetItemPromoAsync(int id)
+        {
+            var promoVM = from promo in context.ItemPromo
+                           join user in userManager.Users on promo.UserCreated equals user.Id
+                           where promo.ItemId == id
+                           select new ItemPromoVM
+                           {
+                               Id = promo.Id,
+                               PromoPriceD = promo.PromoPrice,
+                               ItemId = promo.ItemId,
+                               Name = promo.Name,
+                               EffectiveDateD = promo.EffectiveDate,
+                               ExpirationDateD = promo.ExpirationDate,
+                               UpdateBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                               UpdateDateD = promo.DateCreated,
+                               IsActive = promo.IsActive
+                           };
+            return await promoVM.ToListAsync();
+        }
+
+
+        public async Task<ForDataTables<ItemPromoVM>> GetItemPromoDTAsync(DataTablesRequestForm form, int id)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetItemPromoAsync(id)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.PromoPriceD.ToString().Contains(form.SearchValue)
+                                    || x.Name.ToString().Contains(form.SearchValue)
+
+                                    || x.EffectiveDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ExpirationDate.ToLower().Contains(form.SearchValue.ToLower()));
+                                    
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Price": data = data.OrderBy(s => s.PromoPriceD); break;
+                        case "Name": data = data.OrderBy(s => s.Name); break;
+                        case "EffectiveDate": data = data.OrderBy(s => s.EffectiveDateD); break;
+                        case "ExpirationDate": data = data.OrderBy(s => s.ExpirationDateD); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Price": data = data.OrderByDescending(s => s.PromoPriceD); break;
+                        case "Name": data = data.OrderByDescending(s => s.Name); break;
+                        case "EffectiveDate": data = data.OrderByDescending(s => s.EffectiveDateD); break;
+                        case "ExpirationDate": data = data.OrderByDescending(s => s.ExpirationDateD); break;
+                        default: break;
+                    }
+                }
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<ItemPromoVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,

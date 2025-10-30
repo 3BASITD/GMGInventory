@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
@@ -333,6 +334,51 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveItemPromoJson(ItemPromoVM form)
+        {
+            var response = new ResponseModel();
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            if (form.EffectiveDateD > form.ExpirationDateD)
+            {
+                response.Message = "Effective Date cannot be past the Expiration Date.";
+                response.Status = "Error";
+
+            }
+
+            else
+            {
+                response = await itemRepository.ItemPromoAddAsync(form);
+            }
+
+            return Json(response);
+            
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReactivateItemPromoJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await itemRepository.ReactivateItemPromoAsync(Id);
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteOrDeactivateItemPromoJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await itemRepository.DeleteOrDeactivateItemPromoAsync(Id);
+
+            return Json(response);
+        }
+
         public async Task<IActionResult> DownloadFile(ItemFilterVM filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
@@ -480,6 +526,16 @@ namespace GMGInventory.Controllers
 
             DataTablesRequestForm form = new(Request.Form);
             return Json(await itemRepository.GetItemPriceDTAsync(form, id));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetPromoJson(int id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm form = new(Request.Form);
+            return Json(await itemRepository.GetItemPromoDTAsync(form, id));
         }
 
         [HttpPost]

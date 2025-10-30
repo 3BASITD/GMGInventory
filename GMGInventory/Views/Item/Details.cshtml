@@ -237,6 +237,14 @@
                                 </a>
                             </li>
 
+                            <li class="nav-item">
+                                <a class="nav-link" id="nav-promo-tab" role="tab"
+                                   data-bs-toggle="tab" data-bs-target="#nav-promo"
+                                   aria-controls="nav-promo" aria-selected="true">
+                                    Promo Price
+                                </a>
+                            </li>
+
                         </ul>
                     </div>
                     <div class="card-body">
@@ -364,6 +372,30 @@
                                             <th>Customer</th>
                                             <th>Return Date</th>
                                             <th>Return By</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="nav-promo" role="tabpanel" aria-labelledby="nav-promo-tab">
+                                <div class="card-header ">
+                                    @if (userAccess.CanEdit)
+                                    {
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-primary btn-sm float-right btn-create-promo ml-2" data-bs-toggle="modal" data-bs-target="#promoModal">
+                                                <span class="fas fa-plus"></span> Add Item Promo
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                                <table class="table table-head-fixed table-striped table-hover table-promo">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Price</th>
+                                            <th>Effective Date</th>
+                                            <th>Expiration Date</th>
+                                            <th></th>
+                                            
                                         </tr>
                                     </thead>
                                 </table>
@@ -709,6 +741,75 @@
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary"><span class="fas fa-save mr-2"></span>Save</button>
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="Close"><span class="fas fa-times mr-2"></span>Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Promo Modal -->
+<div class="modal fade" id="promoModal" role="dialog" aria-labelledby="promoModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Item Promo</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="promoForm">
+                <input type="hidden" name="Id" id="save-promo-id" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="save-promo-name" class="control-label mb-0 d-block">Name</label>
+                                <input type="text" name="Name" id="save-promo-name" class="form-control" style="width: 100%"/>
+                                
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="save-promo-price" class="control-label mb-0 d-block">Price</label>
+                                <input type="number" value="0" step="0.01" min="0" name="Price" id="save-promo-price" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="save-promo-effective" class="control-label mb-0 d-block">Effective Date</label>
+                                <input type="date" name="EffectiveDate" id="save-promo-effective" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="save-promo-expiration" class="control-label mb-0 d-block">Expiration Date</label>
+                                <input type="date" name="ExpirationDate" id="save-promo-expiration" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-plus"></span> Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
                 </div>
             </form>
         </div>
@@ -1538,7 +1639,7 @@
                 showBatchLoader("price");
             }).DataTable({
                 ajax: {
-                    url: "@Url.Action("GetPricesJson")",
+                    url: "@Url.Action("GetPromoJson")",
                     type: "POST",
                     data: function (data) {
                         data.Id = @Model?.Id;
@@ -1603,7 +1704,7 @@
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReturnsJson")",
-                type: "POST",
+               type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
                 }
@@ -1629,6 +1730,209 @@
             hideBatchLoader("return");
         });
 
+        
+        
+        // Promo Price
+        var promoDT = $('.table-promo').on('preXhr.dt', function (e, settings, data) {
+            showBatchLoader("promo");
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetPromoJson")",
+                type: "POST",
+                data: function (data) {
+                    data.Id = @Model?.Id;
+                }
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "name", name: "Name" },
+                { data: "promoPrice", name: "Price" },
+                { data: "effectiveDate", name: "EffectiveDate" },
+                { data: "expirationDate", name: "ExpirationDate" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (user_access.canEdit) {
+                            if (data.isActive != true) {
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-promo" data-microtip-title="Reactivate Promo" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
+                            } else {
+
+                                if (new Date(data.expirationDate3) > new Date(getCurrentDate())){
+                                
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-update-promo" data-microtip-title="Update Promo" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-edit"></span></button>';
+                                }
+                            }
+                        }
+                        if (user_access.canDelete && data.isActive == true) {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-promo" data-microtip-title="Delete / Deactivate Promo" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
+                        }
+                        return actions + '</div>';
+                    },
+                    className: "form-cell"
+                }
+            ],
+            order: [[2, "asc"]]
+        }).on("draw.dt", function () {
+            hideBatchLoader("promo");
+
+            if (user_access.canDelete) {
+                $('.btn-remove-promo').off("click").on("click", function () {
+                    swal({
+                        title: "Delete Item Promo",
+                        text: "Are you sure you want to remove this record?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = promoDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("DeleteOrDeactivateItemPromoJson")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        promoDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canEdit) {
+
+                $('.btn-reactivate-promo').off("click").on("click", function () {
+                    swal({
+                        title: "Reactivate Item Promo",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = promoDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("ReactivateItemPromoJson")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        promoDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+
+                $('.btn-update-promo').off("click").on("click", function () {
+                        console.log("show promo");
+                        var row_data = promoDT.row($(this).parents('tr')).data();
+
+                        $("#save-promo-id").val(row_data.id);
+                        $("#save-promo-effective").val(row_data.effectiveDate3);
+                        $("#save-promo-expiration").val(row_data.expirationDate3);
+                        $("#save-promo-name").val(row_data.name);
+                        $("#save-promo-price").val(row_data.promoPrice);
+
+
+                        $("#promoModal").modal("show");
+                    });
+            }
+        });
+
+        $(".btn-create-promo").click(function (e) {
+            clearPromoForm();
+
+        });
+
+        function clearPromoForm(){
+            $("#save-promo-effective").val("");
+            $("#save-promo-expiration").val("");
+            $("#save-promo-name").val("");
+            $("#save-promo-price").val("");
+
+        }
+
+        var validatePromo = $("#promoForm").validate({
+            rules: {
+                Name: { required: true, maxlength: 300 },
+                Price: { required: true, number : true, min: 0},
+                EffectiveDate: {required: true},
+                ExpirationDate: {required: true},
+
+            },
+            messages: {
+                Name: { required: "Name is required" },
+                Price: { required: "Price is required", number: "Please enter a valid number.", min: "Value must be greater than 0."},
+                EffectiveDate: { required: "Effective Date is required"},
+                ExpirationDate: {required: "Expiration Date is required"},
+
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                DoItemPromo();
+            }
+        });
+
+        // Send Item Promo to Controller
+        function DoItemPromo() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveItemPromoJson")",
+                data: {
+                    Id: $("#save-promo-id").val(),
+                    Name: $("#save-promo-name").val(),
+                    ItemId: @Model?.Id,
+                    EffectiveDateD: $("#save-promo-effective").val(),
+                    ExpirationDateD: $("#save-promo-expiration").val(),
+                    PromoPriceD: $("#save-promo-price").val(),
+
+                },
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("#promoModal").modal("hide");
+                        promoDT.ajax.reload();
+
+                        hideLoader()
+                    }
+                }
+            });
+        }
+
+        function getCurrentDate() {
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = String(today.getMonth() + 1).padStart(2, '0');
+          const day = String(today.getDate()).padStart(2, '0');
+
+
+          return `${year}-${month}-${day}`; 
+        }
+
+        
         function DisplayImage() {
             $("#item-image-selected").attr("src", $(".item-image").attr("src"));
             $("#item-image").val("");

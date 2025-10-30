@@ -305,6 +305,26 @@ namespace GMGInventory.Common.Models
         public string UpdateBy { get; set; }
     }
 
+    public class ItemPromoVM
+    {
+        
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int ItemId { get; set; }
+        public string PromoPrice => string.Format(SystemFormat.StringDecimalComma, PromoPriceD);
+        public decimal PromoPriceD { get; set; }
+        public bool IsActive { get; set; }
+        public string EffectiveDate => EffectiveDateD.ToString(SystemFormat.StringDate);
+        public string EffectiveDate3 => EffectiveDateD.ToString(SystemFormat.StringDate3);
+        public DateTime EffectiveDateD { get; set; }
+        public string ExpirationDate => ExpirationDateD.ToString(SystemFormat.StringDate);
+        public string ExpirationDate3 => ExpirationDateD.ToString(SystemFormat.StringDate3);
+        public DateTime ExpirationDateD { get; set; }
+        public string UpdateDate => UpdateDateD.ToString(SystemFormat.StringDateTime);
+        public DateTime UpdateDateD { get; set; }
+        public string UpdateBy { get; set; }
+    }
+
     public class ItemDetailTransferVM
     {
         public int TransferNumber { get; set; }

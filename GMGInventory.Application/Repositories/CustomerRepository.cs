@@ -1211,7 +1211,7 @@ namespace GMGInventory.Application.Repositories
                         await context.SaveChangesAsync(currentUserId);
 
                         response.Status = "Success";
-                        response.Message = "Address successfully deleted";
+                        response.Message = "Discount successfully deleted";
 
 
                     }
