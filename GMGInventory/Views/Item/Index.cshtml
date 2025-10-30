@@ -540,7 +540,60 @@
             }
         }
 
-        let isTable = true;
+        function ApplyFilter() {
+            itemDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        var isTable = true;
+
+        function ResetFilter() {
+            resetToDefaultDTFilter();
+
+            itemDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[1, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            CategoryId: "",
+            ItemTypeId: "",
+            BrandId: "",
+            WarehouseId: ""
+        };
+
+        function checkDefaultFilter() {
+            var changed = JSON.stringify(itemDT.order()) != JSON.stringify(defaultDTState.order) ||
+                          itemDT.page.info().start != defaultDTState.page ||
+                          itemDT.page.len() != defaultDTState.length ||
+                          (itemDT.search() || "") != defaultDTState.search.search ||
+                          $("#CategoryId").val() != defaultDTState.CategoryId ||
+                          $("#ItemTypeId").val() != defaultDTState.ItemTypeId ||
+                          $('#BrandId').val() != defaultDTState.BrandId ||
+                          $('#WarehouseId').val() != defaultDTState.WarehouseId;
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function resetToDefaultDTFilter() {
+            $("#CategoryId").val(defaultDTState.CategoryId).trigger('change');
+            $("#ItemTypeId").val(defaultDTState.ItemTypeId).trigger('change');
+            $("#BrandId").val(defaultDTState.BrandId).trigger('change');
+            $("#WarehouseId").val(defaultDTState.WarehouseId).trigger('change');
+
+            itemDT.state.clear();
+            itemDT.order(defaultDTState.order);
+            itemDT.page(defaultDTState.page);
+            itemDT.search(defaultDTState.search.search);
+        }
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -554,10 +607,10 @@
                 data.IsTable = isTable;
             },
             stateLoadParams: function (settings, data) {
-                $('#CategoryId').val(data.CategoryId || '');
-                $('#ItemTypeId').val(data.ItemTypeId || '');
-                $('#BrandId').val(data.BrandId || '');
-                $('#WarehouseId').val(data.WarehouseId || '');
+                $('#CategoryId').val(data.CategoryId || "").trigger('change');
+                $('#ItemTypeId').val(data.ItemTypeId || "").trigger('change');
+                $('#BrandId').val(data.BrandId || "").trigger('change');
+                $('#WarehouseId').val(data.WarehouseId || "").trigger('change');
                 isTable = data.IsTable;
             },
             ajax: {
@@ -711,6 +764,7 @@
 
             hideLoader();
             LoadSelect2();
+            checkDefaultFilter();
 
             if (user_access.canDelete) {
                 $('.deleteBtn').click(function (e) {
@@ -964,11 +1018,6 @@
                     }
                 });
             }
-        }
-
-        function ApplyFilter() {
-            itemDT.ajax.reload();
-            $("#filterModal").modal("hide");
         }
 
         if (user_access.canUploadDownload) {

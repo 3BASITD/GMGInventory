@@ -112,6 +112,20 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIBrand>> GetListAPI()
+        {
+            return await context.Brands
+                                .Select(s => new APIBrand
+                                {
+                                    Id = s.Id,
+                                    Code = s.Code,
+                                    Name = s.Name,
+                                    ItemTypeId = s.ItemTypeId,
+                                    IsActive = s.IsActive
+                                })
+                                .ToListAsync();
+        }
+
         public async Task<BrandViewVM?> GetBrandViewVM(int? id)
         {
             var brandVM = (await GetListAsync()).Where(s => s.Id == id).FirstOrDefault();

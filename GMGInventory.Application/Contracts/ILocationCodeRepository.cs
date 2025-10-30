@@ -9,6 +9,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId, int itemId);
         Task<IList<LocationCodeVM>> GetAllLocationCodeAsync();
         Task<ForDataTables<LocationCodeVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
+        Task<IList<APIGenericActive>> GetListAPI();
         Task<bool> IsLocationCodeInUse(int id);
 
         Task<bool> IsLocationCodeExist(string code);

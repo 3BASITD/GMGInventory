@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMGInventory.Common", "GMGI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMGInventory.Application", "GMGInventory.Application\GMGInventory.Application.csproj", "{A44B0F95-F305-45A5-A6E8-BF204834536F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMGInventory.API", "GMGInventory.API\GMGInventory.API.csproj", "{6ED64E9A-DC84-43D5-B91B-9411D6922C28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A44B0F95-F305-45A5-A6E8-BF204834536F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A44B0F95-F305-45A5-A6E8-BF204834536F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A44B0F95-F305-45A5-A6E8-BF204834536F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ED64E9A-DC84-43D5-B91B-9411D6922C28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ED64E9A-DC84-43D5-B91B-9411D6922C28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ED64E9A-DC84-43D5-B91B-9411D6922C28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ED64E9A-DC84-43D5-B91B-9411D6922C28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

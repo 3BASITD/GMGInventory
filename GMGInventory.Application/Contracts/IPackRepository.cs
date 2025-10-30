@@ -9,6 +9,7 @@ namespace GMGInventory.Application.Contracts
         Task<PackDetailsVM?> GetDetailsAsync(int? Id); 
         Task<PackDetailsPVM> PrintDetailsAsync(int? Id);
         Task<PackDetailsVM?> GetDetailsBySOAsync(int? Id);
+        Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter);
         Task<ForDataTables<PackVM>> GetListDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter);
         Task<IList<PackItemVM>> GetItemsAsync(int packId);
         Task<IList<PackItemVM>> GetItemsWithPriceAsync(int packId);
@@ -16,5 +17,6 @@ namespace GMGInventory.Application.Contracts
         string? CheckItem(PackFormVM form);
         Task<int> SaveAsync(PackFormVM form);
         Task<int> UpdateAsync(PackFormVM form);
+        Task<ResponseModelData<int>> AddAPI(PackFormAPIVM form);
     }
 }

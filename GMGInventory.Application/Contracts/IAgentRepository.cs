@@ -11,12 +11,10 @@ namespace GMGInventory.Application.Contracts
         Task<int?> GetIdAsync(string? Name);
         Task<IList<AgentViewVM>> GetListAsync();
         Task<ForDataTables<AgentViewVM>> GetListDTAsync(DataTablesRequestForm form);
-
+        Task<IList<APIAgent>> GetListAPI();
         Task<IList<AgentViewVM>> GetAllAsync(AgentFilterVM filter);
         Task<ForDataTables<AgentViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, AgentFilterVM filter);
-
         Task<ForDataTables<AgentVM>> GetAgentDTAsync(DataTablesRequestForm form, int id);
-       
         AgentVM? GetAgentDtlVM(int? id);
         Task<AgentViewVM?> GetAgentViewVM(int? id);
         Task<bool> UploadCombinationExistAsync(AgentVM agentVM);

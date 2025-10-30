@@ -16,7 +16,7 @@
                     <span class="fas fa-plus"></span> New Sales Order
                 </a>
             }
-            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
             @if (userAccess.CanUploadDownload)
@@ -159,6 +159,7 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
@@ -169,11 +170,15 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
+        var date_today = new Date();
+        var date_year_ago = new Date();
+        date_year_ago.setFullYear(date_year_ago.getFullYear() - 1);
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
                 if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
+                    $("#filter-to").val(DateForInput(date_today));
                 } else {
                     var dt_from = new Date($("#filter-from").val());
                     dt_from.setFullYear(dt_from.getFullYear() + 1);
@@ -295,9 +300,72 @@
         }
 
         $(".btnFilter").on("click", function () {
-            orderDT.ajax.reload();
-            $("#filterModal").modal("hide");
+            orderDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
         });
+
+        $(".btnReset").on("click", function () {
+            resetToDefaultDTFilter();
+
+            orderDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        });
+
+        var defaultDTState = {
+            order: [[0, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            AgentId: "",
+            AgentCode: "",
+            AgentName: "",
+            CustomerId: "",
+            CustomerCode: "",
+            CustomerName: "",
+            RegionId: "",
+            FiledBy: "everyone",
+            DateFrom: DateForInput(date_year_ago),
+            DateTo: DateForInput(date_today),
+            Status: ""
+        };
+
+        function checkDefaultFilter() {
+            var changed = JSON.stringify(orderDT.order()) != JSON.stringify(defaultDTState.order) ||
+                          orderDT.page.info().start != defaultDTState.page ||
+                          orderDT.page.len() != defaultDTState.length ||
+                          (orderDT.search() || "") != defaultDTState.search.search ||
+                          $("#filter-agent").val() != defaultDTState.AgentId ||
+                          $("#filter-customer").val() != defaultDTState.CustomerId ||
+                          $('#filter-region').val() != defaultDTState.RegionId ||
+                          $('#filter-filedby').val() != defaultDTState.FiledBy ||
+                          $('#filter-from').val() != defaultDTState.DateFrom ||
+                          $('#filter-to').val() != defaultDTState.DateTo ||
+                          $('#filter-status').val() != defaultDTState.Status;
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function resetToDefaultDTFilter() {
+            $("#filter-agent").val(defaultDTState.AgentId).trigger('change');
+            $("#filter-agent-name").val(defaultDTState.AgentName);
+            $("#filter-customer").val(defaultDTState.CustomerId).trigger('change');
+            $("#filter-customer-name").val(defaultDTState.CustomerName);
+            $('#filter-region').val(defaultDTState.RegionId);
+            $('#filter-filedby').val(defaultDTState.FiledBy);
+            $('#filter-to').val(defaultDTState.DateTo);
+            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-status').val(defaultDTState.Status);
+
+            orderDT.state.clear();
+            orderDT.order(defaultDTState.order);
+            orderDT.page(defaultDTState.page);
+            orderDT.search(defaultDTState.search.search);
+        }
 
         var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -344,8 +412,12 @@
                 $('#filter-to').val(data.DateTo);
                 $('#filter-status').val(data.Status);
             },
+            // initComplete: function () {
+            //     checkDefaultFilter();
+            // },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
+                type: "POST",
                 data: function (data) {
                     var agentId = $("#filter-agent").val();
                     var customerId = $("#filter-customer").val();
@@ -360,7 +432,6 @@
                     data.DateTo = $("#filter-to").val();
                     data.Status = $("#filter-status").val();
                 },
-                type: "POST",
             },
             serverSide: true,
             filter: true,
@@ -405,13 +476,16 @@
                     }
                 }
             ],
-            order: [[5, "desc"], [6, "desc"]]
+            //order: [[5, "desc"], [6, "desc"]]
+            order: [[0, "asc"]]
         });
 
         orderDT.on("draw", function () {
             hideLoader();
 
             LoadFilterSelect2();
+
+            checkDefaultFilter();
         });
 
         if (user_access.canDelete) {

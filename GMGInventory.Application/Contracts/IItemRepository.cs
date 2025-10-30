@@ -16,6 +16,7 @@ namespace GMGInventory.Application.Contracts
         Task<int?> GetUnitIdByNameAsync(string? Name);
         Task<IList<ItemCommonVM>> GetAllAsync(ItemFilterVM filter);
         Task<ForDataTables<ItemCommonVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, ItemFilterVM filter);
+        Task<IList<APIItem>> GetListAPI();
         ItemViewVM? GetItemViewVM(int? id);
         Task<IList<ItemFileVM>> GetAllFileAsync();
         Task<bool> IsCodeExistAsync(string code);

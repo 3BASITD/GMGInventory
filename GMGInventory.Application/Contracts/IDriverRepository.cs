@@ -6,6 +6,7 @@ namespace GMGInventory.Application.Contracts
     {
         Task<IList<DriverVM>> GetDrivers();
         Task<ForDataTables<DriverVM>> GetDriversDT(DataTablesRequestForm form);
+        Task<IList<APIDriver>> GetListAPI();
         Task<ResponseModel> AddDriver(DriverVM driver);
         Task<ResponseModel> UpdateDriver(DriverVM driver);
         Task<ResponseModel> DeleteOrDeactivateDriver(int? Id);

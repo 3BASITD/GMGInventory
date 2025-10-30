@@ -1,4 +1,4 @@
-
+﻿
 
 @media only screen and (min-width: 992px) {
     /*.text-sm, .input-group-sm > .btn, .input-group-sm > .form-control, .input-group-sm > .form-select, .input-group-sm > .input-group-text {
@@ -670,4 +670,44 @@ body.dark-mode .bg-invert {
     border-color: #3f474e;
     color: #eee;
     box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.btn-filter {
+    position: relative;
+}
+
+    .btn-filter::after {
+        content: "";
+        display: none;
+        width: 5px;
+        height: 5px;
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        border-radius: 20px;
+    }
+
+.btn-filtered::after {
+    display: inline-block;
+    animation: pulseAnimation 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseAnimation {
+    0% {
+        opacity: 0.75;
+        transform: scale(1);
+        background-color: red;
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+        background-color: orangered;
+    }
+
+    100% {
+        opacity: 0.75;
+        transform: scale(1);
+        background-color: red;
+    }
 }

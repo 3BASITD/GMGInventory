@@ -10,5 +10,6 @@ namespace GMGInventory.Application.Contracts
     public interface IUnitRepository
     {
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<IList<APIGeneric>> GetListAPI();
     }
 }

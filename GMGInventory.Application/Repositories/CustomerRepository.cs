@@ -552,6 +552,19 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIGenericActive>> GetListAPI()
+        {
+            return await context.Customers
+                                .Select(s => new APIGenericActive
+                                {
+                                    Id = s.Id,
+                                    Code = s.Code,
+                                    Name = s.Name,
+                                    IsActive = s.IsActive
+                                })
+                                .ToListAsync();
+        }
+
         public async Task<IList<Customer>> GetAllActiveCustomerAsync(int includeId)
         {
             return await context.Customers.Where(s => s.IsActive || s.Id == includeId).ToListAsync();

@@ -61,6 +61,13 @@ namespace GMGInventory.Common.Models
         public T NewRow { get; set; }
     }
 
+    public class ResponseModelData<T>
+    {
+        public string Status { get; set; }
+        public string Message { get; set; }
+        public T Data { get; set; }
+    }
+
     public class JsonOptionsModel
     {
         public string Id { get; set; }

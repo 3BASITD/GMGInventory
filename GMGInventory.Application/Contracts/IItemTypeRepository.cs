@@ -9,6 +9,7 @@ namespace GMGInventory.Application.Contracts
         Task<int?> GetIdAsync(string? Name);
         Task<IList<ItemTypeViewVM>> GetListAsync();
         Task<ForDataTables<ItemTypeViewVM>> GetListDTAsync(DataTablesRequestForm form);
+        Task<IList<APIItemType>> GetListAPI();
         Task<ItemTypeViewVM?> GetItemTypeViewVM(int? id);
         Task<bool> UploadCombinationExistAsync(ItemTypeVM itemTypeVM);
         Task<ItemTypeVM?> GetItemTypeVMAsync(int? id);

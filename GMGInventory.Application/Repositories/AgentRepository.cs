@@ -298,6 +298,22 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIAgent>> GetListAPI()
+        {
+            return await context.Agents
+                                .Select(s => new APIAgent
+                                {
+                                    Id = s.Id,
+                                    Code = s.Code,
+                                    FirstName = s.FirstName,
+                                    MiddleName = s.MiddleName,
+                                    LastName = s.LastName,
+                                    AreaId = s.AreaId,
+                                    IsActive = s.IsActive
+                                })
+                                .ToListAsync();
+        }
+
         private async Task<IList<AgentVM>> GetAgentAsync(int id)
         {
             var agentVM = from agent in context.Agents

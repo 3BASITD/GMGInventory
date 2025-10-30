@@ -18,7 +18,6 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> DisapproveAsync(int requestId, string? reason);
         Task<string> GetNewDocumentNumber();
         Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseOrderItemOptions(int PurchaseOrderId);
-
-
+        Task<ResponseModelData<int>> AddAPI(PurchaseReceiveFormAPIVM form);
     }
 }

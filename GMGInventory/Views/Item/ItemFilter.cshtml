@@ -1,6 +1,6 @@
 ﻿@model ItemFilterVM
 
-<button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+<button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
     <span class="fas fa-filter"></span> Filter
 </button>
 
@@ -44,6 +44,7 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>

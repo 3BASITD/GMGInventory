@@ -521,6 +521,28 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIItem>> GetListAPI()
+        {
+            return await context.Items
+                                .Select(s => new APIItem
+                                {
+                                    Id = s.Id,
+                                    Code = s.Code,
+                                    OldCode = s.OldCode,
+                                    Name = s.Name,
+                                    PartNumber = s.PartNumber,
+                                    InterchangeNumber = s.InterchangeNumber,
+                                    Size = s.Size,
+                                    UnitId = s.UnitId,
+                                    CategoryId = s.CategoryId,
+                                    ItemTypeId = s.ItemTypeId,
+                                    BrandId = s.BrandId,
+                                    IsActive = s.IsActive,
+                                    LocationCodeIds = s.ItemLocations.Select(a => a.LocationCodeId).ToList()
+                                })
+                                .ToListAsync();
+        }
+
         public ItemViewVM? GetItemViewVM(int? id)
         {
             var itemVM = (from item in context.Items

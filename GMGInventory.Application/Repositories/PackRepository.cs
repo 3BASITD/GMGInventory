@@ -118,7 +118,7 @@ namespace GMGInventory.Application.Repositories
             return await orderVM.FirstOrDefaultAsync();
         }
 
-        private async Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter)
+        public async Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter)
         {
             var packs = from pck in context.Packs
                         join user in userManager.Users on pck.UserCreated equals user.Id
@@ -567,6 +567,66 @@ namespace GMGInventory.Application.Repositories
                 await context.SaveChangesAsync(currentUserId);
                 return -2;
             }
+        }
+
+        public async Task<ResponseModelData<int>> AddAPI(PackFormAPIVM form)
+        {
+            var orderVM = await context.SalesOrders.Where(s => s.Id == form.SalesOrderId).FirstOrDefaultAsync();
+            if (orderVM == null)
+                return new ResponseModelData<int>
+                {
+                    Status = "Error",
+                    Message = "Sales Order cannot be found",
+                    Data = -1
+                };
+
+
+            var checkItems = CheckItem(new PackFormVM { Items = form.Items });
+            if (checkItems != null)
+                return new ResponseModelData<int>
+                {
+                    Status = "Error",
+                    Message = checkItems,
+                    Data = -1
+                };
+
+            Pack pack = new()
+            {
+                SalesOrderId = orderVM.Id,
+                StatusId = await context.Statuses
+                                        .Where(s => s.Name.ToLower() == "packing draft")
+                                        .Select(s => s.Id)
+                                        .FirstAsync()
+            };
+
+            await context.Packs.AddAsync(pack);
+            await context.SaveChangesAsync(currentUserId);
+
+            foreach (var item in form.Items)
+            {
+                PackLineItem packItem = new()
+                {
+                    BoxNumber = item.BoxNumber,
+                    ItemId = item.Item,
+                    PackId = pack.Id,
+                    PackTypeId = item.PackType,
+                    Quantity = item.Quantity
+                };
+                await context.PackLineItems.AddAsync(packItem);
+                await context.SaveChangesAsync(currentUserId);
+            }
+
+            var quantityOrdered = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == form.SalesOrderId).SumAsync(s => s.Quantity);
+            var quantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
+            quantityPacked += form.Items.Sum(s => s.Quantity);
+
+
+            return new ResponseModelData<int>
+            {
+                Status = "Success",
+                Message = "Pack successfully saved as draft",
+                Data = pack.Id
+            };
         }
     }
 }

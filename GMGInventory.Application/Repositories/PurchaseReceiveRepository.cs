@@ -697,5 +697,72 @@ namespace GMGInventory.Application.Repositories
                                 .OrderBy(s => s.LineNumber)
                                 .ToListAsync();
         }
+
+        public async Task<ResponseModelData<int>> AddAPI(PurchaseReceiveFormAPIVM form)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == "draft").FirstAsync();
+
+            var purchaseOrder = await context.PurchaseOrderNews
+                                             .Where(s => s.Id == form.PurchaseOrderId)
+                                             .FirstOrDefaultAsync();
+            if (purchaseOrder == null)
+                return new ResponseModelData<int>
+                {
+                    Status = "Error",
+                    Message = "Invalid Purchase Order. Record cannot be found",
+                    Data = -1
+                };
+
+            var purchaseOrderItems = from poli in context.PurchaseOrderNewLineItems
+                                     let recq = (from prli in context.PurchaseReceivingLineItems
+                                                 where prli.OrderItemId == poli.Id
+                                                 select (int?)prli.Quantity).Sum() ?? 0
+                                     let retq = (from prli in context.PurchaseReturnNewLineItems
+                                                 where prli.ReceivingItem.OrderItemId == poli.Id
+                                                 select (int?)prli.Quantity).Sum() ?? 0
+                                     where poli.Quantity - recq + retq > 0
+                                     select poli.Id;
+
+            if (form.Items.Any(s => !purchaseOrderItems.Contains(s.OrderItemId)))
+                return new ResponseModelData<int>
+                {
+                    Status = "Error",
+                    Message = "Cannot proceed because there is a problem with one or more items",
+                    Data = -1
+                };
+
+                var receive = new PurchaseReceiving
+                {
+                    DocumentNumber = await GetNewDocumentNumber(),
+                    PurchaseOrderId = purchaseOrder.Id,
+                    DeliveryReceiptNumber = form.DeliveryReceiptNumber,
+                    SalesInvoiceNumber = form.SalesInvoiceNumber,
+                    ReceiveDate = form.DateReceived,
+                    Remarks = form.Remarks,
+                    StatusId = status.Id
+                };
+                await context.PurchaseReceivings.AddAsync(receive);
+                await context.SaveChangesAsync(currentUserId);
+
+
+            var newitems = form.Items
+                               .Select(s => new PurchaseReceivingLineItem
+                               {
+                                   PurchaseReceivingId = receive.Id,
+                                   OrderItemId = s.OrderItemId,
+                                   Quantity = s.Quantity
+                               });
+            context.PurchaseReceivingLineItems.AddRange(newitems);
+            await context.SaveChangesAsync(currentUserId);
+
+            return new ResponseModelData<int>
+            {
+                Status = "Success",
+                Message = "Purchase receive saved as draft.",
+                Data = receive.Id
+            };
+        }
     }
 }

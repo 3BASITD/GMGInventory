@@ -7,6 +7,7 @@ namespace GMGInventory.Application.Contracts
     {
         Task<IList<BrandViewVM>> GetListAsync();
         Task<ForDataTables<BrandViewVM>> GetListDTAsync(DataTablesRequestForm form);
+        Task<IList<APIBrand>> GetListAPI();
         Task<BrandViewVM?> GetBrandViewVM(int? id);
         Task<bool> UploadCombinationExistAsync(BrandVM brandVM);
         Task<BrandVM?> GetBrandVMAsync(int? id);

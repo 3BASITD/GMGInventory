@@ -143,6 +143,19 @@ namespace GMGInventory.Application.Repositories
             return await locations.ToListAsync();
         }
 
+        public async Task<IList<APIGenericActive>> GetListAPI()
+        {
+            return await context.LocationCodes
+                                .Select(s => new APIGenericActive
+                                {
+                                    Id = s.Id,
+                                    Code = s.Code,
+                                    Name = s.Name,
+                                    IsActive = s.IsActive
+                                })
+                                .ToListAsync();
+        }
+
         public async Task<bool> IsLocationCodeInUse(int id)
         {
             return await context.ItemTypes.AnyAsync(s => s.Id == id);

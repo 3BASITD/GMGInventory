@@ -114,11 +114,15 @@ namespace GMGInventory.Common.Models
         public int SalesOrderLineItemId { get; set; }
     }
 
-    public class PackFormVM
+    public class PackFormVM : PackFormAPIVM
     {
         public int? Id { get; set; }
-        public int SalesOrderId { get; set; }
         public string SavingAs { get; set; }
+    }
+
+    public class PackFormAPIVM
+    {
+        public int SalesOrderId { get; set; }
         public IList<PackFormItemVM> Items { get; set; }
     }
 

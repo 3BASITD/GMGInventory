@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
     .EnableSensitiveDataLogging()
     .LogTo(Console.WriteLine));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.Configure<APIHMSettings>(builder.Configuration.GetSection("APIHMSettings"));

@@ -54,7 +54,14 @@
             <td class="right-text"><strong>Date: @DateTime.Now.ToString("MM/dd/yyyy") </strong></td>
     </tr>
     </table>
-    <p> Received from BINA'S AUTO SUPPLY  the following Goods for shipment and delivery consignee name below: </p>
+    @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+    {
+        <p> Received from BINA'S AUTO SUPPLY INC the following Goods for shipment and delivery consignee name below: </p>
+    }
+    else
+    {
+        <p> Received from GMG AUTO PARTS TRADING the following Goods for shipment and delivery consignee name below: </p>
+    }
     <br />
 
     <table>

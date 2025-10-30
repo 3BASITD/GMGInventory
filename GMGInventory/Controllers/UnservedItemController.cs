@@ -12,7 +12,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class UnservedItemController(IAccessRepository accessRepository
-                             , IUnservedItemRepository unservedItemRepository) : BaseController(accessRepository)
+                                      , IUnservedItemRepository unservedItemRepository) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 

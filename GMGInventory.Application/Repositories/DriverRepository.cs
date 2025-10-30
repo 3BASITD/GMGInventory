@@ -112,6 +112,23 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIDriver>> GetListAPI()
+        {
+            return await context.Drivers
+                                .Select(s => new APIDriver
+                                {
+                                    Id = s.Id,
+                                    FirstName = s.FirstName,
+                                    LastName = s.LastName,
+                                    Nickname = s.Nickname,
+                                    LicenseNumber = s.LicenseNumber,
+                                    Restriction = s.Restriction,
+                                    LicenseDateExpiration = s.LicenseDateExpiration,
+                                    IsActive = s.IsActive
+                                })
+                                .ToListAsync();
+        }
+
         public async Task<ResponseModel> AddDriver(DriverVM driver)
         {
             try
