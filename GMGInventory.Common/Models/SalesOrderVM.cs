@@ -326,7 +326,20 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Extended Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
-        public decimal GrossPriceD => Math.Round(QuantityD * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
+        public decimal GrossPriceD
+        {
+            get
+            {
+                decimal gross = QuantityD * SellingPriceD;
+                decimal discounted1 = gross * (100 - Discount1D) / 100;
+                decimal discounted2 = discounted1 * (100 - Discount2D) / 100;
+                decimal discounted3 = discounted2 * (100 - Discount3D) / 100;
+                decimal discounted4 = discounted3 * (100 - Discount4D) / 100;
+                decimal discounted5 = discounted4 * (100 - Discount5D) / 100;
+
+                return Math.Round(discounted5, 2);
+            }
+        }
     }
 
     public class SalesOrderFormVM
@@ -360,7 +373,23 @@ namespace GMGInventory.Common.Models
         public decimal UnitPrice { get; set; }
         public decimal Discount1 { get; set; }
         public decimal Discount2 { get; set; }
-        public decimal GrossPrice => Math.Round(Quantity * UnitPrice * (100 - Discount1) / 100 * (100 - Discount2) / 100, 2);
-        public int CustomerBrandDiscountId { get; set; }
+        public decimal Discount3 { get; set; }
+        public decimal Discount4 { get; set; }
+        public decimal Discount5 { get; set; }
+        public decimal GrossPrice
+        {
+            get
+            {
+                decimal gross = Quantity * UnitPrice;
+                decimal discounted1 = gross * (100 - Discount1) / 100;
+                decimal discounted2 = discounted1 * (100 - Discount2) / 100;
+                decimal discounted3 = discounted2 * (100 - Discount3) / 100;
+                decimal discounted4 = discounted3 * (100 - Discount4) / 100;
+                decimal discounted5 = discounted4 * (100 - Discount5) / 100;
+
+                return Math.Round(discounted5, 2);
+            }
+        }
+        public int? CustomerBrandDiscountId { get; set; }
     }
 }

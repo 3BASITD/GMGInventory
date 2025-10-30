@@ -565,6 +565,9 @@
                                         <th>Unit Price</th>
                                         <th>Discount 1</th>
                                         <th>Discount 2</th>
+                                        <th>Discount 3</th>
+                                        <th>Discount 4</th>
+                                        <th>Discount 5</th>
                                         <th>Extended Price</th>
                                         <th>Served Quantity</th>
                                         <th>Unserved Quantity</th>
@@ -575,7 +578,7 @@
                                     <tr>
                                         <th colspan="2" class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
-                                        <th colspan="7"></th>
+                                        <th colspan="10"></th>
                                         <th class="total-gross-price">0.00</th>
                                         <th class="total-served">0</th>
                                         <th class="total-unserved">0</th>
@@ -664,6 +667,37 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-discount3" class="form-label mb-0">Discount 3</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.01" min="0" max="100" id="add-discount3" name="Discount3" class="form-control form-control-sm" />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-discount4" class="form-label mb-0">Discount 4</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.01" min="0" max="100" id="add-discount4" name="Discount4" class="form-control form-control-sm" />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-discount5" class="form-label mb-0">Discount 5</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.01" min="0" max="100" id="add-discount5" name="Discount5" class="form-control form-control-sm" />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
@@ -1020,26 +1054,18 @@
             });
 
             function GetBrandDiscount(brandId){
-                   var custId = currentCustomer;
-                    if (!custId) return;
-                   var brandDiscountId = 0; 
+                var custId = currentCustomer;
+                if (!custId) return;
+                var brandDiscountId = 0;
 
-                    $.ajax({
-                      url: "@Url.Action("GetBrandDiscount")",
-                      type: "POST",
-                      data: { customerId: custId, brandId: brandId }, // This sends id as a query parameter
-                      success: function (data) {
-
-
-
+                $.ajax({
+                    url: "@Url.Action("GetBrandDiscount")",
+                    type: "POST",
+                    data: { customerId: custId, brandId: brandId }, // This sends id as a query parameter
+                    success: function (data) {
                         if(Object.keys(data).length == 0){
-
                             $("#add-discount1").val("0.00");
-
-                        }
-                            
-                        
-                        else{
+                        } else{
                             console.log(data);
                             $("#add-discount1").val(Round2Decimal(data[0].discount));
                             $("#add-discount-id").val(data[0].id);
@@ -1051,17 +1077,20 @@
                             var unit_price = parseFloat($("#add-unit-price").val());
                             var discount1 = parseFloat($("#add-discount1").val());
                             var discount2 = parseFloat($("#add-discount2").val());
+                            var discount3 = parseFloat($("#add-discount3").val());
+                            var discount4 = parseFloat($("#add-discount4").val());
+                            var discount5 = parseFloat($("#add-discount5").val());
 
-                            //$("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
-                            $("#add-gross-price").val(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
-                        
+                            var grossprice = quantity * unit_price;
+                            var discounted1 = grossprice * (100 - discount1) / 100;
+                            var discounted2 = discounted1 * (100 - discount2) / 100;
+                            var discounted3 = discounted2 * (100 - discount3) / 100;
+                            var discounted4 = discounted3 * (100 - discount4) / 100;
+                            var discounted5 = discounted4 * (100 - discount5) / 100;
+                            $("#add-gross-price").val(Round2Decimal(discounted5));
                         }
-                            
-                      },
-                      error: function () {
-                        toastr.error(data.message, "Error")
-                      }
-                    });
+                    }
+                });
             }
 
             function SaveOrder() {
@@ -1165,17 +1194,23 @@
             $("#add-gross-price").val("0.00");
         });
 
-        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2").on("input", function () {
+        $("#add-quantity, #add-unit-price, #add-discount1, #add-discount2, #add-discount3, #add-discount4, #add-discount5").on("input", function () {
             var quantity = parseFloat($("#add-quantity").val());
             var unit_price = parseFloat($("#add-unit-price").val());
             var discount1 = parseFloat($("#add-discount1").val());
             var discount2 = parseFloat($("#add-discount2").val());
+            var discount3 = parseFloat($("#add-discount3").val());
+            var discount4 = parseFloat($("#add-discount4").val());
+            var discount5 = parseFloat($("#add-discount5").val());
 
-            //$("#add-gross-price").val(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
-            $("#add-gross-price").val(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
-
-
-        });                           
+            var grossprice = quantity * unit_price;
+            var discounted1 = grossprice * (100 - discount1) / 100;
+            var discounted2 = discounted1 * (100 - discount2) / 100;
+            var discounted3 = discounted2 * (100 - discount3) / 100;
+            var discounted4 = discounted3 * (100 - discount4) / 100;
+            var discounted5 = discounted4 * (100 - discount5) / 100;
+            $("#add-gross-price").val(Round2Decimal(discounted5));
+        });
 
         function clearItemForm() {
             $("#add-code").val("").trigger("change");
@@ -1187,6 +1222,9 @@
             $(".add-inventory").text("0");
             $("#add-discount1").val("0.00");
             $("#add-discount2").val("0.00");
+            $("#add-discount3").val("0.00");
+            $("#add-discount4").val("0.00");
+            $("#add-discount5").val("0.00");
             $("#add-gross-price").val("0.00");
         }
 
@@ -1236,13 +1274,19 @@
                     discount1D: $("#add-discount1").val() || 0,
                     discount2: Round2Decimal($("#add-discount2").val() || 0),
                     discount2D: $("#add-discount2").val() || 0,
+                    discount3: Round2Decimal($("#add-discount3").val() || 0),
+                    discount3D: $("#add-discount3").val() || 0,
+                    discount4: Round2Decimal($("#add-discount4").val() || 0),
+                    discount4D: $("#add-discount4").val() || 0,
+                    discount5: Round2Decimal($("#add-discount5").val() || 0),
+                    discount5D: $("#add-discount5").val() || 0,
                     grossPrice: Round2Decimal($("#add-gross-price").val() || 0),
                     grossPriceD: $("#add-gross-price").val() || 0,
                     servedQuantity: 0,
                     serverQuantityD: 0,
                     unservedQuantity: 0,
                     unservedQuantityD: 0,
-                    customerBrandDiscountId: $("#add-discount-id").val() || 0
+                    customerBrandDiscountId: $("#add-discount-id").val()
                 }).order([1, 'asc']).draw();
                 clearItemForm();
 
@@ -1343,6 +1387,39 @@
                     name: "Discount2",
                     className: "form-cell text-end"
                 },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3" /><span class="input-group-text">%</span></div>';
+                        } else {
+                            return Round2Decimal(data.discount3D)
+                        }
+                    },
+                    name: "Discount3",
+                    className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount4D) + '" class="form-control form-control-sm discount4" /><span class="input-group-text">%</span></div>';
+                        } else {
+                            return Round2Decimal(data.discount4D)
+                        }
+                    },
+                    name: "Discount4",
+                    className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount5D) + '" class="form-control form-control-sm discount5" /><span class="input-group-text">%</span></div>';
+                        } else {
+                            return Round2Decimal(data.discount5D)
+                        }
+                    },
+                    name: "Discount5",
+                    className: "form-cell text-end"
+                },
                 { data: "grossPrice", name: "GrossPrice", className: "form-cell text-end grossprice" },
                 { data: "servedQuantity", name: "ServedQuantity", className: "form-cell text-end servedquantity" },
                 { data: "unservedQuantity", name: "UnservedQuantity", className: "form-cell text-end unservedquantity" },
@@ -1365,9 +1442,9 @@
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 2);
-                columnDTTotalDecimal(api, 10);
-                columnDTTotalInteger(api, 11);
-                columnDTTotalInteger(api, 12);
+                columnDTTotalDecimal(api, 13);
+                columnDTTotalInteger(api, 14);
+                columnDTTotalInteger(api, 15);
             }
         });
 
@@ -1375,9 +1452,9 @@
             //if (so_details.status.toLowerCase().includes("submitted")) {
             if (so_details.status.toLowerCase().includes("draft")) {
                 itemDT.column(0).visible(true); // remove button
-                itemDT.column(11).visible(false); // served quantity
-                itemDT.column(12).visible(false); // unserved quantity
-                itemDT.column(13).visible(false); // update served quantity button
+                itemDT.column(14).visible(false); // served quantity
+                itemDT.column(15).visible(false); // unserved quantity
+                itemDT.column(16).visible(false); // update served quantity button
             // } else if (so_details.status.toLowerCase().includes("approved")) {
             //     itemDT.column(0).visible(false);
             //     itemDT.column(11).visible(true);
@@ -1385,9 +1462,9 @@
             //     itemDT.column(13).visible(false);//true dati
             } else {
                 itemDT.column(0).visible(false);
-                itemDT.column(11).visible(true);//false dati
-                itemDT.column(12).visible(true);//false dati
-                itemDT.column(13).visible(false);
+                itemDT.column(14).visible(true);//false dati
+                itemDT.column(15).visible(true);//false dati
+                itemDT.column(16).visible(false);
             }
 
             hideLoader();
@@ -1400,21 +1477,28 @@
             $(".table-item thead th").removeClass("grossprice");
 
             //ComputeTotalQuantity();
-            //ComputeTotalGrossPrice();                                                        
-            $(".quantity, .discount1, .discount2, .unitprice").on("input", function () {
+            //ComputeTotalGrossPrice();
+            $(".quantity, .discount1, .discount2, .discount3, .discount4, .discount5, .unitprice").on("input", function () {
                 var row = itemDT.row($(this).closest('tr'));
                 var rowData = row.data();
 
                 var quantity = parseInt($(this).parents("tr").find(".quantity").val());
                 var discount1 = parseFloat($(this).parents("tr").find(".discount1").val());
                 var discount2 = parseFloat($(this).parents("tr").find(".discount2").val());
-                //var unit_price = rowData.sellingPriceD;
+                var discount3 = parseFloat($(this).parents("tr").find(".discount3").val());
+                var discount4 = parseFloat($(this).parents("tr").find(".discount4").val());
+                var discount5 = parseFloat($(this).parents("tr").find(".discount5").val());
+                //var unit_price = rowData.unitPrice;
                 var unit_price = parseFloat($(this).parents("tr").find(".unitprice").val());
 
-                //var gross_price = FormatStringDecimal(Round2Decimal(quantity * (((100 - discount1 - discount2) * unit_price) / 100)));
-                var gross_price = FormatStringDecimal(Round2Decimal((quantity * unit_price * (100 - discount1) / 100) * (100 - discount2) / 100));
+                var grossprice = quantity * unit_price;
+                var discounted1 = grossprice * (100 - discount1) / 100;
+                var discounted2 = discounted1 * (100 - discount2) / 100;
+                var discounted3 = discounted2 * (100 - discount3) / 100;
+                var discounted4 = discounted3 * (100 - discount4) / 100;
+                var discounted5 = discounted4 * (100 - discount5) / 100;
 
-                $(this).parents("tr").find(".grossprice").html(gross_price);
+                $(this).parents("tr").find(".grossprice").html(FormatStringDecimal(discounted5));
                 ComputeTotalQuantity();
                 ComputeTotalGrossPrice();
             });
@@ -1564,6 +1648,9 @@
                 var row_unitprice = parseFloat($(this.node()).find(".unitprice").val());
                 var row_discount1 = parseFloat($(this.node()).find(".discount1").val());
                 var row_discount2 = parseFloat($(this.node()).find(".discount2").val());
+                var row_discount3 = parseFloat($(this.node()).find(".discount3").val());
+                var row_discount4 = parseFloat($(this.node()).find(".discount4").val());
+                var row_discount5 = parseFloat($(this.node()).find(".discount5").val());
                 item_to_order.push({
                     lineNumber: row_data.lineNumber,
                     item: row_data.itemId,
@@ -1571,6 +1658,9 @@
                     unitPrice: row_unitprice,
                     discount1: row_discount1,
                     discount2: row_discount2,
+                    discount3: row_discount3,
+                    discount4: row_discount4,
+                    discount5: row_discount5,
                     customerBrandDiscountId: row_data.customerBrandDiscountId
                 });
             });

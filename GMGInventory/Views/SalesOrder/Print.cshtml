@@ -188,7 +188,15 @@
                     <td class="center-text"><nobr>@item.Quantity</nobr></td>
                     <td>@item.Unit</td>
                     <td class="right-text">@item.SellingPrice</td>
-                    <td class="right-text">@(item.Discount1)%; @(item.Discount2)%</td>
+                    @{
+                        var discounts = new List<string>();
+                        if (item.Discount1D > 0) discounts.Add(item.Discount1+ "%");
+                        if (item.Discount2D > 0) discounts.Add(item.Discount2 + "%");
+                        if (item.Discount3D > 0) discounts.Add(item.Discount3 + "%");
+                        if (item.Discount4D > 0) discounts.Add(item.Discount4 + "%");
+                        if (item.Discount5D > 0) discounts.Add(item.Discount5 + "%");
+                    }
+                    <td class="right-text">@string.Join("; ", discounts)</td>
                     <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
                 </tr>
             }
