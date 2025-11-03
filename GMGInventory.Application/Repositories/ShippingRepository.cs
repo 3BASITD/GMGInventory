@@ -31,46 +31,41 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<ShippingVM>> GetListAsync(ListFilterCustomerModel filter)
         {
             var invoices = from invs in context.Invoices
-
                            join pack in context.Packs on invs.PackId equals pack.Id
                            join so in context.SalesOrders on invs.SalesOrderId equals so.Id
                            join cust in context.Customers on so.CustomerId equals cust.Id
                            join sts in context.Statuses on invs.StatusId equals sts.Id
-
                            let shippingAddress = cust.ShippingAddresses.Where(s => s.IsDefault == true).FirstOrDefault()
-
                            let packaging = context.PackLineItems.Include(x => x.PackType)
-                                        .Where(s => s.Pack.SalesOrderId == so.Id)
+                                         .Where(s => s.Pack.SalesOrderId == so.Id)
                                          .GroupBy(s => new
                                          {
                                              s.PackType.Code
                                          })
-                                        .Select(s => new
-                                        {
-                                            Id = s.Key,
-                                            Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code,
-                                            PackageCount = s.Select(l => l.BoxNumber).Distinct().Count()
-                                        }).ToList()
-
+                                         .Select(s => new
+                                         {
+                                             Id = s.Key,
+                                             Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code,
+                                             PackageCount = s.Select(l => l.BoxNumber).Distinct().Count()
+                                         }).ToList()
                            let forwarder = so.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == so.Id).FirstOrDefault()!.Forwarder
+                           where (sts.Code.ToLower() == "invoiced" || sts.Code.ToLower() == "draft")
+                           && filter.DateFrom <= invs.SalesOrder.SalesOrderDate.Date
+                           && invs.SalesOrder.SalesOrderDate.Date <= filter.DateTo
+                           && (filter.Customer == null || filter.Customer == so.CustomerId)
 
-                           where sts.Code.ToLower() == "invoiced" || sts.Code.ToLower() == "draft"
-                             && filter.DateFrom <= invs.DateCreated.Date
-                            && invs.DateCreated.Date <= filter.DateTo
-                            && (filter.Customer == null || filter.Customer == so.CustomerId)
-
-                            select new ShippingVM
-                            {
-                                InvoiceNumber = invs.InvoiceNumber,
-                                SONumber = so.SalesOrderNumber,
-                                SalesOrderId = so.Id,
-                                CustomerName = cust.Name,
-                                CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
-                                PackId = pack.Id,
-                                SalesOrderDateD = invs.DateCreated,
-                                TotalPackageCount = packaging.Sum(s => s.PackageCount),
-                                Forwarder = forwarder == null ? null : forwarder.Name
-                            };
+                           select new ShippingVM
+                           {
+                               InvoiceNumber = invs.InvoiceNumber,
+                               SONumber = so.SalesOrderNumber,
+                               SalesOrderId = so.Id,
+                               CustomerName = cust.Name,
+                               CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
+                               PackId = pack.Id,
+                               SalesOrderDateD = invs.SalesOrder.SalesOrderDate,
+                               TotalPackageCount = packaging.Sum(s => s.PackageCount),
+                               Forwarder = forwarder == null ? null : forwarder.Name
+                           };
 
             return await invoices.ToListAsync();
         }

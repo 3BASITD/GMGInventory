@@ -563,11 +563,7 @@
                                         <th>Item Name</th>
                                         <th>Inventory Count</th>
                                         <th>Unit Price</th>
-                                        <th>Discount 1</th>
-                                        <th>Discount 2</th>
-                                        <th>Discount 3</th>
-                                        <th>Discount 4</th>
-                                        <th>Discount 5</th>
+                                        <th>Discount</th>
                                         <th>Extended Price</th>
                                         <th>Served Quantity</th>
                                         <th>Unserved Quantity</th>
@@ -578,7 +574,7 @@
                                     <tr>
                                         <th colspan="2" class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
-                                        <th colspan="10"></th>
+                                        <th colspan="6"></th>
                                         <th class="total-gross-price">0.00</th>
                                         <th class="total-served">0</th>
                                         <th class="total-unserved">0</th>
@@ -1367,57 +1363,25 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if (so_details.status.toLowerCase().includes("draft") && ( user_access.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) )) {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><span class="input-group-text">%</span></div>';
+                        var discount = '';
+                        if (so_details.status.toLowerCase().includes("draft")) {
+                            if( user_access.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) ) {
+                             discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_1" class="input-group-text">#1</label><input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><label for="' + data.lineNumber + '_1" class="input-group-text">%</label></div>';
+                            }
+                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_2" class="input-group-text">#2</label><input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><label for="' + data.lineNumber + '_2" class="input-group-text">%</label></div>';
+                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_3" class="input-group-text">#3</label><input id="' + data.lineNumber + '_3" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3" /><label for="' + data.lineNumber + '_3" class="input-group-text">%</label></div>';
+                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_4" class="input-group-text">#4</label><input id="' + data.lineNumber + '_4" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount4D) + '" class="form-control form-control-sm discount4" /><label for="' + data.lineNumber + '_4" class="input-group-text">%</label></div>';
+                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_5" class="input-group-text">#5</label><input id="' + data.lineNumber + '_5" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount5D) + '" class="form-control form-control-sm discount5" /><label for="' + data.lineNumber + '_5" class="input-group-text">%</label></div>';
                         } else {
-                            return Round2Decimal(data.discount1)
+                            discount += Round2Decimal(data.discount1) + '%<br />';
+                            discount += Round2Decimal(data.discount2) + '%<br />';
+                            discount += Round2Decimal(data.discount3) + '%<br />';
+                            discount += Round2Decimal(data.discount4) + '%<br />';
+                            discount += Round2Decimal(data.discount5) + '%';
                         }
+                        return discount;
                     },
                     name: "Discount1",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><span class="input-group-text">%</span></div>';
-                        } else {
-                            return Round2Decimal(data.discount2D)
-                        }
-                    },
-                    name: "Discount2",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3" /><span class="input-group-text">%</span></div>';
-                        } else {
-                            return Round2Decimal(data.discount3D)
-                        }
-                    },
-                    name: "Discount3",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount4D) + '" class="form-control form-control-sm discount4" /><span class="input-group-text">%</span></div>';
-                        } else {
-                            return Round2Decimal(data.discount4D)
-                        }
-                    },
-                    name: "Discount4",
-                    className: "form-cell text-end"
-                },
-                {
-                    data: function (data, type, dataToSet) {
-                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            return '<div class="input-group input-group-sm" style="width: 100%;"><input type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount5D) + '" class="form-control form-control-sm discount5" /><span class="input-group-text">%</span></div>';
-                        } else {
-                            return Round2Decimal(data.discount5D)
-                        }
-                    },
-                    name: "Discount5",
                     className: "form-cell text-end"
                 },
                 { data: "grossPrice", name: "GrossPrice", className: "form-cell text-end grossprice" },
@@ -1442,9 +1406,9 @@
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 2);
-                columnDTTotalDecimal(api, 13);
-                columnDTTotalInteger(api, 14);
-                columnDTTotalInteger(api, 15);
+                columnDTTotalDecimal(api, 9);
+                columnDTTotalInteger(api, 10);
+                columnDTTotalInteger(api, 11);
             }
         });
 
@@ -1452,9 +1416,9 @@
             //if (so_details.status.toLowerCase().includes("submitted")) {
             if (so_details.status.toLowerCase().includes("draft")) {
                 itemDT.column(0).visible(true); // remove button
-                itemDT.column(14).visible(false); // served quantity
-                itemDT.column(15).visible(false); // unserved quantity
-                itemDT.column(16).visible(false); // update served quantity button
+                itemDT.column(10).visible(false); // served quantity
+                itemDT.column(11).visible(false); // unserved quantity
+                itemDT.column(12).visible(false); // update served quantity button
             // } else if (so_details.status.toLowerCase().includes("approved")) {
             //     itemDT.column(0).visible(false);
             //     itemDT.column(11).visible(true);
@@ -1462,9 +1426,9 @@
             //     itemDT.column(13).visible(false);//true dati
             } else {
                 itemDT.column(0).visible(false);
-                itemDT.column(14).visible(true);//false dati
-                itemDT.column(15).visible(true);//false dati
-                itemDT.column(16).visible(false);
+                itemDT.column(10).visible(true);//false dati
+                itemDT.column(11).visible(true);//false dati
+                itemDT.column(12).visible(false);
             }
 
             hideLoader();

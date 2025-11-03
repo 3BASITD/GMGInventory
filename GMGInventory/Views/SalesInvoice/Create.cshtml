@@ -290,7 +290,8 @@
                         var firstItem = itemDT.row(0).data();
                     /*if (firstItem.sellingPriceType != rowdata.sellingPriceType || firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
                                 toastr.error("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
-                    }*/ if (firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
+                    }*/ 
+                        if (parseFloat(firstItem.discount1) != parseFloat(rowdata.discount1) || parseFloat(firstItem.discount2) != parseFloat(rowdata.discount2)) {
                             toastr.error("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
                         } else {
                             itemDT.row.add(rowdata).draw();

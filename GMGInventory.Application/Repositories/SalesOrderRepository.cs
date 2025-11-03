@@ -515,6 +515,9 @@ namespace GMGInventory.Application.Repositories
                                 {
                                     Discount1D = order.Discount1,
                                     Discount2D = order.Discount2,
+                                    Discount3D = order.Discount3 == null ? 0 : order.Discount3!.Value,
+                                    Discount4D = order.Discount4 == null ? 0 : order.Discount4!.Value,
+                                    Discount5D = order.Discount5 == null ? 0 : order.Discount5!.Value,
                                     CustomerBrandDiscountId = order.CustomerBrandDiscountId,
                                     Id = order.Id,
                                     InventoryCountD = inventory,
@@ -861,6 +864,9 @@ namespace GMGInventory.Application.Repositories
                 dbitem.LineNumber = di.LineNumber;
                 dbitem.Discount1 = di.Discount1;
                 dbitem.Discount2 = di.Discount2;
+                dbitem.Discount3 = di.Discount3;
+                dbitem.Discount4 = di.Discount4;
+                dbitem.Discount5 = di.Discount5;
                 dbitem.Quantity = di.Quantity;
                 dbitem.SellingPrice = di.UnitPrice;
                 dbitem.CustomerBrandDiscountId = di.CustomerBrandDiscountId;

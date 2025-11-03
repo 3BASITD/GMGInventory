@@ -505,6 +505,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
 
+        [Display(Name = "Old Code")]
+        public string OldCode { get; set; }
+
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 

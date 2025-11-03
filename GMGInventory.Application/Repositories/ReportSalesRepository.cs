@@ -1352,6 +1352,7 @@ namespace GMGInventory.Application.Repositories
                               Brand = soline.Item.Brand.Name,
                               CurrentD = packedQuantity - returnedQuantity,
                               ItemCode = soline.Item.Code,
+                              OldCode = soline.Item.OldCode + "",
                               ItemName = soline.Item.Name,
                               //PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
                               //PendingD = soline.Quantity - inventory > 0 ? soline.Quantity - inventory : 0,
@@ -1365,6 +1366,7 @@ namespace GMGInventory.Application.Repositories
                              {
                                  soal.Brand,
                                  soal.ItemCode,
+                                 soal.OldCode,
                                  soal.ItemName
                              } into i
                              let current = solineslist.Where(s => s.ItemCode == i.Key.ItemCode).Take(1).Max(s => s.ReplenishDateD)
@@ -1372,6 +1374,7 @@ namespace GMGInventory.Application.Repositories
                              {
                                  Brand = i.Key.Brand,
                                  ItemCode = i.Key.ItemCode,
+                                 OldCode = i.Key.OldCode,
                                  ItemName = i.Key.ItemName,
                                  ReplenishDateD = current,
                                  CurrentD = i.Sum(s => s.CurrentD),
@@ -1399,6 +1402,7 @@ namespace GMGInventory.Application.Repositories
                     s.Current,
                     s.CurrentD.ToString(),
                     s.ItemCode,
+                    s.OldCode,
                     s.ItemName,
                     s.Pending,
                     s.PendingD.ToString(),

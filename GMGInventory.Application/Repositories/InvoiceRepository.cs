@@ -717,7 +717,10 @@ namespace GMGInventory.Application.Repositories
 
                     //await AddInvoiceItems(invoice.Id, invoice.SalesOrderId, form);
                     var soitems = context.SalesOrderLineItems.Where(s => s.Id == invoice.SalesOrderId);
-                    var citems = context.InvoiceLineItems.Where(s => s.InvoiceId == invoice.Id);
+                    var citems = await context.InvoiceLineItems
+                                              .Where(s => s.InvoiceId == invoice.Id)
+                                              .ToListAsync();
+
                     // add item
                     // check items not in db
                     var items = citems.Select(s => s.ItemId);
@@ -741,7 +744,7 @@ namespace GMGInventory.Application.Repositories
                     foreach (var ei in existitems)
                     {
                         // update all available in db
-                        var dbitem = await citems.Where(s => s.ItemId == ei.Item).FirstAsync();
+                        var dbitem = citems.Where(s => s.ItemId == ei.Item).First();
                         dbitem.Quantity = ei.Quantity;
 
                         context.InvoiceLineItems.Update(dbitem);
@@ -750,9 +753,11 @@ namespace GMGInventory.Application.Repositories
                     // delete item
                     // get items not in form
                     var fitems = form.Items.Select(s => s.Item);
-                    var ritems = citems.Where(s => fitems.Contains(s.Id) == false);
+                    var ritems = citems.Where(s => fitems.Contains(s.ItemId) == false);
                     // remove unavailable items
                     context.InvoiceLineItems.RemoveRange(ritems);
+
+                    await context.SaveChangesAsync(currentUserId);
 
                     return new ResponseModel<int>
                     {

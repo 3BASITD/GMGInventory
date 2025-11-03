@@ -375,6 +375,10 @@ input[type="date"] {
     z-index: 99;
 }
 
+table tr td, table tr th {
+    vertical-align: middle !important;
+}
+
 table tr td > .input-group,
 table tr td > input {
     min-width: 100px;
@@ -386,6 +390,10 @@ table tr td > input {
     table tr td > input[type=radio] {
         min-width: 20px;
     }
+
+table tr td label {
+    font-weight: normal !important;
+}
 
 .form-check-input {
     position: static !important;
