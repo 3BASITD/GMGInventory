@@ -158,7 +158,7 @@
                             @Html.DisplayNameFor(model => model.PONumber)
                         </span>
                         <b class="d-block form-gayahin order-purchase-number">
-                            @(string.IsNullOrEmpty(Model.PONumber) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.PONumber)
+                            @(string.IsNullOrWhiteSpace(Model.PONumber) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.PONumber)
                         </b>
                     </p>
                     <p class="text-sm">
@@ -238,7 +238,7 @@
                             @Html.DisplayNameFor(model => model.CustomerAddress)
                         </span>
                         <b class="d-block form-gayahin order-customer-address">
-                            @(string.IsNullOrEmpty(Model.CustomerAddress) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.CustomerAddress)
+                            @(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.CustomerAddress)
                         </b>
                     </p>
                     <p class="text-sm">
@@ -274,40 +274,20 @@
                         </b>
                     </p>
                     <p class="text-sm">
-                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
-                        {
-                            <label for="order-remarks" class="form-label fw-normal mb-0 text-muted">
-                                @Html.DisplayNameFor(model => model.Remarks)
-                            </label>
-                            <input type="text" id="order-remarks" name="Remarks" class="form-control form-control-sm" value="@Model.Remarks" />
-                        }
-                        else
-                        {
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.Remarks)
-                            </span>
-                            <b class="d-block form-gayahin">
-                                @(string.IsNullOrEmpty(Model.Remarks.Trim()) ? "N/A" : Model.Remarks)
-                            </b>
-                        }
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Priority)
+                        </span>
+                        <b class="d-block form-gayahin order-customer-priority">
+                            @Model.Priority
+                        </b>
                     </p>
                     <p class="text-sm">
-                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
-                        {
-                            <label for="order-instruction" class="form-label fw-normal mb-0 text-muted">
-                                @Html.DisplayNameFor(model => model.SpecialInstruction)
-                            </label>
-                            <input type="text" id="order-instruction" name="Instruction" class="form-control form-control-sm" value="@Model.SpecialInstruction" />
-                        }
-                        else
-                        {
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.SpecialInstruction)
-                            </span>
-                            <b class="d-block form-gayahin">
-                                @(string.IsNullOrEmpty(Model.SpecialInstruction) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.SpecialInstruction)
-                            </b>
-                        }
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Branch)
+                        </span>
+                        <b class="d-block form-gayahin order-customer-branch">
+                            @(string.IsNullOrWhiteSpace(Model.Branch) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Branch)
+                        </b>
                     </p>
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
@@ -361,7 +341,7 @@
                                 @Html.DisplayNameFor(model => model.ServiceLevelAgreement)
                             </span>
                             <b class="d-block form-gayahin">
-                                @(string.IsNullOrEmpty(Model.ServiceLevelAgreement) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.ServiceLevelAgreement)
+                                @(string.IsNullOrWhiteSpace(Model.ServiceLevelAgreement) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.ServiceLevelAgreement)
                             </b>
                         }
                     </p>
@@ -532,6 +512,42 @@
                             </b>
                         </p>
                     }
+                    <p class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
+                        {
+                            <label for="order-remarks" class="form-label fw-normal mb-0 text-muted">
+                                @Html.DisplayNameFor(model => model.Remarks)
+                            </label>
+                            <input type="text" id="order-remarks" name="Remarks" class="form-control form-control-sm" value="@Model.Remarks" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.Remarks)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Remarks)
+                            </b>
+                        }
+                    </p>
+                    <p class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
+                        {
+                            <label for="order-instruction" class="form-label fw-normal mb-0 text-muted">
+                                @Html.DisplayNameFor(model => model.SpecialInstruction)
+                            </label>
+                            <input type="text" id="order-instruction" name="Instruction" class="form-control form-control-sm" value="@Model.SpecialInstruction" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.SpecialInstruction)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @(string.IsNullOrWhiteSpace(Model.SpecialInstruction) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.SpecialInstruction)
+                            </b>
+                        }
+                    </p>
                 </div>
             </div>
             <div class="row">

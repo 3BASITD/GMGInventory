@@ -379,7 +379,7 @@ namespace GMGInventory.Application.Repositories
                                   TIN = cust.TIN,
                                   VAT = cust.VAT,
                                   Branch = cust.Branch,
-                                  Priorities = cust.Priorities,
+                                  PriorityD = cust.Priority,
                                   Remarks = cust.Remarks,
                                   IsActive = cust.IsActive,
                                   CreatedBy = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
@@ -484,6 +484,7 @@ namespace GMGInventory.Application.Repositories
                                 TIN = customer.TIN,
                                 VAT = customer.VAT,
                                 Remarks = customer.Remarks,
+                                PriorityD = customer.Priority,
                                 IsActive = customer.IsActive,
                                 CreatedBy = userc.FirstName + " " + userc.LastName,
                                 DateCreatedD = customer.DateCreated,
@@ -508,7 +509,8 @@ namespace GMGInventory.Application.Repositories
                                     || x.Name.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.AgentName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.CreditLimit.ToString().Contains(form.SearchValue)
-                                    || x.OutstandingBalance.ToString().Contains(form.SearchValue));
+                                    || x.OutstandingBalance.ToString().Contains(form.SearchValue)
+                                    || x.Priority.ToString().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -524,6 +526,7 @@ namespace GMGInventory.Application.Repositories
                         case "AgentName": data = data.OrderBy(s => s.AgentName); break;
                         case "CreditLimit": data = data.OrderBy(s => s.CreditLimitD); break;
                         case "OutstandingBalance": data = data.OrderBy(s => s.OutstandingBalanceD); break;
+                        case "Priority": data = data.OrderBy(s => s.PriorityD); break;
                         default: break;
                     }
                 }
@@ -536,6 +539,7 @@ namespace GMGInventory.Application.Repositories
                         case "AgentName": data = data.OrderByDescending(s => s.AgentName); break;
                         case "CreditLimit": data = data.OrderByDescending(s => s.CreditLimitD); break;
                         case "OutstandingBalance": data = data.OrderByDescending(s => s.OutstandingBalanceD); break;
+                        case "Priority": data = data.OrderByDescending(s => s.PriorityD); break;
                         default: break;
                     }
                 }
@@ -632,7 +636,7 @@ namespace GMGInventory.Application.Repositories
             cust.TIN = custVM.TIN;
             cust.VAT = custVM.VAT;
             cust.Branch = custVM.Branch;
-            cust.Priorities = custVM.Priorities;
+            cust.Priority = custVM.PriorityD;
             //cust.Address = custVM.Address;
             //cust.ContactNumber = custVM.ContactNumber;
             //cust.ContactPerson = custVM.ContactPerson;
@@ -665,7 +669,7 @@ namespace GMGInventory.Application.Repositories
                 TIN = custVM.TIN,
                 VAT = custVM.VAT,
                 Branch = custVM.Branch,
-                Priorities = custVM.Priorities
+                Priority = custVM.PriorityD
                 //Address = custVM.Address,
                 //ContactNumber = custVM.ContactNumber,
                 //ContactPerson = custVM.ContactPerson,
@@ -714,7 +718,7 @@ namespace GMGInventory.Application.Repositories
                                  TIN = cust.TIN,
                                  VAT = cust.VAT,
                                  Branch = cust.Branch,
-                                 Priorities = cust.Priorities
+                                 PriorityD = cust.Priority
                                  //Address = cust.ShippingAddresses
                                  //              .Where(a => a.IsDefault == true)
                                  //              .Select(a => a.Address)

@@ -2,12 +2,10 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Security.Policy;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -158,6 +156,7 @@ namespace GMGInventory.Application.Repositories
                                  //      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
                                  //      + " " + invoice.SalesOrder.Agent.LastName,
                                  Agent = invoice.SalesOrder.Agent.Code,
+                                 Branch = invoice.SalesOrder.Customer.Branch,
                                  ControlNumber = invoice.ControlNumber,
                                  CustomerAddress = invoice.SalesOrder
                                                           .Customer
@@ -176,6 +175,7 @@ namespace GMGInventory.Application.Repositories
                                  PackNumber = invoice.PackId,
                                  PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? null : invoice.SalesOrder.Customer.CreditTerm.Name,
                                  PONumber = invoice.SalesOrder.PurchaseOrder,
+                                 PriorityD = invoice.SalesOrder.Customer.Priority,
                                  Remarks = invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
@@ -226,6 +226,7 @@ namespace GMGInventory.Application.Repositories
                                  PackNumber = invoice.PackId,
                                  PaymentTerms = invoice.SalesOrder.Customer.CreditTerm == null ? null : invoice.SalesOrder.Customer.CreditTerm.Name,
                                  PONumber = invoice.SalesOrder.PurchaseOrder,
+                                 PriorityD = invoice.SalesOrder.Customer.Priority,
                                  Remarks = invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
                                  Status = invoice.Status.Code,
@@ -271,6 +272,7 @@ namespace GMGInventory.Application.Repositories
                               PackNumber = pack.Id,
                               PaymentTerms = pack.SalesOrder.Customer.CreditTerm == null ? null : pack.SalesOrder.Customer.CreditTerm.Name,
                               PONumber = pack.SalesOrder.PurchaseOrder,
+                              PriorityD = pack.SalesOrder.Customer.Priority,
                               SONumber = pack.SalesOrder.SalesOrderNumber,
                               Status = pack.Status.Code,
                               TIN = pack.SalesOrder.Customer.TIN
@@ -299,6 +301,7 @@ namespace GMGInventory.Application.Repositories
                                InvoiceNumber = inv.InvoiceNumber,
                                InvoiceType = inv.InvoiceType.Code,
                                PackNumber = inv.PackId,
+                               PriorityD = inv.SalesOrder.Customer.Priority,
                                SONumber = inv.SalesOrder.SalesOrderNumber,
                                Status = inv.Status.Code,
                                TotalAmountD = (from invli in inv.InvoiceLineItems
@@ -328,60 +331,58 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.BIRInvoiceNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Customer.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Id.ToString().Contains(form.SearchValue)
-                                    || x.InvoiceDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.InvoiceNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.InvoiceType.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PackNumber.ToString().Contains(form.SearchValue)
-                                    || x.SONumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TotalAmountD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.BIRInvoiceNumber,
+                    s.Customer,
+                    s.Id + "",
+                    s.InvoiceDate,
+                    s.InvoiceNumber,
+                    s.InvoiceType,
+                    s.PackNumber + "",
+                    s.Priority,
+                    s.SONumber,
+                    s.Status,
+                    s.TotalAmount
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                var direction = form.SortColumnDirection.ToLower();
+                var sortExpr = $"{form.SortColumn} {direction}";
+                IOrderedQueryable<InvoiceVM> orderedData = null;
+
+                if (form.SortColumn.ToLower().Contains("date") || form.SortColumn == "Priority" || form.SortColumn == "TotalAmount")
                 {
-                    switch (form.SortColumn)
+                    orderedData = direction == "asc" ? form.SortColumn switch
                     {
-                        case "BIRInvoiceNumber": data = data.OrderBy(s => s.BIRInvoiceNumber); break;
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "Id": data = data.OrderBy(s => s.Id); break;
-                        case "InvoiceDate": data = data.OrderBy(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderBy(s => s.InvoiceNumber); break;
-                        case "InvoiceType": data = data.OrderBy(s => s.InvoiceType); break;
-                        case "PackNumber": data = data.OrderBy(s => s.PackNumber); break;
-                        case "SONumber": data = data.OrderBy(s => s.SONumber); break;
-                        case "Status": data = data.OrderBy(s => s.Status); break;
-                        case "TotalAmount": data = data.OrderBy(s => s.TotalAmountD); break;
-                        default: break;
+                        "InvoiceDate" => data.OrderBy(s => s.InvoiceDateD),
+                        "Priority" => data.OrderBy(s => s.PriorityD),
+                        "TotalAmount" => data.OrderBy(s => s.TotalAmountD),
+                        _ => data.OrderBy(sortExpr)
                     }
+                    : form.SortColumn switch
+                    {
+                        "InvoiceDate" => data.OrderByDescending(s => s.InvoiceDateD),
+                        "Priority" => data.OrderByDescending(s => s.PriorityD),
+                        "TotalAmount" => data.OrderByDescending(s => s.TotalAmountD),
+                        _ => data.OrderBy(sortExpr)
+                    };
+
+                    data = orderedData.ThenBy($"Priority {direction}")
+                                      .ThenBy($"InvoiceNumber {direction}");
                 }
-                else if (form.SortColumnDirection == "desc")
+                else
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "BIRInvoiceNumber": data = data.OrderByDescending(s => s.BIRInvoiceNumber); break;
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "Id": data = data.OrderByDescending(s => s.Id); break;
-                        case "InvoiceDate": data = data.OrderByDescending(s => s.InvoiceDateD); break;
-                        case "InvoiceNumber": data = data.OrderByDescending(s => s.InvoiceNumber); break;
-                        case "InvoiceType": data = data.OrderByDescending(s => s.InvoiceType); break;
-                        case "PackNumber": data = data.OrderByDescending(s => s.PackNumber); break;
-                        case "SONumber": data = data.OrderByDescending(s => s.SONumber); break;
-                        case "Status": data = data.OrderByDescending(s => s.Status); break;
-                        case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmountD); break;
-                        default: break;
-                    }
+                    data = data.OrderBy($"{sortExpr}, Priority {direction}, InvoiceNumber {direction}");
                 }
             }
             var totalInvoicedRecord = await context.Invoices
                                                    .Where(s => s.Status.Code.ToLower() == "invoiced"
-                                                            && filter.DateFrom <= s.InvoiceDate.Date 
+                                                            && filter.DateFrom <= s.InvoiceDate.Date
                                                             && s.InvoiceDate.Date <= filter.DateTo)
                                                    .CountAsync();
             var totalInvoicedNotMovedRecord = await context.Invoices
@@ -668,14 +669,16 @@ namespace GMGInventory.Application.Repositories
                     if (invoice.Status.Name.ToLower() != "invoice draft")
                     {
                         return new ResponseModel<int> { Status = "Error", Message = "Cannot delete " + invoice.Status.Name };
-                    } else
+                    }
+                    else
                     {
                         await DeleteInvoiceItems(form, true);
                         context.Invoices.Remove(invoice);
                         await context.SaveChangesAsync(currentUserId);
                         return new ResponseModel<int> { Status = "Success", Message = "Successfully delete invoice." };
                     }
-                } else if (form.SavingAs == "cancel")
+                }
+                else if (form.SavingAs == "cancel")
                 {
                     await DeleteInvoiceItems(form, false);
                     int statusId = await context.Statuses

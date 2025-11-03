@@ -29,6 +29,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Address")]
         public string CustomerAddress { get; set; }
 
+        [Display(Name = "Customer Priority")]
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
+        public int PriorityD { get; set; }
+
         [Display(Name = "Region")]
         public string Region { get; set; }
 
@@ -127,6 +131,13 @@ namespace GMGInventory.Common.Models
         public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
         public string RequiredDeliveryDate3 => RequiredDeliveryDateD.ToString(SystemFormat.StringDate3);
         public DateTime RequiredDeliveryDateD { get; set; }
+
+        [Display(Name = "Customer's Priority")]
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
+        public int PriorityD { get; set; }
+
+        [Display(Name = "Customer's Branch")]
+        public string? Branch { get; set; }
 
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }

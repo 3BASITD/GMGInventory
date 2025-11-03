@@ -2,11 +2,10 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
-using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -73,6 +72,7 @@ namespace GMGInventory.Application.Repositories
                         select new PackDetailsVM
                         {
                             Agent = pack.SalesOrder.Agent.FirstName + " " + pack.SalesOrder.Agent.LastName,
+                            Branch = pack.SalesOrder.Customer.Branch,
                             CustomerCode = pack.SalesOrder.Customer.Code,
                             CustomerName = pack.SalesOrder.Customer.Name,
                             Forwarder = pack.SalesOrder
@@ -82,6 +82,7 @@ namespace GMGInventory.Application.Repositories
                             Id = pack.Id,
                             PackBy = user.FirstName + " " + user.LastName,
                             PackDateD = pack.DateCreated,
+                            PriorityD = pack.SalesOrder.Customer.Priority,
                             SalesOrderDateD = pack.SalesOrder.DateCreated,
                             SalesOrderId = pack.SalesOrder.Id,
                             SONumber = pack.SalesOrder.SalesOrderNumber,
@@ -135,6 +136,7 @@ namespace GMGInventory.Application.Repositories
                             PackedBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                             PackedDateD = pck.DateCreated,
                             PackNumber = pck.Id.ToString(),
+                            PriorityD = pck.SalesOrder.Customer.Priority,
                             SONumber = pck.SalesOrder.SalesOrderNumber,
                             Status = pck.Status.Code
                         };
@@ -152,46 +154,48 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Id.ToString().Contains(form.SearchValue)
-                                    || x.PackedBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PackedDateD.ToString().Contains(form.SearchValue)
-                                    || x.PackNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.SONumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Customer,
+                    s.Id.ToString(),
+                    s.PackedBy,
+                    s.PackedDate,
+                    s.PackNumber,
+                    s.Priority,
+                    s.SONumber,
+                    s.Status
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                var direction = form.SortColumnDirection.ToLower();
+                var sortExpr = $"{form.SortColumn} {direction}";
+                IOrderedQueryable<PackVM> orderedData = null;
+
+                if (form.SortColumn.ToLower().Contains("date") || form.SortColumn == "Priority")
                 {
-                    switch (form.SortColumn)
+                    orderedData = direction == "asc" ? form.SortColumn switch
                     {
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "Id": data = data.OrderBy(s => s.Id); break;
-                        case "PackedBy": data = data.OrderBy(s => s.PackedBy); break;
-                        case "PackedDate": data = data.OrderBy(s => s.PackedDateD); break;
-                        case "PackNumber": data = data.OrderBy(s => s.PackNumber); break;
-                        case "SONumber": data = data.OrderBy(s => s.SONumber); break;
-                        case "Status": data = data.OrderBy(s => s.Status); break;
-                        default: break;
+                        "PackedDate" => data.OrderBy(s => s.PackedDateD),
+                        "Priority" => data.OrderBy(s => s.PriorityD),
+                        _ => data.OrderBy(sortExpr)
                     }
+                    : form.SortColumn switch
+                    {
+                        "PackedDate" => data.OrderByDescending(s => s.PackedDateD),
+                        "Priority" => data.OrderByDescending(s => s.PriorityD),
+                        _ => data.OrderBy(sortExpr)
+                    };
+
+                    data = orderedData.ThenBy($"Priority {direction}")
+                                      .ThenBy($"Id {direction}");
                 }
-                else if (form.SortColumnDirection == "desc")
+                else
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "Id": data = data.OrderByDescending(s => s.Id); break;
-                        case "PackedBy": data = data.OrderByDescending(s => s.PackedBy); break;
-                        case "PackedDate": data = data.OrderByDescending(s => s.PackedDateD); break;
-                        case "PackNumber": data = data.OrderByDescending(s => s.PackNumber); break;
-                        case "SONumber": data = data.OrderByDescending(s => s.SONumber); break;
-                        case "Status": data = data.OrderByDescending(s => s.Status); break;
-                        default: break;
-                    }
+                    data = data.OrderBy($"{sortExpr}, Priority {direction}, Id {direction}");
                 }
             }
             //pagination

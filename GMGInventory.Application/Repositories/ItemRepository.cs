@@ -1189,7 +1189,10 @@ namespace GMGInventory.Application.Repositories
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
                               //UnservedQuantityD = sitem.Quantity - inventory > 0 ? sitem.Quantity - inventory : 0
-                              UnservedQuantityD = Math.Max(0, sitem.Quantity - inventory)
+                              //UnservedQuantityD = Math.Max(0, sitem.Quantity - inventory)
+                              UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned) > 0
+                                                   ? sitem.Quantity - (quantityPacked - quantityReturned)
+                                                   : 0
                           };
             return await salesVM.ToListAsync();
         }

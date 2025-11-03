@@ -2,11 +2,10 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Policy;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -266,6 +265,7 @@ namespace GMGInventory.Application.Repositories
                                AgentName = order.Agent.FirstName + " " + order.Agent.LastName,
                                ApprovedBy = approve.FirstName + " " + approve.LastName,
                                ApprovedDateD = order.ApprovedDate,
+                               Branch = order.Customer.Branch,
                                CreditTerms = order.Customer.CreditTerm.Name,
                                CustomerAddress = order.Customer
                                                       .ShippingAddresses
@@ -300,6 +300,7 @@ namespace GMGInventory.Application.Repositories
                                                    + freightAmount,
                                OverallDiscountD = order.OverallDiscount,
                                PONumber = order.PurchaseOrder,
+                               PriorityD = order.Customer.Priority,
                                Region = order.Customer.Area.Region.Name,
                                Remarks = order.Remarks + "",
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
@@ -384,6 +385,7 @@ namespace GMGInventory.Application.Repositories
                                                       .Where(s => s.IsDefault == true)
                                                       .Select(s => s.Address)
                                                       .FirstOrDefault() ?? "N/A",
+                               PriorityD = order.Customer.Priority,
                                Region = order.Customer.Area.Region.Name,
                                Area = order.Customer.Area.Name,
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
@@ -419,58 +421,56 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.OrderDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.SONumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TotalAmount.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.CustomerAddress.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Region.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Area.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.RequiredDeliveryDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PurchaseRequestDetail.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Forwarder.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Customer,
+                    s.OrderDate,
+                    s.SONumber,
+                    s.Status,
+                    s.TotalAmount,
+                    s.CustomerAddress,
+                    s.Priority,
+                    s.Region,
+                    s.Area,
+                    s.RequiredDeliveryDate,
+                    s.PurchaseRequestDetail,
+                    s.Forwarder
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                var direction = form.SortColumnDirection.ToLower();
+                var sortExpr = $"{form.SortColumn} {direction}";
+                IOrderedQueryable<SalesOrderVM> orderedData = null;
+
+                if (form.SortColumn.ToLower().Contains("date") || form.SortColumn == "Priority" || form.SortColumn == "TotalAmount")
                 {
-                    switch (form.SortColumn)
+                    orderedData = direction == "asc" ? form.SortColumn switch
                     {
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
-                        case "SONumber": data = data.OrderBy(s => s.SONumber); break;
-                        case "Status": data = data.OrderBy(s => s.Status); break;
-                        case "TotalAmount": data = data.OrderBy(s => s.TotalAmountD); break;
-                        case "CustomerAddress": data = data.OrderBy(s => s.CustomerAddress); break;
-                        case "Region": data = data.OrderBy(s => s.Region); break;
-                        case "Area": data = data.OrderBy(s => s.Area); break;
-                        case "RequiredDeliveryDate": data = data.OrderBy(s => s.RequiredDeliveryDateD); break;
-                        case "Forwarder": data = data.OrderBy(s => s.Forwarder); break;
-                        case "PurchaseRequestDetail": data = data.OrderBy(s => s.Forwarder); break;
-                        default: break;
+                        "OrderDate" => data.OrderBy(s => s.OrderDateD),
+                        "TotalAmount" => data.OrderBy(s => s.TotalAmountD),
+                        "Priority" => data.OrderBy(s => s.PriorityD),
+                        "RequiredDeliveryDate" => data.OrderBy(s => s.RequiredDeliveryDateD),
+                        _ => data.OrderBy(sortExpr)
                     }
+                    : form.SortColumn switch
+                    {
+                        "OrderDate" => data.OrderByDescending(s => s.OrderDateD),
+                        "TotalAmount" => data.OrderByDescending(s => s.TotalAmountD),
+                        "Priority" => data.OrderByDescending(s => s.PriorityD),
+                        "RequiredDeliveryDate" => data.OrderByDescending(s => s.RequiredDeliveryDateD),
+                        _ => data.OrderBy(sortExpr)
+                    };
+
+                    data = orderedData.ThenBy($"Priority {direction}")
+                                      .ThenBy($"SONumber {direction}");
                 }
-                else if (form.SortColumnDirection == "desc")
+                else
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
-                        case "SONumber": data = data.OrderByDescending(s => s.SONumber); break;
-                        case "Status": data = data.OrderByDescending(s => s.Status); break;
-                        case "TotalAmount": data = data.OrderByDescending(s => s.TotalAmountD); break;
-                        case "CustomerAddress": data = data.OrderByDescending(s => s.CustomerAddress); break;
-                        case "Region": data = data.OrderByDescending(s => s.Region); break;
-                        case "Area": data = data.OrderByDescending(s => s.Area); break;
-                        case "RequiredDeliveryDate": data = data.OrderByDescending(s => s.RequiredDeliveryDateD); break;
-                        case "Forwarder": data = data.OrderByDescending(s => s.Forwarder); break;
-                        case "PurchaseRequestDetail": data = data.OrderByDescending(s => s.Forwarder); break;
-                        default: break;
-                    }
+                    data = data.OrderBy($"{sortExpr}, Priority {direction}, SONumber {direction}");
                 }
             }
             //pagination

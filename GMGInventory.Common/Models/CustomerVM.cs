@@ -185,9 +185,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Branch")]
         public string? Branch { get; set; }
 
-        [MaxLength(250)]
-        [Display(Name = "Priorities")]
-        public string? Priorities { get; set; }
+        [Display(Name = "Priority")]
+        public int PriorityD { get; set; }
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
 
         [Display(Name = "Date Created")]
         public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDate);
@@ -242,7 +242,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Discount")]
         public string DiscountRate => string.Format(SystemFormat.StringDecimalComma, Discount) + "%";
-        
+
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Discount { get; set; }
 

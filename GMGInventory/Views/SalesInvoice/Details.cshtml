@@ -198,7 +198,7 @@
                                 @Html.DisplayNameFor(model => model.InvoiceDueDate1)
                             </span>
                             <b class="d-block form-gayahin">
-                                @(string.IsNullOrWhiteSpace(Model.InvoiceDueDate1) ? "N/A" : Model.InvoiceDueDate1)
+                                @(string.IsNullOrWhiteSpace(Model.InvoiceDueDate1) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.InvoiceDueDate1)
                             </b>
                         }
                     </p>
@@ -258,7 +258,7 @@
                                 @Html.DisplayNameFor(model => model.Remarks)
                             </span>
                             <b class="d-block form-gayahin">
-                                @(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)
+                                @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Remarks)
                             </b>
                         }
                     </p>
@@ -289,7 +289,27 @@
                             @Html.DisplayNameFor(model => model.CustomerAddress)
                         </span>
                         <b class="d-block form-gayahin">
-                            @(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)
+                            @(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.CustomerAddress)
+                        </b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Priority)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model.Priority
+                        </b>
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Branch)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @(string.IsNullOrWhiteSpace(Model.Branch) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Branch)
                         </b>
                     </p>
                 </div>
@@ -309,7 +329,7 @@
                             @Html.DisplayNameFor(model => model.PONumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)
+                            @(string.IsNullOrWhiteSpace(Model.PONumber) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.PONumber)
                         </b>
                     </p>
                 </div>
@@ -319,7 +339,7 @@
                             @Html.DisplayNameFor(model => model.PaymentTerms)
                         </span>
                         <b class="d-block form-gayahin">
-                            @(string.IsNullOrWhiteSpace(Model.PaymentTerms) ? "N/A" : Model.PaymentTerms)
+                            @(string.IsNullOrWhiteSpace(Model.PaymentTerms) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.PaymentTerms)
                         </b>
                     </p>
                 </div>

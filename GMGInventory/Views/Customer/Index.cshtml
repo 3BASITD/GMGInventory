@@ -46,6 +46,9 @@
                         @Html.DisplayNameFor(model => model.OutstandingBalance)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.Priority)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.IsActive)
                     </th>
 
@@ -219,8 +222,14 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="create-priorities" class="control-label mb-0 d-block">Priorities</label>
-                                    <input type="text" name="Priorities" id="create-priorities" class="form-control form-control-sm" />
+                                    <label for="create-priority" class="control-label mb-0 d-block">Priority</label>
+                                    <select name="Priority" id="create-priority" class="form-control form-control-sm">
+                                        <option value="5">Urgent</option>
+                                        <option value="4">High</option>
+                                        <option value="3">Normal</option>
+                                        <option value="2">Low</option>
+                                        <option value="1">Deferred</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-8">
@@ -585,6 +594,7 @@
                 { data: "agentName", name: "AgentName" },
                 { data: "creditLimit", name: "CreditLimit" },
                 { data: "outstandingBalance", name: "OutstandingBalance" },
+                { data: "priority", name: "Priority" },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.isActive) {
@@ -655,7 +665,7 @@
                 $("#create-credit-limit").val("");
                 $("#create-account-status").prop("selectedIndex", 0).trigger("change");
                 $("#create-branch").val("");
-                $("#create-priorities").val("");
+                $("#create-priority").val("3");
                 $("#create-remarks").val("");
             });
         }
@@ -671,7 +681,7 @@
                 Address: { required: true },
                 CreditLimit: { required: true, range: [0, 1999999.99] },
                 Branch: { maxlength: 250 },
-                Priorities: { maxlength: 250 },
+                //Priorities: { maxlength: 250 },
                 Remarks: { maxlength: 500 }
             },
             messages: {
@@ -684,7 +694,7 @@
                 Address: { required: "Please enter address." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-1999999.99." },
                 Branch: { maxlength: "Branch must not exceed 250 characters." },
-                Priorities: { maxlength: "Priorities must not exceed 250 characters." },
+                //Priorities: { maxlength: "Priorities must not exceed 250 characters." },
                 Remarks: { maxlength: "Remarks must not exceed 500 characters." }
 
             },
@@ -718,7 +728,7 @@
                     CreditLimitD: $("#create-credit-limit").val(),
                     CustomerAccountStatusId: $("#create-account-status").val(),
                     Branch: $("#create-branch").val(),
-                    Priorities: $("#create-priorities").val(),
+                    PriorityD: $("#create-priority").val(),
                     Remarks: $("#create-remarks").val()
                 },
                 success: function (data, status, xhr) {

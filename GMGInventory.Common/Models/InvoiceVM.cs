@@ -31,6 +31,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer")]
         public string Customer { get; set; }
 
+        [Display(Name = "Customer Priority")]
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
+        public int PriorityD { get; set; }
+
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
 
@@ -108,6 +112,13 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Pack Number")]
         public int PackNumber { get; set; }
+
+        [Display(Name = "Customer Priority")]
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
+        public int PriorityD { get; set; }
+
+        [Display(Name = "Customer Branch")]
+        public string? Branch { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }

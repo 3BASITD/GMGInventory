@@ -23,6 +23,10 @@ namespace GMGInventory.Common.Models
         public string PackedDate => PackedDateD.ToString(SystemFormat.StringDate);
         public DateTime PackedDateD { get; set; }
 
+        [Display(Name = "Customer Priority")]
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
+        public int PriorityD { get; set; }
+
         [Display(Name = "Status")]
         public string Status { get; set; }
     }
@@ -41,6 +45,13 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
+
+        [Display(Name = "Customer Priority")]
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
+        public int PriorityD { get; set; }
+
+        [Display(Name = "Branch")]
+        public string? Branch { get; set; }
 
         [Display(Name = "Forwarder")]
         public string? Forwarder { get; set; }

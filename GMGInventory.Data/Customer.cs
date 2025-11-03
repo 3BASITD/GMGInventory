@@ -69,9 +69,7 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(250)")]
         public string? Branch { get; set; }
-
-        [Column(TypeName = "nvarchar(250)")]
-        public string? Priorities { get; set; }
+        public int Priority { get; set; }
 
         //[Column(TypeName = "nvarchar(MAX)")]
         //public string Address { get; set; }

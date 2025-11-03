@@ -37,5 +37,17 @@
 
             return string.IsNullOrEmpty(cleaned) ? "untitled" : cleaned;
         }
+
+        public static string CustomerPriority(int prio)
+        {
+            return prio switch
+            {
+                5 => "Urgent",
+                4 => "High",
+                3 => "Normal",
+                2 => "Low",
+                _ => "Deferred"
+            };
+        }
     }
 }

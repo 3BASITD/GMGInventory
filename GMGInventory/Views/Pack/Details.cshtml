@@ -59,7 +59,7 @@
                 }
             } else if (Model.Status.ToLower() == "posted")
             {
-                <a href="@Url.Action("Create", "SalesInvoice")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
+                <a href="@Url.Action("Create", "SalesInvoice")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
                     <span class="fas fa-file-invoice"></span> Start Invoice
                 </a>
             }
@@ -76,7 +76,7 @@
                         @Html.DisplayNameFor(model => model.Id)
                     </span>
                     <b class="d-block">
-                        @Model?.Id
+                        @Model.Id
                     </b>
                 </p>
                 <p class="text-sm">
@@ -84,7 +84,7 @@
                         @Html.DisplayNameFor(model => model.CustomerCode)
                     </span>
                     <b class="d-block">
-                        @Model?.CustomerCode
+                        @Model.CustomerCode
                     </b>
                 </p>
                 <p class="text-sm">
@@ -92,15 +92,23 @@
                         @Html.DisplayNameFor(model => model.CustomerName)
                     </span>
                     <b class="d-block">
-                        @Model?.CustomerName
+                        @Model.CustomerName
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Forwarder)
+                        @Html.DisplayNameFor(model => model.Priority)
                     </span>
                     <b class="d-block">
-                        @Model?.Forwarder
+                        @Model.Priority
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Branch)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model.Branch) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Branch)
                     </b>
                 </p>
             </div>
@@ -110,7 +118,7 @@
                         @Html.DisplayNameFor(model => model.SONumber)
                     </span>
                     <b class="d-block">
-                        @Model?.SONumber
+                        @Model.SONumber
                     </b>
                 </p>
                 <p class="text-sm">
@@ -118,7 +126,15 @@
                         @Html.DisplayNameFor(model => model.SalesOrderDate)
                     </span>
                     <b class="d-block">
-                        @Model?.SalesOrderDate
+                        @Model.SalesOrderDate
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Forwarder)
+                    </span>
+                    <b class="d-block">
+                        @Model.Forwarder
                     </b>
                 </p>
                 <p class="text-sm">
@@ -126,7 +142,7 @@
                         @Html.DisplayNameFor(model => model.PackDate)
                     </span>
                     <b class="d-block">
-                        @Model?.PackDate
+                        @Model.PackDate
                     </b>
                 </p>
                 <p class="text-sm">
@@ -134,7 +150,7 @@
                         @Html.DisplayNameFor(model => model.PackBy)
                     </span>
                     <b class="d-block">
-                        @Model?.PackBy
+                        @Model.PackBy
                     </b>
                 </p>
             </div>
@@ -144,9 +160,9 @@
                         @Html.DisplayNameFor(model => model.Status)
                     </span>
                     <b class="d-block">
-                        @Model?.Status
+                        @Model.Status
                     </b>
-                    <input type="hidden" id="pack-status" value="@Model?.Status" />
+                    <input type="hidden" id="pack-status" value="@Model.Status" />
                 </p>
             </div>
         </div>
@@ -155,7 +171,7 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Pack Item(s)</span>
-                        @if (Model?.Status.ToLower() == "draft")
+                        @if (Model.Status.ToLower() == "draft")
                         {
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">

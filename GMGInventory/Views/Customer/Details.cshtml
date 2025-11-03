@@ -228,10 +228,10 @@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Priorities)
+                        @Html.DisplayNameFor(model => model.Priority)
                     </span>
-                    <b class="d-block details-priorities">
-                        @(string.IsNullOrWhiteSpace(Model?.Priorities) ? "N/A" : Model?.Priorities)
+                    <b class="d-block details-priority">
+                        @(string.IsNullOrWhiteSpace(Model?.Priority) ? "N/A" : Model?.Priority)
                     </b>
                 </p>
             </div>
@@ -686,8 +686,14 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="edit-priorities" class="control-label mb-0 d-block">Priorities</label>
-                                <input name="Priorities" id="edit-priorities" class="form-control form-control-sm" />
+                                <label for="edit-priority" class="control-label mb-0 d-block">Priority</label>
+                                <select name="Priority" id="edit-priority" class="form-control form-control-sm">
+                                    <option value="5">Urgent</option>
+                                    <option value="4">High</option>
+                                    <option value="3">Normal</option>
+                                    <option value="2">Low</option>
+                                    <option value="1">Deferred</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -1028,7 +1034,6 @@
                 });
             }
         });
-
 
         // Load Select2 Customer Account Status
         $.ajax({
@@ -1520,7 +1525,7 @@
                     $("#edit-credit-limit").val(data.creditLimit);
                     $("#edit-remarks").val(data.remarks);
                     $("#edit-branch").val(data.branch);
-                    $("#edit-priorities").val(data.priorities);
+                    $("#edit-priority").val(data.priorityD);
                     $("#edit-isactive").val(data.isActive);
                     $("#edit-account-status").val(data.customerAccountStatusId).trigger("change");
                     // $("#edit-address").val(data.address);
@@ -1541,7 +1546,7 @@
                 Email: { maxlength: 50 },
                 CreditLimit: { required: true, range: [0, 9999999999.99] },
                 Branch: { maxlength: 250},
-                Priorities: { maxlength: 250},
+                Priority: { maxlength: 250},
                 // Address: { required: true },
                 // ContactPerson: { maxlength: 150 },
                 // ContactNumber: { maxlength: 100 },
@@ -1554,7 +1559,7 @@
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-9999999999.99." },
                 Branch: { maxlength: "Branch must not exceed 250 characters." },
-                Priorities: { maxlength: "Priorities must not exceed 250 characters." },
+                //Priorities: { maxlength: "Priority must not exceed 250 characters." },
                 // Address: { required: "Please enter address." },
                 // ContactPerson: { maxlength: "Contact Person must not exceed 150 characters." },
                 // ContactNumber: { maxlength: "Contact Number number must not exceed 100 characters." },
@@ -1586,12 +1591,12 @@
                     TIN: $("#edit-tin").val(),
                     VAT: $("#edit-vat").val(),
                     CreditTermId: $("#edit-credit-term").val(),
-                    CreditLimit: $("#edit-credit-limit").val(),
+                    CreditLimitD: $("#edit-credit-limit").val(),
                     CustomerAccountStatusId: $("#edit-account-status").val(),
                     Remarks: $("#edit-remarks").val(),
                     IsActive: $("#edit-isactive").val(),
                     Branch: $("#edit-branch").val(),
-                    Priorities: $("#edit-priorities").val()
+                    PriorityD: $("#edit-priority").val()
                     // Address: $("#edit-address").val(),
                     // ContactPerson: $("#edit-contact-person").val(),
                     // ContactNumber: $("#edit-contact-number").val(),
@@ -1621,7 +1626,7 @@
                         $(".details-commission-rate").text($("#edit-usearearate").prop("checked") ? "N/A" : FormatStringDecimal($("#edit-commission").val()));
                         $(".details-account-status").text($("#edit-account-status").select2("data")[0].text);
                         $(".details-branch").text($("#edit-branch").val());
-                        $(".details-priorities").text($("#edit-priorities").val());
+                        $(".details-priority").text($("#edit-priority option:selected").text());
                         // $(".details-address").text($("#edit-address").val() || "N/A");
                         // $(".details-contact-person").text($("#edit-contact-person").val() || "N/A");
                         // $(".details-contact-number").text($("#edit-contact-number").val() || "N/A");
