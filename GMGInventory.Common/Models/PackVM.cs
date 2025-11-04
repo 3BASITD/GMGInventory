@@ -133,21 +133,25 @@ namespace GMGInventory.Common.Models
 
     public class PackFormAPIVM
     {
-        public int SalesOrderId { get; set; }
+        public int? SalesOrderId { get; set; }
+        public string? SalesOrderNumber { get; set; }
         public IList<PackFormItemVM> Items { get; set; }
     }
 
     public class PackFormItemVM
     {
-        public int Item { get; set; }
+        public int? ItemId { get; set; }
+        public string? ItemCode { get; set; }
+        public string? ItemName { get; set; }
         public int Quantity { get; set; }
         public int BoxNumber { get; set; }
-        public int PackType { get; set; }
+        public int? PackTypeId { get; set; }
+        public string? PackTypeName { get; set; }
     }
 
     public class PackDetailsPVM
     {
-            public IList<PackItemVM> Contents { get; set; }
+        public IList<PackItemVM> Contents { get; set; }
         public PackDetailsVM Details { get; set; }
     }
 }

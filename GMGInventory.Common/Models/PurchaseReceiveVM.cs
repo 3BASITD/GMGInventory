@@ -183,7 +183,8 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseReceiveFormAPIVM
     {
-        public int PurchaseOrderId { get; set; }
+        public int? PurchaseOrderId { get; set; }
+        public string? PurchaseOrderNumber { get; set; } 
         public string DeliveryReceiptNumber { get; set; }
         public string SalesInvoiceNumber { get; set; }
         public DateTime DateReceived { get; set; }
@@ -193,7 +194,9 @@ namespace GMGInventory.Common.Models
 
     public class PurchaseReceiveFormItemAPIVM
     {
-        public int OrderItemId { get; set; }
+        public int? ItemId { get; set; }
+        public string? ItemCode { get; set; }
+        public string? ItemName { get; set; }
         public int Quantity { get; set; }
     }
 }

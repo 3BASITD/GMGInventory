@@ -25,7 +25,7 @@ namespace GMGInventory.API.Controllers
 
         [Authorize]
         [HttpPost("Add")]
-        public async Task<ResponseModelData<int>> AddPack([FromBody] PackFormVM form)
+        public async Task<ResponseModelData<int>> AddPack([FromBody] PackFormAPIVM form)
         {
             return await packRepository.AddAPI(form);
         }

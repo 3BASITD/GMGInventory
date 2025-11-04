@@ -328,14 +328,65 @@ namespace GMGInventory.Application.Repositories
 
         public string? CheckItem(PackFormVM form)
         {
-            var invalids = from ite in form.Items
-                           join itm in context.Items on ite.Item equals itm.Id
-                           let ii = (from inv in context.ItemInventories
-                                     where inv.Warehouse.IsMain == true
-                                     && inv.ItemId == ite.Item
-                                     select inv.Quantity).FirstOrDefault()
-                           where ii < ite.Quantity
-                           select itm.Name + ": Ordered " + ite.Quantity + ", Available " + ii + " (Short by " + (ite.Quantity - ii) + ")<br />";
+
+            var invalids = new List<string>();
+
+            foreach (var item in form.Items)
+            {
+                if (item.Quantity == 0)
+                {
+                    var tempId = item.ItemId?.ToString();
+                    invalids.Add($"Nothing to pack: {(tempId ?? item.ItemCode ?? item.ItemName)}");
+                    continue;
+                }
+                var sitem = context.Items.Where(s => s.Id == item.ItemId || s.Code == item.ItemCode || s.Name == item.ItemName).FirstOrDefault();
+                if (sitem == null)
+                {
+                    var tempId = item.ItemId?.ToString();
+                    invalids.Add($"Invalid Item. Record cannot be found: {(tempId ?? item.ItemCode ?? item.ItemName)}");
+                    continue;
+                }
+
+                var stype = context.PackTypes.Where(s => s.Id == item.PackTypeId || s.Name == item.PackTypeName).FirstOrDefault();
+                if (stype == null)
+                {
+                    var tempId = item.PackTypeId?.ToString();
+                    invalids.Add($"Invalid Pack Type. Record cannot be found: {(tempId ?? item.PackTypeName)}");
+                    continue;
+                }
+                var sorder = context.SalesOrders.Where(s => s.Id == form.SalesOrderId || s.SalesOrderNumber == form.SalesOrderNumber).FirstOrDefault();
+                if (sorder == null)
+                {
+                    var tempId = form.SalesOrderId?.ToString();
+                    invalids.Add($"Invalid Sales Order. Record cannot be found: {(tempId ?? form.SalesOrderNumber)}");
+                    continue;
+                }
+                var soli = context.SalesOrderLineItems.Where(s => s.SalesOrderId == sorder.Id && s.ItemId == sitem.Id).FirstOrDefault();
+                if (soli == null)
+                {
+                    invalids.Add($"Invalid Item. Record cannot be found: {sitem.Code} for {sorder.SalesOrderNumber}");
+                    continue;
+                }
+
+                var sinv = context.ItemInventories.Where(s => s.Warehouse.IsMain == true && s.ItemId == sitem.Id).FirstOrDefault();
+                if (sinv == null || sinv.Quantity < item.Quantity)
+                {
+                    var tempId = item.ItemId?.ToString();
+                    invalids.Add($"Insufficient Quantity on Stock: {item.Quantity} of {(tempId ?? item.ItemCode ?? item.ItemName)}");
+                    continue;
+                }
+
+                var pquantity = context.PackLineItems
+                                       .Where(s => s.Pack.SalesOrderId == sorder.Id && s.ItemId == sitem.Id)
+                                       .Select(s => (int?)s.Quantity)
+                                       .Sum() ?? 0;
+                if (item.Quantity > soli.Quantity - pquantity)
+                {
+                    invalids.Add($"Invalid Item Quantity: {(soli.Quantity - pquantity)} remaining for {sitem.Code}");
+                    continue;
+                }
+            }
+
             return invalids.Any() ? string.Join(", ", invalids) : null;
         }
 
@@ -365,9 +416,9 @@ namespace GMGInventory.Application.Repositories
                 PackLineItem packItem = new()
                 {
                     BoxNumber = item.BoxNumber,
-                    ItemId = item.Item,
+                    ItemId = item.ItemId!.Value,
                     PackId = pack.Id,
-                    PackTypeId = item.PackType,
+                    PackTypeId = item.PackTypeId!.Value,
                     Quantity = item.Quantity
                 };
                 await context.PackLineItems.AddAsync(packItem);
@@ -380,7 +431,7 @@ namespace GMGInventory.Application.Repositories
                                                    .Select(s => s.Id)
                                                    .FirstAsync();
                     var itemInventory = await context.ItemInventories
-                                                     .Where(s => s.ItemId == item.Item && s.WarehouseId == warehouseId)
+                                                     .Where(s => s.ItemId == item.ItemId && s.WarehouseId == warehouseId)
                                                      .FirstOrDefaultAsync();
 
                     if (itemInventory != null)
@@ -403,7 +454,7 @@ namespace GMGInventory.Application.Repositories
 
                         var countHistory = new PhysicalCountHistory
                         {
-                            ItemId = item.Item,
+                            ItemId = item.ItemId.Value,
                             QuantityFrom = oldInventoryQuantity,
                             QuantityTo = itemInventory.Quantity,
                             Remarks = "Pack Posted",
@@ -416,7 +467,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         itemInventory = new ItemInventory
                         {
-                            ItemId = item.Item,
+                            ItemId = item.ItemId.Value,
                             Quantity = item.Quantity,
                             WarehouseId = warehouseId
                         };
@@ -425,7 +476,7 @@ namespace GMGInventory.Application.Repositories
 
                         var countHistory = new PhysicalCountHistory
                         {
-                            ItemId = item.Item,
+                            ItemId = item.ItemId.Value,
                             QuantityFrom = 0,
                             QuantityTo = item.Quantity,
                             Remarks = "Pack Posted",
@@ -498,9 +549,9 @@ namespace GMGInventory.Application.Repositories
                     PackLineItem packItem = new()
                     {
                         BoxNumber = item.BoxNumber,
-                        ItemId = item.Item,
+                        ItemId = item.ItemId!.Value,
                         PackId = packVM.Id,
-                        PackTypeId = item.PackType,
+                        PackTypeId = item.PackTypeId!.Value,
                         Quantity = item.Quantity
                     };
                     await context.PackLineItems.AddAsync(packItem);
@@ -513,7 +564,7 @@ namespace GMGInventory.Application.Repositories
                                                        .Select(s => s.Id)
                                                        .FirstAsync();
                         var itemInventory = await context.ItemInventories
-                                                         .Where(s => s.ItemId == item.Item && s.WarehouseId == warehouseId)
+                                                         .Where(s => s.ItemId == item.ItemId && s.WarehouseId == warehouseId)
                                                          .FirstOrDefaultAsync();
 
                         if (itemInventory != null)
@@ -536,7 +587,7 @@ namespace GMGInventory.Application.Repositories
 
                             var countHistory = new PhysicalCountHistory
                             {
-                                ItemId = item.Item,
+                                ItemId = item.ItemId.Value,
                                 QuantityFrom = oldInventoryQuantity,
                                 QuantityTo = itemInventory.Quantity,
                                 Remarks = "Pack Posted",
@@ -550,7 +601,7 @@ namespace GMGInventory.Application.Repositories
 
                             var countHistory = new PhysicalCountHistory
                             {
-                                ItemId = item.Item,
+                                ItemId = item.ItemId.Value,
                                 QuantityFrom = 0,
                                 QuantityTo = item.Quantity,
                                 Remarks = "Pack Posted",
@@ -575,17 +626,31 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModelData<int>> AddAPI(PackFormAPIVM form)
         {
-            var orderVM = await context.SalesOrders.Where(s => s.Id == form.SalesOrderId).FirstOrDefaultAsync();
+            var orderVM = await context.SalesOrders
+                                       .Where(s => s.Id == form.SalesOrderId || s.SalesOrderNumber == form.SalesOrderNumber)
+                                       .Include(s => s.Status)
+                                       .FirstOrDefaultAsync();
             if (orderVM == null)
                 return new ResponseModelData<int>
                 {
                     Status = "Error",
-                    Message = "Sales Order cannot be found",
+                    Message = "Invalid Sales Order. Record cannot be found",
+                    Data = -1
+                };
+            if (orderVM.Status.Code.ToLower() == "draft" || orderVM.Status.Code.ToLower() == "disapproved")
+                return new ResponseModelData<int>
+                {
+                    Status = "Error",
+                    Message = $"Sales Order cannot be used with current status: {orderVM.Status.Code}",
                     Data = -1
                 };
 
-
-            var checkItems = CheckItem(new PackFormVM { Items = form.Items });
+            var checkItems = CheckItem(new PackFormVM
+            {
+                SalesOrderId = form.SalesOrderId,
+                SalesOrderNumber = form.SalesOrderNumber,
+                Items = form.Items
+            });
             if (checkItems != null)
                 return new ResponseModelData<int>
                 {
@@ -608,22 +673,19 @@ namespace GMGInventory.Application.Repositories
 
             foreach (var item in form.Items)
             {
+                var itemTemp = await context.Items.Where(s => s.Id == item.ItemId || s.Code == item.ItemCode || s.Name == item.ItemName).FirstAsync();
+                var packTypeTemp = await context.PackTypes.Where(s => s.Id == item.PackTypeId || s.Name == item.PackTypeName).FirstAsync();
                 PackLineItem packItem = new()
                 {
                     BoxNumber = item.BoxNumber,
-                    ItemId = item.Item,
+                    ItemId = itemTemp.Id,
                     PackId = pack.Id,
-                    PackTypeId = item.PackType,
+                    PackTypeId = packTypeTemp.Id,
                     Quantity = item.Quantity
                 };
                 await context.PackLineItems.AddAsync(packItem);
                 await context.SaveChangesAsync(currentUserId);
             }
-
-            var quantityOrdered = await context.SalesOrderLineItems.Where(s => s.SalesOrderId == form.SalesOrderId).SumAsync(s => s.Quantity);
-            var quantityPacked = await context.PackLineItems.Where(s => s.Pack.SalesOrderId == form.SalesOrderId).SumAsync(s => (int?)s.Quantity) ?? 0;
-            quantityPacked += form.Items.Sum(s => s.Quantity);
-
 
             return new ResponseModelData<int>
             {

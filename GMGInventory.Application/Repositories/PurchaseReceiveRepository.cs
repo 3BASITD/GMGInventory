@@ -15,6 +15,7 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly string currentUserId;
 
         public PurchaseReceiveReporitory(ApplicationDbContext context
                                        , IHttpContextAccessor httpContextAccessor
@@ -23,6 +24,7 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
         public async Task<IList<PurchaseReceiveVM>> GetListAsync(PurchaseReceiveFilter filter)
@@ -328,8 +330,6 @@ namespace GMGInventory.Application.Repositories
         {
             var response = new ResponseModel();
 
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
             var request = await context.PurchaseReceivings.Where(s => s.Id == receiveId).FirstOrDefaultAsync();
 
             if (request == null)
@@ -399,7 +399,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<ResponseModel<int>> AddAsync(PurchaseReceiveSaveVM form, List<PurchaseReceiveLineItemVM> Items)
         {
             var response = new ResponseModel<int>();
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
             if (status == null)
@@ -517,7 +516,7 @@ namespace GMGInventory.Application.Repositories
                                   .Sum(prli => (int?)prli.Quantity) ?? 0;
 
                 var alreadyOn = string.Join(", ", context.PurchaseReceivingLineItems
-                                                         .Where(prli => prli.OrderItem.PurchaseOrder.Id == s.Id 
+                                                         .Where(prli => prli.OrderItem.PurchaseOrder.Id == s.Id
                                                                      && prli.PurchaseReceiving.Status.Name.ToLower() == "approved")
                                                          .Select(prli => prli.PurchaseReceiving.DocumentNumber)
                                                          .Distinct()
@@ -555,7 +554,6 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
 
                 if (!string.IsNullOrWhiteSpace(receive.ApproverId))
@@ -633,11 +631,10 @@ namespace GMGInventory.Application.Repositories
             if (receive == null)
             {
                 response.Status = "Error";
-                response.Message = "Invalid purchase receive";
+                response.Message = "Invalid Purchase Receiving. Record cannot be found";
             }
             else
             {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
                 if (!string.IsNullOrWhiteSpace(receive.DisapproverId))
@@ -700,12 +697,10 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModelData<int>> AddAPI(PurchaseReceiveFormAPIVM form)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-            var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == "draft").FirstAsync();
 
             var purchaseOrder = await context.PurchaseOrderNews
-                                             .Where(s => s.Id == form.PurchaseOrderId)
+                                             .Where(s => s.Id == form.PurchaseOrderId || s.DocumentNumber == form.PurchaseOrderNumber)
+                                             .Include(s => s.Status)
                                              .FirstOrDefaultAsync();
             if (purchaseOrder == null)
                 return new ResponseModelData<int>
@@ -714,48 +709,52 @@ namespace GMGInventory.Application.Repositories
                     Message = "Invalid Purchase Order. Record cannot be found",
                     Data = -1
                 };
-
-            var purchaseOrderItems = from poli in context.PurchaseOrderNewLineItems
-                                     let recq = (from prli in context.PurchaseReceivingLineItems
-                                                 where prli.OrderItemId == poli.Id
-                                                 select (int?)prli.Quantity).Sum() ?? 0
-                                     let retq = (from prli in context.PurchaseReturnNewLineItems
-                                                 where prli.ReceivingItem.OrderItemId == poli.Id
-                                                 select (int?)prli.Quantity).Sum() ?? 0
-                                     where poli.Quantity - recq + retq > 0
-                                     select poli.Id;
-
-            if (form.Items.Any(s => !purchaseOrderItems.Contains(s.OrderItemId)))
+            if (purchaseOrder.Status.Code.ToLower() != "approved")
                 return new ResponseModelData<int>
                 {
                     Status = "Error",
-                    Message = "Cannot proceed because there is a problem with one or more items",
+                    Message = $"Purchase Order cannot be used with current status: {purchaseOrder.Status.Code}",
                     Data = -1
                 };
 
-                var receive = new PurchaseReceiving
+            var checkItems = CheckItem(form);
+            if (checkItems != null)
+                return new ResponseModelData<int>
                 {
-                    DocumentNumber = await GetNewDocumentNumber(),
-                    PurchaseOrderId = purchaseOrder.Id,
-                    DeliveryReceiptNumber = form.DeliveryReceiptNumber,
-                    SalesInvoiceNumber = form.SalesInvoiceNumber,
-                    ReceiveDate = form.DateReceived,
-                    Remarks = form.Remarks,
-                    StatusId = status.Id
+                    Status = "Error",
+                    Message = checkItems,
+                    Data = -1
                 };
-                await context.PurchaseReceivings.AddAsync(receive);
-                await context.SaveChangesAsync(currentUserId);
 
-
-            var newitems = form.Items
-                               .Select(s => new PurchaseReceivingLineItem
-                               {
-                                   PurchaseReceivingId = receive.Id,
-                                   OrderItemId = s.OrderItemId,
-                                   Quantity = s.Quantity
-                               });
-            context.PurchaseReceivingLineItems.AddRange(newitems);
+            var receive = new PurchaseReceiving
+            {
+                DocumentNumber = await GetNewDocumentNumber(),
+                PurchaseOrderId = purchaseOrder.Id,
+                DeliveryReceiptNumber = form.DeliveryReceiptNumber,
+                SalesInvoiceNumber = form.SalesInvoiceNumber,
+                ReceiveDate = form.DateReceived,
+                Remarks = form.Remarks,
+                StatusId = await context.PurchaseStatuses
+                                        .Where(s => s.Name.ToLower() == "draft")
+                                        .Select(s => s.Id)
+                                        .FirstAsync()
+            };
+            await context.PurchaseReceivings.AddAsync(receive);
             await context.SaveChangesAsync(currentUserId);
+
+            foreach (var item in form.Items)
+            {
+                var itemTemp = await context.Items.Where(s => s.Id == item.ItemId || s.Code == item.ItemCode || s.Name == item.ItemName).FirstAsync();
+                var oitemTemp = await context.PurchaseOrderNewLineItems.Where(s => s.PurchaseOrderId == purchaseOrder.Id && s.RequestItem.ItemId == itemTemp.Id).FirstAsync();
+                PurchaseReceivingLineItem receiveItem = new()
+                {
+                    OrderItemId = oitemTemp.Id,
+                    PurchaseReceivingId = purchaseOrder.Id,
+                    Quantity = item.Quantity
+                };
+                await context.PurchaseReceivingLineItems.AddAsync(receiveItem);
+                await context.SaveChangesAsync(currentUserId);
+            }
 
             return new ResponseModelData<int>
             {
@@ -763,6 +762,53 @@ namespace GMGInventory.Application.Repositories
                 Message = "Purchase receive saved as draft.",
                 Data = receive.Id
             };
+        }
+
+        public string? CheckItem(PurchaseReceiveFormAPIVM form)
+        {
+            var invalids = new List<string>();
+
+            foreach (var item in form.Items)
+            {
+                if (item.Quantity == 0)
+                {
+                    var tempId = item.ItemId?.ToString();
+                    invalids.Add($"Nothing to receive: {(tempId ?? item.ItemCode ?? item.ItemName)}");
+                    continue;
+                }
+                var sitem = context.Items.Where(s => s.Id == item.ItemId || s.Code == item.ItemCode || s.Name == item.ItemName).FirstOrDefault();
+                if (sitem == null)
+                {
+                    var tempId = item.ItemId?.ToString();
+                    invalids.Add($"Invalid Item. Record cannot be found: {(tempId ?? item.ItemCode ?? item.ItemName)}");
+                    continue;
+                }
+                var sorder = context.PurchaseOrderNews.Where(s => s.Id == form.PurchaseOrderId || s.DocumentNumber == form.PurchaseOrderNumber).FirstOrDefault();
+                if (sorder == null)
+                {
+                    var tempId = form.PurchaseOrderId?.ToString();
+                    invalids.Add($"Invalid Purchase Order. Record cannot be found: {(tempId ?? form.PurchaseOrderNumber)}");
+                    continue;
+                }
+                var poli = context.PurchaseOrderNewLineItems.Where(s => s.PurchaseOrderId == sorder.Id && s.RequestItem.ItemId == sitem.Id).FirstOrDefault();
+                if (poli == null)
+                {
+                    invalids.Add($"Invalid Item. Record cannot be found: {sitem.Code} for {sorder.DocumentNumber}");
+                    continue;
+                }
+
+                var pquantity = context.PurchaseReceivingLineItems
+                                       .Where(s => s.PurchaseReceiving.PurchaseOrderId == sorder.Id && s.OrderItem.RequestItem.ItemId == sitem.Id)
+                                       .Select(s => (int?)s.Quantity)
+                                       .Sum() ?? 0;
+                if (item.Quantity > poli.Quantity - pquantity)
+                {
+                    invalids.Add($"Invalid Item Quantity: {(poli.Quantity - pquantity)} remaining for {sitem.Code}");
+                    continue;
+                }
+            }
+
+            return invalids.Any() ? string.Join(", ", invalids) : null;
         }
     }
 }
