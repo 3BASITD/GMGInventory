@@ -341,6 +341,20 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
+            if (form.Id == 0)
+            {
+                var dateTime = DateTime.Now;
+
+                if (dateTime > form.EffectiveDateD)
+                {
+                    response.Message = "Cannot set Effective Date as past date.";
+                    response.Status = "Error";
+
+                    return Json(response);
+                }
+
+            }
+
             if (form.EffectiveDateD > form.ExpirationDateD)
             {
                 response.Message = "Effective Date cannot be past the Expiration Date.";

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Sales Order Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var userAccess2 = (ViewsAccessVM)ViewData["UserAccess2"]!;
 }
 
 @section Breadcrumb {
@@ -829,6 +830,7 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var user_access2 = @Html.Raw(Json.Serialize(userAccess2));
         var so_details = @Html.Raw(Json.Serialize(Model));
         var currentCustomer = so_details.customerId;
 
@@ -1381,7 +1383,7 @@
                     data: function (data, type, dataToSet) {
                         var discount = '';
                         if (so_details.status.toLowerCase().includes("draft")) {
-                            if( user_access.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) ) {
+                            if( user_access2.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) ) {
                              discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_1" class="input-group-text">#1</label><input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1" /><label for="' + data.lineNumber + '_1" class="input-group-text">%</label></div>';
                             }
                         discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_2" class="input-group-text">#2</label><input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2" /><label for="' + data.lineNumber + '_2" class="input-group-text">%</label></div>';

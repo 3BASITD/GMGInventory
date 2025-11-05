@@ -781,20 +781,32 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="save-promo-effective" class="control-label mb-0 d-block">Effective Date</label>
                                 <input type="date" name="EffectiveDate" id="save-promo-effective" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="save-promo-effective-time" class="control-label mb-0 d-block">Effective Time</label>
+                                <input type="time" name="EffectiveTime" id="save-promo-effective-time" class="form-control form-control-sm" />
                             </div>
                         </div>
 
                     </div>
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="save-promo-expiration" class="control-label mb-0 d-block">Expiration Date</label>
                                 <input type="date" name="ExpirationDate" id="save-promo-expiration" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="save-promo-expiration-time" class="control-label mb-0 d-block">Expiration Time</label>
+                                <input type="time" name="ExpirationTime" id="save-promo-expiration-time" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -1730,8 +1742,22 @@
             hideBatchLoader("return");
         });
 
-        
-        
+        const convertTime12to24 = (time12h) => {
+          const [time, modifier] = time12h.split(' ');
+
+          let [hours, minutes] = time.split(':');
+
+          if (hours === '12') {
+            hours = '00';
+          }
+
+          if (modifier === 'PM') {
+            hours = parseInt(hours, 10) + 12;
+          }
+
+          return `${hours}:${minutes}`;
+        }
+
         // Promo Price
         var promoDT = $('.table-promo').on('preXhr.dt', function (e, settings, data) {
             showBatchLoader("promo");
@@ -1755,22 +1781,28 @@
                 { data: "promoPrice", name: "Price" },
                 { data: "effectiveDate", name: "EffectiveDate" },
                 { data: "expirationDate", name: "ExpirationDate" },
+
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
+                        const now = new Date();
+
+                        var currentDateTime = getCurrentDate() +" "+ now.toLocaleTimeString();
+                        
+
                         if (user_access.canEdit) {
-                            if (data.isActive != true) {
+                            if (data.isActive == false && (new Date(data.expirationDate) > new Date(currentDateTime) )) {
                                 actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate-promo" data-microtip-title="Reactivate Promo" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
                             } else {
 
-                                if (new Date(data.expirationDate3) > new Date(getCurrentDate())){
+                                if (new Date(data.expirationDate) > new Date(currentDateTime) ){
                                 
                                 actions += '<button type="button" class="btn btn-primary btn-xs btn-update-promo" data-microtip-title="Update Promo" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-edit"></span></button>';
                                 }
                             }
                         }
-                        if (user_access.canDelete && data.isActive == true) {
+                        if (user_access.canDelete && data.isActive == true  && (new Date(data.expirationDate) > new Date(currentDateTime) )) {
                             actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-promo" data-microtip-title="Delete / Deactivate Promo" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
                         }
                         return actions + '</div>';
@@ -1785,7 +1817,7 @@
             if (user_access.canDelete) {
                 $('.btn-remove-promo').off("click").on("click", function () {
                     swal({
-                        title: "Delete Item Promo",
+                        title: "Delete/Deactivate Item Promo",
                         text: "Are you sure you want to remove this record?",
                         icon: "warning",
                         buttons: true,
@@ -1847,10 +1879,12 @@
                 $('.btn-update-promo').off("click").on("click", function () {
                         console.log("show promo");
                         var row_data = promoDT.row($(this).parents('tr')).data();
-
+                        
                         $("#save-promo-id").val(row_data.id);
                         $("#save-promo-effective").val(row_data.effectiveDate3);
                         $("#save-promo-expiration").val(row_data.expirationDate3);
+                        $("#save-promo-effective-time").val(convertTime12to24(row_data.effectiveDate.substring(13)));
+                        $("#save-promo-expiration-time").val(convertTime12to24(row_data.expirationDate.substring(13)));
                         $("#save-promo-name").val(row_data.name);
                         $("#save-promo-price").val(row_data.promoPrice);
 
@@ -1868,8 +1902,12 @@
         function clearPromoForm(){
             $("#save-promo-effective").val("");
             $("#save-promo-expiration").val("");
+            $("#save-promo-effective-time").val("");
+            $("#save-promo-expiration-time").val("");
             $("#save-promo-name").val("");
             $("#save-promo-price").val("");
+            $("#save-promo-id").val("");
+            
 
         }
 
@@ -1903,8 +1941,8 @@
                     Id: $("#save-promo-id").val(),
                     Name: $("#save-promo-name").val(),
                     ItemId: @Model?.Id,
-                    EffectiveDateD: $("#save-promo-effective").val(),
-                    ExpirationDateD: $("#save-promo-expiration").val(),
+                    EffectiveDateD: $("#save-promo-effective").val() +" "+ $("#save-promo-effective-time").val(),
+                    ExpirationDateD: $("#save-promo-expiration").val() +" "+ $("#save-promo-expiration-time").val(),
                     PromoPriceD: $("#save-promo-price").val(),
 
                 },

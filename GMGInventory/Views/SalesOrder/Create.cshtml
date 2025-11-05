@@ -8,6 +8,8 @@
         ViewData["Title"] = "New Sales Order";
     }
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+
+    var userAccess2 = (ViewsAccessVM)ViewData["UserAccess2"]!;
 }
 
 @section Breadcrumb {
@@ -309,6 +311,8 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var user_access2 = @Html.Raw(Json.Serialize(userAccess2));
 
         var currentCustomer = null;
 
@@ -812,7 +816,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        var discount = '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_1" class="input-group-text">#1</label><input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + data.discount1 + '" class="form-control form-control-sm discount1" /><label for="' + data.lineNumber + '_1" class="input-group-text">%</label></div>';
+                        var discount = '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_1" class="input-group-text">#1</label><input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + data.discount1 + '" class="form-control form-control-sm discount1"  /><label for="' + data.lineNumber + '_1" class="input-group-text">%</label></div>';
                         discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_2" class="input-group-text">#2</label><input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + data.discount2 + '" class="form-control form-control-sm discount2" /><label for="' + data.lineNumber + '_2" class="input-group-text">%</label></div>';
                         discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_3" class="input-group-text">#3</label><input id="' + data.lineNumber + '_3" type="number" step="0.01" min="0" max="100" value="' + data.discount3 + '" class="form-control form-control-sm discount3" /><label for="' + data.lineNumber + '_3" class="input-group-text">%</label></div>';
                         discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_4" class="input-group-text">#4</label><input id="' + data.lineNumber + '_4" type="number" step="0.01" min="0" max="100" value="' + data.discount4 + '" class="form-control form-control-sm discount4" /><label for="' + data.lineNumber + '_4" class="input-group-text">%</label></div>';

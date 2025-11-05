@@ -314,11 +314,13 @@ namespace GMGInventory.Common.Models
         public string PromoPrice => string.Format(SystemFormat.StringDecimalComma, PromoPriceD);
         public decimal PromoPriceD { get; set; }
         public bool IsActive { get; set; }
-        public string EffectiveDate => EffectiveDateD.ToString(SystemFormat.StringDate);
+        public string EffectiveDate => EffectiveDateD.ToString("MMM dd, yyyy hh:mm tt");
         public string EffectiveDate3 => EffectiveDateD.ToString(SystemFormat.StringDate3);
+        public string EffectiveTime => EffectiveDateD.ToString("hh:mm:ss tt");
         public DateTime EffectiveDateD { get; set; }
-        public string ExpirationDate => ExpirationDateD.ToString(SystemFormat.StringDate);
+        public string ExpirationDate => ExpirationDateD.ToString("MMM dd, yyyy hh:mm tt");
         public string ExpirationDate3 => ExpirationDateD.ToString(SystemFormat.StringDate3);
+        public string ExpirationTime => ExpirationDateD.ToString("hh:mm:ss tt");
         public DateTime ExpirationDateD { get; set; }
         public string UpdateDate => UpdateDateD.ToString(SystemFormat.StringDateTime);
         public DateTime UpdateDateD { get; set; }
