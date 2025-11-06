@@ -1,0 +1,72 @@
+﻿@model IEnumerable<OrderQueueVM>
+
+@{
+    ViewData["Title"] = "Order Queue";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-orders">
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Agent</th>
+                    <th>Customer</th>
+                    <th>Extended Price</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var orderDT = $('.table-orders').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetOrdersDT")",
+                type: "POST"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "orderNumber", name: "OrderNumber" },
+                { data: "agent", name: "Agent" },
+                { data: "customer", name: "Customer" },
+                { data: "extendedPrice", name: "ExtendedPrice" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.orderNumber + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
+                        if (user_access.canAdd) {
+                            actions += '<button class="btn btn-success btn-xs" type="button" onclick="AddOrder(this)" data-microtip-title="Add to Sales Order" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-plus"></span></button>';
+                        }
+                        actions += '</div>';
+                        return actions;
+                    }
+                }
+            ],
+            order: [[0, "asc"]]
+        });
+
+        orderDT.on("draw", function () {
+            hideLoader();
+        });
+    </script>
+}

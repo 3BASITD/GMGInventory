@@ -78,7 +78,8 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Currency")] Currency,
         [PageNamesString("Service Level Agreement")] ServiceLevelAgreement,
         [PageNamesString("Sales Order (Special)")] SalesOrderSpecial,
-        [PageNamesString("Purchase Request (Automotive)")] PurchaseRequestAutomotive
+        [PageNamesString("Purchase Request (Automotive)")] PurchaseRequestAutomotive,
+        [PageNamesString("Order Queue")] OrderQueue
     }
 
     public static class PageNameExtensions

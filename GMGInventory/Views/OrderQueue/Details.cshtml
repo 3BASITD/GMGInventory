@@ -1,0 +1,227 @@
+﻿@model OrderQueueDetailsVM
+
+@{
+    ViewData["Title"] = "Order Queue Details";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="OrderQueue" asp-action="Index">Order Queue</a></li>
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title po-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-print">
+                    <span class="fas fa-plus"></span> Add to Sales Order
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
+                    <span class="fas fa-plus"></span> Add to Sales Order
+                </button>
+            }
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.OrderNumber)
+                    </span>
+                    <b class="d-block">
+                        @Model.OrderNumber
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Agent)
+                    </span>
+                    <b class="d-block">
+                        @if (Model.IsValidAgent == false)
+                        {
+                            <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
+                                @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Agent)
+                                &emsp;<span class="fas fa-exclamation-triangle"></span>
+                            </span>
+                        } else
+                        {
+                            @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Agent)
+                        }
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Customer)
+                    </span>
+                    <b class="d-block">
+                        @if (Model.IsValidCustomer == false)
+                        {
+                            <span class="text-warning" data-microtip-title="Invalid Customer" data-microtip-position="right" role="tooltip">
+                                @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Customer)
+                                &emsp;<span class="fas fa-exclamation-triangle"></span>
+                            </span>
+                        } else
+                        {
+                            @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Customer)
+                        }
+                    </b>
+                </p>
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Instruction)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model.Instruction) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Instruction)
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Order Queue Item(s)</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Old Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Brand</th>
+                                    <th>Model</th>
+                                    <th>Size</th>
+                                    <th>Part Number</th>
+                                    <th>Unit</th>
+                                    <th>Unit Price</th>
+                                    <th>Discount</th>
+                                    <th>Extended Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>@item.Code</td>
+                                        <td>
+                                            @if (item.IsValidOldCode == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Old Code" data-microtip-position="right" role="tooltip">
+                                                    @item.OldCode&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.OldCode
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsValidItemName == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Item Name" data-microtip-position="right" role="tooltip">
+                                                    @item.ItemName&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.ItemName
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsValidBrand == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Brand" data-microtip-position="right" role="tooltip">
+                                                    @item.Brand&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.Brand
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsValidModel == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Model" data-microtip-position="right" role="tooltip">
+                                                    @item.Model&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.Model
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsValidSize == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Size" data-microtip-position="right" role="tooltip">
+                                                    @item.Size&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.Size
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsValidPartNumber == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Part Number" data-microtip-position="right" role="tooltip">
+                                                    @item.PartNumber&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.PartNumber
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsValidUnit == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Unit" data-microtip-position="right" role="tooltip">
+                                                    @item.Unit&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+
+                                                @item.Unit
+                                            }
+                                        </td>
+                                        <td>@item.UnitPrice</td>
+                                        <td>@item.Discount1%; @item.Discount2%; @item.Discount3%; @item.Discount4%; @item.Discount5%</td>
+                                        <td>@item.ExtendedPrice</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="10" class="text-end">Total</th>
+                                    <th>@Model.Items.Sum(s => s.ExtendedPriceD)</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var orderDT = $('.table-order').DataTable();
+    </script>
+}

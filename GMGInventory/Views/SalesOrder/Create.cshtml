@@ -816,11 +816,27 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        var discount = '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_1" class="input-group-text">#1</label><input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + data.discount1 + '" class="form-control form-control-sm discount1"  /><label for="' + data.lineNumber + '_1" class="input-group-text">%</label></div>';
-                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_2" class="input-group-text">#2</label><input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + data.discount2 + '" class="form-control form-control-sm discount2" /><label for="' + data.lineNumber + '_2" class="input-group-text">%</label></div>';
-                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_3" class="input-group-text">#3</label><input id="' + data.lineNumber + '_3" type="number" step="0.01" min="0" max="100" value="' + data.discount3 + '" class="form-control form-control-sm discount3" /><label for="' + data.lineNumber + '_3" class="input-group-text">%</label></div>';
-                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_4" class="input-group-text">#4</label><input id="' + data.lineNumber + '_4" type="number" step="0.01" min="0" max="100" value="' + data.discount4 + '" class="form-control form-control-sm discount4" /><label for="' + data.lineNumber + '_4" class="input-group-text">%</label></div>';
-                        discount += '<div class="input-group input-group-sm" style="width: 100%;"><label for="' + data.lineNumber + '_5" class="input-group-text">#5</label><input id="' + data.lineNumber + '_5" type="number" step="0.01" min="0" max="100" value="' + data.discount5 + '" class="form-control form-control-sm discount5" /><label for="' + data.lineNumber + '_5" class="input-group-text">%</label></div>';
+                        var discount = '<div class="input-group input-group-sm" style="width: 100%;">';
+
+                        discount += '<label for="' + data.lineNumber + '_1" class="input-group-text text-info bg-info">#1</label>';
+                        discount += '<input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1 discount-form-display" placeholder="Discount 1" />';
+
+                        discount += '<label for="' + data.lineNumber + '_2" class="input-group-text text-info bg-info">#2</label>';
+                        discount += '<input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2 discount-form-display" placeholder="Discount 2" />';
+
+
+                        discount += '<label for="' + data.lineNumber + '_3" class="input-group-text text-info bg-info">#3</label>';
+                        discount += '<input id="' + data.lineNumber + '_3" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3 discount-form-display" placeholder="Discount 3" />';
+
+
+                        discount += '<label for="' + data.lineNumber + '_4" class="input-group-text text-info bg-info">#4</label>';
+                        discount += '<input id="' + data.lineNumber + '_4" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount4D) + '" class="form-control form-control-sm discount4 discount-form-display" placeholder="Discount 4" />';
+
+
+                        discount += '<label for="' + data.lineNumber + '_5" class="input-group-text text-info bg-info">#5</label>';
+                        discount += '<input id="' + data.lineNumber + '_5" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount5D) + '" class="form-control form-control-sm discount5 discount-form-display" placeholder="Discount 5" />';
+
+                        discount += '<span class="input-group-text">%</span></div>';
                         return discount;
                     },
                     name: "Discount1"
@@ -924,6 +940,41 @@
                 itemDT.row(row).data(rowData);
 
                 itemDT.order([1, 'asc']).draw();
+            });
+
+            $(".input-group:has(.discount-form-display)").each(function() {
+                $(this).find("label").hide();
+
+                if ($(this).find("label").first().is(':hidden')) {
+                    $(this).find("input").first().css({
+                        'border-top-left-radius': '0.25rem',
+                        'border-bottom-left-radius': '0.25rem'
+                    });
+                }
+            });
+
+            $(".discount-form-display").off("focusin").on("focusin", function() {
+                $(this).siblings("label").hide();
+                $(this).siblings('label[for="' + this.id + '"]').show();
+                $(this).css('width', '100px');
+
+                var firstInputRadius = $(this).siblings("label").first().is(':hidden') ? '0.25rem' : '';
+                $(this).closest('.input-group').find('input').first().css({
+                    'border-top-left-radius': firstInputRadius,
+                    'border-bottom-left-radius': firstInputRadius
+                });
+            });
+
+            $(".discount-form-display").off("focusout").on("focusout", function() {
+                if($(this).val() == "") $(this).val(0);
+                $(this).siblings("label").hide();
+                $(this).css('width', '');
+
+                var firstInputRadius = $(this).siblings("label").first().is(':hidden') ? '0.25rem' : '';
+                $(this).closest('.input-group').find('input').first().css({
+                    'border-top-left-radius': firstInputRadius,
+                    'border-bottom-left-radius': firstInputRadius
+                });
             });
         });
 

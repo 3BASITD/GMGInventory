@@ -4,6 +4,7 @@ using GMGInventory.Application.Repositories;
 using GMGInventory.Application.Services;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.OrderAppDB;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString, sqlOptions =>
+        sqlOptions.EnableRetryOnFailure()
+    )
+    .EnableSensitiveDataLogging()
+    .LogTo(Console.WriteLine));
+var appOrderConnectionString = builder.Configuration.GetConnectionString("AppOrderConnection");
+builder.Services.AddDbContext<AppOrderDbContext>(options =>
+    options.UseSqlServer(appOrderConnectionString, sqlOptions =>
         sqlOptions.EnableRetryOnFailure()
     )
     .EnableSensitiveDataLogging()
@@ -66,6 +74,7 @@ builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped(typeof(IItemTransferRepository), typeof(ItemTransferRepository));
 builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
 builder.Services.AddScoped(typeof(ILocationCodeRepository), typeof(LocationCodeRepository));
+builder.Services.AddScoped(typeof(IOrderQueueRepository), typeof(OrderQueueRepository));
 builder.Services.AddScoped(typeof(IPackRepository), typeof(PackRepository));
 builder.Services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
 builder.Services.AddScoped(typeof(IPurchaseOrderNewRepository), typeof(PurchaseOrderNewReporitory));

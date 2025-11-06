@@ -86,6 +86,8 @@ builder.Services.AddSwaggerGen();
 //        options.Audience = builder.Configuration["Jwt:Audience"];
 //    });
 
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 app.Use(async (context, next) =>

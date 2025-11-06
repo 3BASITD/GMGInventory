@@ -36,7 +36,8 @@ else
             || navPages.Contains(PageNames.SalesOrder.ToEnumString())
             || navPages.Contains(PageNames.SalesOrderDelivery.ToEnumString())
             || navPages.Contains(PageNames.SalesInvoice.ToEnumString())
-            || navPages.Contains(PageNames.ShippingList.ToEnumString()))
+            || navPages.Contains(PageNames.ShippingList.ToEnumString())
+            || navPages.Contains(PageNames.OrderQueue.ToEnumString()))
         {
             var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "Receptacle", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice", "ShippingList" }).Contains(currentController ?? "");
 
@@ -195,6 +196,24 @@ else
                                     <span class="nav-icon fas fa-shipping-fast"></span>
                                 }
                                 Shipping List
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.OrderQueue.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Shipping" ? "active" : "")"
+                               asp-area="" asp-controller="OrderQueue" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">📋</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-clipboard-list"></span>
+                                }
+                                Order Queue
                             </a>
                         </li>
                     }
