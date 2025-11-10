@@ -395,16 +395,16 @@
             }
         });
 
+        $("#order-customer-code").on("select2:select", function () {
+            changingCustomerCode();
+        });
 
+        var currentCustomer = "";
         function changingCustomerCode() {
             var selectedCustomer = $("#order-customer-code").val();
 
-            console.log("Selected:"+selectedCustomer);
-            console.log("Current:"+currentCustomer);
-            //console.log("So_detail:"+so_details.customerId);
-            var customerText = $("#order-customer-code").select2("data")[0]?.text.toLowerCase() || "";
-
             if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer)) {
+                console.log("Customer changed, load details, sales order create");
                 var changed = "Customer Code"
 
                 swal({
@@ -420,51 +420,45 @@
                         clearItemForm();
                         currentCustomer = selectedCustomer;
 
-                        $(".order-customer-name").text($("#order-customer-code").select2("data")[0].name);
-                        $(".order-customer-address").text($("#order-customer-code").select2("data")[0].address);
-                        $(".order-customer-balance").text($("#order-customer-code").select2("data")[0].outstandingBalance);
-                        $(".order-credit-term").text($("#order-customer-code").select2("data")[0].creditTerm);
-                        $(".order-region").text($("#order-customer-code").select2("data")[0].region);
-                        $(".order-customer-status").text($("#order-customer-code").select2("data")[0].customerStatus);
-
-                        if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
-                            toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
-                        }
-
-                        if ($("#order-agent-code").val() == null) {
-                            var agentId = $("#order-customer-code").select2("data")[0].agentId;
-                            var agentCode = $("#order-customer-code").select2("data")[0].agentCode;
-                            var agentName = $("#order-customer-code").select2("data")[0].agent;
-                            var agentOption = new Option(agentCode, agentId, true, true);
-                            $(agentOption).data('data', {
-                                id: agentId,
-                                text: agentCode,
-                                name: agentName
-                            });
-                            $("#order-agent-code").append(agentOption).trigger("change");
-                            $("#order-agent-name").val(agentName);
-                        }
+                        LoadCustomerDetails();
                     } else {
-
-                            $("#order-customer-code").val(currentCustomer).trigger("change");
-
-
+                        $("#order-customer-code").val(currentCustomer).trigger("change");
                     }
-                        });
+                });
             } else {
+                console.log("Customer not changed, load details, sales order create");
                 currentCustomer = selectedCustomer;
 
+                LoadCustomerDetails();
             }
-
-
         }
 
+        function LoadCustomerDetails() {
+            $("#order-customer-name").val($("#order-customer-code").select2("data")[0].name);
+            $("#order-customer-address").val($("#order-customer-code").select2("data")[0].address);
+            $("#order-customer-balance").val($("#order-customer-code").select2("data")[0].outstandingBalance);
+            $("#order-credit-term").val($("#order-customer-code").select2("data")[0].creditTerm);
+            $("#order-region").val($("#order-customer-code").select2("data")[0].region);
+            $("#order-customer-status").val($("#order-customer-code").select2("data")[0].customerStatus);
 
-        $("#order-customer-code").on("select2:select", function () {
-                changingCustomerCode();
+            if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
+                toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
+            }
 
-
-            });
+            if ($("#order-agent-code").val() == null) {
+                var agentId = $("#order-customer-code").select2("data")[0].agentId;
+                var agentCode = $("#order-customer-code").select2("data")[0].agentCode;
+                var agentName = $("#order-customer-code").select2("data")[0].agent;
+                var agentOption = new Option(agentCode, agentId, true, true);
+                $(agentOption).data('data', {
+                    id: agentId,
+                    text: agentCode,
+                    name: agentName
+                });
+                $("#order-agent-code").append(agentOption).trigger("change");
+                $("#order-agent-name").val(agentName);
+            }
+        }
 
         // Load forwarder data for select2
         $.ajax({

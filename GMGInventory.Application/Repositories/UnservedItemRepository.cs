@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,19 +34,19 @@ namespace GMGInventory.Application.Repositories
                                                                   && s.ItemId == l.ItemId)
                                                          .Sum(s => (int?)s.Quantity) ?? 0
                              let returnedQuantity = context.SalesReturnLineItems
-                                                           .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == l.SalesOrderId
+                                                           .Where(s => s.InvoiceLineItem != null
+                                                                    && s.InvoiceLineItem.Invoice.SalesOrderId == l.SalesOrderId
                                                                     && s.ItemId == l.ItemId)
                                                            .Sum(s => (int?)s.Quantity) ?? 0
-                             //where l.Quantity - (packedQuantity - returnedQuantity) > 0
-                             where (i <= 0 ? l.Quantity - i : 0) > 0
+                             where l.Quantity - (packedQuantity - returnedQuantity) > 0
                              && (filter.Region == null || l.SalesOrder.Customer.Area.Region.Id == filter.Region
-                             || (filter.Region != null && regionSelected.ToLower() == "luzon" && l.SalesOrder.Customer.Area.Region.Name.ToLower() == "metro manila"))
+                             || (filter.Region != null && regionSelected != null && regionSelected.ToLower() == "luzon" && l.SalesOrder.Customer.Area.Region.Name.ToLower() == "metro manila"))
                              && filter.StartDate <= l.SalesOrder.DateCreated.Date
                              && l.SalesOrder.DateCreated.Date <= filter.EndDate
                              select new UnservedItemVM
                              {
                                  Agent = l.SalesOrder.Agent.Code,
-                                 CreatedBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                                 CreatedBy = user.FirstName + " " + user.LastName,
                                  Customer = l.SalesOrder.Customer.Name,
                                  Discount1D = l.Discount1,
                                  Discount2D = l.Discount2,
@@ -56,16 +57,12 @@ namespace GMGInventory.Application.Repositories
                                  OrderDateD = l.SalesOrder.DateCreated,
                                  PackedQuantityD = packedQuantity,
                                  QuantityD = l.Quantity,
-                                 //QuantityOnHandD = i + (packedQuantity - returnedQuantity),
                                  QuantityOnHandD = i,
                                  SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
                                  UnitPriceD = l.SellingPrice,
                                  UnservedQuantityD = l.Quantity - (packedQuantity - returnedQuantity) > 0
                                                    ? l.Quantity - (packedQuantity - returnedQuantity)
                                                    : 0
-                                 //UnservedQuantityD = Math.Max(0, l.Quantity - (packedQuantity - returnedQuantity))
-                                 //UnservedQuantityD = l.Quantity - i > 0 ? l.Quantity - i : 0
-                                 //UnservedQuantityD = Math.Max(0, l.Quantity - i)
                              };
             return await salesOrder.ToListAsync();
         }

@@ -8,5 +8,6 @@ namespace GMGInventory.Application.Contracts
     {
         Task<ForDataTables<OrderQueueVM>> GetOrdersDT(DataTablesRequestForm form);
         Task<OrderQueueDetailsVM?> GetDetails(string OrderNumber);
+        Task<ResponseModel> AddOrder(string OrderNumber);
     }
 }

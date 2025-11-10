@@ -23,96 +23,79 @@
     @if (Model.InvoiceType == "Sales Invoice")
     {
         <!-- SALES INVOICE -->
-        var topMargin = 125;
+        var topMargin = 24;
 
-        if (TempData["CompanyTemplate"]?.ToString() == "BAS")
+        @* if (TempData["CompanyTemplate"]?.ToString() == "BAS")
         {
-            topMargin = 40;
+            topMargin = 24;
         }
         else
         {
-            topMargin = 60;
-        }
+            topMargin = 44;
+        } *@
         <div style="height: @(topMargin)px;">.</div>
         <div style="padding-left:40px; padding-right: 25px;">
-            <table class="table-customer-without-newline">
+            <table style="font-size:16px;">
                 <tbody>
                     <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
-                        <td class="auto-font-size si-customer-name">@Model.CustomerName</td>
                         <td style="width: 50px;"></td>
-                        <td style="width: 150px;">@Model.InvoiceDateD.ToString("MMMM dd")</td>
-                        <td style="width: 50px;">@Model.InvoiceDateD.ToString("yy")</td>
-                    </tr>
-                    <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
-                        <td>@(Model.TIN == "0" || string.IsNullOrWhiteSpace(Model.TIN) ? "N/A" : Model.TIN)</td>
-                        <td style="width: 50px;"></td>
-                        <td style="width: 200px;" colspan="2">@Model.PaymentTerms</td>
-                    </tr>
-                    <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
+                        <td style="width: 125px;"></td>
                         <td></td>
-                        <td style="width: 50px;"></td>
-                        <td style="width: 200px;" colspan="2"></td>
+                        <td style="width: 75px;"></td>
+                        <td style="width: 100px;"></td>
                     </tr>
                     <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
-                        <td class="auto-font-size" style="padding-right:10px;">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
                         <td style="width: 50px;"></td>
-                        <td style="width: 200px;" colspan="2" class="ellipsis">@Model.Agent</td>
+                        <td style="width: 125px;"></td>
+                        <td></td>
+                        <td colspan="2">@Model.InvoiceDateD.ToString("MMMM dd, yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td style="width: 100px;padding-top: 8px;">@Model.PaymentTerms</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50px;"></td>
+                        <td style="width: 125px;"></td>
+                        <td colspan="2" style="padding: 3px;">@Model.CustomerName</td>
+                        <td style="width: 100px; padding-top: 4px;">@Model.Agent</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50px;"></td>
+                        <td colspan="3" style="padding: 3px;">@(Model.TIN == "0" || string.IsNullOrWhiteSpace(Model.TIN) ? "N/A" : Model.TIN)</td>
+                        <td style="width: 100px; padding-top: 4px;">@Model.SONumber</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50px;"></td>
+                        <td style="width: 125px;"></td>
+                        <td colspan="3" style="padding-top: 4px;">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
                     </tr>
                 </tbody>
             </table>
-            <table class="table-customer-with-newline">
-                <tbody>
-                    <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
-                        <td class="auto-font-size" rowspan="2" style="line-height: 23px;">@Model.CustomerName</td>
-                        <td style="width: 50px;"></td>
-                        <td style="width: 150px;">@Model.InvoiceDateD.ToString("MMMM dd")</td>
-                        <td style="width: 50px;">@Model.InvoiceDateD.ToString("yy")</td>
-                    </tr>
-                    <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
-                        <td style="width: 50px;"></td>
-                        <td style="width: 200px;" colspan="2">@Model.PaymentTerms</td>
-                    </tr>
-                    <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
-                        <td>@(Model.TIN == "0" || string.IsNullOrWhiteSpace(Model.TIN) ? "N/A" : Model.TIN)</td>
-                        <td style="width: 50px;"></td>
-                        <td style="width: 200px;" colspan="2"></td>
-                    </tr>
-                    <tr>
-                        <td style="width: 50px;"></td> <!-- INDENT -->
-                        <td class="auto-font-size" style="padding-right:10px;">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
-                        <td style="width: 50px;"></td>
-                        <td style="width: 200px;" colspan="2" class="ellipsis">@Model.Agent</td>
-                    </tr>
-                </tbody>
-            </table>@* 
-        <div style="height: 415px;"> *@
-            <div style="min-height: 450px;">
-                <table style="margin-top: 25px;">
+            <div style="height: 380px;">
+                <table style="margin-top: 50px;">
                     <tbody>
-                        @if (Model != null)
-                        {
+                        <tr>
+                            <td style="width: 90px;"></td>
+                            <td></td>
+                            <td style="width: 75px;"></td>
+                            <td style="width: 90px;"></td>
+                            <td style="width: 115px;"></td>
+                        </tr>
+                        @{
                             int rowctr = 0, otherQuantity = 0;
                             decimal otherGrossPrice = 0;
                             @foreach (var item in Model.Items)
                             {
                                 rowctr++;
-                                if (rowctr < 18 || Model.Items.Count == 18)
+                                if (rowctr < 17 || Model.Items.Count == 17)
                                 {
                                     <tr>
-                                        <td style="width: 75px;">@item.Quantity</td>
-                                        <td style="width: 50px;">@item.Unit</td>
-                                        <td class="auto-font-size" style="width: 90px;">@item.PartNumber</td>
-                                        <td class="auto-font-size">@item.ItemName</td>
+                                        <td class="auto-font-size" style="width: 90px; padding-right: 5px;">@item.PartNumber</td>
+                                        <td class="auto-font-size" style="padding-right: 10px;">@item.ItemName</td>
+                                        <td style="width: 75px;">@item.Quantity @item.Unit</td>
                                         <td style="width: 90px;" class="currency">@item.NetPrice</td>
                                         <td style="width: 115px;" class="currency">@item.GrossPriceNoDiscount</td>
-                                        <td style="width: 10px;"></td>
                                     </tr>
                                 }
                                 else
@@ -125,26 +108,23 @@
                             @if (otherQuantity > 0)
                             {
                                 <tr>
+                                    <td style="width: 90px;"></td>
+                                    <td>+@(Model.Items.Count - 16) more item(s)</td>
                                     <td style="width: 75px;">@otherQuantity</td>
-                                    <td colspan="4">+@(Model.Items.Count - 17) more item(s)</td>
+                                    <td style="width: 90px;"></td>
                                     <td style="width: 115px;" class="currency">@string.Format("{0:#,##0.00}", otherGrossPrice)</td>
-                                    <td style="width: 10px;"></td>
                                 </tr>
                             }
-                            @* else
-                    {
-                        @for (int rem = 0; rem <= 17 - Model.Items.Count; rem++)
-                        {
-                            <tr>
-                                <td style="width: 75px;"></td>
-                                <td style="width: 50px;"></td>
-                                <td></td>
-                                <td style="width: 80px;" class="currency"></td>
-                                <td style="width: 125px;" class="currency"></td>
-                                <td style="width: 10px;"></td>
-                            </tr>
-                        }
-                    } *@
+                            else
+                            {
+                                <tr>
+                                    <td style="width: 90px;"></td>
+                                    <td>*** NOTHING FOLLOWS ***</td>
+                                    <td style="width: 75px;"></td>
+                                    <td style="width: 90px;"></td>
+                                    <td style="width: 115px;"></td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -162,13 +142,8 @@
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency">Total Amount:</td>
-                        <td style="width: 115px;" class="currency">@Model.DiscountedTotal</td>
-                        <td style="width: 10px;"></td>
-                    </tr>
-                    <tr>
                         <td colspan="5" class="currency"></td>
-                        <td style="width: 115px;" class="currency"></td> <!-- Total Sales(VAT Inclusive) -->
+                        <td style="width: 115px;" class="currency">@Model.DiscountedTotal</td> <!-- Total Sales(VAT Inclusive) -->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
@@ -188,7 +163,12 @@
                     </tr>
                     <tr>
                         <td colspan="5" class="currency"></td>
-                        <td style="width: 115px;" class="currency"></td> <!-- Amount Due -->
+                        <td style="width: 115px;" class="currency"></td> <!-- SC/PWD/... -->
+                        <td style="width: 10px;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="currency"></td>
+                        <td style="width: 115px;" class="currency"></td> <!-- Less Withholding Tax -->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
@@ -210,9 +190,6 @@
         <!-- DELIVERY RECEIPT -->
         <span style="font-size: 20px;">@Model.SONumber</span>
         <table class="for-dr" style="margin-top: 15px;">
-            @* <table style="margin-top: 115px;"> *@
-            @*<table style="margin-top: 140px;">*@
-            @* <table style="margin-top: 160px;"> *@
             <tbody>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
@@ -247,8 +224,7 @@
                         <td style="width: 75px !important;" class="currency"></td>
                         <td style="width: 75px !important;" class="currency"></td>
                     </tr>
-                    @if (Model != null)
-                    {
+                    @{
                         int rowctr = 0, otherQuantity = 0;
                         decimal otherGrossPrice = 0;
                         @foreach (var item in Model.Items)
@@ -326,7 +302,7 @@
     }
 </body>
 <script type="text/javascript">
-        @* document.addEventListener('DOMContentLoaded', () => {
+@*     document.addEventListener('DOMContentLoaded', () => {
         const DEFAULT_HEIGHT = 26;
 
         document.querySelectorAll('.auto-font-size').forEach(el => {
@@ -362,7 +338,7 @@
             withoutNewLine.style.display = "none";
         }
     });
-    
+
     window.print();
     window.onafterprint = function () {
         setTimeout(function () {

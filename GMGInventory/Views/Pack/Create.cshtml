@@ -235,7 +235,11 @@
                             }
                         }
                         if(data.inventoryCountD == 0 && data.remainingQuantityD > 0) {
-                            actions += '<strong data-microtip-title="Empty inventory, nothing to pack" data-microtip-position="right" role="tooltip"><span class="fas fa-exclamation"></span></strong>';
+                            //actions += '<strong data-microtip-title="Empty inventory, nothing to pack" data-microtip-position="right" role="tooltip"><span class="fas fa-exclamation"></span></strong>';
+                            actions += '<strong class="text-danger" data-microtip-title="Empty inventory, nothing to pack" data-microtip-position="right" role="tooltip">0 Stocks</strong>';
+                        }
+                        if (actions == '') {
+                            actions += '<strong class="text-success" data-microtip-title="All order already been packed" data-microtip-position="right" role="tooltip">Completed</strong>';
                         }
                         return actions;
                     }

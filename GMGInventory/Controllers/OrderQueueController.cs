@@ -34,6 +34,7 @@ namespace GMGInventory.Controllers
             var form = new DataTablesRequestForm(Request.Form);
             return Json(await queueRepository.GetOrdersDT(form));
         }
+
         public async Task<IActionResult> Details(string Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.View);
@@ -42,6 +43,14 @@ namespace GMGInventory.Controllers
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.OrderQueue)).Convert();
 
             return View(await queueRepository.GetDetails(Id));
+        }
+
+        public async Task<IActionResult> Add(string OrderNumber)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.Add);
+            if (redirectResult != null) return redirectResult;
+
+            return View(await queueRepository.AddOrder(OrderNumber));
         }
     }
 }
