@@ -657,7 +657,7 @@
                 clearItemForm();
                 toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Sales Order Item(s)", "Success");
 
-                $('#addModal').modal('hide')
+                //$('#addModal').modal('hide')
             }
         }
 
@@ -813,22 +813,22 @@
                         var discount = '<div class="input-group input-group-sm" style="width: 100%;">';
 
                         discount += '<label for="' + data.lineNumber + '_1" class="input-group-text text-info bg-info">#1</label>';
-                        discount += '<input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1 discount-form-display" placeholder="Discount 1" />';
+                        discount += '<input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1) + '" class="form-control form-control-sm discount1 discount-form-display" placeholder="Discount 1" />';
 
                         discount += '<label for="' + data.lineNumber + '_2" class="input-group-text text-info bg-info">#2</label>';
-                        discount += '<input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2 discount-form-display" placeholder="Discount 2" />';
+                        discount += '<input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2) + '" class="form-control form-control-sm discount2 discount-form-display" placeholder="Discount 2" />';
 
 
                         discount += '<label for="' + data.lineNumber + '_3" class="input-group-text text-info bg-info">#3</label>';
-                        discount += '<input id="' + data.lineNumber + '_3" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3D) + '" class="form-control form-control-sm discount3 discount-form-display" placeholder="Discount 3" />';
+                        discount += '<input id="' + data.lineNumber + '_3" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount3) + '" class="form-control form-control-sm discount3 discount-form-display" placeholder="Discount 3" />';
 
 
                         discount += '<label for="' + data.lineNumber + '_4" class="input-group-text text-info bg-info">#4</label>';
-                        discount += '<input id="' + data.lineNumber + '_4" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount4D) + '" class="form-control form-control-sm discount4 discount-form-display" placeholder="Discount 4" />';
+                        discount += '<input id="' + data.lineNumber + '_4" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount4) + '" class="form-control form-control-sm discount4 discount-form-display" placeholder="Discount 4" />';
 
 
                         discount += '<label for="' + data.lineNumber + '_5" class="input-group-text text-info bg-info">#5</label>';
-                        discount += '<input id="' + data.lineNumber + '_5" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount5D) + '" class="form-control form-control-sm discount5 discount-form-display" placeholder="Discount 5" />';
+                        discount += '<input id="' + data.lineNumber + '_5" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount5) + '" class="form-control form-control-sm discount5 discount-form-display" placeholder="Discount 5" />';
 
                         discount += '<span class="input-group-text">%</span></div>';
                         return discount;

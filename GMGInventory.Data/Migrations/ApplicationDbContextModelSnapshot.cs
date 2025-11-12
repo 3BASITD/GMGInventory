@@ -979,6 +979,18 @@ namespace GMGInventory.Data.Migrations
                             PageId = 75,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 76,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 76,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -6689,6 +6701,41 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("SalesOrderLineItems");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.SalesOrderSourced", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceOrderNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.ToTable("SalesOrderSources");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
                 {
                     b.Property<int>("Id")
@@ -8166,13 +8213,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8172f322-fed8-45b5-8131-a58d9ad9bee0",
+                            ConcurrencyStamp = "60730573-f4c8-4bb3-b1ae-4734e6de78cc",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGJenOZ2JZ8vpfDTVUguSkl+jnJgMyGaUgm2fhZhkXbYySnbGgHmeZb7beHZl+fkYQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKXt//UVcidr0C1obeC+89oI22RiODF/mH+Bu5b5T6btSPIJZfoyh37wi66DJjtIuA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "80afbc2e-b9b6-41d9-8f42-7ce45d5a7202",
+                            SecurityStamp = "cbc83a2b-48cf-4ac8-9637-da3552b5b50c",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8187,13 +8234,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "61c213ad-68b1-4844-89cc-a639cf6ed85f",
+                            ConcurrencyStamp = "2c2ed681-0862-4129-a8fe-d4a1d2aedc16",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhA1B9IE4GTwMrKBTqvGKD3+LkS/21eSPO6fMiTjS/cIE92I+VBS9WxXWIjEp0vLQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPpHnbZSKsa6nzeKUe5di3QmrwMrXe+vCOgUFyRLjrHmEg5CGjMJtvj/u9fBTt+0cA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8e82214e-74f5-492e-87e1-7bb262a5deaa",
+                            SecurityStamp = "716023d3-dd94-4f75-975d-bf9194ea09c6",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9237,6 +9284,17 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesOrder");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.SalesOrderSourced", b =>
+                {
+                    b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
+                        .WithMany("SalesOrderSources")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalesOrder");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.SalesReturn", b =>
                 {
                     b.HasOne("GMGInventory.Data.Customer", "Customer")
@@ -9873,6 +9931,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesOrderLineItems");
 
                     b.Navigation("SalesOrderResubmits");
+
+                    b.Navigation("SalesOrderSources");
 
                     b.Navigation("SalesReturns");
                 });

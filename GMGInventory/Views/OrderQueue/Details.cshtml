@@ -15,7 +15,7 @@
         <div class="card-tools">
             @if (userAccess.CanAdd)
             {
-                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-print">
+                <button type="button" class="btn btn-success btn-sm float-right ml-2" onclick="AddToSalesOrder()">
                     <span class="fas fa-plus"></span> Add to Sales Order
                 </button>
             }
@@ -32,57 +32,67 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-4">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.OrderNumber)
-                    </span>
-                    <b class="d-block">
-                        @Model.OrderNumber
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Agent)
-                    </span>
-                    <b class="d-block">
-                        @if (Model.IsValidAgent == false)
-                        {
-                            <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
-                                @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Agent)
-                                &emsp;<span class="fas fa-exclamation-triangle"></span>
-                            </span>
-                        } else
-                        {
-                            @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Agent)
-                        }
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Customer)
-                    </span>
-                    <b class="d-block">
-                        @if (Model.IsValidCustomer == false)
-                        {
-                            <span class="text-warning" data-microtip-title="Invalid Customer" data-microtip-position="right" role="tooltip">
-                                @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Customer)
-                                &emsp;<span class="fas fa-exclamation-triangle"></span>
-                            </span>
-                        } else
-                        {
-                            @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Customer)
-                        }
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Instruction)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.Instruction) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Instruction)
-                    </b>
-                </p>
+            <div class="col-md-4 text-sm">
+                <span class="text-muted">
+                    @Html.DisplayNameFor(model => model.OrderNumber)
+                </span>
+                <b class="d-block">
+                    @Model.OrderNumber
+                </b>
+            </div>
+            <div class="col-md-4 text-sm">
+                <span class="text-muted">
+                    @Html.DisplayNameFor(model => model.Agent)
+                </span>
+                <b class="d-block">
+                    @if (Model.IsValidAgent == false)
+                    {
+                        <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
+                            @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Agent)
+                            &emsp;<span class="fas fa-exclamation-triangle"></span>
+                        </span>
+                    }
+                    else
+                    {
+                        @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Agent)
+                    }
+                </b>
+            </div>
+            <div class="col-md-4 text-sm">
+                <span class="text-muted">
+                    @Html.DisplayNameFor(model => model.Customer)
+                </span>
+                <b class="d-block">
+                    @if (Model.IsValidCustomer == false)
+                    {
+                        <span class="text-warning" data-microtip-title="Invalid Customer" data-microtip-position="right" role="tooltip">
+                            @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Customer)
+                            &emsp;<span class="fas fa-exclamation-triangle"></span>
+                        </span>
+                    }
+                    else
+                    {
+                        @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Customer)
+                    }
+                </b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-sm">
+                <span class="text-muted">
+                    @Html.DisplayNameFor(model => model.Instruction)
+                </span>
+                <b class="d-block">
+                    @(string.IsNullOrWhiteSpace(Model.Instruction) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Instruction)
+                </b>
+            </div>
+            <div class="col-md-8 text-sm">
+                <span class="text-muted">
+                    @Html.DisplayNameFor(model => model.SalesOrders)
+                </span>
+                <b class="d-block">
+                    @(string.IsNullOrWhiteSpace(Model.SalesOrders) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SalesOrders)
+                </b>
             </div>
         </div>
         <div class="row">
@@ -221,7 +231,48 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var order_details = @Html.Raw(Json.Serialize(Model));
 
-        var orderDT = $('.table-order').DataTable();
+        var itemDT = $('.table-item').DataTable();
+
+        if (user_access.canAdd) {
+            function AddToSalesOrder() {
+                var timesAdded = "";
+                if (order_details.convertTimes > 0) {
+                    timesAdded += " <strong>This order already added " + order_details.convertTimes + " time(s)</strong>, adding it again might result to duplicate sales order.";
+                }
+
+                swal({
+                    title: "Add to Sales Order",
+                    content: {
+                        element: "div",
+                        attributes: {
+                            style: "color: black;text-align: center;",
+                            innerHTML: "Are you sure you want to add this record to sales order?" + timesAdded
+                        }
+                    },
+                    icon: "info",
+                    buttons: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("Add")",
+                            type: "POST",
+                            data: { OrderNumber: order_details.orderNumber },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    swal.close();
+                                    window.location.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    //toastr.error(data.message, data.status);
+                                    ToastrAndConsoleError(data.status, data.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            };
+        }
     </script>
 }

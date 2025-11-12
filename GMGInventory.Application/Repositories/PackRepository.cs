@@ -377,12 +377,14 @@ namespace GMGInventory.Application.Repositories
                 }
 
                 var pquantity = context.PackLineItems
-                                       .Where(s => s.Pack.SalesOrderId == sorder.Id && s.ItemId == sitem.Id)
+                                       .Where(s => s.Pack.SalesOrderId == sorder.Id 
+                                                && s.ItemId == sitem.Id 
+                                                && s.Pack.Status.Name.ToLower() != "packing draft")
                                        .Select(s => (int?)s.Quantity)
                                        .Sum() ?? 0;
                 if (item.Quantity > soli.Quantity - pquantity)
                 {
-                    invalids.Add($"Invalid Item Quantity: {(soli.Quantity - pquantity)} remaining for {sitem.Code}");
+                    invalids.Add($"Invalid Item Quantity: {(soli.Quantity - pquantity)} remaining to pack for {sitem.Code}");
                     continue;
                 }
             }
