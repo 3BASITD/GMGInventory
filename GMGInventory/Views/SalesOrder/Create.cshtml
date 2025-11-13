@@ -494,14 +494,27 @@
                     "</small>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Item")"
+                url: "@Url.Action("GetOptionsPromo", "Item")",
+                data: function(params){
+                    var query ={
+                    search : params.term,
+                    page : params.page,
+                    orderDate : $("#order-date").val()
+                    }
+                    return query;
+                }
             },
             dropdownParent: $("#addModal")
         });
 
         $("#add-code").on("select2:select", function () {
             $("#add-name").val($("#add-code").select2("data")[0].name);
-            if ($("#add-code").select2("data")[0].retailPriceD > $("#add-code").select2("data")[0].netPriceD) {
+            if($("#add-code").select2("data")[0].promoPriceD > 0){
+                $("#add-unit-price").val($("#add-code").select2("data")[0].promoPriceD);
+                $("#add-gross-price").val($("#add-code").select2("data")[0].promoPriceD);
+                $(".add-price-source").text("(Promo)");
+            }
+            else if ($("#add-code").select2("data")[0].retailPriceD > $("#add-code").select2("data")[0].netPriceD) {
                 $("#add-unit-price").val($("#add-code").select2("data")[0].retailPriceD);
                 $("#add-gross-price").val($("#add-code").select2("data")[0].retailPriceD);
                 $(".add-price-source").text("(Gross)");
@@ -647,12 +660,18 @@
                     unit: $("#add-code").select2("data")[0].unit,
                     unitPrice: Round2Decimal($("#add-unit-price").val() || "0.00"),
                     discount1: Round2Decimal($("#add-discount1").val() || "0.00"),
+                    discount1D: $("#add-discount1").val() || 0,
                     discount2: Round2Decimal($("#add-discount2").val() || "0.00"),
+                    discount2D: $("#add-discount2").val() || 0,
                     discount3: Round2Decimal($("#add-discount3").val() || "0.00"),
+                    discount3D: $("#add-discount3").val() || 0,
                     discount4: Round2Decimal($("#add-discount4").val() || "0.00"),
+                    discount4D: $("#add-discount4").val() || 0,
                     discount5: Round2Decimal($("#add-discount5").val() || "0.00"),
+                    discount5D: $("#add-discount5").val() || 0,
                     grossPrice: Round2Decimal($("#add-gross-price").val() || "0.00"),
-                    customerBrandDiscountId: $("#add-discount-id").val()
+                    customerBrandDiscountId: $("#add-discount-id").val(),
+                    itemPromoId: $("#add-code").select2("data")[0].itemPromoId
                 }).order([1, 'asc']).draw();
                 clearItemForm();
                 toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Sales Order Item(s)", "Success");
@@ -813,7 +832,15 @@
                         var discount = '<div class="input-group input-group-sm" style="width: 100%;">';
 
                         discount += '<label for="' + data.lineNumber + '_1" class="input-group-text text-info bg-info">#1</label>';
-                        discount += '<input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1 discount-form-display" placeholder="Discount 1" />';
+                        discount += '<input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1 discount-form-display" placeholder="Discount 1" ';
+                        if( user_access2.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) )
+                            {
+                                discount += '/>';
+
+                            }
+                            else{
+                                discount += 'readonly/>';
+                            }
 
                         discount += '<label for="' + data.lineNumber + '_2" class="input-group-text text-info bg-info">#2</label>';
                         discount += '<input id="' + data.lineNumber + '_2" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount2D) + '" class="form-control form-control-sm discount2 discount-form-display" placeholder="Discount 2" />';
@@ -1013,7 +1040,8 @@
                     discount3: row_discount3,
                     discount4: row_discount4,
                     discount5: row_discount5,
-                    customerBrandDiscountId: row_data.customerBrandDiscountId
+                    customerBrandDiscountId: row_data.customerBrandDiscountId,
+                    itemPromoId: row_data.itemPromoId
                 });
             });
             return item_to_order;

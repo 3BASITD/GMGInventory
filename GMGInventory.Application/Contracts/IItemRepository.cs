@@ -5,6 +5,7 @@ namespace GMGInventory.Application.Contracts
     public interface IItemRepository
     {
         Task<Select2Model<JsonItemOptionsModel>> GetOptions(string search, int page);
+        Task<Select2Model<JsonItemOptionsModel>> GetOptionsPromo(string search, int page, DateTime orderDate);
         Task<Select2Model<JsonItemOptionsModel>> GetPOItemOptions(int id, string search);
         Task<Select2Model<JsonItemOptionsModel>> GetUnservedOptions(string search, int page, int SalesOrderId);
         Task<Select2Model<JsonOptionsModel>> GetModelNumberOptions(string search, int page);
@@ -26,7 +27,7 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateAsync(int id);
         Task AddAsync(ItemCommonVM itemVM);
         Task<ResponseModel> ItemPromoAddAsync(ItemPromoVM itemPromoVM);
-        Task<ResponseModel> ReactivateItemPromoAsync(int Id);
+        Task<ResponseModel> ReactivateItemPromoAsync(int Id,int itemId, DateTime Start, DateTime End);
         Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id);
         Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);

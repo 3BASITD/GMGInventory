@@ -6659,6 +6659,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ItemPromoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("LineNumber")
                         .HasColumnType("int");
 
@@ -6683,6 +6686,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("CustomerBrandDiscountId");
 
                     b.HasIndex("ItemId");
+
+                    b.HasIndex("ItemPromoId");
 
                     b.HasIndex("SalesOrderId");
 
@@ -8166,13 +8171,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8172f322-fed8-45b5-8131-a58d9ad9bee0",
+                            ConcurrencyStamp = "4882b4b2-b102-48a9-b835-9227c9fc453c",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGJenOZ2JZ8vpfDTVUguSkl+jnJgMyGaUgm2fhZhkXbYySnbGgHmeZb7beHZl+fkYQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKXanTeBzJlXk+NwXDg5A8Zl5/KgbKIyyaR5tX70YIbyzozJxNVe8yIqvBAfGMp5CQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "80afbc2e-b9b6-41d9-8f42-7ce45d5a7202",
+                            SecurityStamp = "58d6e9a5-0a82-4bdd-bbae-012dc6aa8541",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8187,13 +8192,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "61c213ad-68b1-4844-89cc-a639cf6ed85f",
+                            ConcurrencyStamp = "73f3a803-9714-4bc4-9253-b8bb00ac1d4d",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhA1B9IE4GTwMrKBTqvGKD3+LkS/21eSPO6fMiTjS/cIE92I+VBS9WxXWIjEp0vLQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPrqileUE4zoeq4cO8T8czN1EJTPxKBWOO0WKrbJNVs1hBE7Me6JxViRWEtEoN0IBg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8e82214e-74f5-492e-87e1-7bb262a5deaa",
+                            SecurityStamp = "d42ea1a7-ded8-4ff2-9472-24889fac6609",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9224,6 +9229,10 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.ItemPromo", "ItemPromo")
+                        .WithMany()
+                        .HasForeignKey("ItemPromoId");
+
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
                         .WithMany("SalesOrderLineItems")
                         .HasForeignKey("SalesOrderId")
@@ -9233,6 +9242,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("CustomerBrandDiscount");
 
                     b.Navigation("Item");
+
+                    b.Navigation("ItemPromo");
 
                     b.Navigation("SalesOrder");
                 });

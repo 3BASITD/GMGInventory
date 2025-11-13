@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Policy;
 
 namespace GMGInventory.Common.Models
 {
@@ -309,6 +310,10 @@ namespace GMGInventory.Common.Models
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
 
+        [Display(Name = "Promo Price")]
+        public string PromoPrice => string.Format(SystemFormat.StringDecimalComma, PromoPriceD);
+        public decimal PromoPriceD { get; set; }
+
         [Display(Name = "Selling Price")]
         public string SellingPrice => string.Format(SystemFormat.StringDecimalComma, SellingPriceD);
         public decimal SellingPriceD { get; set; }
@@ -334,6 +339,7 @@ namespace GMGInventory.Common.Models
         public decimal Discount5D { get; set; }
 
         public int? CustomerBrandDiscountId { get; set; }
+        public int? ItemPromoId { get; set; }
 
         [Display(Name = "Extended Price")]
         public string GrossPrice => string.Format(SystemFormat.StringDecimalComma, GrossPriceD);
@@ -402,5 +408,6 @@ namespace GMGInventory.Common.Models
             }
         }
         public int? CustomerBrandDiscountId { get; set; }
+        public int? ItemPromoId { get; set; }
     }
 }

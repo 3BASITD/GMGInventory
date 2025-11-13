@@ -27,6 +27,11 @@ namespace GMGInventory.Controllers
             return Json(await itemRepository.GetOptions(search, page));
         }
 
+        public async Task<IActionResult> GetOptionsPromo(string search, int page, DateTime orderDate)
+        {
+            return Json(await itemRepository.GetOptionsPromo(search, page, orderDate));
+        }
+
         public async Task<IActionResult> GetUnservedOptions(string search, int page, int SalesOrderId)
         {
             return Json(await itemRepository.GetUnservedOptions(search, page, SalesOrderId));
@@ -345,9 +350,9 @@ namespace GMGInventory.Controllers
             {
                 var dateTime = DateTime.Now;
 
-                if (dateTime > form.EffectiveDateD)
+                if (dateTime > form.ExpirationDateD)
                 {
-                    response.Message = "Cannot set Effective Date as past date.";
+                    response.Message = "Cannot set Expiration Date as past date.";
                     response.Status = "Error";
 
                     return Json(response);
@@ -372,12 +377,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReactivateItemPromoJson(int Id)
+        public async Task<IActionResult> ReactivateItemPromoJson(int id, int itemId, DateTime start, DateTime end )
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
-            var response = await itemRepository.ReactivateItemPromoAsync(Id);
+            var response = await itemRepository.ReactivateItemPromoAsync(id, itemId, start, end);
 
             return Json(response);
         }

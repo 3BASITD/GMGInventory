@@ -790,7 +790,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="save-promo-effective-time" class="control-label mb-0 d-block">Effective Time</label>
-                                <input type="time" name="EffectiveTime" id="save-promo-effective-time" class="form-control form-control-sm" />
+                                <input type="time" name="EffectiveTime" id="save-promo-effective-time" value="00:00:00" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -806,7 +806,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="save-promo-expiration-time" class="control-label mb-0 d-block">Expiration Time</label>
-                                <input type="time" name="ExpirationTime" id="save-promo-expiration-time" class="form-control form-control-sm" />
+                                <input type="time" name="ExpirationTime" id="save-promo-expiration-time" value="23:59:59" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -1861,7 +1861,10 @@
                             $.ajax({
                                 url: "@Url.Action("ReactivateItemPromoJson")",
                                 type: "POST",
-                                data: { Id: row_data.id },
+                                data: { Id: row_data.id,
+                                        ItemId: row_data.itemId,
+                                        Start: row_data.effectiveDateD,
+                                        End: row_data.expirationDateD},
                                 success: function (data, status, xhr) {
                                     if (data.status == "Success") {
                                         swal.close();
@@ -1902,8 +1905,8 @@
         function clearPromoForm(){
             $("#save-promo-effective").val("");
             $("#save-promo-expiration").val("");
-            $("#save-promo-effective-time").val("");
-            $("#save-promo-expiration-time").val("");
+            $("#save-promo-effective-time").val("00:00");
+            $("#save-promo-expiration-time").val("23:59");
             $("#save-promo-name").val("");
             $("#save-promo-price").val("");
             $("#save-promo-id").val("");

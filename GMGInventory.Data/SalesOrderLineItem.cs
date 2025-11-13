@@ -39,6 +39,10 @@ namespace GMGInventory.Data
 
         public decimal? Discount5 { get; set; }
 
+        [ForeignKey("ItemPromoId")]
+        public int? ItemPromoId { get; set; }
+        public ItemPromo ItemPromo { get; set; }
+
 
     }
 }

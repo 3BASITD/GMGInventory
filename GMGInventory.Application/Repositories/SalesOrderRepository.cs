@@ -535,7 +535,8 @@ namespace GMGInventory.Application.Repositories
                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                     SellingPriceD = order.SellingPrice,
                                     ServedQuantityD = packedQuantity - returnedQuantity,
-                                    Unit = order.Item.Unit.Code
+                                    Unit = order.Item.Unit.Code,
+                                    ItemPromoId = order.ItemPromoId
                                 }).ToListAsync();
 
             return itemVM;
@@ -850,7 +851,9 @@ namespace GMGInventory.Application.Repositories
                                    Quantity = s.Quantity,
                                    SalesOrderId = salesOrderId,
                                    SellingPrice = s.UnitPrice,
-                                   CustomerBrandDiscountId = s.CustomerBrandDiscountId
+                                   CustomerBrandDiscountId = s.CustomerBrandDiscountId,
+                                   ItemPromoId = s.ItemPromoId
+                                   
                                });
             context.SalesOrderLineItems.AddRange(itemsVM);
 
@@ -870,6 +873,7 @@ namespace GMGInventory.Application.Repositories
                 dbitem.Quantity = di.Quantity;
                 dbitem.SellingPrice = di.UnitPrice;
                 dbitem.CustomerBrandDiscountId = di.CustomerBrandDiscountId;
+                dbitem.ItemPromoId = di.ItemPromoId;
 
                 context.SalesOrderLineItems.Update(dbitem);
             }

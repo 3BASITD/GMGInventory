@@ -128,6 +128,9 @@ namespace GMGInventory.Common.Models
         public decimal NetPriceD { get; set; }
         public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
         public decimal RetailPriceD { get; set; }
+        public string PromoPrice => string.Format(SystemFormat.StringDecimalComma, PromoPriceD);
+        public decimal PromoPriceD { get; set; }
+        public int ItemPromoId { get; set; }
         public int InventoryCount { get; set; }
         public int BrandId { get; set; }
        

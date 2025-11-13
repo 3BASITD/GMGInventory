@@ -2,15 +2,16 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core;
-using System.Xml.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq.Dynamic.Core;
+using System.Xml.Linq;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -54,6 +55,7 @@ namespace GMGInventory.Application.Repositories
                                              .OrderByDescending(s => s.DateCreated)
                                              .Take(1)
                                              .DefaultIfEmpty()
+                        
                         let inventory = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true)
                                                .Sum(s => (int?)s.Quantity) ?? 0
@@ -72,7 +74,7 @@ namespace GMGInventory.Application.Repositories
                             Name = item.Name,
                             OldCode = item.OldCode,
                             PartNumber = item.PartNumber + "",
-                            NetPriceD = price == null ? -999999 : price.NetSellingPrice,
+                            NetPriceD =    price == null ? -999999 : price.NetSellingPrice,
                             QuantityD = 0,
                             RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
                             UnitId = item.Unit == null ? -1 : item.Unit.Id,
@@ -87,6 +89,68 @@ namespace GMGInventory.Application.Repositories
                 total_count = items.Count()
             };
         }
+
+        public async Task<Select2Model<JsonItemOptionsModel>> GetOptionsPromo(string search, int page, DateTime orderDate)
+        {
+            var now = DateTime.Now;
+
+            if(page == 0)
+            {
+                page = 1;
+            }
+
+            var itemsQuery =
+                from item in context.Items
+                from price in context.ItemPrices
+                    .Where(p => p.ItemId == item.Id && p.DateCreated <= now)
+                    .OrderByDescending(p => p.DateCreated)
+                    .Take(1)
+                    .DefaultIfEmpty()
+                from promo in context.ItemPromo
+                    .Where(pr => pr.ItemId == item.Id
+                              && pr.EffectiveDate <= orderDate
+                              && pr.ExpirationDate >= orderDate)
+                    .OrderByDescending(pr => pr.DateCreated)
+                    .Take(1)
+                    .DefaultIfEmpty()
+                let inventory = context.ItemInventories
+                    .Where(inv => inv.ItemId == item.Id && inv.Warehouse.IsMain == true)
+                    .Sum(inv => (int?)inv.Quantity) ?? 0
+                where item.IsActive
+                   && (string.IsNullOrWhiteSpace(search)
+                   || item.Code.ToLower().Contains(search.ToLower())
+                   || item.Name.ToLower().Contains(search.ToLower())
+                   || (item.OldCode + "").ToLower().Contains(search.ToLower())
+                   || (item.PartNumber + "").ToLower().Contains(search.ToLower()))
+                orderby item.Code ascending
+                select new JsonItemOptionsModel
+                {
+                    Id = item.Id.ToString(),
+                    InventoryCount = inventory,
+                    Text = item.Code,
+                    Name = item.Name,
+                    OldCode = item.OldCode,
+                    PartNumber = item.PartNumber ?? "",
+                    NetPriceD = price == null ? -999999 : price.NetSellingPrice,
+                    QuantityD = 0,
+                    RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
+                    PromoPriceD = promo == null ? -999999 : promo.PromoPrice,
+                    ItemPromoId = promo == null ? 0 : promo.Id,
+                    UnitId = item.Unit == null ? -1 : item.Unit.Id,
+                    Unit = item.Unit == null ? "" : item.Unit.Code,
+                    BrandId = item.BrandId
+                };
+
+            var totalCount = await itemsQuery.CountAsync();
+            var itemsFiltered = await itemsQuery.Skip((page - 1) * 50).Take(50).ToListAsync();
+
+            return new Select2Model<JsonItemOptionsModel>
+            {
+                items = itemsFiltered,
+                total_count = totalCount
+            };
+        }
+
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetPOItemOptions(int id, string search)
         {
@@ -867,10 +931,18 @@ namespace GMGInventory.Application.Repositories
 
             ResponseModel response = new();
 
+            if( await CheckItemPromoDuration(itemPromoVM.ItemId, itemPromoVM.EffectiveDateD, itemPromoVM.ExpirationDateD))
+            {
+                response.Status = "Error";
+                response.Message = "Item Promo duration overlaps with an existing active promo.";
+
+                return response;
+            }
+
             var itemPromo = await context.ItemPromo.Where(s => s.Id == itemPromoVM.Id).FirstOrDefaultAsync();
             if (itemPromo == null)
             {
-                itemPromo = new ItemPromo
+                itemPromo = new Data.ItemPromo
                 {
                     ItemId = itemPromoVM.ItemId,
                     Name = itemPromoVM.Name,
@@ -906,10 +978,20 @@ namespace GMGInventory.Application.Repositories
             return response;
         }
 
-        public async Task<ResponseModel> ReactivateItemPromoAsync(int Id)
+        public async Task<ResponseModel> ReactivateItemPromoAsync(int Id, int itemId, DateTime Start, DateTime End)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
+
+            if (await CheckItemPromoDuration(itemId, Start, End))
+            {
+                response.Status = "Error";
+                response.Message = "Item Promo duration overlaps with an existing active promo.";
+
+                return response;
+            }
+
+
             var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
             if (itemPromo == null)
             {
@@ -934,6 +1016,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
             var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
+            var isItemPromoSales = await context.SalesOrderLineItems.Where(i => i.ItemPromoId == Id).AnyAsync();
+
             if (itemPromo == null)
             {
                 response.Status = "Error";
@@ -942,17 +1026,7 @@ namespace GMGInventory.Application.Repositories
 
             else
             {
-                if (itemPromo.EffectiveDate > DateTime.Now)
-                {
-
-                    context.ItemPromo.Remove(itemPromo);
-                    await context.SaveChangesAsync(currentUserId);
-
-                    response.Status = "Success";
-                    response.Message = "Item Promo successfully deleted";
-                }
-
-                else 
+                if ( isItemPromoSales || (itemPromo.EffectiveDate < DateTime.Now))
                 {
                     itemPromo.IsActive = false;
                     context.ItemPromo.Update(itemPromo);
@@ -960,6 +1034,17 @@ namespace GMGInventory.Application.Repositories
 
                     response.Status = "Success";
                     response.Message = "Item Promo successfully deactivated";
+
+
+                }
+
+                else 
+                {
+                    context.ItemPromo.Remove(itemPromo);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Item Promo successfully deleted";
 
                 }
 
@@ -1437,6 +1522,14 @@ namespace GMGInventory.Application.Repositories
                                IsActive = promo.IsActive
                            };
             return await promoVM.ToListAsync();
+        }
+
+        public async Task<bool> CheckItemPromoDuration(int itemId, DateTime start, DateTime end)
+        {
+            return await context.ItemPromo.AnyAsync(s => s.ItemId == itemId 
+                                                     && ((s.EffectiveDate <= start && s.ExpirationDate >= start) || (s.EffectiveDate <= end && s.ExpirationDate >= end) || (s.EffectiveDate >= start && s.ExpirationDate >= end) || (s.EffectiveDate >= start && s.ExpirationDate <= end))
+                                                     && s.IsActive);
+         
         }
 
 
