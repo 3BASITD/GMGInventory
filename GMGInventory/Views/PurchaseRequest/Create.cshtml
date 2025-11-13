@@ -88,6 +88,7 @@
                                         <th></th>
                                         <th>#</th>
                                         <th>SO Number</th>
+                                        <th>PO Number</th>
                                         <th>Customer</th>
                                         <th>Item Code</th>
                                         <th>Part Number</th>
@@ -100,6 +101,7 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
+                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -288,8 +290,18 @@
                     },
                     className: "form-cell"
                 },
-                { data: "lineNumber", name: "LineNumber", className: "form-cell" }, 
+                { data: "lineNumber", name: "LineNumber", className: "form-cell" },
                 { data: "salesOrderNumber", name: "SalesOrderNumber", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.poNumber == null) {
+                            return "<em class='text-muted'>N/A</em>";
+                        } else {
+                            return data.poNumber;
+                        }
+                    },
+                    name: "PONumber", 
+                    className: "form-cell" },
                 { data: "customer", name: "Customer", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
@@ -344,7 +356,7 @@
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
 
-                columnDTTotalInteger(api, 8);
+                columnDTTotalInteger(api, 9);
             }
         });
 
@@ -571,11 +583,12 @@
         }
 
         var columnVisibilityMap = {
-            "automotive_rush order": [true, true, true, true, true, true, true, true, false],
-            "automotive_stocking": [false, false, true, true, true, true, true, true, false],
-            "non-automotive_office supplies": [false, false, true, false, true, true, true, true, false],
-            "non-automotive_one-time purchase": [false, false, false, false, true, false, true, true, true],
-            "maintenance & repair_": [false, false, false, false, true, false, true, true, true]
+            // [SO Number, PO Number, Customer, Item Code, Part Number, Item Name, Stock on Hand, Quantity, Unit, Purpose]
+            "automotive_rush order": [true, true, true, true, true, true, true, true, true, false],
+            "automotive_stocking": [false, false, false, true, true, true, true, true, true, false],
+            "non-automotive_office supplies": [false, false, false, true, false, true, true, true, true, false],
+            "non-automotive_one-time purchase": [false, false, false, false, false, true, false, true, true, true],
+            "maintenance & repair_": [false, false, false, false, false, true, false, true, true, true]
         };
 
         function updateColumnVisibility() {
@@ -601,12 +614,12 @@
                     $(".add-unit-container").toggle(false);
                     $(".add-unit2-container").toggle(true);
                 }
-                $(".add-part-container").toggle(columnVisibilityMap[key][3]);
-                $(".add-name-container").toggle(columnVisibilityMap[key][4]);
-                $(".add-stock-container").toggle(columnVisibilityMap[key][5]);
-                // $(".add-quantity-container").toggle(columnVisibilityMap[key][6]);
-                // $(".add-unit-container").toggle(columnVisibilityMap[key][7]);
-                $(".add-purpose-container").toggle(columnVisibilityMap[key][8]);
+                $(".add-part-container").toggle(columnVisibilityMap[key][4]);
+                $(".add-name-container").toggle(columnVisibilityMap[key][5]);
+                $(".add-stock-container").toggle(columnVisibilityMap[key][6]);
+                // $(".add-quantity-container").toggle(columnVisibilityMap[key][7]);
+                // $(".add-unit-container").toggle(columnVisibilityMap[key][8]);
+                $(".add-purpose-container").toggle(columnVisibilityMap[key][9]);
             }
         }
 
@@ -616,10 +629,10 @@
 
             var key = (typeText + "_" + purposeText).toLowerCase();
             if (name == "SONumber") return columnVisibilityMap[key][0];
-            else if (name == "Code") return columnVisibilityMap[key][2];
-            else if (name == "Name") return columnVisibilityMap[key][4];
-            else if (name == "Quantity") return columnVisibilityMap[key][6];
-            else if (name == "Purpose") return columnVisibilityMap[key][7];
+            else if (name == "Code") return columnVisibilityMap[key][3];
+            else if (name == "Name") return columnVisibilityMap[key][5];
+            else if (name == "Quantity") return columnVisibilityMap[key][7];
+            else if (name == "Purpose") return columnVisibilityMap[key][9];
             else return false;
         }
 
@@ -751,7 +764,10 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong><br /><small>Customer: " + repo.customerName + "</small>");
+                return $(`
+                    <strong>${repo.text}</strong><br />
+                    <small>Customer: ${repo.customerName}</small><br />
+                    <small>Purchase Order: ${repo.purchaseOrder || "<em class='text-muted'>N/A</em>"}</small>`);
             },
             ajax: {
                 url: "@Url.Action("GetSalesOrderUnservedOnlyOptions", "SalesOrder")",
@@ -794,14 +810,14 @@
         $(".createBtn").on("click", clearItemForm);
 
         function clearItemForm() {
-            if(itemDT.rows().data().length > 0) {
-                $("#add-so-number").val(itemDT.rows().data()[0].salesOrderId).trigger("change");
-                //$("#add-so-number").prop("disabled", true);
-            } else {
-                $("#add-so-number").val("").trigger("change");
-                //$("#add-so-number").prop("disabled", false);
-            }
-            $("#add-so-customer").val("");
+            // if(itemDT.rows().data().length > 0) {
+            //     $("#add-so-number").val(itemDT.rows().data()[0].salesOrderId).trigger("change");
+            //     //$("#add-so-number").prop("disabled", true);
+            // } else {
+            //     $("#add-so-number").val("").trigger("change");
+            //     //$("#add-so-number").prop("disabled", false);
+            // }
+            // $("#add-so-customer").val("");
             $("#add-code").val("").trigger("change");
             $("#add-part").val("");
             $("#add-name").val("");
@@ -907,6 +923,7 @@
                     itemPartNumber: is_for_na_one_time || is_for_maintenance_repair ? "" : $("#add-part").val(),
                     itemId: is_for_na_one_time || is_for_maintenance_repair ? undefined : $("#add-code").select2("data")[0].id,
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
+                    poNumber: $("#add-so-number").select2("data")[0].purchaseOrder,
                     purchaseRequestId: 0,
                     purpose: $("#add-purpose").val(),
                     quantity: FormatStringInteger($("#add-quantity").val()),

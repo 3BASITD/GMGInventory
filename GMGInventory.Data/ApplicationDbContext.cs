@@ -221,6 +221,7 @@ namespace GMGInventory.Data
         public DbSet<SalesOrder> SalesOrders { get; set; }
         public DbSet<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
         public DbSet<SalesOrderLineItem> SalesOrderLineItems { get; set; }
+        public DbSet<SalesOrderSourced> SalesOrderSources { get; set; }
         public DbSet<SalesReturn> SalesReturns { get; set; }
         //public DbSet<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
         public DbSet<SalesReturnLineItem> SalesReturnLineItems { get; set; }

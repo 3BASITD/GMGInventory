@@ -7,6 +7,7 @@ using GMGInventory.Data.OrderAppDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq.Dynamic.Core;
 using System.Security.Cryptography;
 
@@ -96,6 +97,19 @@ namespace GMGInventory.Application.Repositories
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+
+            foreach (var list in pageList)
+            {
+                list.IsValidAgent = list.Agent != null && context.Agents.Any(s => (s.FirstName + " " + s.LastName).ToLower() == list.Agent.ToLower());
+                list.IsValidCustomer = list.Customer != null && context.Customers.Any(s => s.Name.ToLower() == list.Customer.ToLower());
+                var soConverts = context.SalesOrderSources
+                                        .Where(s => s.SourceOrderNumber == list.OrderNumber)
+                                        .Select(s => s.SalesOrder.SalesOrderNumber)
+                                        .ToList();
+                list.ConvertTimes = soConverts.Count;
+                list.SalesOrders = string.Join(", ", soConverts);
+            }
+
             return new ForDataTables<OrderQueueVM>
             {
                 Draw = form.Draw,
@@ -120,8 +134,14 @@ namespace GMGInventory.Application.Repositories
 
             if (order == null) return null;
 
-            order.IsValidAgent = context.Agents.Any(s => (s.FirstName + " " + s.LastName).ToLower() == order.Agent.ToLower());
-            order.IsValidCustomer = context.Customers.Any(s => s.Name.ToLower() == order.Customer.ToLower());
+            order.IsValidAgent = order.Agent != null && context.Agents.Any(s => (s.FirstName + " " + s.LastName).ToLower() == order.Agent.ToLower());
+            order.IsValidCustomer = order.Customer != null && context.Customers.Any(s => s.Name.ToLower() == order.Customer.ToLower());
+            var soConverts = context.SalesOrderSources
+                                    .Where(s => s.SourceOrderNumber == order.OrderNumber)
+                                    .Select(s => s.SalesOrder.SalesOrderNumber)
+                                    .ToList();
+            order.ConvertTimes = soConverts.Count;
+            order.SalesOrders = string.Join(", ", soConverts);
 
             order.Items = app_context.Orders
                                      .Where(s => s.OrderNo!.ToLower() == OrderNumber.ToLower())
@@ -183,6 +203,7 @@ namespace GMGInventory.Application.Repositories
             var invalids = new List<string>();
             var orders = app_context.Orders
                                     .Where(s => s.OrderNo != null && s.OrderNo.ToLower() == OrderNumber.ToLower())
+                                    .OrderBy(s => s.Id)
                                     .ToList();
 
             if (orders.Count == 0)
@@ -207,8 +228,8 @@ namespace GMGInventory.Application.Repositories
 
             var temp = new List<string>();
 
-            if (agent == null) temp.Add($"Invalid Agent: {agent_first}. ");
-            if (customer == null) temp.Add($"Invalid Customer: {customer_first}. ");
+            if (agent == null) temp.Add($"<span class='text-muted'>Invalid Agent:</span> {agent_first}. ");
+            if (customer == null) temp.Add($"<span class='text-muted'>Invalid Customer:</span> {customer_first}. ");
 
             var latestOrder = context.SalesOrders
                                      .Where(s => s.SalesOrderNumber.StartsWith("SO")
@@ -217,7 +238,7 @@ namespace GMGInventory.Application.Repositories
                                      .Select(s => s.SalesOrderNumber)
                                      .FirstOrDefault();
 
-            if (latestOrder != null && latestOrder.Contains("."))
+            if (latestOrder != null && latestOrder.Contains('.'))
             {
                 var splitLatestOrder = latestOrder.Split(".");
                 latestOrder = splitLatestOrder[0];
@@ -233,8 +254,8 @@ namespace GMGInventory.Application.Repositories
 
             var salesOrder = new SalesOrder
             {
-                AgentId = agent!.Id,
-                CustomerId = customer!.Id,
+                AgentId = agent == null ? 0 : agent.Id,
+                CustomerId = customer == null ? 0 : customer.Id,
                 RequiredDeliveryDate = DateTime.Today,
                 SalesOrderDate = DateTime.Today,
                 SalesOrderNumber = soNumber,
@@ -256,7 +277,7 @@ namespace GMGInventory.Application.Repositories
                                  .FirstOrDefault();
                 if (itm == null)
                 {
-                    temp.Add($"Invalid Item Code: {order.Code}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Code:</span> {order.Code}. ");
                     isInvalid = true;
                 }
 
@@ -264,44 +285,44 @@ namespace GMGInventory.Application.Repositories
                                   .Where(s => s.Name == order.Brand
                                            || (s.Name != null && order.Brand != null && s.Name.ToLower() == order.Brand.ToLower()))
                                   .FirstOrDefault();
-                if (brnd == null || itm!.BrandId != brnd.Id)
+                if (brnd == null || itm == null || itm.BrandId != brnd.Id)
                 {
-                    temp.Add($"Invalid Item Brand: {order.Brand}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Brand:</span> {order.Brand}. ");
                     isInvalid = true;
                 }
 
                 if (itm!.ModelNumber != order.Model
-                && (itm.ModelNumber == null || order.Model == null || itm.ModelNumber!.ToLower() != order.Model!.ToLower()))
+                && (itm.ModelNumber == null || order.Model == null || itm.ModelNumber.ToLower() != order.Model.ToLower()))
                 {
-                    temp.Add($"Invalid Item Model Number: {order.Model}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Model Number:</span> {order.Model}. ");
                     isInvalid = true;
                 }
 
                 if (itm!.OldCode != order.OldCode
                 && (itm.OldCode == null || order.OldCode == null || itm.OldCode.ToLower() != order.OldCode.ToLower()))
                 {
-                    temp.Add($"Invalid Item Old Code: {order.OldCode}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Old Code:</span> {order.OldCode}. ");
                     isInvalid = true;
                 }
 
                 if (itm!.Name != order.ItemName
                 && (itm.Name == null || order.ItemName == null || itm.Name.ToLower() != order.ItemName.ToLower()))
                 {
-                    temp.Add($"Invalid Item Name: {order.ItemName}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Name:</span> {order.ItemName}. ");
                     isInvalid = true;
                 }
 
                 if (itm!.Size != order.Size
                 && (itm.Size == null || order.Size == null || itm.Size.ToLower() != order.Size.ToLower()))
                 {
-                    temp.Add($"Invalid Item Size: {order.Size}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Size:</span> {order.Size}. ");
                     isInvalid = true;
                 }
 
                 if (itm!.PartNumber != order.PartNumber
                 && (itm.PartNumber == null || order.PartNumber == null || itm.PartNumber.ToLower() != order.PartNumber.ToLower()))
                 {
-                    temp.Add($"Invalid Item Part Number: {order.PartNumber}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Part Number:</span> {order.PartNumber}. ");
                     isInvalid = true;
                 }
 
@@ -309,15 +330,15 @@ namespace GMGInventory.Application.Repositories
                                  .Where(s => s.Name == order.Unit
                                           || (s.Name != null && order.Unit != null && s.Name.ToLower() == order.Unit.ToLower()))
                                  .FirstOrDefault();
-                if (unt == null || itm!.UnitId != unt.Id)
+                if (unt == null || itm == null || itm != null && itm.UnitId != unt.Id)
                 {
-                    temp.Add($"Invalid Item Unit: {order.Unit}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item Unit:</span> {order.Unit}. ");
                     isInvalid = true;
                 }
 
                 if (order.Quantity == null || order.Quantity <= 0)
                 {
-                    temp.Add($"Invalid Quantity: {order.Quantity}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Quantity:</span> {order.Quantity}. ");
                     isInvalid = true;
                 }
 
@@ -342,10 +363,11 @@ namespace GMGInventory.Application.Repositories
 
             if (temp.Count > 0)
             {
+                temp = [.. temp.Distinct().OrderBy(s => s)];
                 return new ResponseModel
                 {
                     Status = "Error",
-                    Message = "Cannot proceed with the following problems: " + string.Join("", temp)
+                    Message = "Cannot proceed with the following problems: <ul><li>" + string.Join("</li><li>", temp) + "</li>"
                 };
             }
             else
@@ -357,6 +379,14 @@ namespace GMGInventory.Application.Repositories
                     salesOrderItem.SalesOrderId = salesOrder.Id;
 
                 await context.SalesOrderLineItems.AddRangeAsync(salesOrderItems);
+                await context.SaveChangesAsync(currentUser);
+
+                var source = new SalesOrderSourced
+                {
+                    SourceOrderNumber = OrderNumber,
+                    SalesOrderId = salesOrder.Id
+                };
+                await context.SalesOrderSources.AddAsync(source);
                 await context.SaveChangesAsync(currentUser);
 
                 return new ResponseModel

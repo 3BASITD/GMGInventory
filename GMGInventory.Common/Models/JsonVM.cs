@@ -94,6 +94,7 @@ namespace GMGInventory.Common.Models
         public string? CustomerAddress { get; set; }
         public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDateTime);
         public DateTime SalesOrderDateD { get; set; }
+        public string? PurchaseOrder { get; set; }
         public string? ForwarderName { get; set; }
         public int RegionId { get; set; }
         public string Invoices { get; set; }

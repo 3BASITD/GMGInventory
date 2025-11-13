@@ -117,6 +117,7 @@ namespace GMGInventory.Application.Repositories
                                                     .Select(s => s.Address)
                                                     .FirstOrDefault(),
                              SalesOrderDateD = order.SalesOrderDate,
+                             PurchaseOrder = order.PurchaseOrder,
                              ForwarderName = order.SalesOrderDeliveryMonitorings
                                                   .Select(s => s.Forwarder.Name)
                                                   .FirstOrDefault(),
