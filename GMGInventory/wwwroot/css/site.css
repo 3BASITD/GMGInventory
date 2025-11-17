@@ -354,15 +354,11 @@ input[type=number]:not(:focus) {
     -moz-appearance: textfield;
 }
 
-input[readonly=readonly] {
-    cursor: default;
-}
-
 .select2-selection[aria-disabled=true] {
     background-color: #E9ECEF !important;
 }
 
-.dark-mode input[readonly=readonly],
+.dark-mode input[readonly],
 .dark-mode .select2-selection[aria-disabled=true] {
     background-color: #4A4D50 !important;
 }
@@ -723,3 +719,30 @@ body.dark-mode .bg-invert {
         background-color: red;
     }
 }
+
+input[readonly][type="number"]::-webkit-inner-spin-button,
+input[readonly][type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[readonly][type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[readonly][type="date"]::-webkit-calendar-picker-indicator,
+input[readonly][type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[readonly][type="month"]::-webkit-calendar-picker-indicator,
+input[readonly][type="week"]::-webkit-calendar-picker-indicator,
+input[readonly][type="time"]::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+input[readonly] {
+    caret-color: transparent;
+}
+
+    input[readonly]:focus {
+        outline: none;
+        box-shadow: none;
+    }

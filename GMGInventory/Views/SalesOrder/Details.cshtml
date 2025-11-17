@@ -891,14 +891,11 @@
             function changingCustomerCode() {
             var selectedCustomer = $("#order-customer-code").val();
 
-            console.log("Selected:"+selectedCustomer);
-            console.log("Current:"+currentCustomer);
-            console.log("So_detail:"+so_details.customerId);
             var customerText = $("#order-customer-code").select2("data")[0]?.text.toLowerCase() || "";
 
             if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer)) {
                 var changed = "Customer Code"
-                            
+
                 swal({
                     title: "Sales Order Items not empty",
                     text: "Changing the selected " + changed + " will clear the added items. Do you want to continue?",
@@ -940,14 +937,14 @@
 
                             $("#order-customer-code").val(currentCustomer).trigger("change");
 
-                        
+
                     }
                         });
             } else {
                 currentCustomer = selectedCustomer;
-                
+
             }
-            
+
 
             }
 
@@ -955,7 +952,7 @@
             $("#order-customer-code").on("select2:select", function () {
                 changingCustomerCode();
 
-                
+
             });
 
             // Load forwarder data for select2
@@ -969,7 +966,7 @@
                         data: data,
                         //minimumResultsForSearch: Infinity
                     });
-                    
+
                     if (so_details.forwarderId) {
                         var exists = data.some(item => item.id == so_details.forwarderId);
 
@@ -1081,19 +1078,16 @@
                             $("#add-discount1").val("0.00");
                             $('#add-discount1').prop('readonly', false);
                         } else{
-                            console.log(data);
                             $("#add-discount1").val(Round2Decimal(data[0].discount));
                             $("#add-discount-id").val(data[0].id);
 
                             $('#add-discount1').prop('readonly', true);
 
-                           
                             brandDiscountId = data[0].id;
-                            console.log(brandDiscountId);
 
                             if( user_access2.canEdit || ( (brandDiscountId == 0) || (brandDiscountId == null) ) )
                             {
-                           $('#add-discount1').prop('readonly', false);
+                                $('#add-discount1').prop('readonly', false);
                             }
 
                             var quantity = parseFloat($("#add-quantity").val());
@@ -1196,7 +1190,7 @@
         });
 
         $("#add-code").on("select2:select", function () {
-            
+
             $("#add-name").val($("#add-code").select2("data")[0].name);
             var itemname = $("#add-name").val();
             $('#add-unit-price').prop('readonly', false);
@@ -1224,7 +1218,7 @@
             $(".add-inventory").text($("#add-code").select2("data")[0].inventoryCount);
             $("#add-quantity").val("1");
             $("#add-code-error").html("");
-            
+
         });
 
         $("#add-code").on("select2:unselecting", function (e) {
@@ -1413,13 +1407,13 @@
                     data: function (data, type, dataToSet) {
                         var discount = '<div class="input-group input-group-sm" style="width: 100%;">';
                         if (so_details.status.toLowerCase().includes("draft")) {
-                            
+
                              discount += '<label for="' + data.lineNumber + '_1" class="input-group-text text-info bg-info">#1</label>';
                              discount += '<input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1 discount-form-display" placeholder="Discount 1"' ;
-                            if( user_access2.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) ) 
+                            if( user_access2.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) )
                             {
                                 discount += '/>';
-                                                        
+
                             }
                             else{
                                 discount += 'readonly/>';

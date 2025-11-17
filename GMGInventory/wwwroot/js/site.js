@@ -190,6 +190,12 @@
         return text.length <= param;
     }, "Please enter no more than {0} characters");
 
+    $.validator.setDefaults({
+        onkeyup: false,
+        onfocusout: false,
+        onchange: true
+    });
+
     //$('.mask-decimal').mask('9,999,999.00', {
     //    reverse: true
     //});

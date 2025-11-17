@@ -355,6 +355,12 @@ namespace GMGInventory.Application.Repositories
                                                 .Select(s => s.DocumentNumber)
                                                 .FirstOrDefaultAsync();
 
+                if (lastDocument != null && lastDocument.Contains("-D"))
+                {
+                    var splitLastDocument = lastDocument.Split("-D");
+                    lastDocument = splitLastDocument[0];
+                }
+
                 int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
                 docNumber = $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
             }
@@ -437,7 +443,6 @@ namespace GMGInventory.Application.Repositories
 
                     if (request.DocumentNumber.StartsWith("D") && request.Status.Name.ToLower() == "draft" && status.ToLower() != "draft")
                     {
-
                         var docNumberPrefix = $"{request.Type.Code}-PR{DateTime.Now.Year}-";
 
                         var lastDocument = await context.PurchaseRequests
@@ -569,6 +574,17 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
+                var tempDocumentNumber = request.DocumentNumber + "-D";
+                var latestDisapprovedRequest = context.PurchaseRequests
+                                                      .Where(s => s.DocumentNumber.StartsWith(tempDocumentNumber))
+                                                      .OrderByDescending(s => s.DocumentNumber)
+                                                      .Select(s => s.DocumentNumber)
+                                                      .FirstOrDefault();
+                var latestDisapprovedDocumentNumber = latestDisapprovedRequest == null
+                                                    ? 0
+                                                    : int.Parse(latestDisapprovedRequest.Replace(tempDocumentNumber, ""));
+                var disapprovedDocumentNumber = tempDocumentNumber + string.Format("{0:00}", latestDisapprovedDocumentNumber + 1);
+
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
@@ -579,6 +595,7 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
+                    request.DocumentNumber = disapprovedDocumentNumber;
                     request.DisapproverId = currentUserId;
                     request.DisapprovedReason = reason;
                     request.StatusId = statusId;

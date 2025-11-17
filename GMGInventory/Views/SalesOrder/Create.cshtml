@@ -404,7 +404,6 @@
             var selectedCustomer = $("#order-customer-code").val();
 
             if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer)) {
-                console.log("Customer changed, load details, sales order create");
                 var changed = "Customer Code"
 
                 swal({
@@ -426,7 +425,6 @@
                     }
                 });
             } else {
-                console.log("Customer not changed, load details, sales order create");
                 currentCustomer = selectedCustomer;
 
                 LoadCustomerDetails();
@@ -617,14 +615,12 @@
                         $("#add-discount1").val("0.00");
                         $('#add-discount1').prop('readonly', false);
                     } else{
-                        console.log(data);
                         $("#add-discount1").val(Round2Decimal(data[0].discount));
                         $("#add-discount-id").val(data[0].id);
 
                         $('#add-discount1').prop('readonly', true);
                         
                         brandDiscountId = data[0].id;
-                        console.log(brandDiscountId);
 
                         if( user_access2.canEdit || ( (brandDiscountId == 0) || (brandDiscountId == null) ) )
                         {

@@ -440,7 +440,7 @@
             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
             if (typeText == "non-automotive" && purposeText == "one-time purchase") {
-                $(".description").off("change").on("change", function () {
+                $(".description").off("blur").on("blur", function () {
                     var row = itemDT.row($(this).closest('tr'));
                     var rowData = row.data();
 
@@ -450,7 +450,7 @@
                 });
             }
 
-            $(".quantity").off("change").on("change", function () {
+            $(".quantity").off("blur").on("blur", function () {
                 var row = itemDT.row($(this).closest('tr'));
                 var rowData = row.data();
 
@@ -813,10 +813,10 @@
             });
         }
 
-        $("#add-quantity").on("change", function() {
+        $("#add-quantity").on("blur", function() {
             var quantity = parseInt($(this).val());
             var max_quantity = parseInt($(this).attr("data-max-quantity"));
-            console.log(quantity + " " + max_quantity)
+
             if(quantity > max_quantity) {
                 $(".add-quantity-warning").toggle(true);
                 $(".add-quantity-warning").text("Requesting higher than " + max_quantity + " unserved quantity.");
@@ -859,7 +859,6 @@
         });
 
         $("#add-so-number").on("select2:select", loadSOItemsOptions);
-
 
         // Load so for select2
         $("#addso-so-number").select2({
@@ -987,7 +986,7 @@
                 row.data(rowData).draw(false);
             });
 
-            $(".soquantity").off("change").on("change", function () {
+            $(".soquantity").off("blur").on("blur", function () {
                 var tr = $(this).closest('tr');
                 var row = soDT.row(tr);
                 var rowData = row.data();
