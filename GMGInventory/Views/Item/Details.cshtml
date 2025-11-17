@@ -1027,6 +1027,7 @@
             if (selectedTab == "#nav-price") priceDT.ajax.reload();
             if (selectedTab == "#nav-transfer") transferDT.ajax.reload();
             if (selectedTab == "#nav-return") returnDT.ajax.reload();
+            if (selectedTab == "#nav-promo") promoDT.ajax.reload();
         });
 
 
@@ -1651,7 +1652,7 @@
                 showBatchLoader("price");
             }).DataTable({
                 ajax: {
-                    url: "@Url.Action("GetPromoJson")",
+                    url: "@Url.Action("GetPricesJson")",
                     type: "POST",
                     data: function (data) {
                         data.Id = @Model?.Id;

@@ -55,7 +55,7 @@ namespace GMGInventory.Application.Repositories
                                              .OrderByDescending(s => s.DateCreated)
                                              .Take(1)
                                              .DefaultIfEmpty()
-                        
+
                         let inventory = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true)
                                                .Sum(s => (int?)s.Quantity) ?? 0
@@ -74,7 +74,7 @@ namespace GMGInventory.Application.Repositories
                             Name = item.Name,
                             OldCode = item.OldCode,
                             PartNumber = item.PartNumber + "",
-                            NetPriceD =    price == null ? -999999 : price.NetSellingPrice,
+                            NetPriceD = price == null ? -999999 : price.NetSellingPrice,
                             QuantityD = 0,
                             RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
                             UnitId = item.Unit == null ? -1 : item.Unit.Id,
@@ -94,7 +94,7 @@ namespace GMGInventory.Application.Repositories
         {
             var now = DateTime.Now;
 
-            if(page == 0)
+            if (page == 0)
             {
                 page = 1;
             }
@@ -136,7 +136,7 @@ namespace GMGInventory.Application.Repositories
                     RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
                     PromoPriceD = promo == null ? -999999 : promo.PromoPrice,
                     ItemPromoId = promo.Id,
-                    ItemPromoName= promo.Name ?? "",
+                    ItemPromoName = promo.Name ?? "",
                     UnitId = item.Unit == null ? -1 : item.Unit.Id,
                     Unit = item.Unit == null ? "" : item.Unit.Code,
                     BrandId = item.BrandId
@@ -447,7 +447,8 @@ namespace GMGInventory.Application.Repositories
                                   Image = item.Image
                               };
                 return await itemsVM.ToListAsync();
-            } else
+            }
+            else
             {
                 var itemsVM = from item in context.Items
                               where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
@@ -902,25 +903,22 @@ namespace GMGInventory.Application.Repositories
         public async Task UpdateOrAddItemPrice(int itemId, decimal retailPrice, decimal netPrice)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var price = await context.ItemPrices.Where(s => s.ItemId == itemId).FirstOrDefaultAsync();
+            var latestPrice = await context.ItemPrices
+                                           .Where(s => s.ItemId == itemId)
+                                           .OrderByDescending(s => s.DateCreated)
+                                           .FirstOrDefaultAsync();
 
-            if (price != null)
+            if ((latestPrice != null && (latestPrice.RetailSellingPrice != retailPrice || latestPrice.NetSellingPrice != netPrice))
+              ||(latestPrice == null))
             {
-                price.RetailSellingPrice = retailPrice;
-                price.NetSellingPrice = netPrice;
-
-                //context.ItemPrices.Update(price);
-            }
-            else
-            {
-                price = new ItemPrice
+                latestPrice = new ItemPrice
                 {
                     ItemId = itemId,
                     RetailSellingPrice = retailPrice,
                     NetSellingPrice = netPrice
                 };
 
-                await context.ItemPrices.AddAsync(price);
+                await context.ItemPrices.AddAsync(latestPrice);
             }
 
             await context.SaveChangesAsync(currentUserId);
@@ -932,7 +930,7 @@ namespace GMGInventory.Application.Repositories
 
             ResponseModel response = new();
 
-            if( await CheckItemPromoDuration(itemPromoVM.ItemId, itemPromoVM.EffectiveDateD, itemPromoVM.ExpirationDateD))
+            if (await CheckItemPromoDuration(itemPromoVM.ItemId, itemPromoVM.EffectiveDateD, itemPromoVM.ExpirationDateD))
             {
                 response.Status = "Error";
                 response.Message = "Item Promo duration overlaps with an existing active promo.";
@@ -1027,7 +1025,7 @@ namespace GMGInventory.Application.Repositories
 
             else
             {
-                if ( isItemPromoSales || (itemPromo.EffectiveDate < DateTime.Now))
+                if (isItemPromoSales || (itemPromo.EffectiveDate < DateTime.Now))
                 {
                     itemPromo.IsActive = false;
                     context.ItemPromo.Update(itemPromo);
@@ -1039,7 +1037,7 @@ namespace GMGInventory.Application.Repositories
 
                 }
 
-                else 
+                else
                 {
                     context.ItemPromo.Remove(itemPromo);
                     await context.SaveChangesAsync(currentUserId);
@@ -1508,29 +1506,29 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<ItemPromoVM>> GetItemPromoAsync(int id)
         {
             var promoVM = from promo in context.ItemPromo
-                           join user in userManager.Users on promo.UserCreated equals user.Id
-                           where promo.ItemId == id
-                           select new ItemPromoVM
-                           {
-                               Id = promo.Id,
-                               PromoPriceD = promo.PromoPrice,
-                               ItemId = promo.ItemId,
-                               Name = promo.Name,
-                               EffectiveDateD = promo.EffectiveDate,
-                               ExpirationDateD = promo.ExpirationDate,
-                               UpdateBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-                               UpdateDateD = promo.DateCreated,
-                               IsActive = promo.IsActive
-                           };
+                          join user in userManager.Users on promo.UserCreated equals user.Id
+                          where promo.ItemId == id
+                          select new ItemPromoVM
+                          {
+                              Id = promo.Id,
+                              PromoPriceD = promo.PromoPrice,
+                              ItemId = promo.ItemId,
+                              Name = promo.Name,
+                              EffectiveDateD = promo.EffectiveDate,
+                              ExpirationDateD = promo.ExpirationDate,
+                              UpdateBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                              UpdateDateD = promo.DateCreated,
+                              IsActive = promo.IsActive
+                          };
             return await promoVM.ToListAsync();
         }
 
         public async Task<bool> CheckItemPromoDuration(int itemId, DateTime start, DateTime end)
         {
-            return await context.ItemPromo.AnyAsync(s => s.ItemId == itemId 
+            return await context.ItemPromo.AnyAsync(s => s.ItemId == itemId
                                                      && ((s.EffectiveDate <= start && s.ExpirationDate >= start) || (s.EffectiveDate <= end && s.ExpirationDate >= end) || (s.EffectiveDate >= start && s.ExpirationDate >= end) || (s.EffectiveDate >= start && s.ExpirationDate <= end))
                                                      && s.IsActive);
-         
+
         }
 
 
@@ -1549,7 +1547,7 @@ namespace GMGInventory.Application.Repositories
 
                                     || x.EffectiveDate.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.ExpirationDate.ToLower().Contains(form.SearchValue.ToLower()));
-                                    
+
             }
             // get total count of records after search
             filterRecord = data.Count();

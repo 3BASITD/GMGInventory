@@ -673,14 +673,13 @@
                 });
 
                 $(".add-so-number-container").toggle(columnVisibilityMap[key][0]);
-                if (columnVisibilityMap[key][2]) {
-                    $(".soBtn").toggle(true);
+                $(".soBtn").toggle(columnVisibilityMap[key][0]);
+                if (columnVisibilityMap[key][3]) {
                     $(".add-code-container").toggle(true);
                     $("#add-name").prop("readonly", true);
                     $(".add-unit-container").toggle(true);
                     $(".add-unit2-container").toggle(false);
                 } else {
-                    $(".soBtn").toggle(false);
                     $(".add-code-container").toggle(false);
                     $("#add-name").prop("readonly", false);
                     $(".add-unit-container").toggle(false);
