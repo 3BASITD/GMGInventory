@@ -291,6 +291,36 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<ItemFromSalesOrderVM>> GetSalesOrderItems(int SalesOrderId)
+        {
+            var itemVM = await (from order in context.SalesOrderLineItems
+                                let inventory = context.ItemInventories
+                                                       .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true)
+                                                       .Sum(s => (int?)s.Quantity) ?? 0
+                                let packedQuantity = context.PackLineItems
+                                                            .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
+                                                                     && s.ItemId == order.ItemId)
+                                                            .Sum(s => (int?)s.Quantity) ?? 0
+                                where order.SalesOrderId == SalesOrderId
+                                orderby order.LineNumber ascending
+                                select new ItemFromSalesOrderVM
+                                {
+                                    Id = order.Id,
+                                    LineNumber = order.LineNumber,
+                                    ItemId = order.Item.Id,
+                                    ItemCode = order.Item.Code,
+                                    ItemName = order.Item.Name,
+                                    PartNumber = order.Item.PartNumber,
+                                    InventoryCountD = inventory,
+                                    OrderedQuantityD = order.Quantity,
+                                    RemainingQuantityD = order.Quantity - packedQuantity,
+                                    Unit = order.Item.Unit.Code,
+                                    UnitId = order.Item.Unit.Id
+                                }).ToListAsync();
+
+            return itemVM;
+        }
+
         public async Task<ResponseModel<int>> AddAsync(PurchaseRequestSaveVM form, List<PurchaseRequestLineItemVM> Items)
         {
 

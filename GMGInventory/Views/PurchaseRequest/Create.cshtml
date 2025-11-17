@@ -76,6 +76,9 @@
                         <div class="card-header bg-light">
                             <span class="card-title">Purchase Request Item(s)</span>
                             <div class="card-tools">
+                                <button type="button" class="btn btn-secondary btn-sm float-right soBtn ml-2" data-bs-toggle="modal" data-bs-target="#soModal">
+                                    <span class="fas fa-plus"></span> Add SO Item(s)
+                                </button>
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
                                     <span class="fas fa-plus"></span> Add Item
                                 </button>
@@ -221,6 +224,73 @@
     </div>
 </div>
 
+<!-- Purchase Request Item Modal -->
+<div class="modal fade" id="soModal" role="dialog" aria-labelledby="soModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Purchase Request Item (from Sales Order)</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-md-4">
+                        <div class="form-group">
+                            <label for="addso-so-number" class="form-label mb-0">SO Number</label>
+                            <select id="addso-so-number" name="SONumber" style="width: 100%;">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="addso-customer" class="form-label mb-0">Customer</label>
+                            <input type="text" id="addso-customer" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="addso-po-number" class="form-label mb-0">PO Number</label>
+                            <input type="text" id="addso-po-number" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table table-head-fixed table-striped table-hover table-so">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input class="sochkclassorderall" type="checkbox" />
+                                    </th>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Part Number</th>
+                                    <th>Ordered Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Stock on Hand</th>
+                                    <th>Unserved Quantity</th>
+                                    <th>Request Quantity</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-add-so" onclick="AddSOItem()">
+                    <span class="fas fa-plus"></span> Add
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @if (TempData["PurchaseRequestId"] != null)
 {
     <input type="hidden" id="resubmitPRId" value="@TempData["PurchaseRequestId"]" />
@@ -300,7 +370,7 @@
                             return data.poNumber;
                         }
                     },
-                    name: "PONumber", 
+                    name: "PONumber",
                     className: "form-cell" },
                 { data: "customer", name: "Customer", className: "form-cell" },
                 {
@@ -538,7 +608,7 @@
         function changingTypePurposeOrRegion() {
             var selectedType = $("#request-type").val();
             var selectedPurpose = $("#request-purpose").val();
-            console.log(selectedType + " " + selectedPurpose);
+
             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
             var selectedRegion = typeText == "non-automotive" && purposeText == "one-time purchase" ? $("#order-region").val() : null;
@@ -604,11 +674,13 @@
 
                 $(".add-so-number-container").toggle(columnVisibilityMap[key][0]);
                 if (columnVisibilityMap[key][2]) {
+                    $(".soBtn").toggle(true);
                     $(".add-code-container").toggle(true);
                     $("#add-name").prop("readonly", true);
                     $(".add-unit-container").toggle(true);
                     $(".add-unit2-container").toggle(false);
                 } else {
+                    $(".soBtn").toggle(false);
                     $(".add-code-container").toggle(false);
                     $("#add-name").prop("readonly", false);
                     $(".add-unit-container").toggle(false);
@@ -766,8 +838,8 @@
                 }
                 return $(`
                     <strong>${repo.text}</strong><br />
-                    <small>Customer: ${repo.customerName}</small><br />
-                    <small>Purchase Order: ${repo.purchaseOrder || "<em class='text-muted'>N/A</em>"}</small>`);
+                    <small class='text-muted'>Customer: ${repo.customerName}</small><br />
+                    <small class='text-muted'>Purchase Order: ${repo.purchaseOrder || "<em>N/A</em>"}</small>`);
             },
             ajax: {
                 url: "@Url.Action("GetSalesOrderUnservedOnlyOptions", "SalesOrder")",
@@ -788,6 +860,176 @@
         });
 
         $("#add-so-number").on("select2:select", loadSOItemsOptions);
+
+
+        // Load so for select2
+        $("#addso-so-number").select2({
+            minimumInputLength: -1,
+            allowClear: true,
+            placeholder: "<empty>",
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $(`
+                    <strong>${repo.text}</strong><br />
+                    <small class='text-muted'>Customer: ${repo.customerName}</small><br />
+                    <small class='text-muted'>Purchase Order: ${repo.purchaseOrder || "<em>N/A</em>"}</small>`);
+            },
+            ajax: {
+                url: "@Url.Action("GetSalesOrderUnservedOnlyOptions", "SalesOrder")",
+                data: function (params) {
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
+                        regionId: function () {
+                            var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
+                            var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
+                            var selectedRegion = typeText == "automotive" && purposeText == "rush order" ? $("#request-region").val() : null;
+
+                            return selectedRegion;
+                        }
+                    });
+                }
+            },
+            dropdownParent: $("#soModal")
+        });
+
+        $("#addso-so-number").on("select2:select", function() {
+            $("#addso-customer").val($(this).select2("data")[0].customerName);
+            $("#addso-po-number").val($(this).select2("data")[0].purchaseOrder || "N/A");
+
+            soDT.ajax.reload();
+        });
+
+        var soDT = $('.table-so').DataTable({
+            ajax: {
+                url: '@Url.Action("GetSalesOrderItems")',
+                data: function () {
+                    return {
+                        SalesOrderId: $("#addso-so-number").val()
+                    };
+                },
+                dataSrc: function (json) {
+                    return JSON.parse(JSON.stringify(json));
+                },
+                type: "POST",
+            },
+            serverSide: false,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            searching: false,
+            paging: false,
+            info: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return '<input class="sochkclassorder" type="checkbox" ' + ( data.toRequest == true ? 'checked="checked" ' : '') + 'name="orderitemchk" />';
+                    }
+                },
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "partNumber", name: "PartNumber" },
+                { data: "orderedQuantity", name: "OrderedQuantity", className: "text-end" },
+                { data: "unit", name: "Unit" },
+                { data: "inventoryCount", name: "InventoryCount", className: "text-end" },
+                { data: "remainingQuantity", name: "RemainingQuantity", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.toRequest == true) {
+                            if (data.requestQuantityD > data.remainingQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Requesting higher than ' + data.remainingQuantityD + ' unserved order quantity.</label>';
+                            } else if (data.requestQuantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not request an item with 0 quantity.</label>';
+                            } else {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" />';
+                            }
+                        } else {
+                            return '-';
+                        }
+                    },
+                    name: "RequestQuantity",
+                    className: "form-cell text-end"
+                }
+            ],
+            order: [[1, "asc"]],
+            drawCallback: function () {
+                let api = this.api();
+
+                api.rows().every(function () {
+                    let data = this.data();
+                    let row = this.node();
+
+                    if (data.toRequest === false) {
+                        $(row).find("td").addClass("text-muted");
+                    } else {
+                        $(row).find("td").removeClass("text-muted");
+                    }
+                });
+            }
+        });
+
+        soDT.on("draw", function () {
+            $(".table-so thead th").removeClass("text-end");
+            dtCheckboxes();
+
+            $(".sochkclassorder").off("change").on("change", function () {
+                var tr = $(this).closest('tr');
+                var row = soDT.row(tr);
+                var rowData = row.data();
+
+                rowData.toRequest = $(this).prop("checked");
+                rowData.requestQuantityD = 0;
+
+                row.data(rowData).draw(false);
+            });
+
+            $(".soquantity").off("change").on("change", function () {
+                var tr = $(this).closest('tr');
+                var row = soDT.row(tr);
+                var rowData = row.data();
+
+                rowData.requestQuantityD = $(this).val();
+
+                row.data(rowData).draw(false);
+            });
+        });
+
+        dtCheckboxes();
+        function dtCheckboxes() {
+            $(".sochkclassorderall").off("change").on("change", function () {
+                soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".sochkclassorder").prop("checked", $(".sochkclassorderall").prop("checked"));
+                });
+            });
+
+            $(".sochkclassorder").off("change").on("change", function () {
+                var rows_checked = 0;
+                soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".sochkclassorder").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
+
+                if (rows_checked == 0) {
+                    $(".sochkclassorderall").prop("checked", false);
+                    $(".sochkclassorderall").prop("indeterminate", false);
+                } else if (rows_checked == soDT.rows().count()) {
+                    $(".sochkclassorderall").prop("checked", true);
+                    $(".sochkclassorderall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".sochkclassorderall").prop("checked", false);
+                    $(".sochkclassorderall").prop("indeterminate", false);
+                } else {
+                    $(".sochkclassorderall").prop("checked", false);
+                    $(".sochkclassorderall").prop("indeterminate", true);
+                }
+            });
+        }
 
         // Load unit for select2
         $.ajax({
@@ -941,6 +1183,50 @@
 
                 clearItemForm();
             }
+        }
+
+        function AddSOItem() {
+            var rowsToAdd = soDT.rows().data().toArray().filter(function(row) {
+                return row.toRequest == true;
+            });
+
+            rowsToAdd.forEach(function (row) {
+                var soRow = {
+                    customer: $("#addso-customer").val(),
+                    itemCode: row.itemCode,
+                    itemDescription: row.itemName,
+                    itemPartNumber: row.partNumber,
+                    itemId: row.itemId,
+                    lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
+                    poNumber: $("#add-so-number").select2("data")[0].purchaseOrder,
+                    purchaseRequestId: 0,
+                    purpose: "",
+                    quantity: FormatStringInteger(row.requestQuantityD),
+                    quantityD: row.requestQuantityD,
+                    maxQuantityD: row.remainingQuantityD,
+                    salesOrderId: $("#addso-so-number").select2("data")[0].id,
+                    salesOrderNumber: $("#addso-so-number").select2("data")[0].text,
+                    stockOnHand: row.inventoryCount,
+                    stockOnHandD: row.inventoryCountD,
+                    unitCode: row.unit,
+                    unitId: row.unitId
+                };
+
+                var exists = itemDT.rows().data().toArray().some(function(r) {
+                    return r.salesOrderId == soRow.salesOrderId && r.itemId == soRow.itemId;
+                });
+
+                if (exists){
+                    toastr.warning(soRow.itemDescription + " of " + soRow.salesOrderNumber + " has already been added", "Duplicate");
+                } else if (soRow.quantityD <= 0) {
+                    toastr.warning("Invalid quantity for " + soRow.itemDescription, "Error");
+                } else {
+                    itemDT.row.add(soRow);
+                    toastr.success("Added " + soRow.itemDescription + " on Purchase Request Item(s)", "Success");
+                } 
+            });
+
+            itemDT.draw();
         }
 
         function GetItemsToRequest() {

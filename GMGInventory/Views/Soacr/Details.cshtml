@@ -915,7 +915,13 @@
                     }
                 },
                 ajax: {
-                    url: "@Url.Action("GetInvoiceTBR")"
+                    url: "@Url.Action("GetInvoiceTBR")",
+                    data: function (params) {
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
+                            CustomerId: @Model?.CustomerId
+                        });
+                    }
                 },
                 dropdownParent: $("#tbrModal")
             });

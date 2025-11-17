@@ -137,7 +137,8 @@ namespace GMGInventory.Application.Repositories
                          where order.Invoices.Any(s => s.Status.Code.ToLower() == "invoiced")
                          && (string.IsNullOrWhiteSpace(search)
                          || order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())
-                         || order.Invoices.Any(s => s.InvoiceNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || order.Invoices.Any(s => s.InvoiceNumber.ToLower().Trim().Contains(search.ToLower().Trim()))
+                         || order.Invoices.Any(s => s.ControlNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
                          {
@@ -155,7 +156,7 @@ namespace GMGInventory.Application.Repositories
                              ForwarderName = order.SalesOrderDeliveryMonitorings
                                                   .Select(s => s.Forwarder.Name)
                                                   .FirstOrDefault(),
-                             Invoices = string.Join(", ", order.Invoices.Select(s => s.InvoiceNumber))
+                             Invoices = string.Join(", ", order.Invoices.Select(s => s.InvoiceNumber + " (" + s.ControlNumber + ")"))
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>

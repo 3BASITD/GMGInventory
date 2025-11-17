@@ -748,12 +748,17 @@
                             inventoryCount: v.inventoryCountD,
                             quantity: v.quantityD,
                             unit: v.unit,
-                            unitPrice: v.sellingPriceD.toFixed(2),
-                            discount1: v.discount1D.toFixed(2),
-                            discount2: v.discount2D.toFixed(2),
-                            discount3: v.discount3D.toFixed(2),
-                            discount4: v.discount4D.toFixed(2),
-                            discount5: v.discount5D.toFixed(2),
+                            unitPrice: v.sellingPriceD,
+                            discount1: v.discount1 || "0.00",
+                            discount1D: v.discount1D || 0,
+                            discount2: v.discount2 || "0.00",
+                            discount2D: v.discount2D || 0,
+                            discount3: v.discount3 || "0.00",
+                            discount3D: v.discount3D || 0,
+                            discount4: v.discount4 || "0.00",
+                            discount4D: v.discount4D || 0,
+                            discount5: v.discount5 || "0.00",
+                            discount5D: v.discount5D || 0,
                             grossPrice: v.grossPrice
                         }).draw();
                     });

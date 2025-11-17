@@ -135,6 +135,15 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetSalesOrderItems(int SalesOrderId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await requestRepository.GetSalesOrderItems(SalesOrderId));
+        }
+
+        [HttpPost]
         public async Task<IActionResult> AddJson(PurchaseRequestSaveVM form, List<PurchaseRequestLineItemVM> items)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);

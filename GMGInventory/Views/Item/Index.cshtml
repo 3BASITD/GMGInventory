@@ -1183,8 +1183,8 @@
                 if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
                     $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
                     $("#upload-file").val("");
-                    itemDT.ajax.reload();
                 }
+                itemDT.ajax.reload();
             }
 
             $(".downloadBtn").click(function (e) {

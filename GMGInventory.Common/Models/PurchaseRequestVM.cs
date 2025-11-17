@@ -131,4 +131,42 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Purpose")]
         public string? Purpose { get; set; }
     }
+
+    public class ItemFromSalesOrderVM
+    {
+        public int Id { get; set; }
+
+        public int LineNumber { get; set; }
+
+        public int ItemId { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string ItemCode { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemName { get; set; }
+
+        [Display(Name = "Part Number")]
+        public string PartNumber { get; set; }
+
+        [Display(Name = "Stock on Hand")]
+        public string InventoryCount => string.Format(SystemFormat.StringIntegerComma, InventoryCountD);
+        public int InventoryCountD { get; set; }
+
+        [Display(Name = "Ordered Quantity")]
+        public string OrderedQuantity => string.Format(SystemFormat.StringIntegerComma, OrderedQuantityD);
+        public int OrderedQuantityD { get; set; }
+
+        [Display(Name = "Unserved Quantity")]
+        public string RemainingQuantity => string.Format(SystemFormat.StringIntegerComma, RemainingQuantityD);
+        public int RemainingQuantityD { get; set; }
+
+        [Display(Name = "Unit")]
+        public string Unit { get; set; }
+        public int UnitId { get; set; }
+
+        public bool ToRequest { get; set; } = false;
+
+        public int RequestQuantityD { get; set; } = 0;
+    }
 }

@@ -292,7 +292,7 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong><br /><small>Invoice(s): " + repo.invoices + "</small>");
+                return $("<strong>" + repo.text + "</strong><br /><small class='text-muted'>Invoice(s): " + repo.invoices + "</small>");
             },
             ajax: {
                 url: "@Url.Action("GetSalesOrderInvoicedOptions", "SalesOrder")"

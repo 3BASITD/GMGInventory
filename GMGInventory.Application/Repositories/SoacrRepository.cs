@@ -748,9 +748,13 @@ namespace GMGInventory.Application.Repositories
         {
             var invoices = from ret in context.SalesReturnLineItems
                            let tbr = context.SOACRLineItemTBRs.Where(s => s.SalesReturnLineItemId == ret.Id).ToList()
-                           where (string.IsNullOrWhiteSpace(search) || ret.InvoiceLineItem!.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) || ("tbr".Contains(search.ToLower()) && ret.InvoiceLineItemId == null))
-                           && ((ret.SalesReturn.SalesOrder == null && ret.SalesReturn.Customer!.Id == CustomerId)
-                           || (ret.SalesReturn.SalesOrder != null && ret.SalesReturn.SalesOrder.Customer.Id == CustomerId))
+                           where (string.IsNullOrWhiteSpace(search) 
+                               || ret.InvoiceLineItem!.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) 
+                               || ("tbr".Contains(search.ToLower()) && ret.InvoiceLineItemId == null))
+                           //&& ((ret.SalesReturn.SalesOrder == null && ret.SalesReturn.Customer!.Id == CustomerId)
+                           //|| (ret.SalesReturn.SalesOrder != null && ret.SalesReturn.SalesOrder.Customer.Id == CustomerId))
+                           && ((ret.SalesReturn.SalesOrder != null && ret.SalesReturn.SalesOrder.CustomerId == CustomerId)
+                           || ret.SalesReturn.CustomerId == CustomerId)
                            let discount1 = (100 - ret.Discount1) / 100
                            let discount2 = (100 - ret.Discount2) / 100
                            select new SOACRInvoiceTBRVM
