@@ -491,6 +491,11 @@ namespace GMGInventory.Application.Repositories
             var itemVM = await (from order in context.SalesOrderLineItems
                                                      .Include(s => s.Item)
                                                      .ThenInclude(s => s.Unit)
+                                from promo in context.ItemPromo
+                                                    .Where(pr => pr.Id == order.ItemPromoId)
+                                                    .OrderByDescending(pr => pr.DateCreated)
+                                                    .Take(1)
+                                                    .DefaultIfEmpty()
                                 let price = context.ItemPrices
                                                    .Where(s => s.ItemId == order.ItemId
                                                             && s.DateCreated <= order.SalesOrder.ApprovedDate)
@@ -526,7 +531,7 @@ namespace GMGInventory.Application.Repositories
                                     InvoicedQuantityD = invoicedQuantity,
                                     ItemCode = order.Item.Code,
                                     ItemId = order.Item.Id,
-                                    ItemName = order.Item.Name,
+                                    ItemName = order.Item.Name + (order.ItemPromoId == null ? "" : " (" + promo.Name + ")"),
                                     ItemPartNumber = order.Item.PartNumber + "",
                                     ItemSize = order.Item.Size,
                                     LineNumber = order.LineNumber,
