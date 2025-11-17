@@ -135,7 +135,8 @@ namespace GMGInventory.Application.Repositories
                     QuantityD = 0,
                     RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
                     PromoPriceD = promo == null ? -999999 : promo.PromoPrice,
-                    ItemPromoId = promo == null ? 0 : promo.Id,
+                    ItemPromoId = promo.Id,
+                    ItemPromoName= promo.Name ?? "",
                     UnitId = item.Unit == null ? -1 : item.Unit.Id,
                     Unit = item.Unit == null ? "" : item.Unit.Code,
                     BrandId = item.BrandId
