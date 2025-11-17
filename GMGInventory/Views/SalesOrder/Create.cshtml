@@ -485,7 +485,7 @@
                 return $(
                     "<strong>" + repo.text + "</strong> " +
                     (repo.text != repo.name
-                        ? "<em class='fw-light'> - " + repo.name + "</em>"
+                        ?  "<em class='fw-light'> - " + repo.name + (repo.itemPromoName == "" ? "" : " ("+repo.itemPromoName+")") + "</em>"
                         : "") +
                     "<br />" +
                     "<small class='text-muted'>" +
@@ -509,10 +509,15 @@
 
         $("#add-code").on("select2:select", function () {
             $("#add-name").val($("#add-code").select2("data")[0].name);
+            var itemname = $("#add-name").val();
+            $('#add-unit-price').prop('readonly', false);
+
             if($("#add-code").select2("data")[0].promoPriceD > 0){
                 $("#add-unit-price").val($("#add-code").select2("data")[0].promoPriceD);
                 $("#add-gross-price").val($("#add-code").select2("data")[0].promoPriceD);
                 $(".add-price-source").text("(Promo)");
+                $('#add-unit-price').prop('readonly', true);
+                $("#add-name").val(itemname +" (" +$("#add-code").select2("data")[0].itemPromoName+ ")");
             }
             else if ($("#add-code").select2("data")[0].retailPriceD > $("#add-code").select2("data")[0].netPriceD) {
                 $("#add-unit-price").val($("#add-code").select2("data")[0].retailPriceD);
@@ -574,6 +579,7 @@
             $("#add-discount4").val("0.00");
             $("#add-discount5").val("0.00");
             $("#add-gross-price").val("0.00");
+            
         }
 
         $(".createBtn").on("click", clearItemForm);
@@ -609,13 +615,21 @@
                 success: function (data) {
                     if(Object.keys(data).length == 0){
                         $("#add-discount1").val("0.00");
+                        $('#add-discount1').prop('readonly', false);
                     } else{
                         console.log(data);
                         $("#add-discount1").val(Round2Decimal(data[0].discount));
                         $("#add-discount-id").val(data[0].id);
 
+                        $('#add-discount1').prop('readonly', true);
+                        
                         brandDiscountId = data[0].id;
                         console.log(brandDiscountId);
+
+                        if( user_access2.canEdit || ( (brandDiscountId == 0) || (brandDiscountId == null) ) )
+                        {
+                           $('#add-discount1').prop('readonly', false);
+                        }
 
                         var quantity = parseFloat($("#add-quantity").val());
                         var unit_price = parseFloat($("#add-unit-price").val());
@@ -654,7 +668,7 @@
                     id: $("#add-code").select2("data")[0].id,
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                     code: $("#add-code").select2("data")[0].text,
-                    name: $("#add-code").select2("data")[0].name,
+                    name: $("#add-code").select2("data")[0].name + ($("#add-code").select2("data")[0].itemPromoName == "" ? "": " ("+$("#add-code").select2("data")[0].itemPromoName+")" ),
                     inventoryCount: $("#add-code").select2("data")[0].inventoryCount,
                     quantity: $("#add-quantity").val() || 0,
                     unit: $("#add-code").select2("data")[0].unit,
@@ -827,7 +841,7 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.unitPrice) + '" class="form-control form-control-sm unitprice" style="width: 100%;" />';
+                        return '<input type="number" min="0" step="0.01" max="1999999.99" value="' + Round2Decimal(data.unitPrice) + '" class="form-control form-control-sm unitprice" style="width: 100%;" '+(data.itemPromoId != null ? "readonly" : "")+'/>';
                     },
                     name: "UnitPrice",
                     className: "form-cell text-end"
@@ -1046,7 +1060,7 @@
                     discount4: row_discount4,
                     discount5: row_discount5,
                     customerBrandDiscountId: row_data.customerBrandDiscountId,
-                    itemPromoId: row_data.itemPromoId
+                    itemPromoId: row_data.itemPromoId 
                 });
             });
             return item_to_order;
