@@ -427,6 +427,13 @@ $.fn.select2.defaults.set("ajax", {
     }
 });
 
+var select2FilterConfig = {
+    ajax: null, //should already fetched outside
+    minimumResultsForSearch: -1,
+    allowClear: true,
+    placeholder: "ALL"
+};
+
 /*
 $("#sample-url-query").select2({
     ajax: {
@@ -588,4 +595,10 @@ function imagePreview(that, previewerId, className, idName) {
         imager.setAttribute("id", id);
         document.getElementById(previewerId).append(imager);
     }
+}
+
+function toStr(str, defaultValue = "") {
+    if (str == null) return defaultValue;
+    str = String(str).trim();
+    return str === "" ? defaultValue : str;
 }

@@ -687,11 +687,11 @@ body.dark-mode .bg-invert {
     .btn-filter::after {
         content: "";
         display: none;
-        width: 5px;
-        height: 5px;
-        position: absolute;
-        top: 2px;
-        right: 2px;
+        width: 7px;
+        height: 7px;
+        position: relative;
+        top: -10px;
+        right: -5px;
         border-radius: 20px;
     }
 
@@ -717,6 +717,26 @@ body.dark-mode .bg-invert {
         opacity: 0.75;
         transform: scale(1);
         background-color: red;
+    }
+}
+
+/*.btn-filtered {
+    animation: beat 1.5s infinite ease-in-out;
+    box-shadow: 0 0 3px 0 red;
+}*/
+
+@keyframes beat {
+    0% {
+        /*box-shadow: 0 0 3px rgba(0, 188, 212, 0.6);*/
+        box-shadow: 0 0 3px 0 red;
+    }
+
+    50% {
+        box-shadow: 0 0 3px 0 yellow;
+    }
+
+    100% {
+        box-shadow: 0 0 3px 0 red;
     }
 }
 

@@ -5934,6 +5934,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool?>("HaveStock")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ItemDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(250)");
@@ -6720,12 +6723,15 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SalesOrderId")
+                    b.Property<int?>("SalesOrderId")
                         .HasColumnType("int");
 
                     b.Property<string>("SourceOrderNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserCreated")
                         .IsRequired()
@@ -8218,13 +8224,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2e722c78-3e43-44f0-9e15-11fdb8e9e3a8",
+                            ConcurrencyStamp = "5c12f168-1772-4f93-a8c5-9894aa6c2ccc",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAENwZ8pfQ3EnxVAK1CHxTfITLaZgsqI8cCTN2/sc1J5kzkllSKar4CARO2ZyzdzaktQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP9198De9tdYoBOCfQUh7nALeRA9JQpSLGnsIDeAf6nEm8DxM/l6roZD/apNWtUmfQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0a6e4b42-f752-4870-adb5-4f132106cf9d",
+                            SecurityStamp = "53897702-0036-4972-b201-ff283d13f4a8",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8239,13 +8245,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "35ccf05e-6fd7-43e1-8ce2-1f0c03c5873a",
+                            ConcurrencyStamp = "d8cd9ea8-4623-4d00-8615-51ee4fd8e6c0",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGfDB4CCZs5Qkq6L2RHW/bJr36Q5dzMU0U0AMrV4fy0B4gaBT+uqfA9tZdnWiQUDwg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEA1eIXXd5sUbmv2FShtB0zO+Ud3ylr4Jw/g7QrfY/9KFvPbIHPZ1KiQVApxMWpu8dg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "bcb6969c-0653-4f0f-a788-1348ba8320d1",
+                            SecurityStamp = "21c786de-be44-4bea-897f-ae583a72b2ca",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9299,9 +9305,7 @@ namespace GMGInventory.Data.Migrations
                 {
                     b.HasOne("GMGInventory.Data.SalesOrder", "SalesOrder")
                         .WithMany("SalesOrderSources")
-                        .HasForeignKey("SalesOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SalesOrderId");
 
                     b.Navigation("SalesOrder");
                 });

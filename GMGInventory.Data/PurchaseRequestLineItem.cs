@@ -37,6 +37,8 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string Purpose { get; set; }
 
+        public bool? HaveStock { get; set; }
+
         public ICollection<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
     }
 }

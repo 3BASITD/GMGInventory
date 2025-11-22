@@ -26,13 +26,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetOrdersDT()
+        public async Task<IActionResult> GetOrdersDT(bool IncludeAdded, bool IncludeIgnored)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             var form = new DataTablesRequestForm(Request.Form);
-            return Json(await queueRepository.GetOrdersDT(form));
+            return Json(await queueRepository.GetOrdersDT(form, IncludeAdded, IncludeIgnored));
         }
 
         public async Task<IActionResult> Details(string Id)
@@ -52,6 +52,15 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             return Json(await queueRepository.AddOrder(OrderNumber));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkIgnoreOrder(string OrderNumber)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await queueRepository.MarkIgnoreOrder(OrderNumber));
         }
     }
 }

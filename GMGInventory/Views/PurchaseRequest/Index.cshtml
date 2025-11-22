@@ -15,7 +15,7 @@
                     <span class="fas fa-plus"></span> New Purchase Request
                 </a>
             }
-            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
             @if (userAccess.CanUploadDownload)
@@ -124,8 +124,8 @@
                 </div>
             </div>
             <div class="modal-footer">
+                @* <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button> *@
                 <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
-                <button type="button" class="btn btn-secondary" onclick="ResetFilter()"><span class="fas fa-broom"></span> Reset Filter</button>
             </div>
         </div>
     </div>
@@ -134,18 +134,6 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-
-        var appliedFilters = {
-            typeId: '',
-            type: '',
-            purposeId: '',
-            purpose: '',
-            regionId: '',
-            filedBy: '',
-            dateFrom: '',
-            dateTo: '',
-            statusId: ''
-        };
 
         SetDateFilter();
         function SetDateFilter() {
@@ -177,27 +165,30 @@
                 showBatchLoader("type");
             },
             success: function (data, status, xhr) {
-                $("#filter-type").select2({
-                    ajax: null, //already fetched outside
-                    minimumResultsForSearch: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    data: data
-                }).on("change", function () {
+                if (!data.some(x => x.id === "" || x.id === null)) {
+                    data.unshift({ id: "", text: "" });
+                }
+                $("#filter-type").select2(
+                    $.extend(true, {}, select2FilterConfig, { 
+                        data: data 
+                    })
+                ).on("change", function () {
                     loadPurposeOptions();
                 });
             },
             complete: function (xhr, status) {
                 loadPurposeOptions();
                 hideBatchLoader("type");
+                //loadedSelectOptions.TypeDoneLoading = true;
             }
         });
 
         // Load request purpose data for select2
-        function loadPurposeOptions(selectedId) {
-            $("#filter-purpose").off("change");
-            $("#filter-purpose").empty().trigger('change');
-
+        function loadPurposeOptions() {
+            if ($("#filter-purpose").attr("data-select2-id")) {
+                $("#filter-purpose").select2("destroy");
+                $("#filter-purpose").empty();
+            }
             var typeText = $("#filter-type").select2("data")[0]?.text.toLowerCase() || "";
             if (typeText != "maintenance & repair" && typeText != "") {
                 $(".filter-purpose-container").toggle(true);
@@ -205,24 +196,24 @@
                     type: "POST",
                     url: "@Url.Action("GetPurposeOptions")",
                     data: {
-                        TypeId: $("#filter-type").val(),
-                        SelectedId: selectedId
+                        TypeId: $("#filter-type").val()
                     },
                     beforeSend: function (xhr, error) {
                         showBatchLoader("purpose");
                     },
                     success: function (data) {
-                        $("#filter-purpose").select2({
-                            ajax: null, //already fetched outside
-                            minimumResultsForSearch: -1,
-                            allowClear: true,
-                            placeholder: "ALL",
-                            data: data
-                        });
+                        if (!data.some(x => x.id === "" || x.id === null)) {
+                            data.unshift({ id: "", text: "" });
+                        }
+                        $("#filter-purpose").select2(
+                            $.extend(true, {}, select2FilterConfig, {
+                                data: data
+                            })
+                        );
                     },
                     complete: function (xhr, status) {
-                        $("#filter-purpose").val(appliedFilters.purposeId).trigger("change");
                         hideBatchLoader("purpose");
+                        //loadedSelectOptions.PurposeDoneLoading = true;
                     }
                 });
             } else {
@@ -238,17 +229,18 @@
                 showBatchLoader("region");
             },
             success: function (data, status, xhr) {
-                $("#filter-region").select2({
-                    ajax: null, //already fetched outside
-                    minimumResultsForSearch: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    data: data
-                });
+                if (!data.some(x => x.id === "" || x.id === null)) {
+                    data.unshift({ id: "", text: "" });
+                }
+                $("#filter-region").select2(
+                    $.extend(true, {}, select2FilterConfig, { 
+                        data: data 
+                    })
+                );
             },
             complete: function (xhr, status) {
-                $("#filter-region").val(appliedFilters.regionId).trigger("change");
                 hideBatchLoader("region");
+                //loadedSelectOptions.RegionDoneLoading = true;
             }
         });
 
@@ -260,121 +252,193 @@
                 showBatchLoader("status");
             },
             success: function (data, status, xhr) {
-                $("#filter-status").select2({
-                    ajax: null, //already fetched outside
-                    minimumResultsForSearch: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    data: data
-                });
+                if (!data.some(x => x.id === "" || x.id === null)) {
+                    data.unshift({ id: "", text: "" });
+                }
+                $("#filter-status").select2(
+                    $.extend(true, {}, select2FilterConfig, {
+                        data: data 
+                    })
+                );
             },
             complete: function (xhr, status) {
-                $("#filter-status").val(appliedFilters.statusId).trigger("change");
                 hideBatchLoader("status");
+                //loadedSelectOptions.StatusDoneLoading = true;
             }
         });
 
-
         function ApplyFilter() {
-            appliedFilters.typeId = $('#filter-type').val();
-            appliedFilters.type = $('#filter-type option:selected').text();
-            appliedFilters.purposeId = $('#filter-purpose').val();
-            appliedFilters.purpose = $('#filter-purpose option:selected').text();
-            appliedFilters.regionId = $('#filter-region').val();
-            appliedFilters.filedBy = $('#filter-filedby').val();
-            appliedFilters.dateFrom = $("#filter-from").val();
-            appliedFilters.dateTo = $("#filter-to").val();
-            appliedFilters.statusId = $("#filter-status").val();
-
-            requestDT.ajax.reload();
-            $("#filterModal").modal("hide");
+            // loadedSelectOptions.TypeId = $("#filter-type").val();
+            // loadedSelectOptions.PurposeId = $("#filter-purpose").val();
+            // loadedSelectOptions.RegionId = $("#filter-region").val();
+            // loadedSelectOptions.StatusId = $("#filter-status").val();
+            requestDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                //checkDefaultFilter();
+            });
         };
 
         function ResetFilter() {
-            $('#filter-type').val(null).trigger('change');
-            $('#filter-purpose').val(null).trigger('change');
-            $('#filter-region').val(null).trigger('change');
-            $('#filter-filedby').val("everyone").trigger('change');
-            $('#filter-from').val(null);
-            $('#filter-to').val(null);
-            $('#filter-status').val(null).trigger('change');
+            resetToDefaultDTFilter();
 
-            appliedFilters.typeId = $('#filter-type').val();
-            appliedFilters.type = $('#filter-type option:selected').text();
-            appliedFilters.purposeId = $('#filter-purpose').val();
-            appliedFilters.purpose = $('#filter-purpose option:selected').text();
-            appliedFilters.regionId = $('#filter-region').val();
-            appliedFilters.filedBy = $('#filter-filedby').val();
-            appliedFilters.dateFrom = $("#filter-from").val();
-            appliedFilters.dateTo = $("#filter-to").val();
-            SetDateFilter();
-            appliedFilters.statusId = $("#filter-status").val();
-
-            requestDT.ajax.reload();
-            $("#filterModal").modal("hide");
+            requestDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                //checkDefaultFilter();
+            });
         }
+        
+        // var loadedSelectOptions = {
+        //     TypeId: "",
+        //     TypeDoneLoading: false,
+        //     PurposeId: "",
+        //     PurposeDoneLoading: false,
+        //     RegionId: "",
+        //     RegionDoneLoading: false,
+        //     StatusId: "",
+        //     StatusDoneLoading: false,
+        // };
+
+        // var defaultDTState = {
+        //     order: [[5, "desc"]],
+        //     page: 0,
+        //     length: 10,
+        //     search: { search: "" },
+        //     TypeId: null,
+        //     PurposeId: null,
+        //     Purpose: "",
+        //     RegionId: null,
+        //     FiledBy: "everyone",
+        //     DateFrom: DateForInput(new Date(new Date().setMonth(new Date().getMonth() - 1))),
+        //     DateTo: DateForInput(new Date()),
+        //     StatusId: null
+        // };
+
+        // function checkDefaultFilter() {
+        //     var changed = JSON.stringify(requestDT.order()) != JSON.stringify(defaultDTState.order) ||
+        //                   requestDT.page.info().start != defaultDTState.page ||
+        //                   requestDT.page.len() != defaultDTState.length ||
+        //                   (requestDT.search() || "") != defaultDTState.search.search ||
+        //                   $('#filter-type').val() != defaultDTState.TypeId ||
+        //                   $('#filter-purpose').val() != defaultDTState.PurposeId ||
+        //                   $('#filter-region').val() != defaultDTState.RegionId ||
+        //                   $('#filter-filedby').val() != defaultDTState.FiledBy ||
+        //                   $("#filter-from").val() != defaultDTState.DateFrom ||
+        //                   $("#filter-to").val() != defaultDTState.DateTo ||
+        //                   $("#filter-status").val() != defaultDTState.StatusId;
+
+        //     $(".btn-filter").toggleClass('btn-filtered', changed);
+        //     $(".btnReset").toggle(changed);
+        // }
+
+        // function resetToDefaultDTFilter() {
+        //     $("#filter-type").val(defaultDTState.TypeId).trigger('change');
+        //     $("#filter-purpose").val(defaultDTState.PurposeId).trigger('change');
+        //     $("#filter-region").val(defaultDTState.RegionId).trigger('change');
+        //     $("#filter-filedby").val(defaultDTState.FiledBy);
+        //     $("#filter-from").val(defaultDTState.DateFrom);
+        //     $("#filter-to").val(defaultDTState.DateTo);
+        //     $("#filter-status").val(defaultDTState.StatusId).trigger('change');
+
+        //     console.log("resetToDefaultDTFilter 2 t:" + $("#filter-type").val() + " p:" + $("#filter-purpose").val() + " r:" + $("#filter-region").val() + " s:" + $("#filter-status").val());
+
+        //     loadedSelectOptions.TypeId = defaultDTState.TypeId;
+        //     loadedSelectOptions.PurposeId = defaultDTState.PurposeId;
+        //     loadedSelectOptions.RegionId = defaultDTState.RegionId;
+        //     loadedSelectOptions.StatusId = defaultDTState.StatusId;
+
+        //     requestDT.state.clear();
+        //     requestDT.order(defaultDTState.order);
+        //     requestDT.page(defaultDTState.page);
+        //     requestDT.search(defaultDTState.search.search);
+        // }
+        
+        // function waitForSelect2Loaded() {
+        //     var tries = 0;
+
+        //     function check() { // huwag palitan ng loop, pang iwas problema sa async
+        //         if (loadedSelectOptions.TypeDoneLoading && $("#filter-type").val() != loadedSelectOptions.TypeId)
+        //         {// hiwalay para makapili si purpose
+        //             $("#filter-type").val(loadedSelectOptions.TypeId).trigger("change");
+        //             loadPurposeOptions();
+        //         }
+        //         if ((loadedSelectOptions.PurposeDoneLoading || loadedSelectOptions.TypeId == "") &&
+        //             loadedSelectOptions.RegionDoneLoading &&
+        //             loadedSelectOptions.StatusDoneLoading) {
+        //                 $("#filter-purpose").val(loadedSelectOptions.PurposeId).trigger("change");
+        //                 $("#filter-region").val(loadedSelectOptions.RegionId).trigger("change");
+        //                 $("#filter-status").val(loadedSelectOptions.StatusId).trigger("change");
+
+        //                 return;
+        //         }
+
+        //         if (tries++ < 50) {
+        //             setTimeout(check, 200);
+        //         } else {
+        //             toastr.warning("Filter select option loading timeout. Please try again later by reloading this page");
+        //         }
+        //     }
+
+        //     check();
+        // }
 
         var requestDT = $('.table-request').on('preXhr.dt', function (e, settings, data) {
             showBatchLoader("requestdt");
         }).DataTable({
-            stateSave: true,
-            stateSaveParams: function (settings, data) {
-                data.customFilters = {
-                    typeIdVal: appliedFilters.typeId,
-                    typeVal: appliedFilters.type,
-                    purposeIdVal: appliedFilters.purposeId,
-                    purposeVal: appliedFilters.purpose,
-                    regionIdVal: appliedFilters.regionId,
-                    filedByVal: appliedFilters.filedBy,
-                    dateFromVal: appliedFilters.dateFrom,
-                    dateToVal: appliedFilters.dateTo,
-                    statusIdVal: appliedFilters.statusId
-                };
-            },
-            stateLoadParams: function (settings, data) {
-                if (data.customFilters) {
-                    if(data.customFilters.typeIdVal) {
-                        var typeOption = new Option(data.customFilters.typeVal, data.customFilters.typeIdVal, true, true);
-                        $("#filter-type").append(typeOption).trigger('change');
+            // stateSave: true,
+            // stateSaveParams: function (settings, data) {
+            //     data.TypeId = $('#filter-type').val();
+            //     data.PurposeId = $('#filter-purpose').val();
+            //     data.Purpose = $('#filter-purpose option:selected').text();
+            //     data.RegionId = $('#filter-region').val();
+            //     data.FiledBy = $('#filter-filedby').val();
+            //     data.DateFrom = $("#filter-from").val();
+            //     data.DateTo = $("#filter-to").val();
+            //     data.StatusId = $("#filter-status").val();
+            // },
+            // stateLoadParams: function (settings, data) {
+            //     // $("#filter-type").val(data.TypeId).trigger('change');
+            //     // if(data.PurposeId) {
+            //     //     var purposeOption = new Option(data.Purpose, data.PurposeId, true, true);
+            //     //     $("#filter-purpose").append(purposeOption).trigger('change');
+            //     // } else {
+            //     //     $("#filter-purpose").val(defaultDTState.PurposeId).trigger('change');
+            //     // }
+            //     // $("#filter-region").val(data.RegionId).trigger('change');
+            //     loadedSelectOptions.TypeId = data.TypeId || "";
+            //     loadedSelectOptions.PurposeId = data.PurposeId || "";
+            //     loadedSelectOptions.RegionId = data.RegionId || "";
+            //     $("#filter-filedby").val(data.FiledBy).trigger('change');
+            //     $("#filter-from").val(data.DateFrom);
+            //     $("#filter-to").val(data.DateTo);
+            //     //$("#filter-status").val(data.StatusId).trigger('change');
+            //     loadedSelectOptions.StatusId = data.StatusId || "";
 
-                        //$(".filter-purpose-container").toggle(data.customFilters.typeVal.toLowerCase() != "maintenance & repair");
-                    }
-
-                    if(data.customFilters.purposeIdVal) {
-                        var purposeOption = new Option(data.customFilters.purposeVal, data.customFilters.purposeIdVal, true, true);
-                        $("#filter-purpose").append(purposeOption).trigger('change');
-                    }
-                    $('#filter-region').val(data.customFilters.regionIdVal);
-                    if(data.customFilters.filedByVal != "me") data.customFilters.filedByVal = "everyone";
-                    $('#filter-filedby').val(data.customFilters.filedByVal);
-                    $('#filter-from').val(data.customFilters.dateFromVal);
-                    $('#filter-to').val(data.customFilters.dateToVal);
-                    $('#filter-status').val(data.customFilters.statusIdVal).trigger('change');
-
-                    appliedFilters = {
-                        typeId: data.customFilters.typeIdVal,
-                        type: data.customFilters.typeVal,
-                        purposeId: data.customFilters.purposeIdVal,
-                        purpose: data.customFilters.purposeVal,
-                        regionId: data.customFilters.regionIdVal,
-                        filedBy: data.customFilters.filedByVal,
-                        dateFrom: data.customFilters.dateFromVal,
-                        dateTo: data.customFilters.dateToVal,
-                        statusId: data.customFilters.statusIdVal
-                    };
-                }
-            },
+            //     // waitForSelect2Loaded();
+            // },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
                 data: function (data) {
-                    data.TypeId = $("#filter-type").val();
-                    data.PurposeId = $("#filter-purpose").val();
-                    data.RegionId = $("#filter-region").val();
-                    data.FiledBy = $('#filter-filedby').val();
-                    data.DateFrom = $("#filter-from").val();
-                    data.DateTo = $("#filter-to").val();
-                    data.StatusId = $("#filter-status").val();
+                    typeId = $('#filter-type').val();
+                    purposeId = $('#filter-purpose').val();
+                    purpose = $('#filter-purpose option:selected').text();
+                    regionId = $('#filter-region').val();
+                    // typeId = loadedSelectOptions.TypeId;
+                    // purposeId = loadedSelectOptions.PurposeId;
+                    // regionId = loadedSelectOptions.RegionId;
+                    filedBy = $('#filter-filedby').val();
+                    dateFrom = $("#filter-from").val();
+                    dateTo = $("#filter-to").val();
+                    statusId = $("#filter-status").val();
+                    // statusId = loadedSelectOptions.RegionId;
+
+                    if (typeId) data.TypeId = typeId;
+                    if (purposeId) data.PurposeId = purposeId;
+                    if (regionId) data.RegionId = regionId;
+                    if (filedBy) data.FiledBy = filedBy;
+                    data.DateFrom = dateFrom;
+                    data.DateTo = dateTo;
+                    if (statusId) data.StatusId = statusId;
                 }
             },
             serverSide: true,
@@ -422,6 +486,7 @@
 
         requestDT.on("draw", function () {
             hideBatchLoader("requestdt");
+            //checkDefaultFilter();
         });
 
         if (user_access.canUploadDownload) {

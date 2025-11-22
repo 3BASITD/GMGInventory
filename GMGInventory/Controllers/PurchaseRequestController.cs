@@ -29,7 +29,7 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
-
+            
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseRequest)).Convert();
 
             return View();
@@ -51,6 +51,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseRequest)).Convert();
+            ViewData["UserAccessAutomotive"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseRequestAutomotive)).Convert();
 
             var request = await requestRepository.GetDetails(Id);
             if (request == null)
@@ -161,18 +162,18 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var response = await requestRepository.SaveItemsAsync(items, Id, status);
-            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message; 
 
             return Json(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ApproveJson(int Id)
+        public async Task<IActionResult> ApproveJson(int Id, int? approverNumber = null)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            var response = await requestRepository.ApproveAsync(Id);
+            var response = await requestRepository.ApproveAsync(Id, approverNumber);
             if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
             return Json(response);
         }
@@ -184,6 +185,16 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var response = await requestRepository.DisapproveAsync(Id, reason);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
+
+        public async Task<IActionResult> DeleteJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await requestRepository.DeleteAsync(Id);
             if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
             return Json(response);
         }
