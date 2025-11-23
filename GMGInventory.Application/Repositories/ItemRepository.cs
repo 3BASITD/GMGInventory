@@ -1,4 +1,8 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2013.Word;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -11,6 +15,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Dynamic.Core;
+using System.Reflection.Emit;
 using System.Xml.Linq;
 
 namespace GMGInventory.Application.Repositories
@@ -409,7 +414,8 @@ namespace GMGInventory.Application.Repositories
             if (filter.IsTable != false)
             {
                 var itemsVM = from item in context.Items
-                              join inventory in context.ItemInventories on item.Id equals inventory.ItemId
+                              join inventory in context.ItemInventories on item.Id equals inventory.ItemId into gin
+                              from inventory in gin.DefaultIfEmpty()
                               let price = item.ItemPrices
                                               .Where(s => s.DateCreated.Date <= DateTime.Now)
                                               .OrderByDescending(s => s.DateCreated)
@@ -438,11 +444,11 @@ namespace GMGInventory.Application.Repositories
                                   Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
                                   Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
                                   UnitId = item.UnitId,
-                                  QuantityD = inventory.Quantity,
-                                  RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
-                                  NetPriceD = price == null ? 0 : price.NetSellingPrice,
-                                  Warehouse = inventory.Warehouse.Name,
-                                  WarehouseId = inventory.WarehouseId,
+                                  QuantityD = inventory == null ? null : inventory.Quantity,
+                                  RetailPriceD = price == null ? null : price.RetailSellingPrice,
+                                  NetPriceD = price == null ? null : price.NetSellingPrice,
+                                  Warehouse = inventory == null ? null : inventory.Warehouse.Name,
+                                  WarehouseId = inventory == null ? null : inventory.WarehouseId,
                                   IsActive = item.IsActive,
                                   Image = item.Image
                               };
@@ -725,7 +731,7 @@ namespace GMGInventory.Application.Repositories
         public async Task AddAsync(ItemCommonVM itemVM)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var item = new Item
+            var item = new GMGInventory.Data.Item
             {
                 BrandId = itemVM.BrandId,
                 CategoryId = itemVM.CategoryId,
@@ -747,8 +753,8 @@ namespace GMGInventory.Application.Repositories
             var itemPrice = new ItemPrice
             {
                 ItemId = item.Id,
-                NetSellingPrice = itemVM.NetPriceD,
-                RetailSellingPrice = itemVM.RetailPriceD
+                NetSellingPrice = itemVM.NetPriceD == null ? -1 : itemVM.NetPriceD.Value,
+                RetailSellingPrice = itemVM.RetailPriceD == null ? -1 : itemVM.RetailPriceD.Value
             };
             await context.ItemPrices.AddAsync(itemPrice);
             await context.SaveChangesAsync(currentUserId);
@@ -756,10 +762,10 @@ namespace GMGInventory.Application.Repositories
             var itemInventories = new ItemInventory
             {
                 ItemId = item.Id,
-                Quantity = itemVM.QuantityD,
-                WarehouseId = itemVM.WarehouseId == 0
+                Quantity = itemVM.QuantityD == null ? -1 : itemVM.QuantityD.Value,
+                WarehouseId = itemVM.WarehouseId == 0 || itemVM.WarehouseId == null
                             ? context.Warehouses.Where(s => s.IsMain == true).Select(s => s.Id).FirstOrDefault()
-                            : itemVM.WarehouseId
+                            : itemVM.WarehouseId.Value
             };
             await context.ItemInventories.AddAsync(itemInventories);
             await context.SaveChangesAsync(currentUserId);
@@ -909,7 +915,7 @@ namespace GMGInventory.Application.Repositories
                                            .FirstOrDefaultAsync();
 
             if ((latestPrice != null && (latestPrice.RetailSellingPrice != retailPrice || latestPrice.NetSellingPrice != netPrice))
-              ||(latestPrice == null))
+              || (latestPrice == null))
             {
                 latestPrice = new ItemPrice
                 {
@@ -1810,6 +1816,274 @@ namespace GMGInventory.Application.Repositories
             {
                 return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
             }
+        }
+
+        public async Task<ResponseModelData<FileVM>> UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Invalid file" };
+
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+                stream.Position = 0;
+
+                using var workbook = new XLWorkbook(stream);
+                var worksheet = workbook.Worksheets.First();
+
+                var headers = worksheet.Row(1).Cells().Select(c => c.GetString().Trim()).ToList();
+                var requiredHeaders = new[] { "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse", "Model Number", "Category", "Item Type",
+                    "Brand", "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price"};
+
+                var missingColumns = new List<string>();
+                foreach (var col in requiredHeaders)
+                {
+                    if (!headers.Contains(col))
+                        missingColumns.Add(col);
+                }
+                if (missingColumns.Count > 0)
+                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Missing column(s): " + string.Join(", ", missingColumns) };
+
+                int codeCol = headers.IndexOf("Code") + 1;
+                int nameCol = headers.IndexOf("Name") + 1;
+                int oldSKUCol = headers.IndexOf("Old SKU") + 1;
+                int partNumberCol = headers.IndexOf("Part Number") + 1;
+                int interchangeNumberCol = headers.IndexOf("Interchange Number") + 1;
+                int warehouseCol = headers.IndexOf("Warehouse") + 1;
+                int modelNumberCol = headers.IndexOf("Model Number") + 1;
+                int categoryCol = headers.IndexOf("Category") + 1;
+                int itemTypeCol = headers.IndexOf("Item Type") + 1;
+                int brandCol = headers.IndexOf("Brand") + 1;
+                int sizeCol = headers.IndexOf("Size") + 1;
+                int unitCol = headers.IndexOf("Unit") + 1;
+                int quantityOnHandCol = headers.IndexOf("Quantity on Hand") + 1;
+                int beginningCostCol = headers.IndexOf("Beginning Cost") + 1;
+                int grossPriceCol = headers.IndexOf("Gross Price") + 1;
+                int netPriceCol = headers.IndexOf("Net Price") + 1;
+
+                var xclitems = new List<ItemFileVM>();
+                foreach (var row in worksheet.RowsUsed().Skip(1))
+                {
+                    var xclitem = new ItemFileVM
+                    {
+                        Code = row.Cell(codeCol).GetString(),
+                        Name = row.Cell(nameCol).GetString(),
+                        OldCode = row.Cell(oldSKUCol).GetString(),
+                        PartNumber = row.Cell(partNumberCol).GetString(),
+                        InterchangeNumber = row.Cell(interchangeNumberCol).GetString(),
+                        Warehouse = row.Cell(warehouseCol).GetString(),
+                        ModelNumber = row.Cell(modelNumberCol).GetString(),
+                        Category = row.Cell(categoryCol).GetString(),
+                        ItemType = row.Cell(itemTypeCol).GetString(),
+                        Brand = row.Cell(brandCol).GetString(),
+                        Size = row.Cell(sizeCol).GetString(),
+                        Unit = row.Cell(unitCol).GetString(),
+                        Quantity = int.TryParse(row.Cell(quantityOnHandCol).GetString().Replace(",", ""), out int quantity) ? quantity : -999999,
+                        BeginningCost = decimal.TryParse(row.Cell(beginningCostCol).GetString().Replace(",", ""), out decimal cost) ? cost : -999999,
+                        GrossPrice = decimal.TryParse(row.Cell(grossPriceCol).GetString().Replace(",", ""), out decimal gprice) ? gprice : -999999,
+                        NetPrice = decimal.TryParse(row.Cell(netPriceCol).GetString().Replace(",", ""), out decimal nprice) ? nprice : -999999
+                    };
+
+                    xclitem.Status = await SaveItemFromFile(xclitem);
+
+                    xclitems.Add(xclitem);
+                }
+
+                using var newWorkbook = new XLWorkbook();
+                var newSheet = newWorkbook.AddWorksheet("Result");
+
+                newSheet.Range("A1:Q1").Merge();
+                newSheet.Cell(1, 1).MergedRange().Value = "This file is a result of item upload. Don't use this file for uploading";
+
+                newSheet.Cell(2, 1).Value = "Code";
+                newSheet.Cell(2, 2).Value = "Name";
+                newSheet.Cell(2, 3).Value = "Old SKU";
+                newSheet.Cell(2, 4).Value = "Part Number";
+                newSheet.Cell(2, 5).Value = "Interchange Number";
+                newSheet.Cell(2, 6).Value = "Warehouse";
+                newSheet.Cell(2, 7).Value = "Model Number";
+                newSheet.Cell(2, 8).Value = "Category";
+                newSheet.Cell(2, 9).Value = "Item Type";
+                newSheet.Cell(2, 10).Value = "Brand";
+                newSheet.Cell(2, 11).Value = "Size";
+                newSheet.Cell(2, 12).Value = "Unit";
+                newSheet.Cell(2, 13).Value = "Quantity on Hand";
+                newSheet.Cell(2, 14).Value = "Beginning Cost";
+                newSheet.Cell(2, 15).Value = "Gross Price";
+                newSheet.Cell(2, 16).Value = "Net Price";
+                newSheet.Cell(2, 17).Value = "Status for Uploading";
+
+                for (int i = 0; i < xclitems.Count; i++)
+                {
+                    var p = xclitems[i];
+                    newSheet.Cell(i + 3, 1).Value = p.Code;
+                    newSheet.Cell(i + 3, 2).Value = p.Name;
+                    newSheet.Cell(i + 3, 3).Value = p.OldCode;
+                    newSheet.Cell(i + 3, 4).Value = p.PartNumber;
+                    newSheet.Cell(i + 3, 5).Value = p.InterchangeNumber;
+                    newSheet.Cell(i + 3, 6).Value = p.Warehouse;
+                    newSheet.Cell(i + 3, 7).Value = p.ModelNumber;
+                    newSheet.Cell(i + 3, 8).Value = p.Category;
+                    newSheet.Cell(i + 3, 9).Value = p.ItemType;
+                    newSheet.Cell(i + 3, 10).Value = p.Brand;
+                    newSheet.Cell(i + 3, 11).Value = p.Size;
+                    newSheet.Cell(i + 3, 12).Value = p.Unit;
+                    newSheet.Cell(i + 3, 13).Value = p.Quantity;
+                    newSheet.Cell(i + 3, 14).Value = p.BeginningCost;
+                    newSheet.Cell(i + 3, 15).Value = p.GrossPrice;
+                    newSheet.Cell(i + 3, 16).Value = p.NetPrice;
+                    newSheet.Cell(i + 3, 17).Value = p.Status;
+                }
+
+                using var outStream = new MemoryStream();
+                newWorkbook.SaveAs(outStream);
+                outStream.Position = 0;
+
+                return new ResponseModelData<FileVM>
+                {
+                    Status = "Success",
+                    Message = "The Excel file has been processed. Please check the downloaded file to see the status of the results.",
+                    Data = new FileVM
+                    {
+                        FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Item Upload Processed --- {file.FileName}",
+                        Content = outStream.ToArray()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModelData<FileVM> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
+        private async Task<string> SaveItemFromFile(ItemFileVM itemFile)
+        {
+            if (string.IsNullOrWhiteSpace(itemFile.Code)) return "Item Code is required";
+            if (string.IsNullOrWhiteSpace(itemFile.Name)) return "Item Name is required";
+            if (string.IsNullOrWhiteSpace(itemFile.Size)) return "Item Size is required";
+
+            var category = await context.Categories
+                                        .Where(s => s.Name.ToLower().Trim() == itemFile.Category.ToLower().Trim()
+                                                 || s.Code.ToLower().Trim() == itemFile.Category.ToLower().Trim())
+                                        .FirstOrDefaultAsync();
+            if (category == null) return $"Category({itemFile.Category}) not found";
+
+            var itemType = await context.ItemTypes
+                                        .Where(s => s.Name.ToLower() == itemFile.ItemType.ToLower() 
+                                                 && s.Category.Id == category.Id)
+                                        .FirstOrDefaultAsync();
+            if (itemType == null) return $"Cannot find Item Type({itemFile.ItemType}) under Category({itemFile.Category})";
+
+            var brand = await context.Brands
+                                     .Where(s => s.Name.ToLower() == itemFile.Brand.ToLower() 
+                                              && s.ItemType.Id == itemType.Id)
+                                     .FirstOrDefaultAsync();
+            if (brand == null) return $"Cannot find Brand({itemFile.Brand}) under Item Type({itemFile.ItemType})";
+
+            var unit = await context.Units
+                                    .Where(s => s.Name.ToLower() == itemFile.Unit.ToLower())
+                                    .FirstOrDefaultAsync();
+            if (unit == null) return $"Unit({itemFile.Unit}) not found";
+
+            var warehouse = await context.Warehouses
+                                         .Where(s => s.Code.ToLower() == itemFile.Warehouse.ToLower())
+                                         .FirstOrDefaultAsync();
+            if (warehouse == null) return $"Warehouse({itemFile.Warehouse}) not found";
+
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            var msg = new List<string>();
+
+            var item = await context.Items.Where(s => s.Code.ToLower() == itemFile.Code.ToLower()).FirstOrDefaultAsync();
+            if (item != null)
+            {
+                item.OldCode = !string.IsNullOrWhiteSpace(itemFile.OldCode) ? itemFile.OldCode : item.OldCode;
+                item.Name = itemFile.Name;
+                item.PartNumber = !string.IsNullOrWhiteSpace(itemFile.PartNumber) ? itemFile.PartNumber : item.PartNumber;
+                item.InterchangeNumber = !string.IsNullOrWhiteSpace(itemFile.InterchangeNumber) ? itemFile.InterchangeNumber : item.InterchangeNumber;
+                item.ModelNumber = !string.IsNullOrWhiteSpace(itemFile.ModelNumber) ? itemFile.ModelNumber : item.ModelNumber;
+                item.Size = itemFile.Size;
+                item.UnitId = unit.Id;
+                item.CategoryId = category.Id;
+                item.ItemTypeId = itemType.Id;
+                item.BrandId = brand.Id;
+                item.BeginningCost = itemFile.BeginningCost != -999999 ? itemFile.BeginningCost : item.BeginningCost;
+                item.IsActive = true;
+
+                context.Items.Update(item);
+                msg.Add("Item updated");
+                await context.SaveChangesAsync(currentUserId);
+            }
+            else
+            {
+                item = new GMGInventory.Data.Item
+                {
+                    OldCode = itemFile.OldCode,
+                    Code = itemFile.Code,
+                    Name = itemFile.Name,
+                    PartNumber = itemFile.PartNumber,
+                    InterchangeNumber = itemFile.InterchangeNumber,
+                    ModelNumber = itemFile.ModelNumber,
+                    Size = itemFile.Size,
+                    UnitId = unit.Id,
+                    CategoryId = category.Id,
+                    ItemTypeId = itemType.Id,
+                    BrandId = brand.Id,
+                    BeginningCost = itemFile.BeginningCost != -999999 ? itemFile.BeginningCost
+                                  : itemFile.GrossPrice != -999999 ? itemFile.GrossPrice
+                                  : itemFile.NetPrice != -999999 ? itemFile.NetPrice
+                                  : 0,
+                    IsActive = true,
+                };
+
+                await context.Items.AddAsync(item);
+                msg.Add("Item added");
+                await context.SaveChangesAsync(currentUserId);
+            }
+
+            var itemInventory = await context.ItemInventories
+                                             .Where(s => s.Item.Id == item.Id && s.Warehouse.Id == warehouse.Id)
+                                             .FirstOrDefaultAsync();
+            if (itemInventory != null)
+            {
+                itemInventory.Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0;
+                context.ItemInventories.Update(itemInventory);
+                msg.Add("Item inventory updated");
+            }
+            else
+            {
+                itemInventory = new ItemInventory
+                {
+                    ItemId = item.Id,
+                    WarehouseId = warehouse.Id,
+                    Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0
+                };
+                await context.ItemInventories.AddAsync(itemInventory);
+                msg.Add("Item inventory added");
+            }
+
+            var itemPrice = await context.ItemPrices
+                                         .Where(s => s.Item.Id == item.Id)
+                                         .OrderByDescending(s => s.DateCreated)
+                                         .FirstOrDefaultAsync();
+
+            if (itemPrice == null ||
+                itemPrice.RetailSellingPrice == itemFile.GrossPrice == false ||
+                itemPrice.NetSellingPrice == itemFile.NetPrice == false)
+            {
+                itemPrice = new ItemPrice
+                {
+                    ItemId = item.Id,
+                    RetailSellingPrice = itemFile.GrossPrice != -999999 ? itemFile.GrossPrice : 0,
+                    NetSellingPrice = itemFile.NetPrice != -999999 ? itemFile.NetPrice : 0
+                };
+                await context.ItemPrices.AddAsync(itemPrice);
+                msg.Add("Item price added");
+            }
+
+            await context.SaveChangesAsync(currentUserId);
+
+            return string.Join("; ", msg);
         }
     }
 }

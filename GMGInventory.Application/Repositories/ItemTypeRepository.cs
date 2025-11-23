@@ -84,9 +84,9 @@ namespace GMGInventory.Application.Repositories
                                     || x.Name.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Category.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserModified.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateModified.ToLower().Contains(form.SearchValue.ToLower()));
+                                    || x.DateCreated.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.UserModified + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.DateModified + "").ToLower().Contains(form.SearchValue.ToLower()));
             }
             // get total count of records after search
             filterRecord = data.Count();

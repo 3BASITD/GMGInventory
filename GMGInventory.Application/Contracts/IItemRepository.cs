@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Common.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace GMGInventory.Application.Contracts
 {
@@ -45,5 +46,6 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<ItemDetailTransferVM>> GetItemTransferDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<ItemDetailReturnVM>> GetItemReturnDTAsync(DataTablesRequestForm form, int id);
         Task<ResponseModel> SaveImageAsync(ItemImageFormVM form);
+        Task<ResponseModelData<FileVM>> UploadFile(IFormFile file);
     }
 }

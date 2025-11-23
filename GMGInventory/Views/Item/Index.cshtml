@@ -21,9 +21,15 @@
             }
             @if (userAccess.CanUploadDownload)
             {
-                <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                    <span class="fas fa-upload"></span> Upload
-                </button>
+                <div class="dropdown float-right ml-2">
+                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuUpload" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuUpload">
+                        <li><a class="dropdown-item btn-details-upload uploadBtn" data-bs-toggle="modal" data-bs-target="#uploadModal" data-company="ROW">Upload &amp; Track per Row</a></li>
+                        <li><a class="dropdown-item btn-details-upload uploadFileBtn" data-bs-toggle="modal" data-bs-target="#uploadFileModal" data-company="FILE">Upload Whole File</a></li>
+                    </ul>
+                </div>
                 <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
                     <span class="fas fa-download"></span> Download
                 </button>
@@ -373,6 +379,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadFileModal" role="dialog" aria-labelledby="uploadFileModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload File</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-excel-file">Excel File</label>
+                        <input type="file" id="upload-excel-file" name="file"
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="DoFileUpload()">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 <div class="modal fade" id="pictureModal" role="dialog" aria-labelledby="pictureModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -661,13 +697,46 @@
                 },
                 { data: "partNumber", name: "PartNumber" },
                 { data: "interchangeNumber", name: "InterchangeNumber" },
-                { data: "warehouse", name: "Warehouse" },
-                { data: "retailPrice", name: "RetailPrice", className: "text-end", visible: user_access.canView },
-                { data: "netPrice", name: "NetPrice", className: "text-end", visible: user_access.canView },
+                {
+                    data: function (data, type, dataToSet) {
+                        if(data.warehouse) {
+                            return data.warehouse;
+                        } else {
+                            return '<span class="text-danger" data-microtip-title="Erroneous price data, please contact IT" data-microtip-position="bottom" role="tooltip"><span class="fas fa-exclamation-triangle"></span></span>';
+                        }
+                    },
+                    name: "Warehouse" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if(data.retailPrice && data.retailPriceD >= 0) {
+                            return data.retailPrice;
+                        } else {
+                            return '<span class="text-danger" data-microtip-title="Erroneous price data, please contact IT" data-microtip-position="bottom" role="tooltip"><span class="fas fa-exclamation-triangle"></span></span>';
+                        }
+                    },
+                    name: "RetailPrice",
+                    className: "text-end", 
+                    visible: user_access.canView },
+                {
+                    data: function (data, type, dataToSet) {
+                        if(data.netPrice && data.netPriceD >= 0) {
+                            return data.netPrice;
+                        } else {
+                            return '<span class="text-danger" data-microtip-title="Erroneous price data, please contact IT" data-microtip-position="bottom" role="tooltip"><span class="fas fa-exclamation-triangle"></span></span>';
+                        }
+                    },
+                    name: "NetPrice",
+                    className: "text-end", 
+                    visible: user_access.canView
+                },
                 {
                     data: function (data, type, dataToSet) {
                         //return '<span data-microtip-title="[Inventory:' + FormatStringInteger(data.quantityInventoryD) + ']+[Served:' + FormatStringInteger(data.quantityServedD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityServedD) + ']-[Invoiced:' + FormatStringInteger(data.quantityInvoiceD == null || data.warehouse.toLowerCase().includes("main") != true ? 0 : data.quantityInvoiceD) + ']" data-microtip-position="bottom-left" role="tooltip">' + data.quantity + '</span>';
-                        return data.quantity;
+                        if(data.quantity && data.quantityD >= 0) {
+                            return data.quantity;
+                        } else {
+                            return '<span class="text-danger" data-microtip-title="Erroneous inventory data, please contact IT" data-microtip-position="bottom" role="tooltip"><span class="fas fa-exclamation-triangle"></span></span>';
+                        }
                     },
                     name: "Quantity",
                     className: "text-end"
@@ -1195,6 +1264,63 @@
                 if ($("#WarehouseId").val()) { urlQuery.push("WarehouseId=" + $("#WarehouseId").val()); }
                 window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
             });
+
+            function DoFileUpload() {
+                var formData = new FormData();
+                formData.append("File", $("#upload-excel-file")[0].files[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadFileJson")",
+                    data: formData,
+                    //async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    xhrFields: {
+                        responseType: 'blob'  // important for file
+                    },
+                    //enctype: "multipart/form-data",
+                    success: function (data, status, xhr) {
+                        let statusHeader = xhr.getResponseHeader("X-Status");
+                        let messageHeader = xhr.getResponseHeader("X-Message");
+                        if (statusHeader == "Error") {
+                            toastr.error(messageHeader, "Error");
+                        } else {
+                            // Create a temporary download link
+                            let blob = new Blob([data]);
+                            let url = window.URL.createObjectURL(blob);
+
+                            let a = document.createElement("a");
+                            a.href = url;
+
+                            let disposition = xhr.getResponseHeader('Content-Disposition');
+                            let fileName = "Result.xlsx";
+                            if (disposition) {
+                                // try UTF-8 encoded filename first
+                                let utf8Match = disposition.match(/filename\*=UTF-8''(.+)/);
+                                if (utf8Match && utf8Match[1]) {
+                                    fileName = decodeURIComponent(utf8Match[1]);
+                                } else {
+                                    // fallback to normal filename
+                                    let normalMatch = disposition.match(/filename="?([^";]+)"?/);
+                                    if (normalMatch && normalMatch[1]) fileName = normalMatch[1];
+                                }
+                            }
+                            a.download = fileName;
+                            a.click();
+
+                            window.URL.revokeObjectURL(url);
+
+                            itemDT.ajax.reload();
+
+                            toastr.success(messageHeader, "Success");
+
+                            $("#uploadFileModal").modal("hide");
+                        }
+                    }
+                });
+            }
         }
     </script>
 }
