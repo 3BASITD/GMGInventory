@@ -6602,6 +6602,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateReceive")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DriverId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ForwarderId")
                         .HasColumnType("int");
 
@@ -6624,14 +6627,21 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("VehicleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Waybill")
                         .HasColumnType("nvarchar(150)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DriverId");
+
                     b.HasIndex("ForwarderId");
 
                     b.HasIndex("SalesOrderId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("SalesOrderDeliveryMonitorings");
                 });
@@ -8218,13 +8228,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2e722c78-3e43-44f0-9e15-11fdb8e9e3a8",
+                            ConcurrencyStamp = "933438cc-d3fe-4c6f-b40b-09417f83246e",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAENwZ8pfQ3EnxVAK1CHxTfITLaZgsqI8cCTN2/sc1J5kzkllSKar4CARO2ZyzdzaktQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGOLvCKQDZp8PU53fGSd66y5yYBr01hXyIBIA/BoZT+dWhtTcAngo5Eu76GidLUfKw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0a6e4b42-f752-4870-adb5-4f132106cf9d",
+                            SecurityStamp = "157cfc54-154c-49ad-97cf-80737fa34608",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8239,13 +8249,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "35ccf05e-6fd7-43e1-8ce2-1f0c03c5873a",
+                            ConcurrencyStamp = "ee9e311e-463d-45d0-b21e-0c93eb39284e",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGfDB4CCZs5Qkq6L2RHW/bJr36Q5dzMU0U0AMrV4fy0B4gaBT+uqfA9tZdnWiQUDwg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG/ic/UFzxRhPMfM+6VV47faPzFtAp1E+c7h0F/Llh6r4VplDs9g2VXIEVhi7suIhQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "bcb6969c-0653-4f0f-a788-1348ba8320d1",
+                            SecurityStamp = "a07517e0-ce37-45db-a1a8-f64638d5fb3c",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9247,6 +9257,10 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderDeliveryMonitoring", b =>
                 {
+                    b.HasOne("GMGInventory.Data.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId");
+
                     b.HasOne("GMGInventory.Data.Forwarder", "Forwarder")
                         .WithMany("SalesOrderDeliveryMonitorings")
                         .HasForeignKey("ForwarderId")
@@ -9259,9 +9273,17 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId");
+
+                    b.Navigation("Driver");
+
                     b.Navigation("Forwarder");
 
                     b.Navigation("SalesOrder");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderLineItem", b =>

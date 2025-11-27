@@ -65,7 +65,10 @@ namespace GMGInventory.Application.Repositories
                                  SalesOrderStatus = so.Status.Code,
                                  RequiredDeliveryDateD = so.RequiredDeliveryDate,
                                  Representative = string.IsNullOrWhiteSpace(sdm.Representative) ? null : sdm.Representative,
-                                 DateReceiveD = sdm.DateReceive
+                                 DateReceiveD = sdm.DateReceive,
+                                 DriverId = sdm.DriverId,
+                                 VehicleId = sdm.VehicleId,
+                                 VehicleName = sdm.Vehicle.FleetPlateNumber
                              };
 
             return await salesOrder.ToListAsync();
@@ -178,7 +181,9 @@ namespace GMGInventory.Application.Repositories
                         Remarks = form.Remarks + "",
                         ServiceLevelAgreement = form.ServiceLevelAgreement,
                         Representative = form.Representative,
-                        DateReceive = form.DateReceive
+                        DateReceive = form.DateReceive,
+                        DriverId = form.DriverId,
+                        VehicleId = form.VehicleId
                     };
                     await context.SalesOrderDeliveryMonitorings.AddAsync(delivery);
                     message = "Delivery details added successfully";
@@ -193,6 +198,8 @@ namespace GMGInventory.Application.Repositories
                     delivery.ServiceLevelAgreement = form.ServiceLevelAgreement;
                     delivery.Representative = form.Representative;
                     delivery.DateReceive = form.DateReceive;
+                    delivery.DriverId = form.DriverId;
+                    delivery.VehicleId = form.VehicleId;
                     context.SalesOrderDeliveryMonitorings.Update(delivery);
                     message = "Delivery details updated successfully";
                 }
