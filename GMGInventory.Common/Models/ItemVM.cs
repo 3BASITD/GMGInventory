@@ -82,20 +82,20 @@ namespace GMGInventory.Common.Models
         public decimal? BeginningCostD { get; set; }
 
         [Display(Name = "Quantity")]
-        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
-        public int QuantityD { get; set; }
+        public string? Quantity => QuantityD == null ? null : string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int? QuantityD { get; set; }
 
         [Display(Name = "Retail Price")]
-        public string RetailPrice => string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
-        public decimal RetailPriceD { get; set; }
+        public string? RetailPrice => RetailPriceD == null ? null : string.Format(SystemFormat.StringDecimalComma, RetailPriceD);
+        public decimal? RetailPriceD { get; set; }
 
         [Display(Name = "Net Price")]
-        public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
-        public decimal NetPriceD { get; set; }
+        public string? NetPrice => NetPriceD == null ? null : string.Format(SystemFormat.StringDecimalComma, NetPriceD);
+        public decimal? NetPriceD { get; set; }
 
         [Display(Name = "Warehouse")]
-        public string Warehouse { get; set; }
-        public int WarehouseId { get; set; }
+        public string? Warehouse { get; set; }
+        public int? WarehouseId { get; set; }
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
@@ -224,6 +224,7 @@ namespace GMGInventory.Common.Models
         public bool IsActive { get; set; }
         public decimal GrossPrice { get; set; }
         public decimal NetPrice { get; set; }
+        public string? Status { get; set; }
     }
 
     public class ItemDetailWarehouseVM
@@ -307,7 +308,7 @@ namespace GMGInventory.Common.Models
 
     public class ItemPromoVM
     {
-        
+
         public int Id { get; set; }
         public string Name { get; set; }
         public int ItemId { get; set; }

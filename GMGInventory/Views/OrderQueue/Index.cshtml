@@ -9,6 +9,9 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
@@ -19,6 +22,7 @@
                     <th>Agent</th>
                     <th>Customer</th>
                     <th>Extended Price</th>
+                    <th>Status</th>
                     <th></th>
                 </tr>
             </thead>
@@ -26,16 +30,124 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Report</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-added" class="form-label mb-0">Already Added to Sales Order</label>
+                            <div class="d-flex justify-content-center">
+                                <input type="checkbox" id="filter-added"
+                                       value="on" checked="checked"
+                                       data-toggle="toggle" data-width="150" data-height="35"
+                                       data-on="Include" data-onstyle="success"
+                                       data-off="Exclude" data-offstyle="secondary" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-ignored" class="form-label mb-0">Ignored Order</label>
+                            <div class="d-flex justify-content-center">
+                                <input type="checkbox" id="filter-ignored"
+                                       value="on" checked="checked"
+                                       data-toggle="toggle" data-width="150" data-height="35"
+                                       data-on="Include" data-onstyle="success"
+                                       data-off="Exclude" data-offstyle="secondary" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
+        function ApplyFilter() {
+            orderDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            resetToDefaultDTFilter();
+
+            orderDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            IncludeAdded: true,
+            IncludeIgnored: true
+        };
+
+        function checkDefaultFilter() {
+            var changed = JSON.stringify(orderDT.order()) != JSON.stringify(defaultDTState.order) ||
+                          orderDT.page.info().start != defaultDTState.page ||
+                          orderDT.page.len() != defaultDTState.length ||
+                          (orderDT.search() || "") != defaultDTState.search.search ||
+                          $("#filter-added").prop('checked') != defaultDTState.IncludeAdded ||
+                          $("#filter-ignored").prop('checked') != defaultDTState.IncludeIgnored;
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function resetToDefaultDTFilter() {
+            $("#filter-added").prop('checked', defaultDTState.IncludeAdded).change();
+            $("#filter-ignored").prop('checked', defaultDTState.IncludeIgnored).change();
+
+            orderDT.state.clear();
+            orderDT.order(defaultDTState.order);
+            orderDT.page(defaultDTState.page);
+            orderDT.search(defaultDTState.search.search);
+        }
+
         var orderDT = $('.table-orders').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.IncludeAdded = $("#filter-added").prop('checked');
+                data.IncludeIgnored = $('#filter-ignored').prop('checked');
+            },
+            stateLoadParams: function (settings, data) {
+                $("#filter-added").prop('checked', data.IncludeAdded).change();
+                $("#filter-ignored").prop('checked', data.IncludeIgnored).change();
+            },
             ajax: {
                 url: "@Url.Action("GetOrdersDT")",
-                type: "POST"
+                type: "POST",
+                data: function (data) {
+                    data.IncludeAdded = $("#filter-added").prop('checked');
+                    data.IncludeIgnored = $('#filter-ignored').prop('checked');
+                }
             },
             serverSide: true,
             filter: true,
@@ -51,11 +163,11 @@
                         if (data.isValidAgent == false) {
                             return `
                                 <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
-                                    ${data.agent || "<em class='text-muted'>N/A</em>"}
+                                    ${data.agent || "<em class='fw-normal text-muted'>N/A</em>"}
                                     &emsp;<span class="fas fa-exclamation-triangle"></span>
                                 </span>`;
                         } else {
-                            return data.agent || "<em class='text-muted'>N/A</em>";
+                            return data.agent || "<em class='fw-normal text-muted'>N/A</em>";
                         }
                     },
                     name: "Agent"
@@ -65,34 +177,51 @@
                         if (data.isValidCustomer == false) {
                             return `
                                 <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
-                                    ${data.customer || "<em class='text-muted'>N/A</em>"}
+                                    ${data.customer || "<em class='fw-normal text-muted'>N/A</em>"}
                                     &emsp;<span class="fas fa-exclamation-triangle"></span>
                                 </span>`;
                         } else {
-                            return data.customer || "<em class='text-muted'>N/A</em>";
+                            return data.customer || "<em class='fw-normal text-muted'>N/A</em>";
                         }
                     },
                     name: "Customer"
                 },
                 { data: "extendedPrice", name: "ExtendedPrice" },
+                { data: "status", name: "Status" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.orderNumber + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
-                        if (user_access.canAdd) {
-                            actions += '<button class="btn btn-success btn-xs" type="button" onclick="AddToSalesOrder(\'' + data.orderNumber + '\', ' + data.convertTimes + ')" data-microtip-title="Add to Sales Order" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-plus"></span></button>';
+                        if (data.status.toLowerCase() != "ignored") {
+                            if (user_access.canAdd) {
+                                actions += '<button class="btn btn-success btn-xs" type="button" onclick="AddToSalesOrder(\'' + data.orderNumber + '\', ' + data.convertTimes + ')" data-microtip-title="Add to Sales Order" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-plus"></span></button>';
+                            } else {
+                                actions += '<button type="button" class="btn btn-success btn-xs ui-state-disabled" data-microtip-title="Add access is required" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-plus"></span></button>';
+                            }
+                        } else {
+                            actions += '<button type="button" class="btn btn-success btn-xs ui-state-disabled" data-microtip-title="Action not allowed, order already marked ignore" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-plus"></span></button>';
+                        }
+                        if (data.status.toLowerCase() == "pending") {
+                            if (user_access.canEdit) {
+                                actions += '<button class="btn btn-danger btn-xs" type="button" onclick="MarkIgnoreOrder(\'' + data.orderNumber + '\')" data-microtip-title="Mark Ignore" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-broom"></span></button>';
+                            } else {
+                                actions += '<button type="button" class="btn btn-danger btn-xs ui-state-disabled" data-microtip-title="Edit access is required" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-broom"></span></button>';
+                            }
+                        } else {
+                            actions += '<button type="button" class="btn btn-danger btn-xs ui-state-disabled" data-microtip-title="Can only ignore pending" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-broom"></span></button>';
                         }
                         actions += '</div>';
                         return actions;
                     }
                 }
             ],
-            order: [[0, "asc"]]
+            order: [[0, "desc"]]
         });
 
         orderDT.on("draw", function () {
             hideLoader();
+            checkDefaultFilter();
         });
 
         if (user_access.canAdd) {
@@ -117,6 +246,35 @@
                     if (confirm) {
                         $.ajax({
                             url: "@Url.Action("Add")",
+                            type: "POST",
+                            data: { OrderNumber: ordernum },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    swal.close();
+                                    orderDT.ajax.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    //toastr.error(data.message, data.status);
+                                    ToastrAndConsoleError(data.status, data.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            };
+        }
+
+        if (user_access.canEdit) {
+            function MarkIgnoreOrder(ordernum) {
+                swal({
+                    title: "Ignore Order",
+                    text: "Are you sure you want to mark this record to ignore?",
+                    icon: "info",
+                    buttons: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("MarkIgnoreOrder")",
                             type: "POST",
                             data: { OrderNumber: ordernum },
                             success: function (data, status, xhr) {

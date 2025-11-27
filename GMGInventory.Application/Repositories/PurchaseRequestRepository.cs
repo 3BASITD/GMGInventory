@@ -181,15 +181,15 @@ namespace GMGInventory.Application.Repositories
                               Status = request.Status.Code,
                               RequestDateD = request.RequestDate,
                               Remarks = request.Remarks,
-                              ApprovedBy1 = request.Approver1Id == null ? null : SystemFormat.Name(request.Approver1.FirstName, request.Approver1.LastName, request.Approver1.Nickname),
-                              ApprovedBy2 = request.Approver2Id == null ? null : SystemFormat.Name(request.Approver2.FirstName, request.Approver2.LastName, request.Approver2.Nickname),
-                              DisapprovedBy = request.DisapproverId == null ? null : SystemFormat.Name(request.Disapprover.FirstName, request.Disapprover.LastName, request.Disapprover.Nickname),
+                              ApprovedBy1 = request.Approver1Id == null ? null : request.Approver1.FirstName + " " + request.Approver1.LastName,
+                              ApprovedBy2 = request.Approver2Id == null ? null : request.Approver2.FirstName + " " + request.Approver2.LastName,
+                              DisapprovedBy = request.DisapproverId == null ? null : request.Disapprover.FirstName + " " + request.Disapprover.LastName,
                               DisapprovedReason = request.DisapprovedReason,
                               ResubmitId = request.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
-                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                              UserCreated = userc.FirstName + " " + userc.LastName,
                               DateCreatedD = request.DateCreated,
-                              UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                              UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
                               DateModifiedD = request.DateModified
                           };
             return await details.FirstOrDefaultAsync();
@@ -233,6 +233,7 @@ namespace GMGInventory.Application.Repositories
                                 ItemCode = request.Item == null ? null : request.Item.Code,
                                 ItemPartNumber = (request.Item == null ? null : request.Item.PartNumber) + "",
                                 ItemDescription = request.ItemDescription,
+                                HaveStock = request.HaveStock == true,
                                 StockOnHandD = ii,
                                 QuantityD = request.Quantity,
                                 MaxQuantityD = request.PurchaseRequest.Purpose.Name.ToLower() == "rush order"
@@ -355,6 +356,12 @@ namespace GMGInventory.Application.Repositories
                                                 .Select(s => s.DocumentNumber)
                                                 .FirstOrDefaultAsync();
 
+                if (lastDocument != null && lastDocument.Contains("-D"))
+                {
+                    var splitLastDocument = lastDocument.Split("-D");
+                    lastDocument = splitLastDocument[0];
+                }
+
                 int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
                 docNumber = $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
             }
@@ -437,7 +444,6 @@ namespace GMGInventory.Application.Repositories
 
                     if (request.DocumentNumber.StartsWith("D") && request.Status.Name.ToLower() == "draft" && status.ToLower() != "draft")
                     {
-
                         var docNumberPrefix = $"{request.Type.Code}-PR{DateTime.Now.Year}-";
 
                         var lastDocument = await context.PurchaseRequests
@@ -469,17 +475,18 @@ namespace GMGInventory.Application.Repositories
                     var items = citems.Select(s => s.Id);
                     // add excluding items already available
                     var newitems = Items.Where(s => items.Contains(s.Id) == false)
-                                       .Select(s => new PurchaseRequestLineItem
-                                       {
-                                           PurchaseRequestId = requestId,
-                                           LineNumber = s.LineNumber,
-                                           SalesOrderId = s.SalesOrderId,
-                                           ItemId = s.ItemId,
-                                           ItemDescription = s.ItemDescription,
-                                           Quantity = s.QuantityD,
-                                           UnitId = s.ItemId == null ? s.UnitId : null,
-                                           Purpose = s.Purpose + ""
-                                       });
+                                        .Select(s => new PurchaseRequestLineItem
+                                        {
+                                            PurchaseRequestId = requestId,
+                                            LineNumber = s.LineNumber,
+                                            SalesOrderId = s.SalesOrderId,
+                                            ItemId = s.ItemId,
+                                            ItemDescription = s.ItemDescription,
+                                            Quantity = s.QuantityD,
+                                            UnitId = s.ItemId == null ? s.UnitId : null,
+                                            Purpose = s.Purpose + "",
+                                            HaveStock = s.HaveStock
+                                        });
                     context.PurchaseRequestLineItems.AddRange(newitems);
 
                     // update item
@@ -492,6 +499,7 @@ namespace GMGInventory.Application.Repositories
                         dbitem.LineNumber = ei.LineNumber;
                         dbitem.Quantity = ei.QuantityD;
                         dbitem.UnitId = ei.ItemId == null ? ei.UnitId : null;
+                        dbitem.HaveStock = ei.HaveStock;
 
                         context.PurchaseRequestLineItems.Update(dbitem);
                     }
@@ -517,40 +525,102 @@ namespace GMGInventory.Application.Repositories
             return response;
         }
 
-        public async Task<ResponseModel> ApproveAsync(int requestId)
+        public async Task<ResponseModel> ApproveAsync(int requestId, int? approverNumber = null)
         {
+            approverNumber = approverNumber ?? 1;
             var response = new ResponseModel();
 
-            var request = context.PurchaseRequests.Where(s => s.Id == requestId).FirstOrDefault();
+            var request = context.PurchaseRequests
+                                 .Include(s => s.Type)
+                                 .Where(s => s.Id == requestId)
+                                 .FirstOrDefault();
             if (request == null)
             {
                 response.Status = "Error";
                 response.Message = "Invalid purchase request";
             }
+            else if (approverNumber != 1 && approverNumber != 2)
+            {
+                response.Status = "Error";
+                response.Message = "Invalid approver number";
+            }
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
+                if (request.Type.Name.ToLower() == "non-automotive")
+                {
+                    string? current = approverNumber == 1 ? request.Approver1Id : request.Approver2Id;
+                    string? other = approverNumber == 1 ? request.Approver2Id : request.Approver1Id;
+                    string approverLabel = approverNumber == 1 ? "#1" : "#2";
+                    string otherLabel = approverNumber == 1 ? "#2" : "#1";
 
-                if (!string.IsNullOrWhiteSpace(request.Approver1Id) && !string.IsNullOrWhiteSpace(request.Approver2Id))
-                {
-                    response.Status = "Error";
-                    response.Message = "Purchase request already approved.";
-                }
-                else
-                {
-                    if (string.IsNullOrWhiteSpace(request.Approver1Id))
+                    if (other == currentUserId)
+                    {
+                        response.Status = "Error";
+                        response.Message = $"You have already approved this purchase request as approver {otherLabel}.";
+                        return response;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(current) && current != currentUserId)
+                    {
+                        var diffUser = await userManager.FindByIdAsync(current);
+                        response.Status = "Error";
+                        response.Message = $"Already have an approver {approverLabel}: {diffUser.FirstName} {diffUser.LastName}";
+                        return response;
+                    }
+
+                    if (current == currentUserId)
+                    {
+                        response.Status = "Error";
+                        response.Message = $"You have already approved this purchase request as approver {approverLabel}.";
+                        return response;
+                    }
+
+                    if (approverNumber == 1)
                         request.Approver1Id = currentUserId;
                     else
                         request.Approver2Id = currentUserId;
 
-                    request.StatusId = statusId;
+                    if (!string.IsNullOrWhiteSpace(request.Approver1Id)
+                        && !string.IsNullOrWhiteSpace(request.Approver2Id))
+                    {
+                        request.StatusId = statusId;
+                    }
 
                     context.PurchaseRequests.Update(request);
                     await context.SaveChangesAsync(currentUserId);
 
                     response.Status = "Success";
                     response.Message = "Purchase request successfully approved.";
+                    return response;
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(request.Approver1Id))
+                    {
+                        if (request.StatusId != statusId)
+                        {
+                            request.StatusId = statusId;
+
+                            context.PurchaseRequests.Update(request);
+                            await context.SaveChangesAsync(currentUserId);
+                        }
+
+                        response.Status = "Error";
+                        response.Message = "Purchase request already approved. Try reloading the page.";
+                    }
+                    else
+                    {
+                        request.Approver1Id = currentUserId;
+                        request.StatusId = statusId;
+
+                        context.PurchaseRequests.Update(request);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        response.Status = "Success";
+                        response.Message = "Purchase request successfully approved.";
+                    }
                 }
             }
             return response;
@@ -569,6 +639,17 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
+                var tempDocumentNumber = request.DocumentNumber + "-D";
+                var latestDisapprovedRequest = context.PurchaseRequests
+                                                      .Where(s => s.DocumentNumber.StartsWith(tempDocumentNumber))
+                                                      .OrderByDescending(s => s.DocumentNumber)
+                                                      .Select(s => s.DocumentNumber)
+                                                      .FirstOrDefault();
+                var latestDisapprovedDocumentNumber = latestDisapprovedRequest == null
+                                                    ? 0
+                                                    : int.Parse(latestDisapprovedRequest.Replace(tempDocumentNumber, ""));
+                var disapprovedDocumentNumber = tempDocumentNumber + string.Format("{0:00}", latestDisapprovedDocumentNumber + 1);
+
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
@@ -579,6 +660,9 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
+                    request.DocumentNumber = disapprovedDocumentNumber;
+                    if (request.Approver1Id != null) request.Approver1Id = null;
+                    if (request.Approver2Id != null) request.Approver2Id = null;
                     request.DisapproverId = currentUserId;
                     request.DisapprovedReason = reason;
                     request.StatusId = statusId;
@@ -594,31 +678,39 @@ namespace GMGInventory.Application.Repositories
             return response;
         }
 
-        public async Task<ResponseModel> DeleteAsync(int requestId)
+        public async Task<ResponseModelData<string>> DeleteAsync(int requestId)
         {
-            var response = new ResponseModel();
+            var response = new ResponseModelData<string>();
             try
             {
                 var existingRequest = await context.PurchaseRequests
-                    .FirstOrDefaultAsync(pr => pr.Id == requestId);
+                                                   .Where(s => s.Id == requestId)
+                                                   .FirstOrDefaultAsync();
 
                 if (existingRequest == null)
                 {
                     response.Status = "Error";
-                    response.Message = "Purchase request not found.";
+                    response.Message = "Invalid Purchase Request. Record can not be found.";
                     return response;
                 }
+
+                var requestItems = await context.PurchaseRequestLineItems
+                                                .Where(s => s.PurchaseRequestId == requestId)
+                                                .ToListAsync();
+
+                context.PurchaseRequestLineItems.RemoveRange(requestItems);
 
                 context.PurchaseRequests.Remove(existingRequest);
                 await context.SaveChangesAsync();
 
                 response.Status = "Success";
-                response.Message = "Purchase request successfully deleted.";
+                response.Message = "Purchase Request successfully deleted.";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 response.Status = "Error";
                 response.Message = "An error occurred while deleting the purchase request.";
+                response.Data = SystemFormat.GetInnermostExceptionMessage(ex);
             }
 
             return response;

@@ -690,15 +690,19 @@ namespace GMGInventory.Application.Repositories
                 if (previous == null)
                 {
                     var latestOrder = context.SalesOrders
-                                             .Where(s => s.SalesOrderNumber.StartsWith("SO")
-                                                      && !s.SalesOrderNumber.Contains("-D"))
                                              .OrderByDescending(s => s.SalesOrderNumber)
                                              .Select(s => s.SalesOrderNumber)
                                              .FirstOrDefault();
 
-                    if (latestOrder != null && latestOrder.Contains("."))
+                    if (latestOrder != null && latestOrder.Contains("-D"))
                     {
-                        var splitLatestOrder = latestOrder.Split(".");
+                        var splitLatestOrder = latestOrder.Split("-D");
+                        latestOrder = splitLatestOrder[0];
+                    }
+
+                    if (latestOrder != null && latestOrder.Contains('.'))
+                    {
+                        var splitLatestOrder = latestOrder.Split('.');
                         latestOrder = splitLatestOrder[0];
                     }
 
@@ -841,6 +845,13 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var citemsVM = context.SalesOrderLineItems.Where(s => s.SalesOrderId == salesOrderId);
 
+            Items = Items.OrderBy(x => x.LineNumber)
+                         .Select((item, index) =>
+                         {
+                             item.LineNumber = index + 1;
+                             return item;
+                         }).ToList();
+
             // add item
             // check items not in db
             var items = citemsVM.Select(s => s.ItemId);
@@ -860,7 +871,7 @@ namespace GMGInventory.Application.Repositories
                                    SellingPrice = s.UnitPrice,
                                    CustomerBrandDiscountId = s.CustomerBrandDiscountId,
                                    ItemPromoId = s.ItemPromoId
-                                   
+
                                });
             context.SalesOrderLineItems.AddRange(itemsVM);
 

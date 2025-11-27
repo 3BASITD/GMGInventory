@@ -12,7 +12,9 @@ namespace GMGInventory.Data
         public string SourceOrderNumber { get; set; }
 
         [ForeignKey("SalesOrderId")]
-        public int SalesOrderId { get; set; }
-        public SalesOrder SalesOrder { get; set; }
+        public int? SalesOrderId { get; set; }
+        public SalesOrder? SalesOrder { get; set; }
+
+        public string? Status { get; set; }
     }
 }

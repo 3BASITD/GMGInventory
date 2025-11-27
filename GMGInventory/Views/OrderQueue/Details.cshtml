@@ -48,13 +48,13 @@
                     @if (Model.IsValidAgent == false)
                     {
                         <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
-                            @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Agent)
+                            @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='fw-normal text-warning'>N/A</span>") : Model.Agent)
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
                     }
                     else
                     {
-                        @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Agent)
+                        @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Agent)
                     }
                 </b>
             </div>
@@ -66,13 +66,13 @@
                     @if (Model.IsValidCustomer == false)
                     {
                         <span class="text-warning" data-microtip-title="Invalid Customer" data-microtip-position="right" role="tooltip">
-                            @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-warning'>N/A</span>") : Model.Customer)
+                            @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='fw-normal text-warning'>N/A</span>") : Model.Customer)
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
                     }
                     else
                     {
-                        @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Customer)
+                        @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Customer)
                     }
                 </b>
             </div>
@@ -83,15 +83,15 @@
                     @Html.DisplayNameFor(model => model.Instruction)
                 </span>
                 <b class="d-block">
-                    @(string.IsNullOrWhiteSpace(Model.Instruction) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Instruction)
+                    @(string.IsNullOrWhiteSpace(Model.Instruction) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Instruction)
                 </b>
             </div>
             <div class="col-md-8 text-sm">
                 <span class="text-muted">
-                    @Html.DisplayNameFor(model => model.SalesOrders)
+                    @Html.DisplayNameFor(model => model.Status)
                 </span>
                 <b class="d-block">
-                    @(string.IsNullOrWhiteSpace(Model.SalesOrders) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SalesOrders)
+                    @(string.IsNullOrWhiteSpace(Model.Status) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Html.Raw(Model.Status))
                 </b>
             </div>
         </div>

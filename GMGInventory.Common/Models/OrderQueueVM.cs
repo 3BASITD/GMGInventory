@@ -19,9 +19,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Convert Times")]
         public int ConvertTimes { get; set; }
-
-        [Display(Name = "Sales Order(s)")]
-        public string SalesOrders { get; set; }
+        public string Status { get; set; }
     }
 
     public class OrderQueueDetailsVM : OrderQueueVM

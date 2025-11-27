@@ -340,6 +340,21 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> UploadFileJson(IFormFile file)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await itemRepository.UploadFile(file); 
+            
+            Response.Headers["X-Status"] = response.Status;
+            Response.Headers["X-Message"] = response.Message;
+            return File(response.Data.Content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                        response.Data.FileName);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> SaveItemPromoJson(ItemPromoVM form)
         {
             var response = new ResponseModel();

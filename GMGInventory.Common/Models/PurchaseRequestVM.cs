@@ -130,6 +130,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Purpose")]
         public string? Purpose { get; set; }
+
+        [Display(Name = "Have Stock")]
+        public bool? HaveStock { get; set; }
     }
 
     public class ItemFromSalesOrderVM

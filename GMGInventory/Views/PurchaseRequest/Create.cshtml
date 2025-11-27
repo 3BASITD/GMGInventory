@@ -96,6 +96,7 @@
                                         <th>Item Code</th>
                                         <th>Part Number</th>
                                         <th>Item Name</th>
+                                        <th>Have Stock</th>
                                         <th>Stock on Hand</th>
                                         <th>Quantity</th>
                                         <th>Unit</th>
@@ -104,6 +105,7 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
+                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -172,6 +174,14 @@
                             <div class="form-group">
                                 <label for="add-name" class="form-label mb-0">Item Name</label>
                                 <input type="text" id="add-name" name="Name" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 add-have-stock-container">
+                            <div class="form-group">
+                                <label for="add-have-stock" class="form-label mb-0">Have Stock</label>
+                                <div class="form-check form-switch mt-1">
+                                    <input type="checkbox" class="form-check-input" id="add-have-stock" name="HaveStock" />
+                                    </div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 add-stock-container">
@@ -404,6 +414,13 @@
                     name: "ItemDescription",
                     className: "form-cell"
                 },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<div class="form-check form-switch"><input type="checkbox" class="form-check-input have-stock"' + (data.haveStock == true ? ' checked="checked"' : '') + ' /></div>';
+                    },
+                    name: "HaveStock",
+                    className: "form-cell"
+                },
                 { data: "stockOnHand", name: "StockOnHand", className: "form-cell text-end" },
                 {
                     data: function (data, type, dataToSet) {
@@ -440,7 +457,7 @@
             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
             if (typeText == "non-automotive" && purposeText == "one-time purchase") {
-                $(".description").off("change").on("change", function () {
+                $(".description").off("blur").on("blur", function () {
                     var row = itemDT.row($(this).closest('tr'));
                     var rowData = row.data();
 
@@ -450,7 +467,7 @@
                 });
             }
 
-            $(".quantity").off("change").on("change", function () {
+            $(".quantity").off("blur").on("blur", function () {
                 var row = itemDT.row($(this).closest('tr'));
                 var rowData = row.data();
 
@@ -653,12 +670,12 @@
         }
 
         var columnVisibilityMap = {
-            // [SO Number, PO Number, Customer, Item Code, Part Number, Item Name, Stock on Hand, Quantity, Unit, Purpose]
-            "automotive_rush order": [true, true, true, true, true, true, true, true, true, false],
-            "automotive_stocking": [false, false, false, true, true, true, true, true, true, false],
-            "non-automotive_office supplies": [false, false, false, true, false, true, true, true, true, false],
-            "non-automotive_one-time purchase": [false, false, false, false, false, true, false, true, true, true],
-            "maintenance & repair_": [false, false, false, false, false, true, false, true, true, true]
+            // [SO Number, PO Number, Customer, Item Code, Part Number, Item Name, Have Stock, Stock on Hand, Quantity, Unit, Purpose]
+            "automotive_rush order": [true, true, true, true, true, true, true, true, true, true, false],
+            "automotive_stocking": [false, false, false, true, true, true, true, true, true, true, false],
+            "non-automotive_office supplies": [false, false, false, true, false, true, false, true, true, true, false],
+            "non-automotive_one-time purchase": [false, false, false, false, false, true, false, false, true, true, true],
+            "maintenance & repair_": [false, false, false, false, false, true, false, false, true, true, true]
         };
 
         function updateColumnVisibility() {
@@ -673,14 +690,13 @@
                 });
 
                 $(".add-so-number-container").toggle(columnVisibilityMap[key][0]);
-                if (columnVisibilityMap[key][2]) {
-                    $(".soBtn").toggle(true);
+                $(".soBtn").toggle(columnVisibilityMap[key][0]);
+                if (columnVisibilityMap[key][3]) {
                     $(".add-code-container").toggle(true);
                     $("#add-name").prop("readonly", true);
                     $(".add-unit-container").toggle(true);
                     $(".add-unit2-container").toggle(false);
                 } else {
-                    $(".soBtn").toggle(false);
                     $(".add-code-container").toggle(false);
                     $("#add-name").prop("readonly", false);
                     $(".add-unit-container").toggle(false);
@@ -688,10 +704,11 @@
                 }
                 $(".add-part-container").toggle(columnVisibilityMap[key][4]);
                 $(".add-name-container").toggle(columnVisibilityMap[key][5]);
-                $(".add-stock-container").toggle(columnVisibilityMap[key][6]);
-                // $(".add-quantity-container").toggle(columnVisibilityMap[key][7]);
-                // $(".add-unit-container").toggle(columnVisibilityMap[key][8]);
-                $(".add-purpose-container").toggle(columnVisibilityMap[key][9]);
+                $(".add-have-stock-container").toggle(columnVisibilityMap[key][6]);
+                $(".add-stock-container").toggle(columnVisibilityMap[key][7]);
+                // $(".add-quantity-container").toggle(columnVisibilityMap[key][8]);
+                // $(".add-unit-container").toggle(columnVisibilityMap[key][9]);
+                $(".add-purpose-container").toggle(columnVisibilityMap[key][10]);
             }
         }
 
@@ -703,8 +720,9 @@
             if (name == "SONumber") return columnVisibilityMap[key][0];
             else if (name == "Code") return columnVisibilityMap[key][3];
             else if (name == "Name") return columnVisibilityMap[key][5];
-            else if (name == "Quantity") return columnVisibilityMap[key][7];
-            else if (name == "Purpose") return columnVisibilityMap[key][9];
+            else if (name == "HaveStock") return columnVisibilityMap[key][6];
+            else if (name == "Quantity") return columnVisibilityMap[key][8];
+            else if (name == "Purpose") return columnVisibilityMap[key][10];
             else return false;
         }
 
@@ -744,15 +762,8 @@
 
         function loadSOItemsOptions() {
             $("#add-so-customer").val($("#add-so-number").select2("data")[0].customerName);
-            $("#add-code").val(null).trigger("change");
-            $("#add-part").val("");
-            $("#add-name").val("");
-            $("#add-stock").val(0);
-            $("#add-quantity").val(0);
-            $("#add-quantity").attr("data-max-quantity", "1999999");
-            $(".add-quantity-warning").toggle(false);
-            $(".add-quantity-warning").text("");
-            $("#add-unit").val("");
+
+            clearItemForm();
 
             if ($.fn.select2 && $("#add-code").hasClass("select2-hidden-accessible")) {
                 $("#add-code").select2("destroy");
@@ -798,6 +809,7 @@
                 $("#add-name").val($("#add-code").select2("data")[0].name);
                 $("#add-unit").val($("#add-code").select2("data")[0].unit);
                 $("#add-unit").data("Id", $("#add-code").select2("data")[0].unitId);
+                $("#add-have-stock").prop("checked", $("#add-code").select2("data")[0].inventoryCount > 0);
                 $("#add-stock").val($("#add-code").select2("data")[0].inventoryCount);
                 if (checkIfRequired("SONumber")) {
                     $("#add-quantity").val($("#add-code").select2("data")[0].quantityD);
@@ -814,10 +826,10 @@
             });
         }
 
-        $("#add-quantity").on("change", function() {
+        $("#add-quantity").on("blur", function() {
             var quantity = parseInt($(this).val());
             var max_quantity = parseInt($(this).attr("data-max-quantity"));
-            console.log(quantity + " " + max_quantity)
+
             if(quantity > max_quantity) {
                 $(".add-quantity-warning").toggle(true);
                 $(".add-quantity-warning").text("Requesting higher than " + max_quantity + " unserved quantity.");
@@ -860,7 +872,6 @@
         });
 
         $("#add-so-number").on("select2:select", loadSOItemsOptions);
-
 
         // Load so for select2
         $("#addso-so-number").select2({
@@ -988,7 +999,7 @@
                 row.data(rowData).draw(false);
             });
 
-            $(".soquantity").off("change").on("change", function () {
+            $(".soquantity").off("blur").on("blur", function () {
                 var tr = $(this).closest('tr');
                 var row = soDT.row(tr);
                 var rowData = row.data();
@@ -1059,12 +1070,12 @@
             //     $("#add-so-number").val("").trigger("change");
             //     //$("#add-so-number").prop("disabled", false);
             // }
-            // $("#add-so-customer").val("");
             $("#add-code").val("").trigger("change");
             $("#add-part").val("");
             $("#add-name").val("");
             $("#add-quantity").val("0");
             $("#add-quantity").attr("data-max-quantity", "1999999");
+            $("#add-have-stock").prop("checked", false);
             $("#add-stock").val("0");
             $("#add-unit").val("");
             $("#add-unit2").val("").trigger("change");
@@ -1160,6 +1171,7 @@
                 var is_for_maintenance_repair = $("#request-type").select2("data")[0]?.text.toLowerCase() == "maintenance & repair";
                 itemDT.row.add({
                     customer: $("#add-so-customer").val(),
+                    haveStock: $("#add-have-stock").prop("checked"),
                     itemCode: is_for_na_one_time || is_for_maintenance_repair ? "" : $("#add-code").select2("data")[0].text,
                     itemDescription: $("#add-name").val(),
                     itemPartNumber: is_for_na_one_time || is_for_maintenance_repair ? "" : $("#add-part").val(),
@@ -1193,6 +1205,7 @@
             rowsToAdd.forEach(function (row) {
                 var soRow = {
                     customer: $("#addso-customer").val(),
+                    haveStock: row.inventoryCountD > 0,
                     itemCode: row.itemCode,
                     itemDescription: row.itemName,
                     itemPartNumber: row.partNumber,
@@ -1227,19 +1240,6 @@
             });
 
             itemDT.draw();
-        }
-
-        function GetItemsToRequest() {
-            var item_to_request = [];
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var row_data = this.data();
-                row_data.quantityD = parseInt($(this.node()).find(".quantity").val());
-                row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
-                row_data.stockOnHandD = parseInt($(this.node()).find(".stock").val());
-                row_data.stockOnHand = FormatStringInteger(parseInt($(this.node()).find(".stock").val()));
-                item_to_request.push(row_data);
-            });
-            return item_to_request;
         }
 
         $("#form-request button[type=submit]").on("click", function () {
@@ -1302,6 +1302,7 @@
                 row_data.quantity = FormatStringInteger(parseInt($(this.node()).find(".quantity").val()));
                 row_data.stockOnHandD = parseInt($(this.node()).find(".stock").val());
                 row_data.stockOnHand = FormatStringInteger(parseInt($(this.node()).find(".stock").val()));
+                row_data.haveStock = $(this.node()).find(".have-stock").prop("checked");
                 item_to_request.push(row_data);
             });
             return item_to_request;

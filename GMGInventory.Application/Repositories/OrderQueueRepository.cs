@@ -4,6 +4,7 @@ using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Data.Migrations;
 using GMGInventory.Data.OrderAppDB;
+using Humanizer.Localisation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ namespace GMGInventory.Application.Repositories
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
-        private async Task<IList<OrderQueueVM>> GetOrders()
+        private async Task<IList<OrderQueueVM>> GetOrders(bool IncludeAdded, bool IncludeIgnored)
         {
             var orders = from order in app_context.Orders
                          where order.OrderNo!.ToLower().StartsWith("draft-") == false
@@ -45,14 +46,45 @@ namespace GMGInventory.Application.Repositories
                              Customer = gorder.Select(s => s.Customer).FirstOrDefault(),
                              ExtendedPriceD = gorder.Sum(s => s.ExtendedPrice) ?? 0
                          };
-            return await orders.ToListAsync();
+
+            var ordersList = await orders.ToListAsync();
+
+            var sources = context.SalesOrderSources.ToList();
+
+            for (int i = ordersList.Count - 1; i >= 0; i--)
+            {
+                var order = ordersList[i];
+
+                var status = from source in sources
+                             join userc in userManager.Users on source.UserCreated equals userc.Id
+                             where source.SourceOrderNumber == order.OrderNumber
+                             select new
+                             {
+                                 source.Status,
+                                 CreatedBy = userc.FirstName + " " + userc.LastName
+                             };
+
+                order.Status = status.Any()
+                             ? (status.Count() > 1 ? status.Count() + " times " : "")
+                             + (status.First().Status == null ? "Added" : status.First().Status)
+                             + (status.Count() == 1 ? " by " + status.First().CreatedBy : "")
+                             : "Pending";
+
+                if ((status.Any(s => s.Status == null || s.Status.ToLower() == "added") && IncludeAdded == false)
+                 || (status.Any(s => s.Status != null && s.Status.ToLower() == "ignored") && IncludeIgnored == false))
+                {
+                    ordersList.RemoveAt(i);
+                }
+            }
+
+            return ordersList;
         }
 
-        public async Task<ForDataTables<OrderQueueVM>> GetOrdersDT(DataTablesRequestForm form)
+        public async Task<ForDataTables<OrderQueueVM>> GetOrdersDT(DataTablesRequestForm form, bool IncludeAdded, bool IncludeIgnored)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetOrders()).AsQueryable();
+            var data = (await GetOrders(IncludeAdded, IncludeIgnored)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -63,7 +95,8 @@ namespace GMGInventory.Application.Repositories
                     s.OrderNumber,
                     s.Agent,
                     s.Customer,
-                    s.ExtendedPrice
+                    s.ExtendedPrice,
+                    s.Status
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
@@ -103,11 +136,12 @@ namespace GMGInventory.Application.Repositories
                 list.IsValidAgent = list.Agent != null && context.Agents.Any(s => (s.FirstName + " " + s.LastName).ToLower() == list.Agent.ToLower());
                 list.IsValidCustomer = list.Customer != null && context.Customers.Any(s => s.Name.ToLower() == list.Customer.ToLower());
                 var soConverts = context.SalesOrderSources
-                                        .Where(s => s.SourceOrderNumber == list.OrderNumber)
+                                        .Where(s => s.SourceOrderNumber == list.OrderNumber
+                                                 && (s.Status == null || s.Status.ToLower() == "added")
+                                                 && s.SalesOrder != null)
                                         .Select(s => s.SalesOrder.SalesOrderNumber)
                                         .ToList();
                 list.ConvertTimes = soConverts.Count;
-                list.SalesOrders = string.Join(", ", soConverts);
             }
 
             return new ForDataTables<OrderQueueVM>
@@ -122,7 +156,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<OrderQueueDetailsVM?> GetDetails(string OrderNumber)
         {
             var order = app_context.Orders
-                                   .Where(s => s.OrderNo!.ToLower() == OrderNumber.ToLower())
+                                   .Where(s => s.OrderNo != null && s.OrderNo.ToLower() == OrderNumber.ToLower())
                                    .Select(s => new OrderQueueDetailsVM
                                    {
                                        OrderNumber = s.OrderNo,
@@ -134,14 +168,37 @@ namespace GMGInventory.Application.Repositories
 
             if (order == null) return null;
 
+            var status = from source in context.SalesOrderSources
+                         join userc in userManager.Users on source.UserCreated equals userc.Id
+                         where source.SourceOrderNumber == order.OrderNumber
+                         orderby source.DateCreated ascending
+                         select new
+                         {
+                             SONumber = source.SalesOrder == null ? null : source.SalesOrder.SalesOrderNumber,
+                             source.Status,
+                             CreatedBy = userc.FirstName + " " + userc.LastName,
+                             DateCreated = source.DateCreated.ToString("MMMM d, yyyy hh:mm:ss tt")
+                         };
+
+            order.Status = status.Any()
+                         ? string.Join("<br />", status.Select(s => (s.Status == null ? "Added" : s.Status)
+                                                                  + (s.SONumber == null ? "" : " " + s.SONumber)
+                                                                  + "<span class='fw-normal text-muted'>"
+                                                                  + " by "
+                                                                  + s.CreatedBy
+                                                                  + " on "
+                                                                  + s.DateCreated
+                                                                  + "</span>"))
+                         : "Pending";
+
             order.IsValidAgent = order.Agent != null && context.Agents.Any(s => (s.FirstName + " " + s.LastName).ToLower() == order.Agent.ToLower());
             order.IsValidCustomer = order.Customer != null && context.Customers.Any(s => s.Name.ToLower() == order.Customer.ToLower());
             var soConverts = context.SalesOrderSources
                                     .Where(s => s.SourceOrderNumber == order.OrderNumber)
+                                    .OrderBy(s => s.DateCreated)
                                     .Select(s => s.SalesOrder.SalesOrderNumber)
                                     .ToList();
             order.ConvertTimes = soConverts.Count;
-            order.SalesOrders = string.Join(", ", soConverts);
 
             order.Items = app_context.Orders
                                      .Where(s => s.OrderNo!.ToLower() == OrderNumber.ToLower())
@@ -384,7 +441,8 @@ namespace GMGInventory.Application.Repositories
                 var source = new SalesOrderSourced
                 {
                     SourceOrderNumber = OrderNumber,
-                    SalesOrderId = salesOrder.Id
+                    SalesOrderId = salesOrder.Id,
+                    Status = "Added"
                 };
                 await context.SalesOrderSources.AddAsync(source);
                 await context.SaveChangesAsync(currentUser);
@@ -395,6 +453,24 @@ namespace GMGInventory.Application.Repositories
                     Message = $"Successfully added to sales order with SONumber: {salesOrder.SalesOrderNumber}"
                 };
             }
+        }
+
+        public async Task<ResponseModel> MarkIgnoreOrder(string OrderNumber)
+        {
+            var source = new SalesOrderSourced
+            {
+                SourceOrderNumber = OrderNumber,
+                SalesOrderId = null,
+                Status = "Ignored"
+            };
+            await context.SalesOrderSources.AddAsync(source);
+            await context.SaveChangesAsync(currentUser);
+
+            return new ResponseModel
+            {
+                Status = "Success",
+                Message = $"Successfully marked ignore Order: {OrderNumber}"
+            };
         }
     }
 }
