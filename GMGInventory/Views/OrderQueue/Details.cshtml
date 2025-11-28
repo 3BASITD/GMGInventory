@@ -105,6 +105,7 @@
                         <table class="table table-head-fixed table-striped table-hover table-item">
                             <thead>
                                 <tr>
+                                    <th><input type="checkbox" class="checkall" /></th>
                                     <th>Item Code</th>
                                     <th>Old Item Code</th>
                                     <th>Item Name</th>
@@ -112,6 +113,7 @@
                                     <th>Model</th>
                                     <th>Size</th>
                                     <th>Part Number</th>
+                                    <th>Quantity</th>
                                     <th>Unit</th>
                                     <th>Unit Price</th>
                                     <th>Discount</th>
@@ -122,6 +124,26 @@
                                 @foreach (var item in Model.Items)
                                 {
                                     <tr>
+                                        <td>
+                                            @if (Model.IsValidAgent == false ||
+                                                 Model.IsValidCustomer == false ||
+                                                 item.IsValidOldCode == false ||
+                                                 item.IsValidItemName == false ||
+                                                 item.IsValidBrand == false ||
+                                                 item.IsValidModel == false ||
+                                                 item.IsValidSize == false ||
+                                                 item.IsValidPartNumber == false ||
+                                                 item.IsValidUnit == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Cannot select this row because of invalid data. Please fix the invalid data first." data-microtip-position="right" role="tooltip">
+                                                    <span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="checkrow" data-row-id="@item.Id" />
+                                            }
+                                        </td>
                                         <td>@item.Code</td>
                                         <td>
                                             @if (item.IsValidOldCode == false)
@@ -195,6 +217,7 @@
                                                 @item.PartNumber
                                             }
                                         </td>
+                                        <td class="text-end">@item.Quantity</td>
                                         <td>
                                             @if (item.IsValidUnit == false)
                                             {
@@ -208,16 +231,22 @@
                                                 @item.Unit
                                             }
                                         </td>
-                                        <td>@item.UnitPrice</td>
+                                        <td class="text-end">@item.UnitPrice</td>
                                         <td>@item.Discount1%; @item.Discount2%; @item.Discount3%; @item.Discount4%; @item.Discount5%</td>
-                                        <td>@item.ExtendedPrice</td>
+                                        <td class="text-end">@item.ExtendedPrice</td>
                                     </tr>
                                 }
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="10" class="text-end">Total</th>
-                                    <th>@Model.Items.Sum(s => s.ExtendedPriceD)</th>
+                                    @{
+                                        var totalQuantity = string.Format("{0:#,##0}",Model.Items.Sum(s => s.QuantityD));
+                                        var totalPrice = string.Format("{0:#,##0.00}",Model.Items.Sum(s => s.ExtendedPriceD));
+                                    }
+                                    <th colspan="8">Total</th>
+                                    <th class="text-end">@totalQuantity</th>
+                                    <th colspan="3"></th>
+                                    <th class="text-end">@totalPrice</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -235,44 +264,74 @@
 
         var itemDT = $('.table-item').DataTable();
 
+        $(".checkall").on("change", function() {
+            $(".checkrow").prop("checked", $(this).prop("checked"));
+        });
+
+        $(".checkrow").on("change", function() {
+            var rows_count = $(".checkrow").length;
+            var checked_count = $(".checkrow:checked").length;
+            if(checked_count == 0) {
+                $(".checkall").prop("checked", false);
+                $(".checkall").prop("indeterminate", false);
+            } else if(checked_count == rows_count) {
+                $(".checkall").prop("checked", true);
+                $(".checkall").prop("indeterminate", false);
+            } else {
+                $(".checkall").prop("checked", false);
+                $(".checkall").prop("indeterminate", true);
+            }
+        });
+
         if (user_access.canAdd) {
             function AddToSalesOrder() {
-                var timesAdded = "";
-                if (order_details.convertTimes > 0) {
-                    timesAdded += " <strong>This order already added " + order_details.convertTimes + " time(s)</strong>, adding it again might result to duplicate sales order.";
-                }
-
-                swal({
-                    title: "Add to Sales Order",
-                    content: {
-                        element: "div",
-                        attributes: {
-                            style: "color: black;text-align: center;",
-                            innerHTML: "Are you sure you want to add this record to sales order?" + timesAdded
-                        }
-                    },
-                    icon: "info",
-                    buttons: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $.ajax({
-                            url: "@Url.Action("Add")",
-                            type: "POST",
-                            data: { OrderNumber: order_details.orderNumber },
-                            success: function (data, status, xhr) {
-                                if (data.status == "Success") {
-                                    swal.close();
-                                    window.location.reload();
-                                    toastr.success(data.message, data.status);
-                                } else {
-                                    //toastr.error(data.message, data.status);
-                                    ToastrAndConsoleError(data.status, data.message);
-                                }
-                            }
-                        });
+                var row_selected = $(".checkrow:checked").map(function () {
+                                                                  return $(this).data("row-id");
+                                                              }).get();
+                if (row_selected.length == 0) {
+                    toastr.warning("Select at least one row to proceed with adding to the sales order", "No selected row");
+                } else {
+                    var timesAdded = "";
+                    if (order_details.convertTimes > 0) {
+                        timesAdded += " <strong>This order already added " + order_details.convertTimes + " time(s)</strong>, adding it again might result to duplicate sales order.";
                     }
-                });
-            };
+
+                    swal({
+                        title: "Add to Sales Order",
+                        content: {
+                            element: "div",
+                            attributes: {
+                                style: "color: black;text-align: center;",
+                                innerHTML: "Are you sure you want to add this record to sales order?" + timesAdded
+                            }
+                        },
+                        icon: "info",
+                        buttons: true
+                    }).then((confirm) => {
+                        if (confirm) {
+
+                            $.ajax({
+                                url: "@Url.Action("Add")",
+                                type: "POST",
+                                data: {
+                                    OrderNumber: order_details.orderNumber,
+                                    ItemIds: row_selected
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        window.location.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        //toastr.error(data.message, data.status);
+                                        ToastrAndConsoleError(data.status, data.message);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
         }
     </script>
 }

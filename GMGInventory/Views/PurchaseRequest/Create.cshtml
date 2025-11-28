@@ -909,6 +909,8 @@
             $("#addso-customer").val($(this).select2("data")[0].customerName);
             $("#addso-po-number").val($(this).select2("data")[0].purchaseOrder || "N/A");
 
+            $(".sochkclassorderall").prop("checked", false);
+
             soDT.ajax.reload();
         });
 
@@ -939,7 +941,7 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        return '<input class="sochkclassorder" type="checkbox" ' + ( data.toRequest == true ? 'checked="checked" ' : '') + 'name="orderitemchk" />';
+                        return '<input class="sochkclassorder" type="checkbox" ' + ( data.toRequest == true ? 'checked="checked" ' : '') + 'name="orderitemchk_' + data.id + '" />';
                     }
                 },
                 { data: "itemCode", name: "ItemCode" },
@@ -1013,8 +1015,13 @@
         dtCheckboxes();
         function dtCheckboxes() {
             $(".sochkclassorderall").off("change").on("change", function () {
+                var isChecked = $(".sochkclassorderall").prop("checked");
                 soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    $(this.node()).find(".sochkclassorder").prop("checked", $(".sochkclassorderall").prop("checked"));
+                    $(this.node()).find(".sochkclassorder").prop("checked", isChecked);
+
+                    var data = this.data();
+                    data.toRequest = isChecked;
+                    this.data(data);
                 });
             });
 

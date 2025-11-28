@@ -31,29 +31,78 @@ namespace GMGInventory.Application.Repositories
         {
             try
             {
+                //var soacr = from soa in context.SOACRs
+                //            select new SOACRVM
+                //            {
+                //                Id = soa.Id,
+                //                Customer = soa.Customer.Name,
+                //                Type = soa.SOACRType.Code,
+                //                SOAFromD = soa.SOAFrom,
+                //                SOAToD = soa.SOATo
+                //            };
+                //var soacrl = await soacr.ToListAsync();
+                //foreach (var scl in soacrl)
+                //{
+                //    var soadetails = await GetSOACRItemsAsync(scl.Id);
+                //    scl.TotalAmountD = soadetails.Sum(s => s.InvoiceAmountD);
+                //    scl.TBRD = soadetails.Sum(s => s.TBRD);
+                //    scl.CreditD = soadetails.Sum(s => s.CreditD);
+                //    scl.DebitD = soadetails.Sum(s => s.DebitD);
+                //    scl.PaidAmountD = soadetails.Sum(s => s.PaidAmountD);
+                //    scl.FreightChargeD = soadetails.Sum(s => s.FreightChargeD);
+                //    scl.BalanceD = soadetails.Sum(s => s.BalanceD);
+                //    scl.OverPaymentD = soadetails.Sum(s => s.OverPaymentD);
+                //}
+                //return soacrl;
                 var soacr = from soa in context.SOACRs
+                            let invoiceTotals = soa.SOACRLineItems
+                                                   .SelectMany(scli => scli.Invoice
+                                                                           .InvoiceLineItems
+                                                                           .Join(context.SalesOrderLineItems,
+                                                                                 ili => new { scli.Invoice.SalesOrderId, ili.ItemId },
+                                                                                 soli => new { soli.SalesOrderId, soli.ItemId },
+                                                                                 (ili, soli) => new
+                                                                                 {
+                                                                                     Amount = (decimal?)ili.Quantity *
+                                                                                              ili.UnitPrice *
+                                                                                              (100 - soli.Discount1) / 100m *
+                                                                                              (100 - soli.Discount2) / 100m
+                                                                                 }
+                                                                           )
+                                                   )
+                                                   .Sum(s => s.Amount) ?? 0
+                            let tbrTotal = soa.SOACRLineItems
+                                              .SelectMany(scli => context.SOACRLineItemTBRs
+                                                                         .Where(s => s.SOACRLineItemId == scli.Id))
+                                              .Sum(s => (decimal?)s.Amount) ?? 0
+                            let paymentTotal = soa.SOACRLineItems
+                                                  .SelectMany(scli => context.CustomerPaymentDetails
+                                                                             .Where(s => s.InvoiceId == scli.InvoiceId
+                                                                                      && s.CustomerPayment.SOACR.Id == soa.Id))
+                                                  .Sum(p => (decimal?)p.PaidAmount) ?? 0
+                            let creditTotal = soa.SOACRLineItems.Sum(scli => (decimal?)scli.CreditAmount) ?? 0
+                            let debitTotal = soa.SOACRLineItems.Sum(scli => (decimal?)scli.DebitAmount) ?? 0
+                            let freightTotal = soa.SOACRLineItems.Sum(scli => (decimal?)scli.FreightCost) ?? 0
+                            let balance = invoiceTotals + debitTotal + tbrTotal - creditTotal - paymentTotal
                             select new SOACRVM
                             {
                                 Id = soa.Id,
                                 Customer = soa.Customer.Name,
                                 Type = soa.SOACRType.Code,
                                 SOAFromD = soa.SOAFrom,
-                                SOAToD = soa.SOATo
+                                SOAToD = soa.SOATo,
+
+                                TotalAmountD = invoiceTotals,
+                                TBRD = tbrTotal,
+                                PaidAmountD = paymentTotal,
+                                CreditD = creditTotal,
+                                DebitD = debitTotal,
+                                FreightChargeD = freightTotal,
+
+                                BalanceD = balance > 0 ? balance : 0,
+                                OverPaymentD = balance < 0 ? Math.Abs(balance) : 0,
                             };
-                var soacrl = await soacr.ToListAsync();
-                foreach (var scl in soacrl)
-                {
-                    var soadetails = await GetSOACRItemsAsync(scl.Id);
-                    scl.TotalAmountD = soadetails.Sum(s => s.InvoiceAmountD);
-                    scl.TBRD = soadetails.Sum(s => s.TBRD);
-                    scl.CreditD = soadetails.Sum(s => s.CreditD);
-                    scl.DebitD = soadetails.Sum(s => s.DebitD);
-                    scl.PaidAmountD = soadetails.Sum(s => s.PaidAmountD);
-                    scl.FreightChargeD = soadetails.Sum(s => s.FreightChargeD);
-                    scl.BalanceD = soadetails.Sum(s => s.BalanceD);
-                    scl.OverPaymentD = soadetails.Sum(s => s.OverPaymentD);
-                }
-                return soacrl;
+                return await soacr.ToListAsync();
             }
             catch (Exception ex)
             {

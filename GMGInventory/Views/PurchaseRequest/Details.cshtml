@@ -1111,6 +1111,8 @@
                 $("#addso-customer").val($(this).select2("data")[0].customerName);
                 $("#addso-po-number").val($(this).select2("data")[0].purchaseOrder || "N/A");
 
+                $(".sochkclassorderall").prop("checked", false);
+
                 soDT.ajax.reload();
             });
 
@@ -1141,7 +1143,7 @@
                     {
                         orderable: false,
                         data: function (data, type, dataToSet) {
-                            return '<input class="sochkclassorder" type="checkbox" ' + ( data.toRequest == true ? 'checked="checked" ' : '') + 'name="orderitemchk" />';
+                            return '<input class="sochkclassorder" type="checkbox" ' + ( data.toRequest == true ? 'checked="checked" ' : '') + 'name="orderitemchk_' + data.id + '" />';
                         }
                     },
                     { data: "itemCode", name: "ItemCode" },
@@ -1215,8 +1217,13 @@
             dtCheckboxes();
             function dtCheckboxes() {
                 $(".sochkclassorderall").off("change").on("change", function () {
+                    var isChecked = $(".sochkclassorderall").prop("checked");
                     soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                        $(this.node()).find(".sochkclassorder").prop("checked", $(".sochkclassorderall").prop("checked"));
+                        $(this.node()).find(".sochkclassorder").prop("checked", isChecked);
+
+                        var data = this.data();
+                        data.toRequest = isChecked;
+                        this.data(data);
                     });
                 });
 
@@ -1513,6 +1520,7 @@
 
         if (user_access.canApproveDisapprove) {
             $('.btn-details-approve').click(function (e) {
+                var btnapproverNumber = $(this).data("approver-number");
                 swal({
                     title: "Approve Purchase Request",
                     text: "Continue to approve this purchase request?",
@@ -1526,7 +1534,7 @@
                             type: "POST",
                             data: {
                                 Id: request_data.id,
-                                approverNumber: $(".btn-details-approve").data("approver-number")
+                                approverNumber: btnapproverNumber
                             },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {

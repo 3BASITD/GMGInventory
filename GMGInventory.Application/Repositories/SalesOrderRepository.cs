@@ -398,7 +398,7 @@ namespace GMGInventory.Application.Repositories
                                ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate,
                                IsAllPacked = !orderIncompletePack.Contains(order.Id),
-                               PurchaseRequestDetail = string.Join(",",
+                               PurchaseRequestDetail = string.Join(", ",
                                                        context.PurchaseRequestLineItems
                                                        .Where(prli => prli.SalesOrderId == order.Id)
                                                        .Join(context.PurchaseRequests,

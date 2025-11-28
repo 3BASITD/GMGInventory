@@ -46,12 +46,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(string OrderNumber)
+        public async Task<IActionResult> Add(string OrderNumber, List<int> ItemIds)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await queueRepository.AddOrder(OrderNumber));
+            return Json(await queueRepository.AddOrder(OrderNumber, ItemIds));
         }
 
         [HttpPost]

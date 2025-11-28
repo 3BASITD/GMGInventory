@@ -1142,18 +1142,18 @@
         function DoAddCheck() {
             $('span[data-valmsg-for="check-checknumber"]').text("");
             $("#check-checknumber").removeClass("text-danger text-xs");
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("CheckCheckNumberJson")",
-                data: {
-                    CheckNumber: $("#check-checknumber").val()
-                },
-                success: function (data, status, xhr) {
-                    if (data.status == "Error") {
-                        toastr.warning("Check Number already in use in other payment", "Required field &lt;Check Number&gt;");
-                        $('span[data-valmsg-for="check-checknumber"]').text("Check Number already in use in other payment");
-                        $("#check-checknumber").addClass("text-danger text-xs");
-                    } else {
+            // $.ajax({
+            //     type: "POST",
+            //     url: "@Url.Action("CheckCheckNumberJson")",
+            //     data: {
+            //         CheckNumber: $("#check-checknumber").val()
+            //     },
+            //     success: function (data, status, xhr) {
+            //         if (data.status == "Error") {
+            //             toastr.warning("Check Number already in use in other payment", "Required field &lt;Check Number&gt;");
+            //             $('span[data-valmsg-for="check-checknumber"]').text("Check Number already in use in other payment");
+            //             $("#check-checknumber").addClass("text-danger text-xs");
+            //         } else {
                         var checkDuplicateNumber = false;
                         checkTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
                             if (this.data().CheckNumber == $("#check-checknumber").val()) { checkDuplicateNumber = true; }
@@ -1161,7 +1161,7 @@
                         });
                         if (checkDuplicateNumber) {
                             toastr.warning("Duplicate Check Number", "Required field &lt;Check Number&gt;");
-                            $('span[data-valmsg-for="check-checknumber"]').text("Duplicate Check Number");
+                            $('span[data-valmsg-for="check-checknumber"]').text("Check Number already added");
                         } else {
                             var invoiceForm = {
                                 BankName: $("#check-bankname").val(),
@@ -1173,9 +1173,9 @@
                             checkTable.row.add(invoiceForm).draw();
                             ResetCheckPaymentForm();
                         }
-                    }
-                }
-            });
+            //         }
+            //     }
+            // });
         }
 
         $(".btnClearCheck").on("click", ResetCheckPaymentForm);
