@@ -11,5 +11,6 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> UpdateDriver(DriverVM driver);
         Task<ResponseModel> DeleteOrDeactivateDriver(int? Id);
         Task<ResponseModel> ReactivateDriver(int? Id);
+        Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page);
     }
 }

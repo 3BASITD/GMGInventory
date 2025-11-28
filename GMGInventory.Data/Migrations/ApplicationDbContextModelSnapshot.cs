@@ -6605,6 +6605,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("DateReceive")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DriverId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ForwarderId")
                         .HasColumnType("int");
 
@@ -6627,14 +6630,21 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("VehicleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Waybill")
                         .HasColumnType("nvarchar(150)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DriverId");
+
                     b.HasIndex("ForwarderId");
 
                     b.HasIndex("SalesOrderId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("SalesOrderDeliveryMonitorings");
                 });
@@ -9253,6 +9263,10 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderDeliveryMonitoring", b =>
                 {
+                    b.HasOne("GMGInventory.Data.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId");
+
                     b.HasOne("GMGInventory.Data.Forwarder", "Forwarder")
                         .WithMany("SalesOrderDeliveryMonitorings")
                         .HasForeignKey("ForwarderId")
@@ -9265,9 +9279,17 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GMGInventory.Data.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId");
+
+                    b.Navigation("Driver");
+
                     b.Navigation("Forwarder");
 
                     b.Navigation("SalesOrder");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.SalesOrderLineItem", b =>

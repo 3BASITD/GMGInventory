@@ -33,6 +33,14 @@ namespace GMGInventory.Data
         public string? Representative { get; set; }
         public DateTime? DateReceive { get; set; }
 
+        [ForeignKey("VehicleId")]
+        public int? VehicleId { get; set; }
+        public Vehicle Vehicle { get; set; }
+
+        [ForeignKey("DriverId")]
+        public int? DriverId { get; set; }
+        public Driver Driver { get; set; }
+
         //public ICollection<SalesReturnAppliedAmount> SalesReturnAppliedAmounts { get; set; }
     }
 }

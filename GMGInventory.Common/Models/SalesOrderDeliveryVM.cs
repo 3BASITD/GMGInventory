@@ -59,6 +59,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Driver / Representative")]
         public string? Representative { get; set; }
 
+        public int? DriverId { get; set; }
+        public int? VehicleId { get; set; }
+
+        [Display(Name = "Vehicle")]
+        public string? VehicleName { get; set; }
+
         [Display(Name = "Order Received by Customer(VISMIN)")]
         public string? DateReceive => DateReceiveD == null ? null: DateReceiveD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateReceiveD { get; set; }
@@ -96,5 +102,8 @@ namespace GMGInventory.Common.Models
         public DateTime? ServiceLevelAgreement { get; set; }
         public string Representative { get; set; }
         public DateTime? DateReceive { get; set; }
+        public int VehicleId { get; set; }
+        public int DriverId { get; set; }
+
     }
 }

@@ -10,5 +10,6 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> UpdateVehicle(VehicleVM Vehicle);
         Task<ResponseModel> DeleteOrDeactivateVehicle(int? Id);
         Task<ResponseModel> ReactivateVehicle(int? Id);
+        Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page);
     }
 }

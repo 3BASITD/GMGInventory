@@ -46,6 +46,28 @@ namespace GMGInventory.Application.Repositories
             return await vehicles.ToListAsync();
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page)
+        {
+            var dateNow = DateTime.Now.Date;
+            
+            var vehicles = from vehicle in context.Vehicles
+                       where vehicle.IsActive == true
+                       && (vehicle.DateRegistered <= dateNow && vehicle.DateExpiration >= dateNow)
+                       && (string.IsNullOrWhiteSpace(search) || vehicle.FleetPlateNumber.ToLower().Contains(search.ToLower()) || vehicle.VehicleType.ToLower().Contains(search.ToLower()))
+                       select new JsonOptionsModel
+                       {
+                           Id = vehicle.Id.ToString(),
+                           Text = vehicle.FleetPlateNumber //+" - "+ vehicle.VehicleType
+                       };
+            var filteredVehicles = await vehicles.Skip((page - 1) * 50).Take(50).ToListAsync();
+
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = filteredVehicles,
+                total_count = filteredVehicles.Count()
+            };
+        }
+
         public async Task<ForDataTables<VehicleVM>> GetVehiclesDT(DataTablesRequestForm form)
         {
             int totalRecord = 0;

@@ -48,6 +48,28 @@ namespace GMGInventory.Application.Repositories
             return await drivers.ToListAsync();
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page)
+        {
+            var dateNow = DateTime.Now.Date;
+
+            var drivers = from driver in context.Drivers
+                           where driver.IsActive == true
+                           //&& (driver.LicenseDateExpiration <= dateNow)
+                           && (string.IsNullOrWhiteSpace(search) || driver.FirstName.ToLower().Contains(search.ToLower()) || driver.Nickname.ToLower().Contains(search.ToLower()) || driver.FirstName.ToLower().Contains(search.ToLower()))
+                           select new JsonOptionsModel
+                           {
+                               Id = driver.Id.ToString(),
+                               Text = driver.LastName + ", " + driver.FirstName
+                           };
+            var filteredDrivers = await drivers.Skip((page - 1) * 50).Take(50).ToListAsync();
+
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = filteredDrivers,
+                total_count = filteredDrivers.Count()
+            };
+        }
+
         public async Task<ForDataTables<DriverVM>> GetDriversDT(DataTablesRequestForm form)
         {
             int totalRecord = 0;

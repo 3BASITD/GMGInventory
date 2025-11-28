@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -20,6 +21,11 @@ namespace GMGInventory.Controllers
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Vehicle)).Convert();
 
             return View();
+        }
+
+        public async Task<IActionResult> GetOptions(string search, int page)
+        {
+            return Json(await vehicleRepository.GetOptions(search, page));
         }
 
         [HttpPost]

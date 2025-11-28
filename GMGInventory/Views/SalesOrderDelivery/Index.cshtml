@@ -209,9 +209,13 @@
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="form-group">
+                                 @*<div class="form-group">
                                     <label for="delivery-representative" class="form-label mb-0">@Html.DisplayNameFor(model => model.Representative)</label>
                                     <input type="text" id="delivery-representative" name="Representative" class="form-control form-control-sm" />
+                                </div>*@
+                                <div class="form-group">
+                                    <label for="delivery-driver" class="form-label mb-0">@Html.DisplayNameFor(model => model.Representative)</label>
+                                    <select id="delivery-driver" name="Driver" style="width: 100%"></select>
                                 </div>
                             </div>
                         </div>
@@ -224,12 +228,21 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
+                                    <label for="delivery-vehicle" class="form-label mb-0">@Html.DisplayNameFor(model => model.VehicleName)</label>
+                                    <select id="delivery-vehicle" name="Vehicle" style="width: 100%" ></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
                                     <label for="delivery-remarks" class="form-label mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
                                     <input type="text" id="delivery-remarks" class="form-control form-control-sm" />
                                 </div>
                             </div>
                         </div>
                         <input type="hidden" id="delivery-sales-order-id" />
+                        <input type="hidden" id="delivery-representative" name="Representative" />
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary btn-save">
@@ -352,6 +365,10 @@
         }
 
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+        
+        
+
+
 
         var loadfilterloaded = false;
         function LoadFilterSelect2() {
@@ -440,7 +457,50 @@
                     });
                 }
             });
+
+            
         }
+
+        // Load vehicle for select2
+        $("#delivery-vehicle").select2({
+           // minimumInputLength: 1,
+            placeholder: '<empty>',
+            allowClear: true,
+            dropdownParent: $("#editModal"),
+            
+            ajax: {
+                url: "@Url.Action("GetOptions", "Vehicle")"
+            }
+        });
+
+
+
+
+       
+
+        // Load driver for select2
+        $("#delivery-driver").select2({
+           // minimumInputLength: 1,
+            placeholder: '<empty>',
+            allowClear: true,
+            dropdownParent: $("#editModal"),
+           
+            ajax: {
+                url: "@Url.Action("GetOptions", "Driver")"
+            }
+        });
+
+
+        $("#delivery-driver").on("select2:select",function (e){
+            var data = e.params.data
+            console.log(data);
+
+             $("#delivery-representative").val(data.text);
+
+        
+        
+        });
+
 
         $(".btnFilter").on("click", function () {
             deliveryDT.ajax.reload();
@@ -556,6 +616,7 @@
             function ShowEdit(id){
                 var datas = deliveryDT.rows().data().toArray().filter(row => row.id === id);
                 var data = datas[0];
+                //console.log(data);
                 $("#delivery-sales-order-id").val(data.id);
                 $("#delivery-date").val(DateForInput(data.dateDeliverD));
                 $("#delivery-pickup-date").val(DateForInput(data.datePickupD));
@@ -566,6 +627,26 @@
                 $("#delivery-receive-date").val(DateForInput(data.dateReceive));
                 $("#delivery-forwarder").val(data.forwarderId);
                 $("#delivery-forwarder").trigger("change");
+
+                if(data.vehicleId){
+                var vehicleOption = new Option(data.vehicleName, data.vehicleId, true, true);
+                $("#delivery-vehicle").append(vehicleOption).trigger('change');
+                }
+                else{
+                    $("#delivery-vehicle").val(null).trigger('change');
+                }
+               // $("#delivery-vehicle").val(data.vehicleId);
+               // $("#delivery-vehicle").trigger("change");
+
+               if(data.driverId){
+                var driverOption = new Option(data.representative, data.driverId, true, true);
+                $("#delivery-driver").append(driverOption).trigger('change');
+               }
+               else{
+                    $("#delivery-driver").val(null).trigger('change');
+                }
+                //$("#delivery-driver").val(data.driverId);
+                //$("#delivery-driver").trigger("change");
             }
 
             // Validation for Edit Modal
@@ -574,13 +655,17 @@
                     Forwarder: { required: true },
                     Waybill: { required: true, maxlength: 150 },
                     Remarks: { maxlength: 500 },
-                    Representative: { maxlength: 150 }
+                    //Representative: { maxlength: 150 },
+                    Vehicle: { required: true },
+                    Driver: { required: true }
                 },
                 messages: {
                     Forwarder: { required: "Please select a forwarder." },
                     Waybill: { required: "Please enter waybill number.", maxlength: "Waybill must not exceed 150 characters." },
                     Remarks: { maxlength: "Remarks must not exceed 500 characters." },
-                    Representative: { maxlength: "Driver / Representative must not exceed 150 characters." }
+                    //Representative: { maxlength: "Driver / Representative must not exceed 150 characters." },
+                    Vehicle: { required: "Please select a vehicle." },
+                    Driver: { required: "Please select a driver." }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -602,7 +687,9 @@
                         Remarks: $("#delivery-remarks").val(),
                         ServiceLevelAgreement: $("#delivery-sla-date").val(),
                         Representative: $("#delivery-representative").val(),
-                        DateReceive: $("#delivery-receive-date").val()
+                        DateReceive: $("#delivery-receive-date").val(),
+                        VehicleId: $("#delivery-vehicle").val(),
+                        DriverId: $("#delivery-driver").val(),
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
