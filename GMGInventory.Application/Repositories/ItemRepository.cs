@@ -594,26 +594,29 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIItem>> GetListAPI()
+        public async Task<IList<APIItem>> GetListAPI(int? CategoryId, int? ItemTypeId, int? BrandId)
         {
-            return await context.Items
-                                .Select(s => new APIItem
-                                {
-                                    Id = s.Id,
-                                    Code = s.Code,
-                                    OldCode = s.OldCode,
-                                    Name = s.Name,
-                                    PartNumber = s.PartNumber,
-                                    InterchangeNumber = s.InterchangeNumber,
-                                    Size = s.Size,
-                                    UnitId = s.UnitId,
-                                    CategoryId = s.CategoryId,
-                                    ItemTypeId = s.ItemTypeId,
-                                    BrandId = s.BrandId,
-                                    IsActive = s.IsActive,
-                                    LocationCodeIds = s.ItemLocations.Select(a => a.LocationCodeId).ToList()
-                                })
-                                .ToListAsync();
+            var items = from item in context.Items
+                        where (CategoryId == null || CategoryId == item.CategoryId)
+                        && (ItemTypeId == null || ItemTypeId == item.ItemTypeId)
+                        && (BrandId == null || BrandId == item.BrandId)
+                        select new APIItem
+                        {
+                            Id = item.Id,
+                            Code = item.Code,
+                            OldCode = item.OldCode,
+                            Name = item.Name,
+                            PartNumber = item.PartNumber,
+                            InterchangeNumber = item.InterchangeNumber,
+                            Size = item.Size,
+                            UnitId = item.UnitId,
+                            CategoryId = item.CategoryId,
+                            ItemTypeId = item.ItemTypeId,
+                            BrandId = item.BrandId,
+                            LocationCodeIds = item.ItemLocations.Select(a => a.LocationCodeId)
+                        };
+
+            return await items.ToListAsync();
         }
 
         public ItemViewVM? GetItemViewVM(int? id)
@@ -1970,13 +1973,13 @@ namespace GMGInventory.Application.Repositories
             if (category == null) return $"Category({itemFile.Category}) not found";
 
             var itemType = await context.ItemTypes
-                                        .Where(s => s.Name.ToLower() == itemFile.ItemType.ToLower() 
+                                        .Where(s => s.Name.ToLower() == itemFile.ItemType.ToLower()
                                                  && s.Category.Id == category.Id)
                                         .FirstOrDefaultAsync();
             if (itemType == null) return $"Cannot find Item Type({itemFile.ItemType}) under Category({itemFile.Category})";
 
             var brand = await context.Brands
-                                     .Where(s => s.Name.ToLower() == itemFile.Brand.ToLower() 
+                                     .Where(s => s.Name.ToLower() == itemFile.Brand.ToLower()
                                               && s.ItemType.Id == itemType.Id)
                                      .FirstOrDefaultAsync();
             if (brand == null) return $"Cannot find Brand({itemFile.Brand}) under Item Type({itemFile.ItemType})";

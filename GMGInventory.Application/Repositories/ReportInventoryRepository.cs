@@ -680,12 +680,19 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<StockStatusRVM>> GetStockStatus(ListFilterInventoryModel filter)
         {
             var stocks = from item in context.Items
-                         let ii = context.ItemInventories.Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true).Select(s => s.Quantity).FirstOrDefault()
+                         let ii = context.ItemInventories
+                                         .Where(s => s.ItemId == item.Id 
+                                                  && ((filter.Warehouse == null)// && s.Warehouse.IsMain == true)
+                                                  || (filter.Warehouse == s.WarehouseId)))
+                                         .Select(s => (int?)s.Quantity)
+                                         .Sum() ?? 0
                          let lc = context.PurchaseOrderNewLineItems
                                       .Where(s => s.RequestItem.ItemId == item.Id)
                                       .OrderByDescending(s => s.PurchaseOrder.OrderDate)
                                       .Select(s => (decimal?)s.UnitCost)
                                       .FirstOrDefault() ?? 0
+                         where (filter.Item == null || filter.Item == item.Id)
+                         && (filter.Brand == null || filter.Brand == item.BrandId)
                          select new StockStatusRVM
                          {
                              Brand = item.Brand.Name,

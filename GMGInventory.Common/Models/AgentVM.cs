@@ -23,7 +23,7 @@ namespace GMGInventory.Common.Models
         //[Required]
         [StringLength(50)]
         [Display(Name = "Middle Name")]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; }
 
         [Required]
         [StringLength(50)]

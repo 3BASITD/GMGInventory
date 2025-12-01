@@ -112,18 +112,18 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIBrand>> GetListAPI()
+        public async Task<IList<APIBrand>> GetListAPI(int? ItemTypeId)
         {
-            return await context.Brands
-                                .Select(s => new APIBrand
-                                {
-                                    Id = s.Id,
-                                    Code = s.Code,
-                                    Name = s.Name,
-                                    ItemTypeId = s.ItemTypeId,
-                                    IsActive = s.IsActive
-                                })
-                                .ToListAsync();
+            var brands = from brand in context.Brands
+                         where brand.IsActive == true
+                         select new APIBrand
+                         {
+                             Id = brand.Id,
+                             Code = brand.Code,
+                             Name = brand.Name,
+                             ItemTypeId = brand.ItemTypeId
+                         };
+            return await brands.ToListAsync();
         }
 
         public async Task<BrandViewVM?> GetBrandViewVM(int? id)

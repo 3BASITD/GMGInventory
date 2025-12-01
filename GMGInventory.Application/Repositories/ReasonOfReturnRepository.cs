@@ -107,21 +107,34 @@ namespace GMGInventory.Application.Repositories
 
             var reasons = from reason in context.ReasonOfReturns
 
-                             join userc in userManager.Users on reason.UserCreated equals userc.Id
-                             join userm in userManager.Users on reason.UserModified equals userm.Id into m
-                             from userm in m.DefaultIfEmpty()
+                          join userc in userManager.Users on reason.UserCreated equals userc.Id
+                          join userm in userManager.Users on reason.UserModified equals userm.Id into m
+                          from userm in m.DefaultIfEmpty()
 
-                             select new ReasonOfReturnVM
-                             {
-                                 Id = reason.Id,
-                                 ReasonOfReturnName = reason.Name,
-                                 ReasonOfReturnCode = reason.Code,
-                                 IsActive = reason.IsActive,
-                                 DateCreatedD = reason.DateCreated,
-                                 DateModifiedD = reason.DateModified == null ? null : reason.DateModified.Value,
-                                 UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                                 UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
-                             };
+                          select new ReasonOfReturnVM
+                          {
+                              Id = reason.Id,
+                              ReasonOfReturnName = reason.Name,
+                              ReasonOfReturnCode = reason.Code,
+                              IsActive = reason.IsActive,
+                              DateCreatedD = reason.DateCreated,
+                              DateModifiedD = reason.DateModified == null ? null : reason.DateModified.Value,
+                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                              UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                          };
+            return await reasons.ToListAsync();
+        }
+
+        public async Task<IList<APIGeneric>> GetListAPI()
+        {
+            var reasons = from reason in context.ReasonOfReturns
+                          where reason.IsActive == true
+                          select new APIGeneric
+                          {
+                              Id = reason.Id,
+                              Code = reason.Code,
+                              Name = reason.Name
+                          };
             return await reasons.ToListAsync();
         }
 

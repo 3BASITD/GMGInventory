@@ -251,6 +251,34 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIPurchaseOrder>> GetListAPI(DateTime? OrderDate)
+        {
+            if (OrderDate == null) OrderDate = DateTime.Today;
+
+            var orders = from order in context.PurchaseOrderNews
+                         where (OrderDate.Value.Date == order.OrderDate.Date)
+                         && order.ApproverId != null
+                         select new APIPurchaseOrder
+                         {
+                             Id = order.Id,
+                             DocumentNumber = order.DocumentNumber,
+                             SupplierId = order.SupplierId,
+                             WarehouseId = order.DeliveryAddressId,
+                             OrderDate = order.OrderDate,
+                             DueDate = order.DueDate,
+                             LineItems = from item in order.PurchaseOrderLineItems
+                                         select new APIPurchaseLineItem
+                                         {
+                                             Id = item.Id,
+                                             ItemId = item.RequestItem.ItemId != null
+                                                    ? item.RequestItem.ItemId.Value
+                                                    : -1,
+                                             Quantity = item.Quantity
+                                         }
+                         };
+            return await orders.ToListAsync();
+        }
+
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
         {
             var details = from order in context.PurchaseOrderNews

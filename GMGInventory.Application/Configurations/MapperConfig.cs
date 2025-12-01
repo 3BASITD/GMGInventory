@@ -8,7 +8,7 @@ namespace GMGInventory.Application.Configurations
     {
         public MapperConfig()
         {
-            string DateFormat = "yyyy/MM/dd hh:mm:ss tt";
+            string DateFormat = "yyyy/MM/dd hh:mm:ss tt"; 
             // Agent
             CreateMap<Agent, AgentVM>().ReverseMap();
             CreateMap<Agent, AgentViewVM>().ReverseMap();

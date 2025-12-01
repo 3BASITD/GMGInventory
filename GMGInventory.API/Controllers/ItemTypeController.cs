@@ -9,11 +9,10 @@ namespace GMGInventory.API.Controllers
     [Route("[controller]")]
     public class ItemTypeController(IItemTypeRepository itemTypeRepository) : ControllerBase
     {
-        [Authorize]
         [HttpGet("List")]
-        public async Task<IList<APIItemType>> GetList()
+        public async Task<IList<APIItemType>> GetList(int? CategoryId)
         {
-            return await itemTypeRepository.GetListAPI();
+            return await itemTypeRepository.GetListAPI(CategoryId);
         }
     }
 }

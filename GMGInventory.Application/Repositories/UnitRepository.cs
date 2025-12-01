@@ -39,14 +39,14 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<APIGeneric>> GetListAPI()
         {
-            return await context.Units
-                                .Select(s => new APIGeneric
-                                {
-                                    Id = s.Id,
-                                    Code = s.Code,
-                                    Name = s.Name
-                                })
-                                .ToListAsync();
+            var units = from unit in context.Units
+                        select new APIGeneric
+                        {
+                            Id = unit.Id,
+                            Code = unit.Code,
+                            Name = unit.Name
+                        };
+            return await units.ToListAsync();
         }
     }
 }

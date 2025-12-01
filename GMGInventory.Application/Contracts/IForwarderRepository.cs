@@ -7,6 +7,7 @@ namespace GMGInventory.Application.Contracts
     {
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
         Task<IList<ForwarderViewVM>> GetAllForwarderVMAsync();
+        Task<IList<APIGeneric>> GetListAPI();
         Task<ForwarderViewVM?> GetForwarderViewVMAsync(int? id);
         Task<ForwarderVM?> GetForwarderVMAsync(int? id);
         Task<IList<Forwarder>> GetAllActiveForwarderAsync(int includeId);

@@ -413,6 +413,33 @@ namespace GMGInventory.Application.Repositories
             return await orderVM.ToListAsync();
         }
 
+        public async Task<IList<APISalesOrder>> GetListAPI(DateTime? OrderDate)
+        {
+            if (OrderDate == null) OrderDate = DateTime.Today;
+
+            var orders = from order in context.SalesOrders
+                         where order.SalesOrderDate.Date == OrderDate.Value.Date
+                         && order.ApprovedBy != null
+                         && order.ApprovedDate != null
+                         select new APISalesOrder
+                         {
+                             Id = order.Id,
+                             AgentId = order.AgentId,
+                             CustomerId = order.CustomerId,
+                             SalesOrderNumber = order.SalesOrderNumber,
+                             OrderDate = order.SalesOrderDate,
+                             LineItems = from item in order.SalesOrderLineItems
+                                         select new APISalesOrderLineItem
+                                         {
+                                             Id = item.Id,
+                                             LineNumber = item.LineNumber,
+                                             ItemId = item.ItemId,
+                                             Quantity = item.Quantity
+                                         }
+                         };
+            return await orders.ToListAsync();
+        }
+
         public async Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter)
         {
             int totalRecord = 0;
