@@ -7,7 +7,7 @@ namespace GMGInventory.Data
     {
         public PurchaseRequestLineItem()
         {
-            this.PurchaseOrderLineItems = new HashSet<PurchaseOrderLineItem>();
+            this.PurchaseOrderLineItems = new HashSet<PurchaseOrderNewLineItem>();
         }
 
         [ForeignKey("PurchaseRequestId")]
@@ -39,6 +39,6 @@ namespace GMGInventory.Data
 
         public bool? HaveStock { get; set; }
 
-        public ICollection<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
+        public ICollection<PurchaseOrderNewLineItem> PurchaseOrderLineItems { get; set; }
     }
 }

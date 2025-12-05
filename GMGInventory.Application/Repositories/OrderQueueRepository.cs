@@ -1,16 +1,12 @@
 ﻿using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Data.Migrations;
 using GMGInventory.Data.OrderAppDB;
-using Humanizer.Localisation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq.Dynamic.Core;
-using System.Security.Cryptography;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -34,57 +30,64 @@ namespace GMGInventory.Application.Repositories
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
-        private async Task<IList<OrderQueueVM>> GetOrders(bool IncludeAdded, bool IncludeIgnored)
+        private async Task<IList<OrderQueueVM>> GetOrders(string? Status, DateTime? DateFrom, DateTime? DateTo)
         {
+            if (DateFrom == null) DateFrom = DateTime.Today.AddMonths(-1);
+            if (DateTo == null) DateTo = DateTime.Today;
+            if (DateFrom > DateTo) (DateFrom, DateTo) = (DateTo, DateFrom);
+
             var orders = from order in app_context.Orders
                          where order.OrderNo!.ToLower().StartsWith("draft-") == false
+                         && DateFrom <= order.CreatedDate
+                         && order.CreatedDate <= DateTo
                          group order by order.OrderNo into gorder
                          select new OrderQueueVM
                          {
                              OrderNumber = gorder.Key,
                              Agent = gorder.Select(s => s.Agent).FirstOrDefault(),
                              Customer = gorder.Select(s => s.Customer).FirstOrDefault(),
-                             ExtendedPriceD = gorder.Sum(s => s.ExtendedPrice) ?? 0
+                             ExtendedPriceD = gorder.Sum(s => s.ExtendedPrice) ?? 0,
+                             DateCreatedD = gorder.Select(s => s.CreatedDate).FirstOrDefault(),
+                             ItemCount = gorder.Count()
                          };
 
             var ordersList = await orders.ToListAsync();
-
-            var sources = context.SalesOrderSources.ToList();
 
             for (int i = ordersList.Count - 1; i >= 0; i--)
             {
                 var order = ordersList[i];
 
-                var status = from source in sources
+                var status = from source in context.SalesOrderSources
                              join userc in userManager.Users on source.UserCreated equals userc.Id
                              where source.SourceOrderNumber == order.OrderNumber
                              select new
                              {
                                  source.Status,
-                                 CreatedBy = userc.FirstName + " " + userc.LastName
+                                 ItemCount = source.SalesOrderLineItems.Count()
                              };
 
-                order.Status = status.Any()
-                             ? (status.Count() > 1 ? status.Count() + " times " : "")
-                             + (status.First().Status == null ? "Added" : status.First().Status)
-                             + (status.Count() == 1 ? " by " + status.First().CreatedBy : "")
-                             : "Pending";
+                order.AddedCount = status.Any() ? status.First().ItemCount : 0;
 
-                if ((status.Any(s => s.Status == null || s.Status.ToLower() == "added") && IncludeAdded == false)
-                 || (status.Any(s => s.Status != null && s.Status.ToLower() == "ignored") && IncludeIgnored == false))
-                {
-                    ordersList.RemoveAt(i);
-                }
+                order.Status = status.Any() == false
+                             ? "Pending"
+                             : (status.First().Status == null || status.First().Status.ToLower().Contains("added"))
+                             ? (order.ItemCount == order.AddedCount ? "Fully Added" : "Partial Added")
+                             : status.First().Status;
             }
 
-            return ordersList;
+            return ordersList.Where(s => Status == null
+                                      || (Status.ToLower().Contains("pending") && s.Status.ToLower().Contains("pending"))
+                                      || (Status.ToLower().Contains("partial") && s.Status.ToLower().Contains("partial"))
+                                      || (Status.ToLower().Contains("full") && s.Status.ToLower().Contains("full"))
+                                      || (Status.ToLower().Contains("ignore") && s.Status.ToLower().Contains("ignore")))
+                             .ToList();
         }
 
-        public async Task<ForDataTables<OrderQueueVM>> GetOrdersDT(DataTablesRequestForm form, bool IncludeAdded, bool IncludeIgnored)
+        public async Task<ForDataTables<OrderQueueVM>> GetOrdersDT(DataTablesRequestForm form, string? Status, DateTime? DateFrom, DateTime? DateTo)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetOrders(IncludeAdded, IncludeIgnored)).AsQueryable();
+            var data = (await GetOrders(Status, DateFrom, DateTo)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -96,7 +99,8 @@ namespace GMGInventory.Application.Repositories
                     s.Agent,
                     s.Customer,
                     s.ExtendedPrice,
-                    s.Status
+                    s.Status,
+                    s.DateCreated
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
@@ -104,13 +108,14 @@ namespace GMGInventory.Application.Repositories
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn.ToLower() == "ExtendedPrice")
+                if (form.SortColumn.ToLower().Contains("date") || form.SortColumn.ToLower() == "ExtendedPrice")
                 {
                     if (form.SortColumnDirection == "asc")
                     {
                         switch (form.SortColumn)
                         {
                             case "ExtendedPrice": data = data.OrderBy(s => s.ExtendedPriceD); break;
+                            case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
                             default: break;
                         }
                     }
@@ -119,6 +124,7 @@ namespace GMGInventory.Application.Repositories
                         switch (form.SortColumn)
                         {
                             case "ExtendedPrice": data = data.OrderByDescending(s => s.ExtendedPriceD); break;
+                            case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
                             default: break;
                         }
                     }
@@ -229,6 +235,16 @@ namespace GMGInventory.Application.Repositories
                 var itm = context.Items.Where(s => i.Code != null && s.Code.ToLower() == i.Code.ToLower()).FirstOrDefault();
                 if (itm != null)
                 {
+                    var dest = (from destination in context.SalesOrderSources
+                                join destinationorder in context.SalesOrders on destination.SalesOrderId equals destinationorder.Id
+                                join destinationitem in context.SalesOrderLineItems on destinationorder.Id equals destinationitem.SalesOrderId
+                                where destination.SourceOrderNumber == OrderNumber
+                                && destinationitem.ItemId == itm.Id
+                                select destinationorder).FirstOrDefault();
+
+                    i.SalesOrderNumber = dest == null ? null : dest.SalesOrderNumber;
+                    i.SalesOrderId = dest == null ? null : dest.Id;
+
                     var brnd = context.Brands
                                       .Where(s => s.Name == i.Brand
                                                || (s.Name != null && i.Brand != null && s.Name.ToLower() == i.Brand.ToLower()))
@@ -262,7 +278,7 @@ namespace GMGInventory.Application.Repositories
             var orders = app_context.Orders
                                     .Where(s => ItemIds != null
                                              && ItemIds.Contains(s.Id)
-                                             && s.OrderNo != null 
+                                             && s.OrderNo != null
                                              && s.OrderNo.ToLower() == OrderNumber.ToLower())
                                     .OrderBy(s => s.Id)
                                     .ToList();
@@ -436,12 +452,6 @@ namespace GMGInventory.Application.Repositories
                 await context.SalesOrders.AddAsync(salesOrder);
                 await context.SaveChangesAsync(currentUser);
 
-                foreach (var salesOrderItem in salesOrderItems)
-                    salesOrderItem.SalesOrderId = salesOrder.Id;
-
-                await context.SalesOrderLineItems.AddRangeAsync(salesOrderItems);
-                await context.SaveChangesAsync(currentUser);
-
                 var source = new SalesOrderSourced
                 {
                     SourceOrderNumber = OrderNumber,
@@ -449,6 +459,15 @@ namespace GMGInventory.Application.Repositories
                     Status = "Added"
                 };
                 await context.SalesOrderSources.AddAsync(source);
+                await context.SaveChangesAsync(currentUser);
+
+                foreach (var salesOrderItem in salesOrderItems)
+                {
+                    salesOrderItem.SalesOrderId = salesOrder.Id;
+                    salesOrderItem.SalesOrderSourceId = source.Id;
+                }
+
+                await context.SalesOrderLineItems.AddRangeAsync(salesOrderItems);
                 await context.SaveChangesAsync(currentUser);
 
                 return new ResponseModel

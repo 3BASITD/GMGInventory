@@ -373,7 +373,8 @@ namespace GMGInventory.Application.Repositories
                            && (filter.FiledBy == null || filter.FiledBy.ToLower() != "me" || (filter.FiledBy.ToLower() == "me" && order.UserCreated == currentUserId))
                            select new SalesOrderVM
                            {
-                               Customer = order.Customer.Name,
+                               CustomerCode = order.Customer.Code,
+                               CustomerName = order.Customer.Name,
                                Id = order.Id,
                                OrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,
@@ -407,7 +408,13 @@ namespace GMGInventory.Application.Repositories
                                                            (prli, pr) => new { pr, prli })
                                                        .Select(x => $"{x.pr.DocumentNumber}-[{x.pr.Status.Name}]")
                                                        .Distinct()
-                                                       )
+                                                       ),
+                               ServiceLevelAgreement = order.ServiceLevelAgreement.Name,
+                               WithLP = order.WithLP,
+                               WithREYCONonDefective = order.WithREYCONonDefective,
+                               WithREYCOJITLPDelivery = order.WithREYCOJITLPDelivery.Name,
+                               SpecialInstruction = order.SpecialInstruction,
+                               Remarks = order.Remarks
 
                            });
             return await orderVM.ToListAsync();
@@ -452,7 +459,8 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(s => new[]
                 {
-                    s.Customer,
+                    s.CustomerCode,
+                    s.CustomerName,
                     s.OrderDate,
                     s.SONumber,
                     s.Status,

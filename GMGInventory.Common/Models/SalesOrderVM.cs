@@ -13,8 +13,11 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Order Number")]
         public string SONumber { get; set; }
 
-        [Display(Name = "Customer")]
-        public string Customer { get; set; }
+        [Display(Name = "Customer Code")]
+        public string CustomerCode { get; set; }
+
+        [Display(Name = "Customer Name")]
+        public string CustomerName { get; set; }
 
         [Display(Name = "Order Date")]
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
@@ -57,6 +60,24 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Purchase Request")]
         public string PurchaseRequestDetail { get; set; }
+
+        [Display(Name = "SLA")]
+        public string? ServiceLevelAgreement { get; set; }
+
+        [Display(Name = "With L/P")]
+        public bool WithLP { get; set; }
+
+        [Display(Name = "With REYCO Non-Defective")]
+        public bool WithREYCONonDefective { get; set; }
+
+        [Display(Name = "With REYCO JIT L/P Delivery")]
+        public string? WithREYCOJITLPDelivery { get; set; }
+
+        [Display(Name = "Special Instruction")]
+        public string? SpecialInstruction { get; set; }
+
+        [Display(Name = "Remarks")]
+        public string? Remarks { get; set; }
     }
 
     public class SalesOrderFilterVM : ListFilterCommonModel

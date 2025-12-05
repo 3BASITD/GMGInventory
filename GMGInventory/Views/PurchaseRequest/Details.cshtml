@@ -4,6 +4,7 @@
     ViewData["Title"] = "Purchase Request Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
     var userAccessAutomotive = (ViewsAccessVM)ViewData["UserAccessAutomotive"]!;
+    var userAccessNonAutomotive = (ViewsAccessVM)ViewData["UserAccessNonAutomotive"]!;
 }
 
 @section Breadcrumb {
@@ -69,35 +70,53 @@
             {
                 @if (Model.Type.ToLower() == "non-automotive")
                 {
-                    @if (userAccess.CanApproveDisapprove)
+                    @if (userAccess.CanApproveDisapprove || userAccessNonAutomotive.CanApproveDisapprove)
                     {
                         @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1) || string.IsNullOrWhiteSpace(Model.ApprovedBy2))
                         {
                             <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
                                 <span class="fas fa-times"></span> Disapprove
                             </button>
-                            @if (string.IsNullOrWhiteSpace(Model.ApprovedBy2))
+                            @if (userAccess.CanApproveDisapprove || userAccessNonAutomotive.CanApproveDisapprove)
                             {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="2" data-microtip-title="Non-automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
+                                @if (string.IsNullOrWhiteSpace(Model.ApprovedBy2))
+                                {
+                                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="2" data-microtip-title="Non-automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
+                                        <span class="fas fa-check"></span> Approve #2
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #2. Waiting for Approver #1" data-microtip-position="bottom-left" role="tooltip">
+                                        <span class="fas fa-check"></span> Approved #2
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
                                     <span class="fas fa-check"></span> Approve #2
                                 </button>
                             }
+                            @if (userAccess.CanApproveDisapprove)
+                            {
+                                @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1))
+                                {
+                                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="1" data-microtip-title="Non-automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
+                                        <span class="fas fa-check"></span> Approve #1
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #1. Waiting for Approver #2" data-microtip-position="bottom-left" role="tooltip">
+                                        <span class="fas fa-check"></span> Approved #1
+                                    </button>
+                                }
+                            }
                             else
                             {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #2. Waiting for Approver #1" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approved #2
-                                </button>
-                            }
-                            @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1))
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="1" data-microtip-title="Non-automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
+                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
                                     <span class="fas fa-check"></span> Approve #1
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #1. Waiting for Approver #2" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approved #1
                                 </button>
                             }
                         }
@@ -679,7 +698,16 @@
                     className: "form-cell"
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
-                { data: "salesOrderNumber", name: "SalesOrderNumber", className: "form-cell" },
+                { 
+                    data: function (data, type, dataToSet) {
+                        if (data.poNumber == null) {
+                            return "<em class='text-muted'>N/A</em>";
+                        } else {
+                            return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='text-info' target='_blank'>" + data.salesOrderNumber + "</a>";
+                        }
+                    },
+                    name: "SalesOrderNumber",
+                    className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.poNumber == null) {
@@ -690,13 +718,23 @@
                     },
                     name: "PONumber",
                     className: "form-cell" },
-                { data: "customer", name: "Customer", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.poNumber == null) {
+                            return "<em class='text-muted'>N/A</em>";
+                        } else {
+                            return "<a href='/Customer/Details/" + data.customerId + "' class='text-info' target='_blank'>" + data.customer + "</a>";
+                        }
+                    },
+                    name: "Customer", 
+                    className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.itemId == null || data.itemCode == null) {
-                            return "-";
+                            return "<em class='text-muted'>N/A</em>";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            return "<a href='/Item/Details/" + data.itemId + "' class='text-info' target='_blank'>" + data.itemCode + "</a>";
                         }
                     },
                     name: "ItemCode",

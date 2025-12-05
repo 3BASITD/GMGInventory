@@ -78,6 +78,23 @@ namespace GMGInventory.Common.Models
         public int Quantity { get; set; }
     }
 
+    public class APIPack
+    {
+        public int Id { get; set; }
+        public int SalesOrderId { get; set; }
+        public DateTime PackDate { get; set; }
+        public IEnumerable<APIPackLineItem> LineItems { get; set; }
+    }
+
+    public class APIPackLineItem
+    {
+        public int Id { get; set; }
+        public string PackType { get; set; }
+        public int BoxNumber { get; set; }
+        public int ItemId { get; set; }
+        public int Quantity { get; set; }
+    }
+
     public class APISalesReturn
     {
         public int Id { get; set; }

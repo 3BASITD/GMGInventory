@@ -38,7 +38,10 @@
                         @Html.DisplayNameFor(model => model.PurchaseRequestDetail)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Customer)
+                        @Html.DisplayNameFor(model => model.CustomerCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerName)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Priority)
@@ -454,7 +457,8 @@
                     }, 
                     name: "PurchaseRequestDetail"
                 },
-                { data: "customer", name: "Customer" },
+                { data: "customerCode", name: "CustomerCode" },
+                { data: "customerName", name: "CustomerName" },
                 { data: "priority", name: "Priority" },
                 { data: "customerAddress", name: "CustomerAddress" },
                 { data: "area", name: "Area" },

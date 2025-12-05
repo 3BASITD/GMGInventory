@@ -79,7 +79,11 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Service Level Agreement")] ServiceLevelAgreement,
         [PageNamesString("Sales Order (Special)")] SalesOrderSpecial,
         [PageNamesString("Purchase Request (Automotive)")] PurchaseRequestAutomotive,
-        [PageNamesString("Order Queue")] OrderQueue
+        [PageNamesString("Order Queue")] OrderQueue,
+        [PageNamesString("Purchase Request (Non-Automotive Approver #2)")] PurchaseRequestNonAutomotive,
+        [PageNamesString("Barcotech (Pack)")] BarcotechPack,
+        [PageNamesString("Barcotech (Receiving)")] BarcotechReceiving,
+        [PageNamesString("Barcotech (Transfer)")] BarcotechTransfer,
     }
 
     public static class PageNameExtensions

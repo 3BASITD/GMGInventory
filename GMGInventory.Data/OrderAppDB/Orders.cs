@@ -66,6 +66,8 @@ namespace GMGInventory.Data.OrderAppDB
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public decimal? ExtendedPrice { get; set; } 
+
+        public DateTime CreatedDate { get; set; }
     }
 }
 

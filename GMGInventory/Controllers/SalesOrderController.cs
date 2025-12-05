@@ -298,7 +298,8 @@ namespace GMGInventory.Controllers
             DataTable dt = new("Sales Order");
             dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("SONumber")),
-                new DataColumn(chelper.DisplayName<SalesOrderVM>("Customer")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("CustomerCode")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("CustomerName")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("CustomerAddress")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("Area")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("Region")),
@@ -306,15 +307,20 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("RequiredDeliveryDate")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("Forwarder")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("TotalAmount")),
-                new DataColumn(chelper.DisplayName<SalesOrderVM>("Status"))
-                //new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedBy")),
-                //new DataColumn(chelper.DisplayName<SalesOrderVM>("ApprovedDisapprovedDate"))
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Status")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("ServiceLevelAgreement")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("WithLP")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("WithREYCONonDefective")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("WithREYCOJITLPDelivery")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("SpecialInstruction")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Remarks"))
             ]);
             var sos = await salesOrderRepository.GetListAsync(filter);
             foreach (var so in sos)
             {
                 dt.Rows.Add(so.SONumber,
-                            so.Customer,
+                            so.CustomerCode,
+                            so.CustomerName,
                             so.CustomerAddress,
                             so.Area,
                             so.Region,
@@ -322,7 +328,13 @@ namespace GMGInventory.Controllers
                             so.RequiredDeliveryDate,
                             so.Forwarder,
                             so.TotalAmount,
-                            so.Status);
+                            so.Status,
+                            so.ServiceLevelAgreement,
+                            so.WithLP ? "Yes" : "No",
+                            so.WithREYCONonDefective ? "Yes" : "No",
+                            so.WithREYCOJITLPDelivery,
+                            so.SpecialInstruction,
+                            so.Remarks);
             }
 
             using XLWorkbook wb = new();

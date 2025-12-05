@@ -19,7 +19,13 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Convert Times")]
         public int ConvertTimes { get; set; }
+        public int ItemCount { get; set; }
+        public int AddedCount { get; set; }
         public string Status { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string? DateCreated => DateCreatedD == null ? null : DateCreatedD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? DateCreatedD { get; set; }
     }
 
     public class OrderQueueDetailsVM : OrderQueueVM
@@ -31,6 +37,8 @@ namespace GMGInventory.Common.Models
     public class OrderQueueItemVM
     {
         public int Id { get; set; }
+        public string? SalesOrderNumber { get; set; }
+        public int? SalesOrderId { get; set; }
         public string? Brand { get; set; }
         public bool IsValidBrand { get; set; }
         public string? Model { get; set; }

@@ -220,14 +220,24 @@ namespace GMGInventory.Application.Repositories
                                                            && s.ItemId == soli.ItemId
                                                            && s.PurchaseRequest.Status.Name.ToLower() == "approved")
                                                   .Sum(s => (int?)s.Quantity) ?? 0
+                            let po = request.PurchaseOrderLineItems
+                                            .Select(s => new
+                                            {
+                                                Id = s.PurchaseOrder.Id,
+                                                DocNum = s.PurchaseOrder.DocumentNumber
+                                            })
+                                            .Distinct()
                             where request.PurchaseRequestId == purchaseRequestId
                             select new PurchaseRequestLineItemVM
                             {
                                 Id = request.Id,
                                 PurchaseRequestId = request.PurchaseRequestId,
+
                                 LineNumber = request.LineNumber,
                                 SalesOrderId = request.SalesOrderId,
                                 SalesOrderNumber = request.SalesOrder.SalesOrderNumber,
+                                PONumber = string.Join("", po.Select(s => "<a href='/PurchaseOrder/Details/" + s.Id + "' class='text-info' target='_blank'>" + s.DocNum + "</a>")),
+                                CustomerId = request.SalesOrder.Customer.Id,
                                 Customer = request.SalesOrder.Customer.Name,
                                 ItemId = request.ItemId,
                                 ItemCode = request.Item == null ? null : request.Item.Code,

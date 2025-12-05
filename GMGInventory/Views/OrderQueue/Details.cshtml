@@ -13,16 +13,52 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (userAccess.CanAdd)
+            @if (Model.Status.ToLower().Contains("pending"))
             {
-                <button type="button" class="btn btn-success btn-sm float-right ml-2" onclick="AddToSalesOrder()">
-                    <span class="fas fa-plus"></span> Add to Sales Order
-                </button>
+                @if (userAccess.CanEdit)
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="MarkIgnoreOrder()">
+                        <span class="fas fa-broom"></span> Ignore All
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
+                        <span class="fas fa-broom"></span> Ignore All
+                    </button>
+                }
             }
             else
             {
-                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
-                    <span class="fas fa-plus"></span> Add to Sales Order
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Action not allowed, only permitted for pending status" data-microtip-position="bottom-left" role="tooltip">
+                    <span class="fas fa-broom"></span> Ignore All
+                </button>
+            }
+            @if (Model.Status.ToLower().Contains("ignored") == false)
+            {
+                @if(Model.Items.Where(s => s.SalesOrderNumber != null).Count() == Model.Items.Count())
+                {
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Nothing to add anymore. All items have been added to the sales order" data-microtip-position="bottom-left" role="tooltip">
+                        <span class="fas fa-plus"></span> Add Selected to Sales Order
+                    </button>
+                }
+                else if (userAccess.CanAdd)
+                {
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2" onclick="AddToSalesOrder()">
+                        <span class="fas fa-plus"></span> Add Selected to Sales Order
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
+                        <span class="fas fa-plus"></span> Add Selected to Sales Order
+                    </button>
+                }
+            }
+            else
+            {
+                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Action not allowed, order already marked ignore." data-microtip-position="bottom-left" role="tooltip">
+                    <span class="fas fa-plus"></span> Add Selected to Sales Order
                 </button>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
@@ -139,6 +175,23 @@
                                                     <span class="fas fa-exclamation-triangle"></span>
                                                 </span>
                                             }
+                                            else if(string.IsNullOrWhiteSpace(item.SalesOrderNumber) == false)
+                                            {
+                                                @Html.ActionLink(item.SalesOrderNumber,
+                                                                 "Details",
+                                                                 "SalesOrder", 
+                                                                 new { id = item.SalesOrderId }, 
+                                                                 new { @class = "text-info", 
+                                                                       @data_microtip_title = "Item already added to Sales Order " + item.SalesOrderNumber, 
+                                                                       @data_microtip_position = "right", 
+                                                                       role = "tooltip" })
+                                            } 
+                                            else if(Model.Status.ToLower().Contains("ignored"))
+                                            {
+                                                <span class="text-danger" data-microtip-title="Cannot add items from an ignored order." data-microtip-position="right" role="tooltip">
+                                                    <span class="fas fa-times"></span>
+                                                </span>
+                                            } 
                                             else
                                             {
                                                 <input type="checkbox" class="checkrow" data-row-id="@item.Id" />
@@ -262,7 +315,9 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var order_details = @Html.Raw(Json.Serialize(Model));
 
-        var itemDT = $('.table-item').DataTable();
+        var itemDT = $('.table-item').DataTable({
+            order: [[1, "asc"]]
+        });
 
         $(".checkall").on("change", function() {
             $(".checkrow").prop("checked", $(this).prop("checked"));
@@ -292,24 +347,23 @@
                     toastr.warning("Select at least one row to proceed with adding to the sales order", "No selected row");
                 } else {
                     var timesAdded = "";
-                    if (order_details.convertTimes > 0) {
-                        timesAdded += " <strong>This order already added " + order_details.convertTimes + " time(s)</strong>, adding it again might result to duplicate sales order.";
-                    }
+                    // if (order_details.convertTimes > 0) {
+                    //     timesAdded += " <strong>This order already added " + order_details.convertTimes + " time(s)</strong>, adding it again might result to duplicate sales order.";
+                    // }
 
                     swal({
-                        title: "Add to Sales Order",
+                        title: "Add Selected to Sales Order",
                         content: {
                             element: "div",
                             attributes: {
                                 style: "color: black;text-align: center;",
-                                innerHTML: "Are you sure you want to add this record to sales order?" + timesAdded
+                                innerHTML: "Are you sure you want to add the selected item(s) to sales order?" + timesAdded
                             }
                         },
                         icon: "info",
                         buttons: true
                     }).then((confirm) => {
                         if (confirm) {
-
                             $.ajax({
                                 url: "@Url.Action("Add")",
                                 type: "POST",
@@ -319,7 +373,7 @@
                                 },
                                 success: function (data, status, xhr) {
                                     if (data.status == "Success") {
-                                        swal.close();
+                                        //swal.close();
                                         window.location.reload();
                                         toastr.success(data.message, data.status);
                                     } else {
@@ -332,6 +386,38 @@
                     });
                 }
             }
+        }
+
+        if (user_access.canEdit) {
+            function MarkIgnoreOrder(ordernum) {
+                swal({
+                    title: "Ignore All",
+                    text: "Are you sure you want to mark this order record to ignore?",
+                    icon: "error",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("MarkIgnoreOrder")",
+                            type: "POST",
+                            data: {
+                                OrderNumber: order_details.orderNumber
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    //swal.close();
+                                    window.location.reload();
+                                    toastr.success(data.message, data.status);
+                                } else {
+                                    //toastr.error(data.message, data.status);
+                                    ToastrAndConsoleError(data.status, data.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            };
         }
     </script>
 }

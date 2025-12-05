@@ -33,6 +33,7 @@ builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderReposit
 builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
 builder.Services.AddScoped(typeof(ILocationCodeRepository), typeof(LocationCodeRepository));
+builder.Services.AddScoped(typeof(IPackRepository), typeof(PackRepository));
 builder.Services.AddScoped(typeof(IPurchaseOrderNewRepository), typeof(PurchaseOrderNewReporitory));
 builder.Services.AddScoped(typeof(IPurchaseReturnNewRepository), typeof(PurchaseReturnNewReporitory));
 builder.Services.AddScoped(typeof(IReasonOfReturnRepository), typeof(ReasonOfReturnRepository));

@@ -52,6 +52,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseRequest)).Convert();
             ViewData["UserAccessAutomotive"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseRequestAutomotive)).Convert();
+            ViewData["UserAccessNonAutomotive"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseRequestNonAutomotive)).Convert();
 
             var request = await requestRepository.GetDetails(Id);
             if (request == null)

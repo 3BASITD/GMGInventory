@@ -210,6 +210,31 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIPack>> GetListAPI(DateTime? PackDate)
+        {
+            if (PackDate == null) PackDate = DateTime.Today;
+
+            var packs = from pack in context.Packs
+                         where pack.PackDate.Date == PackDate.Value.Date
+                         && pack.Status.Code.ToLower() == "draft"
+                         select new APIPack
+                         {
+                             Id = pack.Id,
+                             SalesOrderId = pack.SalesOrderId,
+                             PackDate = pack.PackDate,
+                             LineItems = from item in pack.PackLineItems
+                                         select new APIPackLineItem
+                                         {
+                                             Id = item.Id,
+                                             PackType = item.PackType.Code,
+                                             BoxNumber = item.BoxNumber,
+                                             ItemId = item.ItemId,
+                                             Quantity = item.Quantity
+                                         }
+                         };
+            return await packs.ToListAsync();
+        }
+
         public async Task<IList<PackItemVM>> GetItemsAsync(int packId)
         {
             var itemVM = from pack in context.PackLineItems

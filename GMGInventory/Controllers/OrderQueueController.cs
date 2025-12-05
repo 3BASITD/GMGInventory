@@ -26,13 +26,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetOrdersDT(bool IncludeAdded, bool IncludeIgnored)
+        public async Task<IActionResult> GetOrdersDT(string? Status, DateTime? DateFrom, DateTime? DateTo)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             var form = new DataTablesRequestForm(Request.Form);
-            return Json(await queueRepository.GetOrdersDT(form, IncludeAdded, IncludeIgnored));
+            return Json(await queueRepository.GetOrdersDT(form, Status, DateFrom, DateTo));
         }
 
         public async Task<IActionResult> Details(string Id)
