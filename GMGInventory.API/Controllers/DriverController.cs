@@ -9,7 +9,6 @@ namespace GMGInventory.API.Controllers
     [Route("[controller]")]
     public class DriverController(IDriverRepository driverRepository) : ControllerBase
     {
-        [Authorize]
         [HttpGet("List")]
         public async Task<IList<APIDriver>> GetList()
         {

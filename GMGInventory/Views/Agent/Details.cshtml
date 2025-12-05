@@ -8,34 +8,33 @@
     <li class="breadcrumb-item"><a asp-controller="Agent" asp-action="Index">Agents</a></li>
 }
 
-    <div class="card card-default">
-        <div class="card-header">
-            <span class="card-title">@ViewData["Title"]</span>
-            <div class="card-tools">
-                <a class="btn btn-light btn-sm float-right" asp-action="Index">
-                    <span class="fas fa-arrow-left"></span> Back to List
-                </a>
-
-            </div>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+                <span class="fas fa-arrow-left"></span> Back to List
+            </a>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-3">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Code)
-                        </span>
-                        <b class="d-block">
-                            @Model?.Code
-                        </b>
-                    </p>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-3">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Code)
+                    </span>
+                    <b class="d-block">
+                        @Model.Code
+                    </b>
+                </p>
 
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.UserCreated)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.UserCreated) ? "-" : Model?.UserCreated)
+                        @Model.UserCreated
                     </b>
                 </p>
 
@@ -44,57 +43,54 @@
                         @Html.DisplayNameFor(model => model.Area)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.Area) ? "-" : Model?.Area)
+                        @Model.Area
                     </b>
                 </p>
 
             </div>
             <div class="col-3">
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.FirstName)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrWhiteSpace(Model?.FirstName) ? "-" : Model?.FirstName)
-                        </b>
-                    </p>
-                
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.FirstName)
+                    </span>
+                    <b class="d-block">
+                        @Model.FirstName
+                    </b>
+                </p>
+
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.DateCreated)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.DateCreated) ? "-" : Model?.DateCreated)
+                        @Model.DateCreated
                     </b>
                 </p>
                 <p class="text-sm">
-                    <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.IsActive)
                     </span>
                     <b class="d-block">
-                         
-                    @if (Model?.IsActive == true)
-           
-                            {
-                                <span class="fas fa-check text-success"></span>
-                            }
-                            else
-                            {
-                                <span class="fas fa-times text-danger"></span>
-                            }
+                        @if (Model.IsActive == true)
+                        {
+                            <span class="fas fa-check text-success"></span>
+                        }
+                        else
+                        {
+                            <span class="fas fa-times text-danger"></span>
+                        }
                     </b>
                 </p>
-           
+
             </div>
             <div class="col-3">
 
                 <p class="text-sm">
                     <span class="text-muted">
-                         @Html.DisplayNameFor(model => model.MiddleName)
-                        </span>
-                        <b class="d-block">
-                            @(string.IsNullOrWhiteSpace(Model?.MiddleName) ? "-" : Model?.MiddleName)
+                        @Html.DisplayNameFor(model => model.MiddleName)
+                    </span>
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model.MiddleName) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.MiddleName)
                     </b>
                 </p>
 
@@ -103,7 +99,7 @@
                         @Html.DisplayNameFor(model => model.UserModified)
                     </span>
                     <b class="d-block">
-                        @Model?.UserModified
+                        @(string.IsNullOrWhiteSpace(Model.UserModified) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.UserModified)
                     </b>
                 </p>
 
@@ -116,16 +112,16 @@
                         @Html.DisplayNameFor(model => model.LastName)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model?.LastName) ? "-" : Model?.LastName)
+                        @(string.IsNullOrWhiteSpace(Model.LastName) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.LastName)
                     </b>
                 </p>
 
-               <p class="text-sm">
+                <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.DateModified)
                     </span>
                     <b class="d-block">
-                        @Model?.DateModified
+                        @(string.IsNullOrWhiteSpace(Model.DateModified) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.DateModified)
                     </b>
                 </p>
 
@@ -161,7 +157,7 @@
                                     </thead>
                                 </table>
                             </div>
-          
+
 
                         </div>
 
@@ -213,7 +209,7 @@
                 url: "@Url.Action("GetDetailsJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = @Model.Id;
                 }
             },
             serverSide: true,
@@ -225,9 +221,33 @@
             },
             columns: [
                 { data: "customerName", name: "CustomerName" },
-                { data: "customerAddress", name: "CustomerAddress" },
-                { data: "customerEmail", name: "CustomerEmail" },
-                { data: "customerContactNo", name: "CustomerContactNo" },
+                { 
+                    data: function (data, type, dataToSet) {
+                        if(data.customerAddress)
+                            return data.customerAddress;
+                        else
+                            return '<em class="text-muted">N/A</em>';
+                    },  
+                    name: "CustomerAddress"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if(data.customerEmail)
+                            return data.customerEmail;
+                        else
+                            return '<em class="text-muted">N/A</em>';
+                    },
+                    name: "CustomerEmail" 
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if(data.customerContactNo)
+                            return data.customerContactNo;
+                        else
+                            return '<em class="text-muted">N/A</em>';
+                    },
+                    name: "CustomerContactNo"
+                },
 
             ],
             order: [[0, "asc"]]

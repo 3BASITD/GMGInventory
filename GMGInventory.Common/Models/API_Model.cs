@@ -6,24 +6,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Common.Models
 {
-    public class APILogin
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-    // unit
     public class APIGeneric
     {
         public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
-    }
-
-    // customer, category, location code
-    public class APIGenericActive : APIGeneric
-    {
-        public bool IsActive { get; set; }
     }
 
     public class APIAgent
@@ -34,7 +21,6 @@ namespace GMGInventory.Common.Models
         public string? MiddleName { get; set; }
         public string LastName { get; set; }
         public int AreaId { get; set; }
-        public bool IsActive { get; set; }
     }
 
     public class APIDriver
@@ -46,7 +32,6 @@ namespace GMGInventory.Common.Models
         public string? LicenseNumber { get; set; }
         public string? Restriction { get; set; }
         public DateTime? LicenseDateExpiration { get; set; }
-        public bool IsActive { get; set; }
     }
 
     public class APIItem
@@ -62,17 +47,77 @@ namespace GMGInventory.Common.Models
         public int CategoryId { get; set; }
         public int ItemTypeId { get; set; }
         public int BrandId { get; set; }
-        public bool IsActive { get; set; }
-        public IList<int> LocationCodeIds { get; set; }
+        public IEnumerable<int> LocationCodeIds { get; set; }
     }
 
-    public class APIItemType : APIGenericActive
+    public class APIItemType : APIGeneric
     {
         public int CategoryId { get; set; }
     }
 
-    public class APIBrand : APIGenericActive
+    public class APIBrand : APIGeneric
     {
         public int ItemTypeId { get; set; }
+    }
+
+    public class APISalesOrder
+    {
+        public int Id { get; set; }
+        public int AgentId { get; set; }
+        public int CustomerId { get; set; }
+        public string SalesOrderNumber { get; set; }
+        public DateTime OrderDate { get; set; }
+        public IEnumerable<APISalesOrderLineItem> LineItems { get; set; }
+    }
+
+    public class APISalesOrderLineItem
+    {
+        public int Id { get; set; }
+        public int LineNumber { get; set; }
+        public int ItemId { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class APISalesReturn
+    {
+        public int Id { get; set; }
+        public int? SalesOrderId { get; set; }
+        public string SalesReturnNumber { get; set; }
+        public DateTime ReturnDate { get; set; }
+        public IEnumerable<APISalesReturnLineItem> LineItems { get; set; }
+    }
+
+    public class APISalesReturnLineItem
+    {
+        public int Id { get; set; }
+        public int ItemId { get; set; }
+        public int Quantity { get; set; }
+        public int ReasonOfReturnId { get; set; }
+    }
+
+    public class APIPurchaseOrder
+    {
+        public int Id { get; set; }
+        public string DocumentNumber { get; set; }
+        public int SupplierId { get; set; }
+        public int WarehouseId { get; set; }
+        public DateTime OrderDate { get; set; }
+        public DateTime? DueDate { get; set; }
+        public IEnumerable<APIPurchaseLineItem> LineItems { get; set; }
+    }
+
+    public class APIPurchaseReturn
+    {
+        public int Id { get; set; }
+        public string DocumentNumber { get; set; }
+        public DateTime ReturnDate { get; set; }
+        public IEnumerable<APIPurchaseLineItem> LineItems { get; set; }
+    }
+
+    public class APIPurchaseLineItem
+    {
+        public int Id { get; set; }
+        public int ItemId { get; set; }
+        public int Quantity { get; set; }
     }
 }

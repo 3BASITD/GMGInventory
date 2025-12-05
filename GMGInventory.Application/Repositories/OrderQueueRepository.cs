@@ -204,6 +204,7 @@ namespace GMGInventory.Application.Repositories
                                      .Where(s => s.OrderNo!.ToLower() == OrderNumber.ToLower())
                                      .Select(s => new OrderQueueItemVM
                                      {
+                                         Id = s.Id,
                                          Brand = s.Brand,
                                          Model = s.Model,
                                          OldCode = s.OldCode,
@@ -255,11 +256,14 @@ namespace GMGInventory.Application.Repositories
             return order;
         }
 
-        public async Task<ResponseModel> AddOrder(string OrderNumber)
+        public async Task<ResponseModel> AddOrder(string OrderNumber, List<int> ItemIds)
         {
             var invalids = new List<string>();
             var orders = app_context.Orders
-                                    .Where(s => s.OrderNo != null && s.OrderNo.ToLower() == OrderNumber.ToLower())
+                                    .Where(s => ItemIds != null
+                                             && ItemIds.Contains(s.Id)
+                                             && s.OrderNo != null 
+                                             && s.OrderNo.ToLower() == OrderNumber.ToLower())
                                     .OrderBy(s => s.Id)
                                     .ToList();
 

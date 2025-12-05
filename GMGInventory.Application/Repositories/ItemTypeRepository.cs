@@ -133,18 +133,19 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIItemType>> GetListAPI()
+        public async Task<IList<APIItemType>> GetListAPI(int? CategoryId)
         {
-            return await context.ItemTypes
-                                .Select(s => new APIItemType
-                                {
-                                    Id = s.Id,
-                                    Code = s.Code,
-                                    Name = s.Name,
-                                    CategoryId = s.CategoryId,
-                                    IsActive = s.IsActive
-                                })
-                                .ToListAsync();
+            var itemTypes = from itemType in context.ItemTypes
+                            where itemType.IsActive == true
+                            && (CategoryId == null || CategoryId == itemType.CategoryId)
+                            select new APIItemType
+                            {
+                                Id = itemType.Id,
+                                Code = itemType.Code,
+                                Name = itemType.Name,
+                                CategoryId = itemType.CategoryId
+                            };
+            return await itemTypes.ToListAsync();
         }
 
         public async Task<ItemTypeViewVM?> GetItemTypeViewVM(int? id)

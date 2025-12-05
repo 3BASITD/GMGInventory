@@ -151,17 +151,18 @@ namespace GMGInventory.Application.Repositories
             return categoriesVM;
         }
 
-        public async Task<IList<APIGenericActive>> GetListAPI()
+        public async Task<IList<APIGeneric>> GetListAPI()
         {
-            return await context.Categories
-                                .Select(s => new APIGenericActive
-                                {
-                                    Id = s.Id,
-                                    Code = s.Code,
-                                    Name = s.Name,
-                                    IsActive = s.IsActive
-                                })
-                                .ToListAsync();
+            var categories = from category in context.Categories
+                             where category.IsActive == true
+                             select new APIGeneric
+                             {
+                                 Id = category.Id,
+                                 Code = category.Code,
+                                 Name = category.Name
+                             };
+
+            return await categories.ToListAsync();
         }
 
         public async Task<GenericAuditVM?> GetGenericVMAsync(int? id)

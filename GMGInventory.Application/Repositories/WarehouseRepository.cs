@@ -128,6 +128,19 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIGeneric>> GetListAPI()
+        {
+            var warehouses = from warehouse in context.Warehouses
+                             where warehouse.IsActive == true
+                             select new APIGeneric
+                             {
+                                 Id = warehouse.Id,
+                                 Code = warehouse.Code,
+                                 Name = warehouse.Name
+                             };
+            return await warehouses.ToListAsync();
+        }
+
         public async Task<ResponseModel> AddAsync(WarehouseVM warehouse)
         {
             var response = new ResponseModel();

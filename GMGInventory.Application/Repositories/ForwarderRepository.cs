@@ -148,6 +148,18 @@ namespace GMGInventory.Application.Repositories
             return forwardersViewVM;
         }
 
+        public async Task<IList<APIGeneric>> GetListAPI()
+        {
+            var forwarders = from forwarder in context.Forwarders
+                             where forwarder.IsActive == true
+                             select new APIGeneric
+                             {
+                                 Id = forwarder.Id,
+                                 Name = forwarder.Name
+                             };
+            return await forwarders.ToListAsync();
+        }
+
         public async Task<ForwarderViewVM?> GetForwarderViewVMAsync(int? id)
         {
             var forwarders = await context.Forwarders

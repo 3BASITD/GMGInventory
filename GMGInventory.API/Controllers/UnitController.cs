@@ -9,7 +9,6 @@ namespace GMGInventory.API.Controllers
     [Route("[controller]")]
     public class UnitController(IUnitRepository unitRepository) : ControllerBase
     {
-        [Authorize]
         [HttpGet("List")]
         public async Task<IList<APIGeneric>> GetList()
         {

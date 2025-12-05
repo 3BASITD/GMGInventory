@@ -1,6 +1,5 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMGInventory.API.Controllers
@@ -9,11 +8,10 @@ namespace GMGInventory.API.Controllers
     [Route("[controller]")]
     public class BrandController(IBrandRepository brandRepository) : ControllerBase
     {
-        [Authorize]
         [HttpGet("List")]
-        public async Task<IList<APIBrand>> GetList()
+        public async Task<IList<APIBrand>> GetList(int? ItemTypeId)
         {
-            return await brandRepository.GetListAPI();
+            return await brandRepository.GetListAPI(ItemTypeId);
         }
     }
 }

@@ -192,6 +192,32 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APIPurchaseReturn>> GetListAPI(DateTime? ReturnDate)
+        {
+            if (ReturnDate == null) ReturnDate = DateTime.Today;
+
+            var preturns = from preturn in context.PurchaseReturnNews
+                           where ReturnDate.Value.Date == preturn.ReturnDate.Date
+                           && preturn.Approver != null
+                           select new APIPurchaseReturn
+                           {
+                               Id = preturn.Id,
+                               DocumentNumber = preturn.DocumentNumber,
+                               ReturnDate = preturn.ReturnDate,
+                               LineItems = from item in preturn.PurchasReturnLineItem
+                                           select new APIPurchaseLineItem
+                                           {
+                                               Id = item.Id,
+                                               ItemId = item.ReceivingItem.OrderItem.RequestItem.ItemId != null
+                                                      ? item.ReceivingItem.OrderItem.RequestItem.ItemId.Value
+                                                      : -1,
+                                               Quantity = item.Quantity
+                                           }
+                           };
+
+            return await preturns.ToListAsync();
+        }
+
         public async Task<PurchaseReturnNewDetailedVM?> GetDetails(int returnId)
         {
             var details = from retrn in context.PurchaseReturnNews

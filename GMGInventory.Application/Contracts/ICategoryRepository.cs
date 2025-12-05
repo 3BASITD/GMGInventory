@@ -19,6 +19,6 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsCodeExist(string code);
         Task<IList<CategoryVM>> GetAllCategoryAsync();
         Task<ForDataTables<CategoryVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
-        Task<IList<APIGenericActive>> GetListAPI();
+        Task<IList<APIGeneric>> GetListAPI();
     }
 }

@@ -5,7 +5,9 @@ using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -245,9 +247,9 @@ namespace GMGInventory.Application.Repositories
                                     || x.LastName.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Area.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateModified.ToString().Contains(form.SearchValue));
+                                    || x.DateCreated.ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.UserModified + "").ToLower().Contains(form.SearchValue.ToLower())
+                                    || (x.DateModified + "").ToLower().Contains(form.SearchValue));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -298,20 +300,21 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIAgent>> GetListAPI()
+        public async Task<IList<APIAgent>> GetListAPI(int? AreaId)
         {
-            return await context.Agents
-                                .Select(s => new APIAgent
-                                {
-                                    Id = s.Id,
-                                    Code = s.Code,
-                                    FirstName = s.FirstName,
-                                    MiddleName = s.MiddleName,
-                                    LastName = s.LastName,
-                                    AreaId = s.AreaId,
-                                    IsActive = s.IsActive
-                                })
-                                .ToListAsync();
+            var agents = from agent in context.Agents
+                         where agent.IsActive == true
+                         && (AreaId == null || AreaId == agent.AreaId)
+                         select new APIAgent
+                         {
+                             Id = agent.Id,
+                             Code = agent.Code,
+                             FirstName = agent.FirstName,
+                             MiddleName = agent.MiddleName,
+                             LastName = agent.LastName,
+                             AreaId = agent.AreaId
+                         };
+            return await agents.ToListAsync();
         }
 
         private async Task<IList<AgentVM>> GetAgentAsync(int id)
@@ -326,12 +329,12 @@ namespace GMGInventory.Application.Repositories
                               CustomerAddress = cust.ShippingAddresses
                                                     .Where(s => s.IsDefault == true)
                                                     .Select(s => s.Address)
-                                                    .FirstOrDefault() ?? "N/A",
+                                                    .FirstOrDefault() ?? "",
                               CustomerEmail = cust.Email + "",
                               CustomerContactNo = cust.ShippingAddresses
                                                       .Where(s => s.IsDefault == true)
                                                       .Select(s => s.PhoneNumber)
-                                                      .FirstOrDefault() ?? "N/A",
+                                                      .FirstOrDefault() ?? "",
                           };
             return await agentVM.ToListAsync();
         }
@@ -393,17 +396,34 @@ namespace GMGInventory.Application.Repositories
 
         public AgentVM? GetAgentDtlVM(int? id)
         {
-            var agentVM = (from cust in context.Agents
-                                    .Include(s => s.Area)
-                                    .Include(s => s.Customers)
-
-                           where cust.Id == id
+            var agentVM = (from agnt in context.Agents
+                           join userc in userManager.Users on agnt.UserCreated equals userc.Id
+                           join userm in userManager.Users on agnt.UserModified equals userm.Id into um
+                           from userm in um.DefaultIfEmpty()
+                           where agnt.Id == id
                            select new AgentVM
                            {
-                               Id = cust.Id,
-                               Code = cust.Code,
+                               Id = agnt.Id,
+                               Code = agnt.Code,
+                               FirstName = agnt.FirstName,
+                               MiddleName = agnt.MiddleName,
+                               LastName = agnt.LastName,
+                               AreaId = agnt.AreaId,
+                               Area = agnt.Area.Name,
+                               IsActive = agnt.IsActive,
+                               UserCreated = userc.FirstName + " " + userc.LastName,
+                               DateCreatedD = agnt.DateCreated,
+                               UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                               DateModifiedD = agnt.DateModified
                            }).FirstOrDefault();
             return agentVM;
+            //var agent = await context.Agents.Include(s => s.Area).Where(s => s.Id == id).FirstOrDefaultAsync();
+            //if (agent == null)
+            //{
+            //    return null;
+            //}
+            //var agentViewVM = mapper.Map<AgentVM>(agent);
+            //return agentViewVM;
         }
 
         public async Task<AgentViewVM?> GetAgentViewVM(int? id)

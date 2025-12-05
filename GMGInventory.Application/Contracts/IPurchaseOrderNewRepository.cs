@@ -12,6 +12,7 @@ namespace GMGInventory.Application.Contracts
         Task<string> GetNewDocumentNumber(int? TypeId);
         Task<IList<PurchaseOrderNewVM>> GetListAsync(PurchaseOrderFilter filter);
         Task<ForDataTables<PurchaseOrderNewVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseOrderFilter filter);
+        Task<IList<APIPurchaseOrder>> GetListAPI(DateTime? OrderDate);
         Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId);
         Task<IList<PurchaseOrderLineItemVM>> GetItemListAsync(int purchaseOrderId);
         Task<ForDataTables<PurchaseOrderLineItemVM>> GetItemListDTAsync(DataTablesRequestForm form, int purchaseRequestId);

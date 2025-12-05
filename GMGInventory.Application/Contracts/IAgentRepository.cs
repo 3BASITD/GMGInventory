@@ -11,7 +11,7 @@ namespace GMGInventory.Application.Contracts
         Task<int?> GetIdAsync(string? Name);
         Task<IList<AgentViewVM>> GetListAsync();
         Task<ForDataTables<AgentViewVM>> GetListDTAsync(DataTablesRequestForm form);
-        Task<IList<APIAgent>> GetListAPI();
+        Task<IList<APIAgent>> GetListAPI(int? AreaId);
         Task<IList<AgentViewVM>> GetAllAsync(AgentFilterVM filter);
         Task<ForDataTables<AgentViewVM>> GetAllForDataTablesAsync(DataTablesRequestForm form, AgentFilterVM filter);
         Task<ForDataTables<AgentVM>> GetAgentDTAsync(DataTablesRequestForm form, int id);

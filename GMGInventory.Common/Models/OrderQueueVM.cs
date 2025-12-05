@@ -30,6 +30,7 @@ namespace GMGInventory.Common.Models
 
     public class OrderQueueItemVM
     {
+        public int Id { get; set; }
         public string? Brand { get; set; }
         public bool IsValidBrand { get; set; }
         public string? Model { get; set; }

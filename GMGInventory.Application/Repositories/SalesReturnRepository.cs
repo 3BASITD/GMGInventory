@@ -155,6 +155,31 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<APISalesReturn>> GetListAPI(DateTime? ReturnDate)
+        {
+            if (ReturnDate == null) ReturnDate = DateTime.Today;
+
+            var sreturns = from sreturn in context.SalesReturns
+                           where ReturnDate.Value.Date == sreturn.ReturnDate.Date
+                           select new APISalesReturn
+                           {
+                               Id = sreturn.Id,
+                               SalesOrderId = sreturn.SalesOrderId,
+                               SalesReturnNumber = sreturn.SalesReturnNumber,
+                               ReturnDate = sreturn.ReturnDate,
+                               LineItems = from item in sreturn.SalesReturnLineItems
+                                           select new APISalesReturnLineItem
+                                           {
+                                               Id = item.Id,
+                                               ItemId = item.ItemId,
+                                               Quantity = item.Quantity,
+                                               ReasonOfReturnId = item.ReasonOfReturnId
+                                           }
+                           };
+
+            return await sreturns.ToListAsync();
+        }
+
         public async Task<IList<SalesReturnItemVM>> GetItemsAsync(int salesReturnId)
         {
             var itemVM = from rturn in context.SalesReturnLineItems

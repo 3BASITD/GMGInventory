@@ -8,6 +8,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId);
         Task<WarehouseVM?> GetWarehouse(int Id);
         Task<ForDataTables<WarehouseVM>> GetWarehousesDT(DataTablesRequestForm form);
+        Task<IList<APIGeneric>> GetListAPI();
         Task<ResponseModel> AddAsync(WarehouseVM warehouse);
         Task<ResponseModel> UpdateAsync(WarehouseVM warehouse);
         Task<ResponseModel> DeleteDeactivateAsync(int Id);
