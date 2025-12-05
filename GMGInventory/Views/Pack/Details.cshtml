@@ -547,7 +547,23 @@
                     name: "ItemCode"
                 },
                 { data: "itemName", name: "ItemName" },
-                { data: "quantity", name: "Quantity", className: "text-end" }
+                //{ data: "quantity", name: "Quantity", className: "text-end" },
+                {data: function (data, type, dataToSet) {
+
+                    if(($("#pack-status").val().toLowerCase() == "draft" && user_access.canEdit)){
+                     return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
+
+
+                    }
+                    else{
+                        return data.quantity
+                    }
+
+                    },
+                    name: "Quantity",
+                    className: "form-cell text-end"
+                }
+
             ],
             order: [[0, "asc"]],
             footerCallback: function (row, data, start, end, display) {
@@ -633,9 +649,83 @@
 
             $(".table-item thead th").removeClass("text-end");
 
-            $(".quantity").on("input", function () {
-                CheckQuantityServed();
-                ComputeTotalQuantity();
+            $(".quantity").off("input").on("input", function () {
+                var rowdata = itemDT.row($(this).parents('tr')).data();
+                var $qtyInput = $(this).parents("tr").find(".quantity");
+                //var quantityToPack = parseInt($(this).parents("tr").find(".quantity").val());//parseInt(rowdata.quantity);
+
+                // NEW quantity user typed
+                var newQty = parseInt($(this).parents("tr").find(".quantity").val()) || 0;
+
+                // OLD quantity stored in the row object
+                var oldQty = parseInt(rowdata.quantity) || 0;
+
+                var delta = newQty - oldQty;
+                
+                // Update the row’s stored quantity so that next input compares correctly
+                rowdata.quantity = newQty;
+
+                
+
+                orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var row_data = this.data();
+                    
+                    if (row_data.id == rowdata.salesOrderLineItemId) {
+
+                        if((parseInt(row_data.remainingQuantityD) - delta) >= 0)  {
+                            
+
+
+
+
+                            row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) - delta;
+                            row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
+                            row_data.packedQuantityD = parseInt(row_data.packedQuantityD) + delta;
+                            row_data.packedQuantity = FormatStringInteger(row_data.packedQuantityD);
+                            row_data.inventoryCountD = parseInt(row_data.inventoryCountD) - delta;
+                            row_data.inventoryCount = FormatStringInteger(row_data.inventoryCountD);
+
+
+
+
+                        }
+                        else{
+                           
+                                var correctedQty = oldQty;
+
+                                rowdata.quantity = correctedQty;
+
+                                // avoid infinite loop
+                                $qtyInput.off("input");
+                                $qtyInput.val(correctedQty);
+                                $qtyInput.on("input", arguments.callee);
+
+
+                                toastr.warning("Partial Quantity exceed the Remaining Quantity.", "Warning");
+                        }
+
+
+
+                         this.data(row_data);
+                            if (row_data.remainingQuantityD == 0) {
+                                $(this.node()).addClass("text-muted");
+                            } else {
+                                $(this.node()).removeClass("text-muted");
+                            }
+                            if (row_data.inventoryCountD == 0 && row_data.remainingQuantityD > 0) {
+                                $(this.node()).addClass("text-danger");
+                            } else {
+                                $(this.node()).removeClass("text-danger");
+                            }
+
+                    }
+                });
+
+                dtCheckboxes();
+                itemDT.draw();
+                 
+                //CheckQuantityServed();
+                //ComputeTotalQuantity();
             });
         });
 
