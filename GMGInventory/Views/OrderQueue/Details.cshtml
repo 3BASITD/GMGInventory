@@ -83,7 +83,7 @@
                 <b class="d-block">
                     @if (Model.IsValidAgent == false)
                     {
-                        <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
+                        <span class="text-danger" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
                             @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='fw-normal text-warning'>N/A</span>") : Model.Agent)
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
@@ -101,7 +101,7 @@
                 <b class="d-block">
                     @if (Model.IsValidCustomer == false)
                     {
-                        <span class="text-warning" data-microtip-title="Invalid Customer" data-microtip-position="right" role="tooltip">
+                        <span class="text-danger" data-microtip-title="Invalid Customer" data-microtip-position="right" role="tooltip">
                             @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='fw-normal text-warning'>N/A</span>") : Model.Customer)
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
@@ -162,14 +162,20 @@
                                     <tr>
                                         <td>
                                             @if (Model.IsValidAgent == false ||
-                                                 Model.IsValidCustomer == false ||
-                                                 item.IsValidOldCode == false ||
-                                                 item.IsValidItemName == false ||
-                                                 item.IsValidBrand == false ||
-                                                 item.IsValidModel == false ||
-                                                 item.IsValidSize == false ||
-                                                 item.IsValidPartNumber == false ||
-                                                 item.IsValidUnit == false)
+                                                 Model.IsValidCustomer == false)
+                                            {
+                                                <span class="text-danger" data-microtip-title="Cannot select this row because of invalid record. Please fix the Invalid Agent / Customer first." data-microtip-position="right" role="tooltip">
+                                                    <span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else if (item.IsValidItem == false ||
+                                                     item.IsValidOldCode == false ||
+                                                     item.IsValidItemName == false ||
+                                                     item.IsValidBrand == false ||
+                                                     item.IsValidModel == false ||
+                                                     item.IsValidSize == false ||
+                                                     item.IsValidPartNumber == false ||
+                                                     item.IsValidUnit == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Cannot select this row because of invalid data. Please fix the invalid data first." data-microtip-position="right" role="tooltip">
                                                     <span class="fas fa-exclamation-triangle"></span>
@@ -197,9 +203,20 @@
                                                 <input type="checkbox" class="checkrow" data-row-id="@item.Id" />
                                             }
                                         </td>
-                                        <td>@item.Code</td>
                                         <td>
-                                            @if (item.IsValidOldCode == false)
+                                            @if (item.IsValidItem == false)
+                                            {
+                                                <span class="text-warning" data-microtip-title="Invalid Code" data-microtip-position="right" role="tooltip">
+                                                    @item.Code&emsp;<span class="fas fa-exclamation-triangle"></span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.Code
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.IsValidItem == true && item.IsValidOldCode == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Invalid Old Code" data-microtip-position="right" role="tooltip">
                                                     @item.OldCode&emsp;<span class="fas fa-exclamation-triangle"></span>
@@ -207,11 +224,13 @@
                                             }
                                             else
                                             {
-                                                @item.OldCode
+                                                @(string.IsNullOrWhiteSpace(item.OldCode) 
+                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                                : item.OldCode)
                                             }
                                         </td>
                                         <td>
-                                            @if (item.IsValidItemName == false)
+                                            @if (item.IsValidItem == true && item.IsValidItemName == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Invalid Item Name" data-microtip-position="right" role="tooltip">
                                                     @item.ItemName&emsp;<span class="fas fa-exclamation-triangle"></span>
@@ -223,7 +242,7 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (item.IsValidBrand == false)
+                                            @if (item.IsValidItem == true && item.IsValidBrand == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Invalid Brand" data-microtip-position="right" role="tooltip">
                                                     @item.Brand&emsp;<span class="fas fa-exclamation-triangle"></span>
@@ -235,7 +254,7 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (item.IsValidModel == false)
+                                            @if (item.IsValidItem == true && item.IsValidModel == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Invalid Model" data-microtip-position="right" role="tooltip">
                                                     @item.Model&emsp;<span class="fas fa-exclamation-triangle"></span>
@@ -243,11 +262,13 @@
                                             }
                                             else
                                             {
-                                                @item.Model
+                                                @(string.IsNullOrWhiteSpace(item.Model) 
+                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                                : item.Model)
                                             }
                                         </td>
                                         <td>
-                                            @if (item.IsValidSize == false)
+                                            @if (item.IsValidItem == true && item.IsValidSize == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Invalid Size" data-microtip-position="right" role="tooltip">
                                                     @item.Size&emsp;<span class="fas fa-exclamation-triangle"></span>
@@ -255,11 +276,13 @@
                                             }
                                             else
                                             {
-                                                @item.Size
+                                                @(string.IsNullOrWhiteSpace(item.Size) 
+                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                                : item.Size)
                                             }
                                         </td>
                                         <td>
-                                            @if (item.IsValidPartNumber == false)
+                                            @if (item.IsValidItem == true && item.IsValidPartNumber == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Invalid Part Number" data-microtip-position="right" role="tooltip">
                                                     @item.PartNumber&emsp;<span class="fas fa-exclamation-triangle"></span>
@@ -267,12 +290,14 @@
                                             }
                                             else
                                             {
-                                                @item.PartNumber
+                                                @(string.IsNullOrWhiteSpace(item.PartNumber) 
+                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                                : item.PartNumber)
                                             }
                                         </td>
                                         <td class="text-end">@item.Quantity</td>
                                         <td>
-                                            @if (item.IsValidUnit == false)
+                                            @if (item.IsValidItem == true && item.IsValidUnit == false)
                                             {
                                                 <span class="text-warning" data-microtip-title="Invalid Unit" data-microtip-position="right" role="tooltip">
                                                     @item.Unit&emsp;<span class="fas fa-exclamation-triangle"></span>
@@ -316,7 +341,23 @@
         var order_details = @Html.Raw(Json.Serialize(Model));
 
         var itemDT = $('.table-item').DataTable({
-            order: [[1, "asc"]]
+            order: [[1, "asc"]],
+            columnDefs: [
+                {
+                    targets: [2, 5, 6, 7],
+                    render: function(data, type, row, meta) {
+                        if (type == "sort") {
+                            var text = $('<div>').html(data).text().trim();
+
+                            if (!text || text.toLowerCase() == "n/a") {
+                                return "~~~~";
+                            }
+                            return text;
+                        }
+                        return data;
+                    }
+                }
+            ]
         });
 
         $(".checkall").on("change", function() {

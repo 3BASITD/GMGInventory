@@ -30,5 +30,7 @@ namespace GMGInventory.Data
         [ForeignKey("ReasonOfReturnId")]
         public int ReasonOfReturnId { get; set; }
         public ReasonOfReturn ReasonOfReturn { get; set; }
+
+        public int? BarcotechReturnId { get; set; }
     }
 }

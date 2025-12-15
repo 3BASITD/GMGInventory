@@ -16,5 +16,7 @@ namespace GMGInventory.Data
         public int? LocationCodeId { get; set; }
         public LocationCode LocationCode { get; set; }
         public int Quantity { get; set; }
+
+        public string? BarcotechTransferCode { get; set; }
     }
 }

@@ -10,9 +10,11 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Source Warehouse")]
         public string Source { get; set; }
+        public int SourceId { get; set; }
 
         [Display(Name = "Destination Warehouse")]
         public string Destination { get; set; }
+        public int DestinationId { get; set; }
 
         [Display(Name = "Transfer Date")]
         public string TransferDate => TransferDateD.ToString(SystemFormat.StringDate);
@@ -53,6 +55,8 @@ namespace GMGInventory.Common.Models
 
     public class ItemTransferVM : TransferVM
     {
+        public int ItemId { get; set; }
+
         [Display(Name = "Item Code")]
         public string Code { get; set; }
 

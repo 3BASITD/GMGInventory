@@ -5,13 +5,16 @@ using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
     public class SalesOrderController(IAccessRepository accessRepository
-                                    , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
+                                    , ISalesOrderRepository salesOrderRepository
+                                    , IAPIBCT_Service apiBCTService
+                                    , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 
@@ -68,7 +71,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
 
-            ViewData["UserAccess2"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrderSpecial)).Convert();
+            ViewData["UserAccessSpecial"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrderSpecial)).Convert();
 
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (order == null)
@@ -346,5 +349,13 @@ namespace GMGInventory.Controllers
                         DateTime.Now.ToString("yyyyMMdd") + " Sales Order.xlsx");
         }
 
+        public async Task<IActionResult> SyncFromBarcotech(DateTime? FromDate)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechOutbound, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var bctOutboundItems = await apiBCTService.GetOutbound(apiBCTOptions.Value.URLOutbound, FromDate);
+            return Json(bctOutboundItems);
+        }
     }
 }

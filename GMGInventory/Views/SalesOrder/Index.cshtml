@@ -35,6 +35,9 @@
                         @Html.DisplayNameFor(model => model.SONumber)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.OrderQueueNumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.PurchaseRequestDetail)
                     </th>
                     <th>
@@ -450,22 +453,43 @@
                 { data: "soNumber", name: "SONumber" },
                 {
                     data: function (data, type, dataToSet) {
-                        if(data.purchaseRequestDetail)
-                            return data.purchaseRequestDetail;
+                        if(data.orderQueueNumber)
+                            return `<a href="/OrderQueue/Details/${data.orderQueueNumber}" class="text-info" target="_blank">${data.orderQueueNumber}</a>`;
                         else
-                            return '<em class="text-muted">N/A</em>';
+                            return '<span class="text-muted">N/A</span>';
+                    },
+                    name: "PurchaseRequestDetail"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.purchaseRequestDetail || '<span class="text-muted">N/A</span>';
                     }, 
                     name: "PurchaseRequestDetail"
                 },
-                { data: "customerCode", name: "CustomerCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/Customer/Details/${data.customerId}" class="text-info" target="_blank">${data.customerCode}</a>`;
+                    },
+                    name: "CustomerCode" 
+                },
                 { data: "customerName", name: "CustomerName" },
                 { data: "priority", name: "Priority" },
-                { data: "customerAddress", name: "CustomerAddress" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.customerAddress || '<span class="text-muted">N/A</span>';
+                    }, 
+                    name: "CustomerAddress"
+                },
                 { data: "area", name: "Area" },
                 { data: "region", name: "Region" },
                 { data: "orderDate", name: "OrderDate" },
                 { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
-                { data: "forwarder", name: "Forwarder" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.forwarder || '<span class="text-muted">N/A</span>';
+                    }, 
+                    name: "Forwarder"
+                },
                 { data: "totalAmount", name: "TotalAmount", className: "text-end" },
                 { data: "status", name: "Status" },
                 {

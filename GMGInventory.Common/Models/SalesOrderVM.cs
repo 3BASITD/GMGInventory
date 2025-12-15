@@ -13,6 +13,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Order Number")]
         public string SONumber { get; set; }
 
+        public int CustomerId { get; set; }
+
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
 
@@ -31,7 +33,7 @@ namespace GMGInventory.Common.Models
         public string Status { get; set; }
 
         [Display(Name = "Customer Address")]
-        public string CustomerAddress { get; set; }
+        public string? CustomerAddress { get; set; }
 
         [Display(Name = "Customer Priority")]
         public string Priority => SystemFormat.CustomerPriority(PriorityD);
@@ -48,13 +50,13 @@ namespace GMGInventory.Common.Models
         public DateTime RequiredDeliveryDateD { get; set; }
 
         [Display(Name = "Forwarder")]
-        public string Forwarder { get; set; }
+        public string? Forwarder { get; set; }
 
         [Display(Name = "Approved / Disapproved By")]
-        public string ApprovedDisapprovedBy { get; set; }
+        public string? ApprovedDisapprovedBy { get; set; }
 
         [Display(Name = "Approved / Disapproved Date")]
-        public string ApprovedDisapprovedDate => ApprovedDisapprovedDateD == null ? "-" : ApprovedDisapprovedDateD.Value.ToString(SystemFormat.StringDate);
+        public string? ApprovedDisapprovedDate => ApprovedDisapprovedDateD == null ? null : ApprovedDisapprovedDateD.Value.ToString(SystemFormat.StringDate);
         public DateTime? ApprovedDisapprovedDateD { get; set; }
         public bool IsAllPacked { get; set; }
 
@@ -78,6 +80,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
+
+        [Display(Name = "Order Queue Reference")]
+        public string? OrderQueueNumber { get; set; }
     }
 
     public class SalesOrderFilterVM : ListFilterCommonModel
@@ -208,6 +213,7 @@ namespace GMGInventory.Common.Models
         public string DisapprovedReason { get; set; }
 
         public int? ResubmitId { get; set; }
+        public int? ResubmitFromId { get; set; }
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }

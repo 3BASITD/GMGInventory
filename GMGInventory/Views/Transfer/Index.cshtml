@@ -3,21 +3,46 @@
 @{
     ViewData["Title"] = "Warehouse Transfer";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var barcotechUserAccess = (ViewsAccessVM)ViewData["BarcotechUserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
+            @if (barcotechUserAccess.CanUploadDownload)
+            {
+                <button class="btn btn-light text-dark btn-sm float-right ml-2" onclick="FetchFromBarcotech()">
+                    <span class="fas fa-download"></span> Fetch from Barcotech
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Barcotech (Transfer) Upload / Download access is required." data-microtip-position="bottom-left" role="tooltip">
+                    <span class="fas fa-download"></span> Fetch from Barcotech
+                </button>
+            }
             @if (userAccess.CanAdd)
             {
                 <a asp-action="Create" class="btn btn-primary btn-sm float-right">
                     <span class="fas fa-plus"></span> New Warehouse Transfer
                 </a>
             }
+            else
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
+                    <span class="fas fa-plus"></span> New Warehouse Transfer
+                </button>
+            }
             @if (userAccess.CanUploadDownload)
             {
                 <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn mr-2">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Upload / Download access is required." data-microtip-position="bottom" role="tooltip">
                     <span class="fas fa-download"></span> Download
                 </button>
             }
@@ -140,10 +165,51 @@
     </div>
 </div>
 
+<!-- Barcotech Modal -->
+<div class="modal fade" id="barcotechModal" role="dialog" aria-labelledby="barcotechModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Fetch from Barcotech</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table table-head-fixed table-striped table-hover table-fetch">
+                            <thead>
+                                <tr>
+                                    <th>Transfer Code</th>
+                                    <th>Item Code</th>
+                                    <th>Quantity Transfered</th>
+                                    <th>Transfer Date</th>
+                                    <th>Transfer By</th>
+                                    <th>From Warehouse Code</th>
+                                    <th>To Warehouse Code</th>
+                                    <th>Bin Location Code</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var barcotech_user_access = @Html.Raw(Json.Serialize(barcotechUserAccess));
 
         SetDateFilter();
         function SetDateFilter() {
@@ -191,11 +257,26 @@
             },
             columns: [
                 { data: "id", name: "Id" },
-                { data: "source", name: "Source" },
-                { data: "destination", name: "Destination" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/Warehouse/Details/${data.sourceId}" class="text-info" target="_blank">${data.source}</a>`;
+                    },
+                    name: "Source"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/Warehouse/Details/${data.destinationId}" class="text-info" target="_blank">${data.destination}</a>`;
+                    },
+                    name: "Destination"
+                },
                 { data: "itemCount", name: "ItemCount", className: "text-end" },
                 { data: "transferDate", name: "TransferDate" },
-                { data: "remarks", name: "Remarks" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.remarks || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "Remarks"
+                },
                 { data: "createdBy", name: "CreatedBy" },
                 {
                     orderable: false,
@@ -275,13 +356,59 @@
         }
 
         if (user_access.canUploadDownload) {
-                $(".downloadBtn").click(function (e) {
-                    var urlQuery = [];
-                    urlQuery.push("DateFrom=" + $("#filter-from").val());
-                    urlQuery.push("DateTo=" + $("#filter-to").val());
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
 
-                   window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            });
+        }
+
+        if (barcotech_user_access.canUploadDownload) {
+            function FetchFromBarcotech() {
+                swal({
+                    title: "Fetch from Barcotech",
+                    text: "This action will fetch all records from Barcotech. The process may take some time, depending on the number of records to be retrieve. Are you sure you want to proceed?",
+                    icon: "warning",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("FetchFromBarcotech", "Transfer")",
+                            type: "POST",
+                            data: {
+                                //FromDate: $("#").val() // wala pang filter sa api ng barcotech
+                            },
+                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the transfer, which may result in some records being transferred while others are not.</small>",
+                            success: function (data, status, xhr) {
+                                var success_ctr = 0;
+                                $("table.table-fetch tbody").html("");
+                                $.each(data, function (i, v) {
+                                    $("table.table-fetch tbody").append(`
+                                        <tr>
+                                            <td>${v.data.transfer_code}</td>
+                                            <td>${v.data.item_code}</td>
+                                            <td>${v.data.qty_transferred}</td>
+                                            <td>${v.data.transfer_date}</td>
+                                            <td>${v.data.transferred_by}</td>
+                                            <td>${v.data.from_wh_code}</td>
+                                            <td>${v.data.to_wh_code}</td>
+                                            <td>${v.data.bin_location_code}</td>
+                                            <td class="${(v.status.toLowerCase() == "success" ? "text-success" : "text-danger")}">${v.message}</td>
+                                        </tr>`);
+                                    success_ctr++;
+                                });
+                                if(success_ctr > 0) {
+                                    dataTable.ajax.reload();
+                                }
+                                $("#barcotechModal").modal("show");
+                            }
+                        });
+                    }
                 });
             }
+        }
     </script>
 }

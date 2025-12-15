@@ -27,7 +27,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<WarehouseTransferVM>> GetAllTransferAsync(ListFilterCommonModel filter)
         {
             var transfers = from transfer in context.TransferItems
-
                             join userc in userManager.Users on transfer.UserCreated equals userc.Id
                             join userm in userManager.Users on transfer.UserModified equals userm.Id into m
                             from um in m.DefaultIfEmpty()
@@ -37,10 +36,12 @@ namespace GMGInventory.Application.Repositories
                             select new WarehouseTransferVM
                             {
                                 Destination = transfer.Destination.Name,
+                                DestinationId = transfer.Destination.Id,
                                 Id = transfer.Id,
                                 ItemCount = transfer.TransferItemDetails.Count,
                                 Remarks = transfer.Remarks,
                                 Source = transfer.Source.Name,
+                                SourceId = transfer.Source.Id,
                                 CreatedBy = userc.FirstName + " " + userc.LastName,
                                 TransferDateD = transfer.TransferDate
                             };
@@ -51,8 +52,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<TransferVM?> GetTransferVMAsync(int? Id)
         {
             var transferVM = (from transfer in context.TransferItems
-                                                      .Include(s => s.Source)
-                                                      .Include(s => s.Destination)
                               join userc in userManager.Users on transfer.UserCreated equals userc.Id
                               join userm in userManager.Users on transfer.UserModified equals userm.Id into um
                               from userm in um.DefaultIfEmpty()
@@ -60,9 +59,11 @@ namespace GMGInventory.Application.Repositories
                               select new TransferVM
                               {
                                   Destination = transfer.Destination.Name,
+                                  DestinationId = transfer.Destination.Id,
                                   Id = transfer.Id,
                                   Remarks = transfer.Remarks,
                                   Source = transfer.Source.Name,
+                                  SourceId = transfer.Source.Id,
                                   TransferDateD = transfer.TransferDate,
                                   CreatedBy = userc.FirstName + " " + userc.LastName,
                                   DateCreatedD = transfer.DateCreated,
@@ -72,32 +73,11 @@ namespace GMGInventory.Application.Repositories
             return await transferVM.FirstOrDefaultAsync();
         }
 
-        private async Task<IList<WarehouseTransferVM>> GetWarehouseTransfersAsync(ListFilterCommonModel filter)
-        {
-            var transferVM = (from transfer in context.TransferItems
-                                                      .Include(s => s.TransferItemDetails)
-                                                      .Include(s => s.Source)
-                                                      .Include(s => s.Destination)
-                              join user in userManager.Users on transfer.UserCreated equals user.Id
-                              where filter.DateFrom <= transfer.TransferDate.Date && transfer.TransferDate.Date <= filter.DateTo
-                              select new WarehouseTransferVM
-                              {
-                                  Destination = transfer.Destination.Name,
-                                  Id = transfer.Id,
-                                  ItemCount = transfer.TransferItemDetails.Count,
-                                  Remarks = transfer.Remarks,
-                                  Source = transfer.Source.Name,
-                                  CreatedBy = user.FirstName + " " + user.LastName,
-                                  TransferDateD = transfer.TransferDate
-                              });
-            return await transferVM.ToListAsync();
-        }
-
         public async Task<ForDataTables<WarehouseTransferVM>> GetWarehouseTransfersDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetWarehouseTransfersAsync(filter)).AsQueryable();
+            var data = (await GetAllTransferAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -159,14 +139,12 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<WarehouseTransferVM>> GetWarehouseTransfersAsync(int WarehouseId, ListFilterCommonModel filter)
         {
             var transferVM = (from trdetail in context.TransferItemDetails
-                                                      .Include(s => s.Item)
-                              join transfer in context.TransferItems
-                                                      .Include(s => s.Source) on trdetail.TransferItemId equals transfer.Id
+                              join transfer in context.TransferItems on trdetail.TransferItemId equals transfer.Id
                               join user in userManager.Users on transfer.UserCreated equals user.Id
-                              where transfer.DestinationId == WarehouseId
-                                 || transfer.SourceId == WarehouseId
-
-                                 && filter.DateFrom <= transfer.TransferDate.Date && transfer.TransferDate.Date <= filter.DateTo
+                              where (transfer.DestinationId == WarehouseId
+                                 || transfer.SourceId == WarehouseId)
+                                 && filter.DateFrom <= transfer.TransferDate.Date 
+                                 && transfer.TransferDate.Date <= filter.DateTo
                               select new WarehouseTransferVM
                               {
                                   Destination = transfer.Destination.Name,
@@ -258,6 +236,7 @@ namespace GMGInventory.Application.Repositories
                                   Code = transfer.Item.Code,
                                   Destination = transfer.TransferItem.Destination.Code,
                                   Id = transfer.TransferItem.Id,
+                                  ItemId = transfer.Item.Id,
                                   Name = transfer.Item.Name,
                                   Quantity = transfer.Quantity.ToString(),
                                   Remarks = transfer.TransferItem.Remarks,
@@ -345,7 +324,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<int> AddAsync(TransferFormVM formVM)
+        public async Task<int> AddAsync(TransferFormVM formVM) 
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var transferVM = new TransferItem

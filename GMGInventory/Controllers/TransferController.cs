@@ -1,18 +1,23 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Repositories;
+using GMGInventory.Application.Services;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Data;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
     public class TransferController(IAccessRepository accessRepository
-                                  , IItemTransferRepository itemTransferRepository) : BaseController(accessRepository)
+                                  , IItemTransferRepository itemTransferRepository
+                                  , IAPIBCT_Service apiBCTService
+                                  , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()
@@ -21,6 +26,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.WarehouseTransfer)).Convert();
+            ViewData["BarcotechUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BarcotechTransfer)).Convert();
 
             return View();
         }
@@ -132,5 +138,13 @@ namespace GMGInventory.Controllers
             DateTime.Now.ToString("yyyyMMdd") + " WarehouseTransfers.xlsx");
         }
 
+        public async Task<IActionResult> FetchFromBarcotech(DateTime? FromDate)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechTransfer, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var bctTransferItems = await apiBCTService.GetTransfer(apiBCTOptions.Value.URLTransfer, FromDate);
+            return Json(bctTransferItems);
+        }
     }
 }

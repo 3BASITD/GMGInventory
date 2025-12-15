@@ -35,7 +35,11 @@
                         @Html.DisplayNameFor(model => model.Source)
                     </span>
                     <b class="d-block">
-                        @Model.Source
+                        @Html.ActionLink(Model.Source,
+                                         "Details", 
+                                         "Warehouse", 
+                                         new { @Id = Model.SourceId }, 
+                                         new { @class = "text-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -45,7 +49,11 @@
                         @Html.DisplayNameFor(model => model.Destination)
                     </span>
                     <b class="d-block">
-                        @Model.Destination
+                        @Html.ActionLink(Model.Destination, 
+                                         "Details",
+                                         "Warehouse",
+                                         new { @Id = Model.DestinationId }, 
+                                         new { @class = "text-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -67,7 +75,7 @@
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)
+                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class='text-muted fw-normal'>N/A</span>") : Model.Remarks)
                     </b>
                 </p>
             </div>
@@ -121,17 +129,26 @@
             </div>
         </div>
         <div class="row">
-            <table class="table table-head-fixed table-striped table-hover table-item">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Quantity</th>
-                        <th>Unit</th>
-                        <th>Location Code</th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <span class="card-title">Transfer Item(s)</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-head-fixed table-striped table-hover table-item">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Location Code</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -155,11 +172,21 @@
                 return: true,
             },
             columns: [
-                { data: "code", name: "Code" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/Item/Details/${data.itemId}" class="text-info" target="_blank">${data.code}</a>`;
+                    },
+                    name: "Code"
+                },
                 { data: "name", name: "Name" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "unit", name: "Unit" },
-                { data: "locationCode", name: "LocationCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.locationCode || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "LocationCode"
+                },
             ],
             order: [[0, "asc"]]
         });

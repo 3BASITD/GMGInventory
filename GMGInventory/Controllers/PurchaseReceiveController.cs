@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Services;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -11,11 +12,13 @@ using System.Data;
 
 namespace GMGInventory.Controllers
 {
-    [Authorize]
+    [Authorize] 
     public class PurchaseReceiveController(IAccessRepository accessRepository
                                          , IPurchaseReceiveRepository receiveRepository
                                          , IAPIHM_Service apiHMService
-                                         , IOptions<APIHMSettings> apiHMOptions) : BaseController(accessRepository)
+                                         , IOptions<APIHMSettings> apiHMOptions
+                                         , IAPIBCT_Service apiBCTService
+                                         , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 
@@ -248,6 +251,15 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             return Json(await apiHMService.MoveAllPostedPurchaseOrder(DateFrom, DateTo, apiHMOptions.Value.Host, apiHMOptions.Value.User, apiHMOptions.Value.Password));
+        }
+
+        public async Task<IActionResult> SyncFromBarcotech(DateTime? FromDate)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechReceiving, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var bctReceivingItems = await apiBCTService.GetReceiving(apiBCTOptions.Value.URLReceiving, FromDate);
+            return Json(bctReceivingItems);
         }
     }
 }

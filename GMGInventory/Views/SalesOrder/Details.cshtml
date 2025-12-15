@@ -3,7 +3,29 @@
 @{
     ViewData["Title"] = "Sales Order Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
-    var userAccess2 = (ViewsAccessVM)ViewData["UserAccess2"]!;
+    var userAccessSpecial = (ViewsAccessVM)ViewData["UserAccessSpecial"]!;
+
+    var status = Model.Status?.ToLowerInvariant();
+
+    bool isDraft = status == "draft";
+    bool isSubmitted = status == "submitted";
+    bool isApproved = status == "approved";
+    bool isDisapproved = status == "disapproved";
+
+    bool canPrint = userAccess.CanPrint && !isDisapproved;
+    bool canApproveDisapprove = userAccess.CanApproveDisapprove && isSubmitted;
+    bool canDelete = userAccess.CanDelete && isDraft;
+    bool canEdit = userAccess.CanEdit && isDraft;
+
+    bool canPack = isApproved &&
+                   !string.IsNullOrWhiteSpace(Model.ApprovedBy) &&
+                   Model.ApprovedDate != null;
+
+    bool canRecreate = isDisapproved &&
+                       !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
+                       Model.DisapprovedDate != null &&
+                       Model.ResubmitId == null &&
+                       userAccess.CanAdd;
 }
 
 @section Breadcrumb {
@@ -15,133 +37,176 @@
         <div class="card-header">
             <span class="card-title po-title">@ViewData["Title"]</span>
             <div class="card-tools">
-                @if (Model.Status.ToLower() != "disapproved")
+                @if (canPrint)
                 {
-                    @if (userAccess.CanPrint)
-                    {
-                        <div class="dropdown float-right ml-2">
-                            <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="fas fa-print"></span> Print
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
-                                <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
-                                <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
-                            </ul>
-                        </div>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
+                    <div class="dropdown float-right ml-2">
+                        <button class="btn btn-info btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             <span class="fas fa-print"></span> Print
                         </button>
-                    }
-                }
-                @if (Model.Status.ToLower() == "submitted")
-                {
-                    @if (userAccess.CanApproveDisapprove)
-                    {
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
-                            <span class="fas fa-check"></span> Approve
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                            <span class="fas fa-times"></span> Disapprove
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-check"></span> Approve
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-times"></span> Disapprove
-                        </button>
-                    }
-                }
-                else if (Model.Status.ToLower() == "draft")
-                {
-                    @if (userAccess.CanDelete)
-                    {
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeleteDraft()">
-                            <span class="fas fa-trash"></span> Delete
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-trash"></span> Delete
-                        </button>
-                    }
-                    @if (userAccess.CanEdit)
-                    {
-                        <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
-                            <span class="fas fa-save"></span> Save as Draft
-                        </button>
-                        <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
-                            <span class="fas fa-save"></span> Submit
-                        </button>
-                        <input type="hidden" id="action-type" name="ActionType" value="">
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-save"></span> Save as Draft
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-save"></span> Submit
-                        </button>
-                    }
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
+                            <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Logo</a></li>
+                        </ul>
+                    </div>
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(Model.ApprovedBy) && Model.ApprovedDate != null)
-                    {
-                        if (Model.IsAllPacked != true && Model.Status.ToLower() != "draft" && Model.Status.ToLower() != "submitted" && Model.Status.ToLower() != "disapproved")
-                        {
-                            <a href="@Url.Action("Create", "Pack")/@Model.Id?page=SalesOrder" target="_blank" class="btn btn-primary btn-sm float-right ml-2">
-                                <span class="fas fa-box-open"></span> Start Packing
-                            </a>
-                        }
-                    }
-                    if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null && Model.ResubmitId == null)
-                    {
-                        @if (userAccess.CanAdd)
-                        {
-                            <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
-                                <span class="fas fa-edit"></span> Update to Resubmit
-                            </a>
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                                <span class="fas fa-edit"></span> Update to Resubmit
-                            </button>
-                        }
-                    }
+                    <button type="button"
+                            class="btn btn-info btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="@(isDisapproved ? "Only non-disapproved orders can be printed" : "Print access is required")"
+                            data-microtip-position="bottom-left"
+                            role="tooltip">
+                        <span class="fas fa-print"></span> Print
+                    </button>
                 }
+
+                @if (canApproveDisapprove)
+                {
+                    <button type="button"
+                            class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
+                        <span class="fas fa-check"></span> Approve
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
+                        <span class="fas fa-times"></span> Disapprove
+                    </button>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted orders can be approved")"
+                            data-microtip-position="bottom-left"
+                            role="tooltip">
+                        <span class="fas fa-check"></span> Approve
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted orders can be disapproved")"
+                            data-microtip-position="bottom"
+                            role="tooltip">
+                        <span class="fas fa-times"></span> Disapprove
+                    </button>
+                }
+
+                @if (canDelete)
+                {
+                    <button type="button"
+                            class="btn btn-danger btn-sm float-right ml-2" 
+                            onclick="DeleteDraft()">
+                        <span class="fas fa-trash"></span> Delete
+                    </button>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="@(isDraft ? "Delete access is required" : "Only draft order can be deleted")"
+                            data-microtip-position="bottom" role="tooltip">
+                        <span class="fas fa-trash"></span> Delete
+                    </button>
+                }
+                @if (canEdit)
+                {
+                    <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
+                        <span class="fas fa-save"></span> Submit
+                    </button>
+                    <input type="hidden" id="action-type" name="ActionType" value="">
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="@(isDraft ? "Edit access is required" : "Only draft orders can be saved as draft")"
+                            data-microtip-position="bottom"
+                            role="tooltip">
+                        <span class="fas fa-save"></span> Save as Draft
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="@(isDraft ? "Edit access is required" : "Only draft orders can be submitted")"
+                            data-microtip-position="bottom"
+                            role="tooltip">
+                        <span class="fas fa-save"></span> Submit
+                    </button>
+                }
+
+                @if (canPack)
+                {
+                    <a href="@Url.Action("Create", "Pack")/@Model.Id?page=SalesOrder"
+                       target="_blank" 
+                       class="btn btn-primary btn-sm float-right ml-2">
+                        <span class="fas fa-box-open"></span> Start Packing
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" 
+                            data-microtip-title="Only approved order can be packed" 
+                            data-microtip-position="bottom" 
+                            role="tooltip">
+                        <span class="fas fa-box-open"></span> Start Packing
+                    </button>
+                }
+
+                @if (canRecreate)
+                {
+                    <a href="@Url.Action("Create")/@Model.Id"
+                       class="btn btn-primary btn-sm float-right ml-2">
+                        <span class="fas fa-edit"></span> Update to Resubmit
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="@(Model.ResubmitId != null ? "Order already been resubmitted" : "Only disapproved orders can be resubmitted")"
+                            data-microtip-position="bottom"
+                            role="tooltip">
+                        <span class="fas fa-edit"></span> Update to Resubmit
+                    </button>
+                }
+
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
                 </a>
             </div>
         </div>
         <div class="card-body">
-            @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null)
+            @if ((!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null) || Model.ResubmitFromId != null)
             {
                 <div class="row">
+                @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null)
+                {
                     <div class="col-12">
                         <div class="alert alert-danger text-sm" role="alert">
                             <strong>Disapproved:</strong>
                             @(string.IsNullOrWhiteSpace(Model.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
                         </div>
                     </div>
-                    @if (Model.ResubmitId != null)
-                    {
-                        <div class="col-12">
-                            <div class="alert alert-info text-sm" role="alert">
-                                <strong>Resubmitted:</strong>
-                                This has been resubmitted. You can view the details <a href="@Url.Action("Details", "SalesOrder", new { Id = Model.ResubmitId })">here</a>.
-                            </div>
+                }
+                @if (Model.ResubmitId != null || Model.ResubmitFromId != null)
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-sm" role="alert">
+                        <strong>Resubmit Details:</strong>
+                        @if (Model.ResubmitId != null)
+                        {
+                            <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "SalesOrder", new { Id = Model.ResubmitId })" class="alert-link">here</a>.</div>
+                        }
+                        @if (Model.ResubmitFromId != null)
+                        {
+                            <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "SalesOrder", new { Id = Model.ResubmitFromId })" class="alert-link">here</a>.</div>
+                        }
                         </div>
-                    }
+                    </div>
+                }
                 </div>
             }
             <div class="row">
@@ -662,7 +727,11 @@
                             </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
-                                    <label for="add-discount1" class="form-label mb-0">Discount 1</label>
+                                    <label for="add-discount1" class="form-label mb-0">
+                                        Discount 1 <span class="discount1-info text-info" data-microtip-title="Customer auto-brand discount. Sales Order (Special) access is required to change discount 1" data-microtip-position="right" role="tooltip">
+                                            <span class="fas fa-info-circle"></span>
+                                        </span>
+                                    </label>
                                     <div class="input-group input-group-sm">
                                         <input type="number" step="0.01" min="0" max="100" id="add-discount1" name="Discount1" class="form-control form-control-sm" />
                                         <span class="input-group-text">%</span>
@@ -830,7 +899,7 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var user_access2 = @Html.Raw(Json.Serialize(userAccess2));
+        var user_access_special = @Html.Raw(Json.Serialize(userAccessSpecial));
         var so_details = @Html.Raw(Json.Serialize(Model));
         var currentCustomer = so_details.customerId;
 
@@ -1077,17 +1146,20 @@
                         if(Object.keys(data).length == 0){
                             $("#add-discount1").val("0.00");
                             $('#add-discount1').prop('readonly', false);
+                            $('.discount1-info').addClass('d-none');
                         } else{
                             $("#add-discount1").val(Round2Decimal(data[0].discount));
                             $("#add-discount-id").val(data[0].id);
 
                             $('#add-discount1').prop('readonly', true);
+                            $('.discount1-info').removeClass('d-none');
 
                             brandDiscountId = data[0].id;
 
-                            if( user_access2.canEdit || ( (brandDiscountId == 0) || (brandDiscountId == null) ) )
+                            if( user_access_special.canEdit || brandDiscountId == 0 || brandDiscountId == null )
                             {
                                 $('#add-discount1').prop('readonly', false);
+                                $('.discount1-info').addClass('d-none');
                             }
 
                             var quantity = parseFloat($("#add-quantity").val());
@@ -1410,7 +1482,7 @@
 
                              discount += '<label for="' + data.lineNumber + '_1" class="input-group-text text-info bg-info">#1</label>';
                              discount += '<input id="' + data.lineNumber + '_1" type="number" step="0.01" min="0" max="100" value="' + Round2Decimal(data.discount1D) + '" class="form-control form-control-sm discount1 discount-form-display" placeholder="Discount 1"' ;
-                            if( user_access2.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) )
+                            if( user_access_special.canEdit || ( (data.customerBrandDiscountId == 0) || (data.customerBrandDiscountId == null) ) )
                             {
                                 discount += '/>';
 

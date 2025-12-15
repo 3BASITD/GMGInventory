@@ -1,15 +1,19 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Services;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace GMGInventory.Controllers
 {
     [Authorize]
     public class SalesReturnController(IAccessRepository accessRepository
-                                     , ISalesReturnRepository salesReturnRepository) : BaseController(accessRepository)
+                                     , ISalesReturnRepository salesReturnRepository
+                                     , IAPIBCT_Service apiBCTService
+                                     , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {
@@ -88,6 +92,15 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             return View(await salesReturnRepository.PrintDetails(Id));
+        }
+
+        public async Task<IActionResult> SyncFromBarcotech(DateTime? FromDate)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechReturn, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var bctReturnItems = await apiBCTService.GetReturn(apiBCTOptions.Value.URLReturn, FromDate);
+            return Json(bctReturnItems);
         }
     }
 }

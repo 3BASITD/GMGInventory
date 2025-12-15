@@ -455,7 +455,12 @@
                 { data: "region", name: "Region" },
                 { data: "status", name: "Status" },
                 { data: "requestDate", name: "RequestDate" },
-                { data: "remarks", name: "Remarks" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.remarks || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "Remarks"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {

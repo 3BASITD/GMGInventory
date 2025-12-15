@@ -233,7 +233,7 @@
                                 <dt>Prepared By:</dt>
                             </dl>
                         </div>
-                        @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1) || !string.IsNullOrWhiteSpace(Model.ApprovedBy2))
+                        @* @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1) || !string.IsNullOrWhiteSpace(Model.ApprovedBy2))
                         {
                             <div class="column center-text">
                                 <dl>
@@ -245,6 +245,15 @@
                                     {
                                         <dd>@Model.ApprovedBy2</dd>
                                     }
+                                    <dt>Approved By:</dt>
+                                </dl>
+                            </div>
+                        } *@
+                        @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy1))
+                        {
+                            <div class="column center-text">
+                                <dl>
+                                    <dd>@Model.ApprovedBy1</dd>
                                     <dt>Approved By:</dt>
                                 </dl>
                             </div>

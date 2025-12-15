@@ -29,6 +29,7 @@ builder.Services.AddDbContext<AppOrderDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.Configure<APIHMSettings>(builder.Configuration.GetSection("APIHMSettings"));
+builder.Services.Configure<APIBCTSettings>(builder.Configuration.GetSection("APIBCTSettings"));
 
 builder.Services.Configure<FormOptions>(options =>
 {
@@ -109,6 +110,7 @@ builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseReposit
 builder.Services.AddScoped(typeof(ITrackerRepository), typeof(TrackerRepository));
 
 builder.Services.AddScoped<IAPIHM_Service, APIHM_Service>();
+builder.Services.AddScoped<IAPIBCT_Service, APIBCT_Service>();
 
 builder.Services.AddHttpClient();
 
