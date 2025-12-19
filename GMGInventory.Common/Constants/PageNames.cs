@@ -86,7 +86,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Barcotech (Pack)")] BarcotechPack,
         [PageNamesString("Barcotech (Receiving)")] BarcotechReceiving,
         [PageNamesString("Barcotech (Transfer)")] BarcotechTransfer,
-        
+        [PageNamesString("Barcotech (Receiving)")] BarcotechReceiving
     }
 
     public static class PageNameExtensions

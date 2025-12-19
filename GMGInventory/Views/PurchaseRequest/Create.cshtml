@@ -273,7 +273,7 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        <input class="sochkclassorderall" type="checkbox" />
+                                        <input class="sochkclassorderall" type="checkbox" onclick="SORowSelectAll()" />
                                     </th>
                                     <th>Item Code</th>
                                     <th>Item Name</th>
@@ -671,8 +671,8 @@
 
         var columnVisibilityMap = {
             // [SO Number, PO Number, Customer, Item Code, Part Number, Item Name, Have Stock, Stock on Hand, Quantity, Unit, Purpose]
-            "automotive_rush order": [true, true, true, true, true, true, true, true, true, true, false],
-            "automotive_stocking": [false, false, false, true, true, true, true, true, true, true, false],
+            "automotive_rush order": [true, true, true, true, true, true, false, true, true, true, false],
+            "automotive_stocking": [false, false, false, true, true, true, false, true, true, true, false],
             "non-automotive_office supplies": [false, false, false, true, false, true, false, true, true, true, false],
             "non-automotive_one-time purchase": [false, false, false, false, false, true, false, false, true, true, true],
             "maintenance & repair_": [false, false, false, false, false, true, false, false, true, true, true]
@@ -941,7 +941,7 @@
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
-                        return '<input class="sochkclassorder" type="checkbox" ' + ( data.toRequest == true ? 'checked="checked" ' : '') + 'name="orderitemchk_' + data.id + '" />';
+                        return '<input class="sochkclassorder" type="checkbox" ' + ( data.toRequest == true ? 'checked="checked" ' : '') + 'name="orderitemchk_' + data.id + '" onchange="SORowSelect(this)" />';
                     }
                 },
                 { data: "itemCode", name: "ItemCode" },
@@ -988,18 +988,6 @@
 
         soDT.on("draw", function () {
             $(".table-so thead th").removeClass("text-end");
-            dtCheckboxes();
-
-            $(".sochkclassorder").off("change").on("change", function () {
-                var tr = $(this).closest('tr');
-                var row = soDT.row(tr);
-                var rowData = row.data();
-
-                rowData.toRequest = $(this).prop("checked");
-                rowData.requestQuantityD = 0;
-
-                row.data(rowData).draw(false);
-            });
 
             $(".soquantity").off("blur").on("blur", function () {
                 var tr = $(this).closest('tr');
@@ -1012,41 +1000,44 @@
             });
         });
 
-        dtCheckboxes();
-        function dtCheckboxes() {
-            $(".sochkclassorderall").off("change").on("change", function () {
-                var isChecked = $(".sochkclassorderall").prop("checked");
-                soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    $(this.node()).find(".sochkclassorder").prop("checked", isChecked);
+        function SORowSelectAll() {
+            var isChecked = $(".sochkclassorderall").prop("checked");
+            soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                $(this.node()).find(".sochkclassorder").prop("checked", isChecked);
 
-                    var data = this.data();
-                    data.toRequest = isChecked;
-                    this.data(data);
-                });
+                var data = this.data();
+                data.toRequest = isChecked;
+                this.data(data);
             });
+        }
 
-            $(".sochkclassorder").off("change").on("change", function () {
-                var rows_checked = 0;
-                soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    if ($(this.node()).find(".sochkclassorder").prop("checked")) {
-                        rows_checked++;
-                    }
-                });
+        function SORowSelect(elem) {
+            var tr = $(elem).closest('tr');
+            var row = soDT.row(tr);
+            var rowData = row.data();
 
-                if (rows_checked == 0) {
-                    $(".sochkclassorderall").prop("checked", false);
-                    $(".sochkclassorderall").prop("indeterminate", false);
-                } else if (rows_checked == soDT.rows().count()) {
-                    $(".sochkclassorderall").prop("checked", true);
-                    $(".sochkclassorderall").prop("indeterminate", false);
-                } else if (rows_checked == 0) {
-                    $(".sochkclassorderall").prop("checked", false);
-                    $(".sochkclassorderall").prop("indeterminate", false);
-                } else {
-                    $(".sochkclassorderall").prop("checked", false);
-                    $(".sochkclassorderall").prop("indeterminate", true);
+            rowData.toRequest = $(elem).prop("checked");
+            rowData.requestQuantityD = 0;
+
+            row.data(rowData).draw(false);
+
+            var rows_checked = 0;
+            soDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                if ($(this.node()).find(".sochkclassorder").prop("checked")) {
+                    rows_checked++;
                 }
             });
+
+            if (rows_checked == soDT.rows().count()) {
+                $(".sochkclassorderall").prop("checked", true);
+                $(".sochkclassorderall").prop("indeterminate", false);
+            } else if (rows_checked == 0) {
+                $(".sochkclassorderall").prop("checked", false);
+                $(".sochkclassorderall").prop("indeterminate", false);
+            } else {
+                $(".sochkclassorderall").prop("checked", false);
+                $(".sochkclassorderall").prop("indeterminate", true);
+            }
         }
 
         // Load unit for select2
@@ -1070,13 +1061,6 @@
         $(".createBtn").on("click", clearItemForm);
 
         function clearItemForm() {
-            // if(itemDT.rows().data().length > 0) {
-            //     $("#add-so-number").val(itemDT.rows().data()[0].salesOrderId).trigger("change");
-            //     //$("#add-so-number").prop("disabled", true);
-            // } else {
-            //     $("#add-so-number").val("").trigger("change");
-            //     //$("#add-so-number").prop("disabled", false);
-            // }
             $("#add-code").val("").trigger("change");
             $("#add-part").val("");
             $("#add-name").val("");

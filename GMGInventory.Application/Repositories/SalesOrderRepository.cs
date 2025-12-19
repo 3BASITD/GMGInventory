@@ -258,6 +258,9 @@ namespace GMGInventory.Application.Repositories
                                                           .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
                            let freightAmount = customerSOACR.Where(s => s.CustomerId == order.Customer.Id)
                                                             .Sum(s => (decimal?)s.FreightAmount) ?? 0
+                           let resubmitfrom = context.SalesOrders
+                                                     .Where(s => s.ResubmitId == order.Id)
+                                                     .FirstOrDefault()
                            where order.Id == Id
                            select new SalesOrderDetailsVM
                            {
@@ -307,6 +310,7 @@ namespace GMGInventory.Application.Repositories
                                Remarks = order.Remarks + "",
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
                                ResubmitId = order.ResubmitId,
+                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
                                ServiceLevelAgreement = order.ServiceLevelAgreementId == null ? null : order.ServiceLevelAgreement.Name,
                                ServiceLevelAgreementId = order.ServiceLevelAgreementId == null ? null : order.ServiceLevelAgreement.Id,
                                ShippingAddress = "",
@@ -367,12 +371,13 @@ namespace GMGInventory.Application.Repositories
                            where (filter.AgentId == null || order.AgentId == filter.AgentId)
                            && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
                            && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
-                           && filter.DateFrom <= order.DateCreated.Date
-                           && order.DateCreated.Date <= filter.DateTo
+                           && filter.DateFrom <= order.SalesOrderDate.Date
+                           && order.SalesOrderDate.Date <= filter.DateTo
                            && (filter.Status == null || filter.Status == order.Status.Id)
                            && (filter.FiledBy == null || filter.FiledBy.ToLower() != "me" || (filter.FiledBy.ToLower() == "me" && order.UserCreated == currentUserId))
                            select new SalesOrderVM
                            {
+                               CustomerId = order.Customer.Id,
                                CustomerCode = order.Customer.Code,
                                CustomerName = order.Customer.Name,
                                Id = order.Id,
@@ -387,7 +392,7 @@ namespace GMGInventory.Application.Repositories
                                                       .ShippingAddresses
                                                       .Where(s => s.IsDefault == true)
                                                       .Select(s => s.Address)
-                                                      .FirstOrDefault() ?? "N/A",
+                                                      .FirstOrDefault() ?? null,
                                PriorityD = order.Customer.Priority,
                                Region = order.Customer.Area.Region.Name,
                                Area = order.Customer.Area.Name,
@@ -395,27 +400,42 @@ namespace GMGInventory.Application.Repositories
                                Forwarder = order.SalesOrderDeliveryMonitorings
                                                 .OrderByDescending(s => s.DateCreated)
                                                 .Select(s => s.Forwarder.Name)
-                                                .FirstOrDefault() ?? "",
-                               ApprovedDisapprovedBy = approvedby != null ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname) : disapprovedby != null ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname) : "-",
+                                                .FirstOrDefault(),
+                               ApprovedDisapprovedBy = approvedby != null
+                                                     ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname)
+                                                     : disapprovedby != null
+                                                     ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname)
+                                                     : null,
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate,
                                IsAllPacked = !orderIncompletePack.Contains(order.Id),
-                               PurchaseRequestDetail = string.Join(", ",
-                                                       context.PurchaseRequestLineItems
-                                                       .Where(prli => prli.SalesOrderId == order.Id)
-                                                       .Join(context.PurchaseRequests,
-                                                           prli => prli.PurchaseRequestId,
-                                                           pr => pr.Id,
-                                                           (prli, pr) => new { pr, prli })
-                                                       .Select(x => $"{x.pr.DocumentNumber}-[{x.pr.Status.Name}]")
-                                                       .Distinct()
-                                                       ),
+                               //PurchaseRequestDetail = string.Join(", ",
+                               //                        context.PurchaseRequestLineItems
+                               //                        .Where(prli => prli.SalesOrderId == order.Id)
+                               //                        .Join(context.PurchaseRequests,
+                               //                              prli => prli.PurchaseRequestId,
+                               //                              pr => pr.Id,
+                               //                              (prli, pr) => new { pr, prli })
+                               //                        .Select(x => $"{x.pr.DocumentNumber}-[{x.pr.Status.Name}]")
+                               //                        .Distinct()
+                               //                        ),
+                               PurchaseRequestDetail = string.Join(", ", order.PurchaseRequestLineItems
+                                                                              .Select(s => new
+                                                                              {
+                                                                                  Id = s.PurchaseRequest.Id,
+                                                                                  Number = s.PurchaseRequest.DocumentNumber,
+                                                                                  Status = s.PurchaseRequest.Status.Name
+                                                                              })
+                                                                              .Distinct()
+                                                                              .Select(s => $"<a href='/PurchaseRequest/Details/{s.Id}' class='text-info' target='_blank'>{s.Number}</a>-[{s.Status}]")),
                                ServiceLevelAgreement = order.ServiceLevelAgreement.Name,
                                WithLP = order.WithLP,
                                WithREYCONonDefective = order.WithREYCONonDefective,
                                WithREYCOJITLPDelivery = order.WithREYCOJITLPDelivery.Name,
                                SpecialInstruction = order.SpecialInstruction,
-                               Remarks = order.Remarks
-
+                               Remarks = order.Remarks,
+                               OrderQueueNumber = order.SalesOrderLineItems
+                                                       .Select(s => s.SalesOrderSource.SourceOrderNumber)
+                                                       .FirstOrDefault()
                            });
             return await orderVM.ToListAsync();
         }

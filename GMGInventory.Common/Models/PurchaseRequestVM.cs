@@ -49,8 +49,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Approved By")]
         public string? ApprovedBy1 { get; set; }
 
-        [Display(Name = "Approved By #2")]
-        public string? ApprovedBy2 { get; set; }
+        //[Display(Name = "Approved By #2")]
+        //public string? ApprovedBy2 { get; set; }
 
         [Display(Name = "Disapproved By")]
         public string? DisapprovedBy { get; set; }

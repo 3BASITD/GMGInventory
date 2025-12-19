@@ -123,7 +123,7 @@
                             <input type="text" id="source-unit" class="form-control form-control-sm" readonly="readonly" />
                         </div>
                         <div class="form-group">
-                            <label for="source-location-" class="form-label mb-0">Location Code</label>
+                            <label for="source-location" class="form-label mb-0">Location Code</label>
                             <select id="source-location" name="LocationCode" style="width: 100%;"></select>
                         </div>
                     </div>
@@ -305,8 +305,8 @@
                     sourceQuantity: $("#source-code").select2("data")[0].quantity,
                     transferQuantity: $("#source-transfer-quantity").val() || 0,
                     unit: $("#source-code").select2("data")[0].unit,
-                    locationCode: $("#source-location").select2("data")[0].text,
-                    locationCodeId: $("#source-location").select2("data")[0].id,
+                    locationCode: $("#source-location").val() == null ? null : $("#source-location").select2("data")[0].text,
+                    locationCodeId: $("#source-location").val() == null ? null : $("#source-location").select2("data")[0].id,
                 }).draw();
 
                 toastr.success("Added " + $("#source-code").select2("data")[0].text + " on Transfer Item(s)", "Success");
@@ -370,8 +370,14 @@
                     name: "TransferQuantity"
                 },
                 { data: "unit", name: "Name", className: "form-cell" },
-                { data: "locationCode", name: "LocationCode", className: "form-cell" },
-                { data: "locationCodeId", name: "LocationCodeId", className: "form-cell",visible: false },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return data.locationCode || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "LocationCode",
+                    className: "form-cell" 
+                },
+                { data: "locationCodeId", name: "LocationCodeId", className: "form-cell", visible: false },
             ]
         });
 

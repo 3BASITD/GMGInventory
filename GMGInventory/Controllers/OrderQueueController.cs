@@ -42,7 +42,9 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.OrderQueue)).Convert();
 
-            return View(await queueRepository.GetDetails(Id));
+            var details = await queueRepository.GetDetails(Id);
+            if (details == null) return NotFound();
+            else return View(details);
         }
 
         [HttpPost]

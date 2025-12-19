@@ -232,7 +232,12 @@ namespace GMGInventory.Application.Repositories
 
             foreach (var i in order.Items)
             {
-                var itm = context.Items.Where(s => i.Code != null && s.Code.ToLower() == i.Code.ToLower()).FirstOrDefault();
+                var itm = context.Items
+                                 .Where(s => !string.IsNullOrWhiteSpace(i.Code)
+                                          && s.Code.ToLower() == i.Code.ToLower())
+                                 .FirstOrDefault();
+
+                i.IsValidItem = itm != null;
                 if (itm != null)
                 {
                     var dest = (from destination in context.SalesOrderSources
@@ -246,24 +251,24 @@ namespace GMGInventory.Application.Repositories
                     i.SalesOrderId = dest == null ? null : dest.Id;
 
                     var brnd = context.Brands
-                                      .Where(s => s.Name == i.Brand
-                                               || (s.Name != null && i.Brand != null && s.Name.ToLower() == i.Brand.ToLower()))
+                                      .Where(s => !string.IsNullOrWhiteSpace(i.Brand)
+                                               && s.Name.ToLower() == i.Brand.ToLower())
                                       .FirstOrDefault();
                     i.IsValidBrand = brnd != null && itm.BrandId == brnd.Id;
 
-                    i.IsValidModel = itm.ModelNumber == i.Model
-                                  || (itm.ModelNumber != null && i.Model != null && itm.ModelNumber.ToLower() == i.Model.ToLower());
-                    i.IsValidOldCode = itm.OldCode == i.OldCode
-                                    || (itm.OldCode != null && i.OldCode != null && itm.OldCode.ToLower() == i.OldCode.ToLower());
-                    i.IsValidItemName = itm.Name == i.ItemName
-                                     || (i.ItemName != null && itm.Name.ToLower() == i.ItemName.ToLower());
-                    i.IsValidSize = itm.Size == i.Size
-                                 || (i.Size != null && itm.Size.ToLower() == i.Size.ToLower());
-                    i.IsValidPartNumber = itm.PartNumber == i.PartNumber
-                                       || (itm.PartNumber != null && i.PartNumber != null && itm.PartNumber.ToLower() == i.PartNumber.ToLower());
+                    i.IsValidModel = (string.IsNullOrWhiteSpace(itm.ModelNumber) && string.IsNullOrWhiteSpace(i.Model))
+                                  || (!string.IsNullOrWhiteSpace(itm.ModelNumber) && !string.IsNullOrWhiteSpace(i.Model) && itm.ModelNumber.ToLower() == i.Model.ToLower());
+                    i.IsValidOldCode = (string.IsNullOrWhiteSpace(itm.OldCode) && string.IsNullOrWhiteSpace(i.OldCode))
+                                    || (!string.IsNullOrWhiteSpace(itm.OldCode) && !string.IsNullOrWhiteSpace(i.OldCode) && itm.OldCode.ToLower() == i.OldCode.ToLower());
+                    i.IsValidItemName = (string.IsNullOrWhiteSpace(itm.Name) && string.IsNullOrWhiteSpace(i.ItemName))
+                                     || (!string.IsNullOrWhiteSpace(itm.Name) && !string.IsNullOrWhiteSpace(i.ItemName) && itm.Name.ToLower() == i.ItemName.ToLower());
+                    i.IsValidSize = (string.IsNullOrWhiteSpace(itm.Size) && string.IsNullOrWhiteSpace(i.Size))
+                                 || (!string.IsNullOrWhiteSpace(itm.Size) && !string.IsNullOrWhiteSpace(i.Size) && itm.Size.ToLower() == i.Size.ToLower());
+                    i.IsValidPartNumber = (string.IsNullOrWhiteSpace(itm.PartNumber) && string.IsNullOrWhiteSpace(i.PartNumber))
+                                       || (!string.IsNullOrWhiteSpace(itm.PartNumber) && !string.IsNullOrWhiteSpace(i.PartNumber) && itm.PartNumber.ToLower() == i.PartNumber.ToLower());
                     var unt = context.Units
-                                     .Where(s => s.Name == i.Unit
-                                              || (s.Name != null && i.Unit != null && s.Name.ToLower() == i.Unit.ToLower()))
+                                     .Where(s => !string.IsNullOrWhiteSpace(i.Unit)
+                                              && s.Name.ToLower() == i.Unit.ToLower())
                                      .FirstOrDefault();
                     i.IsValidUnit = unt != null && itm.UnitId == unt.Id;
                 }
@@ -350,7 +355,8 @@ namespace GMGInventory.Application.Repositories
             {
                 var isInvalid = false;
                 var itm = context.Items
-                                 .Where(s => order.Code != null && s.Code.ToLower() == order.Code.ToLower())
+                                 .Where(s => !string.IsNullOrWhiteSpace(order.Code)
+                                          && s.Code.ToLower() == order.Code.ToLower())
                                  .FirstOrDefault();
                 if (itm == null)
                 {
@@ -359,8 +365,8 @@ namespace GMGInventory.Application.Repositories
                 }
 
                 var brnd = context.Brands
-                                  .Where(s => s.Name == order.Brand
-                                           || (s.Name != null && order.Brand != null && s.Name.ToLower() == order.Brand.ToLower()))
+                                  .Where(s => !string.IsNullOrWhiteSpace(order.Brand)
+                                           && s.Name.ToLower() == order.Brand.ToLower())
                                   .FirstOrDefault();
                 if (brnd == null || itm == null || itm.BrandId != brnd.Id)
                 {
@@ -368,44 +374,44 @@ namespace GMGInventory.Application.Repositories
                     isInvalid = true;
                 }
 
-                if (itm!.ModelNumber != order.Model
-                && (itm.ModelNumber == null || order.Model == null || itm.ModelNumber.ToLower() != order.Model.ToLower()))
-                {
-                    temp.Add($"<span class='text-muted'>Invalid Item Model Number:</span> {order.Model}. ");
-                    isInvalid = true;
-                }
+                if ((!string.IsNullOrWhiteSpace(itm!.ModelNumber) || !string.IsNullOrWhiteSpace(order.Model))
+                 && (string.IsNullOrWhiteSpace(itm.ModelNumber) || string.IsNullOrWhiteSpace(order.Model) || itm.ModelNumber.ToLower() != order.Model.ToLower()))
+                    {
+                        temp.Add($"<span class='text-muted'>Invalid Item Model Number:</span> {order.Model}. ");
+                        isInvalid = true;
+                    }
 
-                if (itm!.OldCode != order.OldCode
-                && (itm.OldCode == null || order.OldCode == null || itm.OldCode.ToLower() != order.OldCode.ToLower()))
+                if ((!string.IsNullOrWhiteSpace(itm!.OldCode) || !string.IsNullOrWhiteSpace(order.OldCode))
+                 && (string.IsNullOrWhiteSpace(itm.OldCode) || string.IsNullOrWhiteSpace(order.OldCode) || itm.OldCode.ToLower() != order.OldCode.ToLower()))
                 {
                     temp.Add($"<span class='text-muted'>Invalid Item Old Code:</span> {order.OldCode}. ");
                     isInvalid = true;
                 }
 
-                if (itm!.Name != order.ItemName
-                && (itm.Name == null || order.ItemName == null || itm.Name.ToLower() != order.ItemName.ToLower()))
+                if ((!string.IsNullOrWhiteSpace(itm!.Name) || !string.IsNullOrWhiteSpace(order.ItemName))
+                 && (string.IsNullOrWhiteSpace(itm.Name) || string.IsNullOrWhiteSpace(order.ItemName) || itm.Name.ToLower() != order.ItemName.ToLower()))
                 {
                     temp.Add($"<span class='text-muted'>Invalid Item Name:</span> {order.ItemName}. ");
                     isInvalid = true;
                 }
 
-                if (itm!.Size != order.Size
-                && (itm.Size == null || order.Size == null || itm.Size.ToLower() != order.Size.ToLower()))
+                if ((!string.IsNullOrWhiteSpace(itm!.Size) || !string.IsNullOrWhiteSpace(order.Size))
+                 && (string.IsNullOrWhiteSpace(itm.Size) || string.IsNullOrWhiteSpace(order.Size) || itm.Size.ToLower() != order.Size.ToLower()))
                 {
                     temp.Add($"<span class='text-muted'>Invalid Item Size:</span> {order.Size}. ");
                     isInvalid = true;
                 }
 
-                if (itm!.PartNumber != order.PartNumber
-                && (itm.PartNumber == null || order.PartNumber == null || itm.PartNumber.ToLower() != order.PartNumber.ToLower()))
+                if ((!string.IsNullOrWhiteSpace(itm!.PartNumber) || !string.IsNullOrWhiteSpace(order.PartNumber))
+                 && (string.IsNullOrWhiteSpace(itm.PartNumber) || string.IsNullOrWhiteSpace(order.PartNumber) || itm.PartNumber.ToLower() != order.PartNumber.ToLower()))
                 {
                     temp.Add($"<span class='text-muted'>Invalid Item Part Number:</span> {order.PartNumber}. ");
                     isInvalid = true;
                 }
 
                 var unt = context.Units
-                                 .Where(s => s.Name == order.Unit
-                                          || (s.Name != null && order.Unit != null && s.Name.ToLower() == order.Unit.ToLower()))
+                                 .Where(s => !string.IsNullOrWhiteSpace(order.Unit)
+                                          && s.Name.ToLower() == order.Unit.ToLower())
                                  .FirstOrDefault();
                 if (unt == null || itm == null || itm != null && itm.UnitId != unt.Id)
                 {

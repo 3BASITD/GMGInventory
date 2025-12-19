@@ -215,13 +215,13 @@ namespace GMGInventory.Application.Repositories
             if (PackDate == null) PackDate = DateTime.Today;
 
             var packs = from pack in context.Packs
-                         where pack.PackDate.Date == PackDate.Value.Date
-                         && pack.Status.Code.ToLower() == "draft"
+                         where pack.DateCreated.Date == PackDate.Value.Date
+                         && pack.Status.Code.ToLower() == "posted"
                          select new APIPack
                          {
                              Id = pack.Id,
                              SalesOrderId = pack.SalesOrderId,
-                             PackDate = pack.PackDate,
+                             PackDate = pack.DateCreated,
                              LineItems = from item in pack.PackLineItems
                                          select new APIPackLineItem
                                          {

@@ -47,6 +47,6 @@ namespace GMGInventory.Data
         public int? ItemPromoId { get; set; }
         public ItemPromo ItemPromo { get; set; }
 
-
+        public int? BarcotechOutboundId { get; set; }
     }
 }

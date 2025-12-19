@@ -43,6 +43,7 @@ namespace GMGInventory.Common.Models
         public bool IsValidBrand { get; set; }
         public string? Model { get; set; }
         public bool IsValidModel { get; set; }
+        public bool IsValidItem { get; set; }
 
         [Display(Name = "Old Code")]
         public string? OldCode { get; set; }

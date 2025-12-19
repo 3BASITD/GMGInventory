@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -182,7 +183,7 @@ namespace GMGInventory.Application.Repositories
                               RequestDateD = request.RequestDate,
                               Remarks = request.Remarks,
                               ApprovedBy1 = request.Approver1Id == null ? null : request.Approver1.FirstName + " " + request.Approver1.LastName,
-                              ApprovedBy2 = request.Approver2Id == null ? null : request.Approver2.FirstName + " " + request.Approver2.LastName,
+                              //ApprovedBy2 = request.Approver2Id == null ? null : request.Approver2.FirstName + " " + request.Approver2.LastName,
                               DisapprovedBy = request.DisapproverId == null ? null : request.Disapprover.FirstName + " " + request.Disapprover.LastName,
                               DisapprovedReason = request.DisapprovedReason,
                               ResubmitId = request.ResubmitId,
@@ -236,7 +237,7 @@ namespace GMGInventory.Application.Repositories
                                 LineNumber = request.LineNumber,
                                 SalesOrderId = request.SalesOrderId,
                                 SalesOrderNumber = request.SalesOrder.SalesOrderNumber,
-                                PONumber = string.Join("", po.Select(s => "<a href='/PurchaseOrder/Details/" + s.Id + "' class='text-info' target='_blank'>" + s.DocNum + "</a>")),
+                                PONumber = string.Join(", ", po.Select(s => "<a href='/PurchaseOrder/Details/" + s.Id + "' class='text-info' target='_blank'>" + s.DocNum + "</a>")),
                                 CustomerId = request.SalesOrder.Customer.Id,
                                 Customer = request.SalesOrder.Customer.Name,
                                 ItemId = request.ItemId,
@@ -350,36 +351,10 @@ namespace GMGInventory.Application.Repositories
             var previousRequest = await context.PurchaseRequests
                                                .Where(s => s.Id == form.ResubmitId)
                                                .FirstOrDefaultAsync();
-
-            var docNumber = "";
-            if (previousRequest == null)
-            {
-                var docNumberPrefix = "";
-                if (form.Status.ToLower() == "draft")
-                    docNumberPrefix = $"D{type.Code}-PR{DateTime.Now.Year}-";
-                else
-                    docNumberPrefix = $"{type.Code}-PR{DateTime.Now.Year}-";
-
-                var lastDocument = await context.PurchaseRequests
-                                                .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
-                                                .OrderByDescending(s => s.DocumentNumber)
-                                                .Select(s => s.DocumentNumber)
-                                                .FirstOrDefaultAsync();
-
-                if (lastDocument != null && lastDocument.Contains("-D"))
-                {
-                    var splitLastDocument = lastDocument.Split("-D");
-                    lastDocument = splitLastDocument[0];
-                }
-
-                int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
-                docNumber = $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
-            }
-            else
-            {
-                docNumber = previousRequest.DocumentNumber;
-            }
-
+            var procurementHelper = new ProcurementHelper();
+            var docNumber = previousRequest == null
+                          ? await procurementHelper.GetNewRequest(context, type.Code, form.Status)
+                          : previousRequest.DocumentNumber;
 
             var request = new PurchaseRequest
             {
@@ -537,7 +512,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> ApproveAsync(int requestId, int? approverNumber = null)
         {
-            approverNumber = approverNumber ?? 1;
+            //approverNumber = approverNumber ?? 1;
             var response = new ResponseModel();
 
             var request = context.PurchaseRequests
@@ -549,64 +524,64 @@ namespace GMGInventory.Application.Repositories
                 response.Status = "Error";
                 response.Message = "Invalid purchase request";
             }
-            else if (approverNumber != 1 && approverNumber != 2)
-            {
-                response.Status = "Error";
-                response.Message = "Invalid approver number";
-            }
+            //else if (approverNumber != 1 && approverNumber != 2)
+            //{
+            //    response.Status = "Error";
+            //    response.Message = "Invalid approver number";
+            //}
             else
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
-                if (request.Type.Name.ToLower() == "non-automotive")
-                {
-                    string? current = approverNumber == 1 ? request.Approver1Id : request.Approver2Id;
-                    string? other = approverNumber == 1 ? request.Approver2Id : request.Approver1Id;
-                    string approverLabel = approverNumber == 1 ? "#1" : "#2";
-                    string otherLabel = approverNumber == 1 ? "#2" : "#1";
+                //if (request.Type.Name.ToLower() == "non-automotive" || request.Type.Name.ToLower() == "automotive")
+                //{
+                //    string? current = approverNumber == 1 ? request.Approver1Id : request.Approver2Id;
+                //    string? other = approverNumber == 1 ? request.Approver2Id : request.Approver1Id;
+                //    string approverLabel = approverNumber == 1 ? "#1" : "#2";
+                //    string otherLabel = approverNumber == 1 ? "#2" : "#1";
 
-                    if (other == currentUserId)
-                    {
-                        response.Status = "Error";
-                        response.Message = $"You have already approved this purchase request as approver {otherLabel}.";
-                        return response;
-                    }
+                //    if (other == currentUserId)
+                //    {
+                //        response.Status = "Error";
+                //        response.Message = $"You have already approved this purchase request as approver {otherLabel}.";
+                //        return response;
+                //    }
 
-                    if (!string.IsNullOrWhiteSpace(current) && current != currentUserId)
-                    {
-                        var diffUser = await userManager.FindByIdAsync(current);
-                        response.Status = "Error";
-                        response.Message = $"Already have an approver {approverLabel}: {diffUser.FirstName} {diffUser.LastName}";
-                        return response;
-                    }
+                //    if (!string.IsNullOrWhiteSpace(current) && current != currentUserId)
+                //    {
+                //        var diffUser = await userManager.FindByIdAsync(current);
+                //        response.Status = "Error";
+                //        response.Message = $"Already have an approver {approverLabel}: {diffUser.FirstName} {diffUser.LastName}";
+                //        return response;
+                //    }
 
-                    if (current == currentUserId)
-                    {
-                        response.Status = "Error";
-                        response.Message = $"You have already approved this purchase request as approver {approverLabel}.";
-                        return response;
-                    }
+                //    if (current == currentUserId)
+                //    {
+                //        response.Status = "Error";
+                //        response.Message = $"You have already approved this purchase request as approver {approverLabel}.";
+                //        return response;
+                //    }
 
-                    if (approverNumber == 1)
-                        request.Approver1Id = currentUserId;
-                    else
-                        request.Approver2Id = currentUserId;
+                //    if (approverNumber == 1)
+                //        request.Approver1Id = currentUserId;
+                //    else
+                //        request.Approver2Id = currentUserId;
 
-                    if (!string.IsNullOrWhiteSpace(request.Approver1Id)
-                        && !string.IsNullOrWhiteSpace(request.Approver2Id))
-                    {
-                        request.StatusId = statusId;
-                    }
+                //    if (!string.IsNullOrWhiteSpace(request.Approver1Id)
+                //        && !string.IsNullOrWhiteSpace(request.Approver2Id))
+                //    {
+                //        request.StatusId = statusId;
+                //    }
 
-                    context.PurchaseRequests.Update(request);
-                    await context.SaveChangesAsync(currentUserId);
+                //    context.PurchaseRequests.Update(request);
+                //    await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "Purchase request successfully approved.";
-                    return response;
-                }
-                else
-                {
+                //    response.Status = "Success";
+                //    response.Message = "Purchase request successfully approved.";
+                //    return response;
+                //}
+                //else
+                //{
                     if (!string.IsNullOrWhiteSpace(request.Approver1Id))
                     {
                         if (request.StatusId != statusId)
@@ -631,7 +606,7 @@ namespace GMGInventory.Application.Repositories
                         response.Status = "Success";
                         response.Message = "Purchase request successfully approved.";
                     }
-                }
+                //}
             }
             return response;
         }
