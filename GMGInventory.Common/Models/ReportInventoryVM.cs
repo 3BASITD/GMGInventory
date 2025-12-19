@@ -302,4 +302,66 @@ namespace GMGInventory.Common.Models
         public string TotalPrice => string.Format(SystemFormat.StringDecimalComma, TotalPriceD);
         public decimal TotalPriceD { get; set; }
     }
+
+    public class WarehouseTransferRVM
+    {
+        [Display(Name = "Transfer Number")]
+        public int Id { get; set; }
+
+        [Display(Name = "Source Warehouse")]
+        public string Source { get; set; }
+
+        [Display(Name = "Destination Warehouse")]
+        public string Destination { get; set; }
+
+        [Display(Name = "Transfer Date")]
+        public string TransferDate => TransferDateD.ToString(SystemFormat.StringDate);
+        public DateTime TransferDateD { get; set; }
+
+        [Display(Name = "Date Created")]
+        public string DateCreated => DateCreatedD.ToString(SystemFormat.StringDateTime);
+        public DateTime DateCreatedD { get; set; }
+
+        [Display(Name = "Created By")]
+        public string CreatedBy { get; set; }
+
+        [Display(Name = "Date Modified")]
+        public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
+        public DateTime? DateModifiedD { get; set; }
+
+        [Display(Name = "Modified By")]
+        public string? ModifiedBy { get; set; }
+        //
+
+        [Display(Name = "Item Count")]
+        public int ItemCount { get; set; }
+
+        [Display(Name = "Quantity")]
+        public int Quantity { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string ItemCode { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemName { get; set; }
+
+        [Display(Name = "Brand")]
+        public string BrandName { get; set; }
+
+    }
+
+    public class WarehouseTransferPVM
+    {
+        public IList<WarehouseTransferRVM> WarehouseTransfers { get; set; }
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public DateTime DateFromD { get; set; }
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public DateTime DateToD { get; set; }
+        public string Brand { get; set; }
+        public string WarehouseOrigin { get; set; }
+        public string WarehouseDestination { get; set; }
+        public string TotalQuantity => string.Format(SystemFormat.StringIntegerComma, TotalQuantityD);
+        public int TotalQuantityD { get; set; }
+
+    }
 }

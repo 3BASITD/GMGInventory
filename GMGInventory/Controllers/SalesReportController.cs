@@ -1,7 +1,9 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
+using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -914,5 +916,81 @@ namespace GMGInventory.Controllers
                 DateTime.Now.ToString("yyyyMMdd") + " Unserved Items.xlsx");
         }
         #endregion Unserved Items
+
+
+
+        #region  Outbound
+        public async Task<IActionResult> Outbound()
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailyOutboundReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.DailyOutboundReport)).Convert();
+
+           
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetOutboundDT(ListFilterSalesModel filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailyOutboundReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm dtForm = new DataTablesRequestForm(Request.Form);
+            return Json(await reportSalesRepository.GetOutboundDT(dtForm, filter));
+        }
+
+        public async Task<IActionResult> DownloadOutbound(ListFilterSalesModel filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailyOutboundReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("Outbound "
+                             + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                             + "-"
+                             + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
+            dt.Columns.AddRange([
+                new DataColumn(chelper.DisplayName<OutboundRVM>("OldSkuCode")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("ItemCode")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("ItemName")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("Quantity")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("SalesOrderNumber")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("Region")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("Area"))
+            ]);
+            var items = await reportSalesRepository.GetOutbound(filter);
+            foreach (var item in items)
+            {
+                dt.Rows.Add(item.OldSkuCode,
+                            item.ItemCode,
+                            item.ItemName,
+                            item.Brand,
+                            item.Quantity,
+                            item.SalesOrderNumber,
+                            item.Region,
+                            item.Area);
+            }
+
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                DateTime.Now.ToString("yyyyMMdd") + " Outbound.xlsx");
+        }
+
+        public async Task<IActionResult> PrintOutbound(ListFilterSalesModel filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DailyOutboundReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
+            return View(await reportSalesRepository.PrintOutbound(filter));
+        }
+        #endregion Outbound
     }
+
 }

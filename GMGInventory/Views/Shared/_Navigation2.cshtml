@@ -968,6 +968,7 @@ else
             || navPages.Contains(PageNames.SalesReportByBasisReport.ToEnumString())
             || navPages.Contains(PageNames.SalesReturnListingReport.ToEnumString())
             || navPages.Contains(PageNames.UnservedItemReport.ToEnumString())
+            || navPages.Contains(PageNames.DailyOutboundReport.ToEnumString())
             || navPages.Contains(PageNames.BelowMaintainingItemsReport.ToEnumString())
             || navPages.Contains(PageNames.ReceivingListingReport.ToEnumString())
             || navPages.Contains(PageNames.ReceivingListingBySupplierReport.ToEnumString())
@@ -975,6 +976,7 @@ else
             || navPages.Contains(PageNames.StockCardReport.ToEnumString())
             || navPages.Contains(PageNames.StockStatusReport.ToEnumString())
             || navPages.Contains(PageNames.SupplierPurchaseHistoryReport.ToEnumString())
+            || navPages.Contains(PageNames.WarehouseTransferReport.ToEnumString())
             || navPages.Contains(PageNames.CreditMemoListingReport.ToEnumString())
             || navPages.Contains(PageNames.DebitMemoListingReport.ToEnumString())
             || navPages.Contains(PageNames.PurchaseOrderReport.ToEnumString())
@@ -1011,7 +1013,8 @@ else
                                                 || navPages.Contains(PageNames.SalesByAgentAreaReport.ToEnumString())
                                                 || navPages.Contains(PageNames.SalesReportByBasisReport.ToEnumString())
                                                 || navPages.Contains(PageNames.SalesReturnListingReport.ToEnumString())
-                                                || navPages.Contains(PageNames.UnservedItemReport.ToEnumString()))
+                                                || navPages.Contains(PageNames.UnservedItemReport.ToEnumString())
+                                                || navPages.Contains(PageNames.DailyOutboundReport.ToEnumString()))
                             {
                                 <div class="col-md-4 col-report">
                                     <span class="dropdown-header">SALES REPORT</span>
@@ -1075,6 +1078,11 @@ else
                                         <a class="dropdown-item @(currentController == "SalesReport" && currentAction == "UnservedItem" ? "active" : "")"
                                            asp-area="" asp-controller="SalesReport" asp-action="UnservedItem">Unserved Item</a>
                                     }
+                                    @if (navPages.Contains(PageNames.DailyOutboundReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController == "SalesReport" && currentAction == "Outbound" ? "active" : "")"
+                                           asp-area="" asp-controller="SalesReport" asp-action="Outbound">Daily Outbound</a>
+                                    }
                                 </div>
                             }
                             @if (navPages.Contains(PageNames.BelowMaintainingItemsReport.ToEnumString())
@@ -1083,7 +1091,8 @@ else
                                                 || navPages.Contains(PageNames.ReceivingSummaryReport.ToEnumString())
                                                 || navPages.Contains(PageNames.StockCardReport.ToEnumString())
                                                 || navPages.Contains(PageNames.StockStatusReport.ToEnumString())
-                                                || navPages.Contains(PageNames.SupplierPurchaseHistoryReport.ToEnumString()))
+                                                || navPages.Contains(PageNames.SupplierPurchaseHistoryReport.ToEnumString())
+                                                || navPages.Contains(PageNames.WarehouseTransferReport.ToEnumString()))
                             {
                                 <div class="col-md-4 col-report">
                                     <span class="dropdown-header">INVENTORY REPORT</span>
@@ -1121,6 +1130,11 @@ else
                                     {
                                         <a class="dropdown-item @(currentController == "InventoryReport" && currentAction == "SupplierPurchase" ? "active" : "")"
                                            asp-area="" asp-controller="InventoryReport" asp-action="SupplierPurchase">Supplier Purchase History</a>
+                                    }
+                                    @if (navPages.Contains(PageNames.WarehouseTransferReport.ToEnumString()))
+                                    {
+                                        <a class="dropdown-item @(currentController == "InventoryReport" && currentAction == "WarehouseTransfer" ? "active" : "")"
+                                           asp-area="" asp-controller="InventoryReport" asp-action="WarehouseTransfer">Warehouse Transfer Report</a>
                                     }
                                 </div>
                             }
