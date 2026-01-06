@@ -8,8 +8,10 @@ namespace GMGInventory.Common.Models
     {
         [Display(Name = "Order Number")]
         public string OrderNumber { get; set; }
+        public int AgentId { get; set; }
         public string? Agent { get; set; }
         public bool IsValidAgent { get; set; }
+        public int CustomerId { get; set; }
         public string? Customer { get; set; }
         public bool IsValidCustomer { get; set; }
 
@@ -40,27 +42,22 @@ namespace GMGInventory.Common.Models
         public string? SalesOrderNumber { get; set; }
         public int? SalesOrderId { get; set; }
         public string? Brand { get; set; }
-        public bool IsValidBrand { get; set; }
         public string? Model { get; set; }
-        public bool IsValidModel { get; set; }
         public bool IsValidItem { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Old Code")]
         public string? OldCode { get; set; }
-        public bool IsValidOldCode { get; set; }
         public string? Code { get; set; }
 
         [Display(Name = "Item Name")]
         public string? ItemName { get; set; }
-        public bool IsValidItemName { get; set; }
         public string? Size { get; set; }
-        public bool IsValidSize { get; set; }
 
         [Display(Name = "Part Number")]
         public string? PartNumber { get; set; }
-        public bool IsValidPartNumber { get; set; }
         public string? Unit { get; set; }
-        public bool IsValidUnit { get; set; }
 
         [Display(Name = "Unit Price")]
         public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD ?? 0);

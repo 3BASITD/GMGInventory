@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -15,6 +16,7 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly string currentUserId;
 
         public PurchaseOrderNewReporitory(ApplicationDbContext context
                                         , IHttpContextAccessor httpContextAccessor
@@ -23,6 +25,7 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
         public async Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page)
@@ -251,13 +254,14 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIPurchaseOrder>> GetListAPI(DateTime? OrderDate)
+        public async Task<IList<APIPurchaseOrder>> GetListAPI()
         {
-            if (OrderDate == null) OrderDate = DateTime.Today;
-
+            DateTime dtNow = DateTime.Now;
+            DateTime dtTomorrow = dtNow.AddDays(1);
             var orders = from order in context.PurchaseOrderNews
-                         where (OrderDate.Value.Date == order.OrderDate.Date)
-                         && order.ApproverId != null
+                         where (order.BarcotechRequestDate == null
+                         || order.BarcotechRequestDate < dtTomorrow)
+                         && order.Status.Code.ToLower() == "approved"
                          select new APIPurchaseOrder
                          {
                              Id = order.Id,
@@ -276,7 +280,19 @@ namespace GMGInventory.Application.Repositories
                                              Quantity = item.Quantity
                                          }
                          };
-            return await orders.ToListAsync();
+            var resultOrders = await orders.ToListAsync();
+
+            foreach (var order in resultOrders)
+            {
+                var retrievedorder = context.PurchaseOrderNews.Where(s => s.Id == order.Id).First();
+                if (retrievedorder.BarcotechRequestDate == null)
+                {
+                    retrievedorder.BarcotechRequestDate = dtNow;
+                    context.SaveChanges();
+                }
+            }
+
+            return resultOrders;
         }
 
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
@@ -465,7 +481,6 @@ namespace GMGInventory.Application.Repositories
         {
             try
             {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
                 var type = await context.PurchaseOrderTypes.Where(s => s.Id == form.TypeId).FirstOrDefaultAsync();
                 if (type == null)
@@ -542,7 +557,6 @@ namespace GMGInventory.Application.Repositories
         {
             try
             {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
                 var order = await context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefaultAsync();
 
@@ -670,7 +684,7 @@ namespace GMGInventory.Application.Repositories
                                 NewCost = cost.NewCostD,
                                 Remarks = cost.Remarks
                             };
-                            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
                             await context.PurchaseOrderNewLineItemNewCosts.AddAsync(newcost);
                             await context.SaveChangesAsync(currentUserId);
 
@@ -759,7 +773,7 @@ namespace GMGInventory.Application.Repositories
                                 NewQuantity = quantity.NewQuantity,
                                 Remarks = quantity.Remarks
                             };
-                            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
                             await context.PurchaseOrderNewLineItemNewQuantities.AddAsync(qty);
                             await context.SaveChangesAsync(currentUserId);
 
@@ -808,7 +822,6 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
-                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                     int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
 
                     if (!string.IsNullOrWhiteSpace(order.ApproverId))
@@ -844,7 +857,6 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
-                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                     int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
                     if (!string.IsNullOrWhiteSpace(order.DisapproverId))
@@ -888,7 +900,6 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
-                    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                     var resubmittedOrder = await context.PurchaseRequests
                                                         .Where(s => s.ResubmitId == existingRequest.Id)
                                                         .FirstOrDefaultAsync();

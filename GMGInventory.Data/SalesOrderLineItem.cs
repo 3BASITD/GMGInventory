@@ -37,16 +37,22 @@ namespace GMGInventory.Data
         public int? CustomerBrandDiscountId { get; set; }
         public CustomerBrandDiscount CustomerBrandDiscount { get; set; }
 
+
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal? Discount3 { get; set; }
 
+
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal? Discount4 { get; set; }
 
+
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal? Discount5 { get; set; }
 
         [ForeignKey("ItemPromoId")]
         public int? ItemPromoId { get; set; }
         public ItemPromo ItemPromo { get; set; }
 
-        public int? BarcotechOutboundId { get; set; }
+        public string? BarcotechOutboundId { get; set; }
     }
 }

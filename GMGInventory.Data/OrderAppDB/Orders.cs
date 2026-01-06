@@ -68,6 +68,16 @@ namespace GMGInventory.Data.OrderAppDB
         public decimal? ExtendedPrice { get; set; } 
 
         public DateTime CreatedDate { get; set; }
+
+        public int AgentId { get; set; }
+
+        public int CustomerId { get; set; }
+
+        public int ItemId { get; set; }
+
+        public int BrandId { get; set; }
+
+        public int UnitId { get; set; }
     }
 }
 

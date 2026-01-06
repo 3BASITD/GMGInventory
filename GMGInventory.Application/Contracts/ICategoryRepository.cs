@@ -1,5 +1,6 @@
 ﻿using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace GMGInventory.Application.Contracts
 {
@@ -20,5 +21,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<CategoryVM>> GetAllCategoryAsync();
         Task<ForDataTables<CategoryVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
         Task<IList<APIGeneric>> GetListAPI();
+        Task<ResponseModelData<FileVM>> UploadFile(IFormFile file);
+        Task<string> SaveItemFromFile(CategoryFileVM categoryVM);
     }
 }

@@ -238,105 +238,11 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            ResponseModel responseModel = new();
-
-            int? CategoryId = await categoryRepository.GetIdAsync(itemVM.Category);
-            if (CategoryId == null)
+            return Json(new ResponseModel()
             {
-                responseModel.Status = "Error";
-                responseModel.Message = "Unknown Category";
-            }
-            else
-            {
-                int? ItemTypeId = await itemTypeRepository.GetIdAsync(itemVM.ItemType);
-                if (ItemTypeId == null)
-                {
-                    responseModel.Status = "Error";
-                    responseModel.Message = "Unknown Item Type";
-                }
-                else
-                {
-                    int? BrandId = await brandRepository.GetIdAsync(itemVM.Brand);
-                    if (BrandId == null)
-                    {
-                        responseModel.Status = "Error";
-                        responseModel.Message = "Unknown Brand";
-                    }
-                    else
-                    {
-                        int? UnitId = await itemRepository.GetUnitIdByNameAsync(itemVM.Unit);
-                        if (UnitId == null)
-                        {
-                            responseModel.Status = "Error";
-                            responseModel.Message = "Unknown Unit";
-                        }
-                        else
-                        {
-                            int? warehouseId = await warehouseRepository.GetIdAsync(itemVM.Warehouse);
-                            if (warehouseId == null)
-                            {
-                                responseModel.Status = "Error";
-                                responseModel.Message = "Unknown Warehouse";
-                            }
-                            else
-                            {
-                                if (await itemRepository.IsCodeExistAsync(itemVM.Code))
-                                {
-                                    int itemId = (int)await itemRepository.GetIdAsync(itemVM.Code);
-
-                                    await itemRepository.UpdateAsync(new ItemCommonVM
-                                    {
-                                        BeginningCostD = itemVM.BeginningCost,
-                                        BrandId = BrandId.Value,
-                                        CategoryId = CategoryId.Value,
-                                        Id = itemId,
-                                        InterchangeNumber = itemVM.InterchangeNumber,
-                                        ItemTypeId = ItemTypeId.Value,
-                                        ModelNumber = itemVM.ModelNumber,
-                                        Name = itemVM.Name,
-                                        OldCode = itemVM.OldCode,
-                                        PartNumber = itemVM.PartNumber,
-                                        Size = itemVM.Size,
-                                        UnitId = UnitId.Value
-                                    });
-
-                                    await itemRepository.UpdateOrAddItemWarehouse(itemId, warehouseId.Value, itemVM.Quantity, "Updated through file upload");
-
-                                    await itemRepository.UpdateOrAddItemPrice(itemId, itemVM.GrossPrice, itemVM.NetPrice);
-
-                                    responseModel.Status = "Success";
-                                    responseModel.Message = "Item updated";
-                                }
-                                else
-                                {
-                                    await itemRepository.AddAsync(new ItemCommonVM
-                                    {
-                                        BeginningCostD = itemVM.BeginningCost,
-                                        BrandId = BrandId.Value,
-                                        CategoryId = CategoryId.Value,
-                                        Code = itemVM.Code,
-                                        InterchangeNumber = itemVM.InterchangeNumber,
-                                        ItemTypeId = ItemTypeId.Value,
-                                        ModelNumber = itemVM.ModelNumber,
-                                        Name = itemVM.Name,
-                                        OldCode = itemVM.OldCode,
-                                        PartNumber = itemVM.PartNumber,
-                                        Size = itemVM.Size,
-                                        UnitId = UnitId.Value,
-                                        QuantityD = itemVM.Quantity,
-                                        WarehouseId = warehouseId.Value,
-                                        NetPriceD = itemVM.NetPrice,
-                                        RetailPriceD = itemVM.GrossPrice,
-                                    });
-                                    responseModel.Status = "Success";
-                                    responseModel.Message = "Item added";
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return Json(responseModel);
+                Status = "Success",
+                Message = await itemRepository.SaveItemFromFile(itemVM)
+            });
         }
 
         [HttpPost]
@@ -345,12 +251,12 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            var response = await itemRepository.UploadFile(file); 
-            
+            var response = await itemRepository.UploadFile(file);
+
             Response.Headers["X-Status"] = response.Status;
             Response.Headers["X-Message"] = response.Message;
             return File(response.Data.Content,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         response.Data.FileName);
         }
 
@@ -388,11 +294,11 @@ namespace GMGInventory.Controllers
             }
 
             return Json(response);
-            
+
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReactivateItemPromoJson(int id, int itemId, DateTime start, DateTime end )
+        public async Task<IActionResult> ReactivateItemPromoJson(int id, int itemId, DateTime start, DateTime end)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;

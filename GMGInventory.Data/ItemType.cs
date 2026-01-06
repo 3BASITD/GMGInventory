@@ -15,11 +15,7 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "nvarchar(100)")]
         public string Name { get; set; }
-
-        [ForeignKey("CategoryId")]
-        public int CategoryId { get; set; }
-        public Category Category { get; set; }
-
+        
         public bool IsActive { get; set; }
 
         public ICollection<Brand> Brands { get; set; }

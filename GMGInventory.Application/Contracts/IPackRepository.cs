@@ -11,7 +11,7 @@ namespace GMGInventory.Application.Contracts
         Task<PackDetailsVM?> GetDetailsBySOAsync(int? Id);
         Task<IList<PackVM>> GetListAsync(ListFilterCommonModel filter);
         Task<ForDataTables<PackVM>> GetListDTAsync(DataTablesRequestForm form, ListFilterCommonModel filter);
-        Task<IList<APIPack>> GetListAPI(DateTime? PackDate);
+        Task<IList<APIPack>> GetListAPI();
         Task<IList<PackItemVM>> GetItemsAsync(int packId);
         Task<IList<PackItemVM>> GetItemsWithPriceAsync(int packId);
         Task<ForDataTables<PackItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int packId);

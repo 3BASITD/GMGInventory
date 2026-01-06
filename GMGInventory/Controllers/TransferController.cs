@@ -15,9 +15,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class TransferController(IAccessRepository accessRepository
-                                  , IItemTransferRepository itemTransferRepository
-                                  , IAPIBCT_Service apiBCTService
-                                  , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
+                                  , IItemTransferRepository itemTransferRepository) : BaseController(accessRepository)
     {
 
         public async Task<IActionResult> Index()
@@ -136,15 +134,6 @@ namespace GMGInventory.Controllers
             return File(stream.ToArray(),
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             DateTime.Now.ToString("yyyyMMdd") + " WarehouseTransfers.xlsx");
-        }
-
-        public async Task<IActionResult> FetchFromBarcotech(DateTime? FromDate)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechTransfer, AccessTypes.UploadDownload);
-            if (redirectResult != null) return redirectResult;
-
-            var bctTransferItems = await apiBCTService.GetTransfer(apiBCTOptions.Value.URLTransfer, FromDate);
-            return Json(bctTransferItems);
         }
     }
 }

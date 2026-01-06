@@ -195,6 +195,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Special Instruction")]
         public string? SpecialInstruction { get; set; }
 
+        [Display(Name = "App Order Source")]
+        public string? AppOrderSource { get; set; }
+
         [Display(Name = "Approved By")]
         public string ApprovedBy { get; set; }
 

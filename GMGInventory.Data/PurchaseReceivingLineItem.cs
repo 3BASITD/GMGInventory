@@ -19,7 +19,7 @@ namespace GMGInventory.Data
 
         public int Quantity { get; set; }
 
-        public int? BarcotechReceivingId { get; set; }
+        public string? BarcotechReceivingId { get; set; }
 
         public ICollection<PurchaseReturnNewLineItem> PurchaseReturnLineItem { get; set; }
     }

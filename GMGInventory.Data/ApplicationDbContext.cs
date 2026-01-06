@@ -93,65 +93,69 @@ namespace GMGInventory.Data
         {
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
+
             foreach (var entry in ChangeTracker.Entries())
             {
-                if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                if (entry.Entity is AuditLog ||
+                    entry.State == EntityState.Detached ||
+                    entry.State == EntityState.Unchanged)
                     continue;
-                var auditEntry = new AuditEntry(entry);
-                auditEntry.TableName = entry.Entity.GetType().Name;
-                auditEntry.UserId = user;
-                auditEntries.Add(auditEntry);
+
+                var auditEntry = new AuditEntry(entry)
+                {
+                    TableName = entry.Entity.GetType().Name,
+                    UserId = user
+                };
+
                 foreach (var property in entry.Properties)
                 {
-                    string propertyName = property.Metadata.Name;
-                    if ((auditEntry.TableName != "User"
-                        && propertyName != "UserCreated" && propertyName != "UserModified"
-                        && propertyName != "DateCreated" && propertyName != "DateModified")
-                      || (auditEntry.TableName == "User"
-                        && (propertyName == "Id" || propertyName == "UserName" || propertyName == "FirstName" || propertyName == "IsActive" || propertyName == "IsDarkMode" || propertyName == "LastName" || propertyName == "Nickname" || propertyName == "PasswordHash")))
+                    var propertyName = property.Metadata.Name;
+
+                    if (property.Metadata.IsPrimaryKey())
                     {
-                        var currentValue = propertyName == "PasswordHash" ? "*****" : property.CurrentValue ?? string.Empty;
-                        var originalValue = propertyName == "PasswordHash" ? "*****" : property.OriginalValue ?? string.Empty;
-                        if (property.Metadata.IsPrimaryKey())
-                        {
-                            auditEntry.KeyValues[propertyName] = currentValue;
-                            continue;
-                        }
-                        switch (entry.State)
-                        {
-                            case EntityState.Added:
-                                auditEntry.AuditType = Common.Constants.AuditType.Create;
-                                auditEntry.NewValues[propertyName] = currentValue;
-                                break;
-                            case EntityState.Deleted:
-                                auditEntry.AuditType = Common.Constants.AuditType.Delete;
-                                auditEntry.OldValues[propertyName] = originalValue;
-                                break;
-                            case EntityState.Modified:
-                                if (property.IsModified && (originalValue.Equals(currentValue) == false
-                                    || (propertyName == "PasswordHash" && property?.CurrentValue?.Equals(property.OriginalValue) == false)))
-                                {
-                                    auditEntry.ChangedColumns.Add(propertyName);
-                                    auditEntry.AuditType = Common.Constants.AuditType.Update;
-                                    auditEntry.OldValues[propertyName] = originalValue;
-                                    auditEntry.NewValues[propertyName] = currentValue;
-                                }
-                                break;
-                        }
+                        auditEntry.KeyValues[propertyName] = property.CurrentValue;
+                        continue;
                     }
+
+                    if (!property.IsModified)
+                        continue;
+
+                    var original = property.OriginalValue?.ToString() ?? "";
+                    var current = property.CurrentValue?.ToString() ?? "";
+
+                    if (original == current)
+                        continue;
+
+                    auditEntry.ChangedColumns.Add(propertyName);
+                    auditEntry.OldValues[propertyName] = original;
+                    auditEntry.NewValues[propertyName] = current;
                 }
+
+                if (!auditEntry.ChangedColumns.Any())
+                    continue;
+
+                auditEntry.AuditType = entry.State switch
+                {
+                    EntityState.Added => Common.Constants.AuditType.Create,
+                    EntityState.Deleted => Common.Constants.AuditType.Delete,
+                    _ => Common.Constants.AuditType.Update
+                };
+
+                auditEntries.Add(auditEntry);
             }
-            //foreach (var auditEntry in auditEntries)
-            foreach (var auditEntry in auditEntries.Where(s => s.AuditType != Common.Constants.AuditType.None))
+
+            foreach (var auditEntry in auditEntries)
             {
                 AuditLogs.Add(auditEntry.ToAudit());
             }
         }
 
 
+
         public DbSet<Access> Accesses { get; set; }
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Area> Areas { get; set; }
+        public DbSet<BarcotechSync> BarcotechSyncs { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<BusinessStyle> BusinessStyles { get; set; }
         public DbSet<Category> Categories { get; set; }

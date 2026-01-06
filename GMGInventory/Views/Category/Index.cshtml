@@ -2,24 +2,34 @@
 
 @{
     ViewData["Title"] = "Category";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @*            <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
-            <span class="fas fa-plus"></span> New Category
-            </a>*@
-            <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
-                <span class="fas fa-plus"></span> New Category
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                <span class="fas fa-upload"></span> Upload
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
-                <span class="fas fa-download"></span> Download
-            </button>
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#createModal">
+                    <span class="fas fa-plus"></span> New Category
+                </button>
+            }
+            @if (userAccess.CanUploadDownload)
+            {
+                <div class="dropdown float-right ml-2">
+                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuUpload" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuUpload">
+                        <li><a class="dropdown-item btn-details-upload uploadBtn" data-bs-toggle="modal" data-bs-target="#uploadModal" data-company="ROW">Upload &amp; Track per Row</a></li>
+                        <li><a class="dropdown-item btn-details-upload uploadFileBtn" data-bs-toggle="modal" data-bs-target="#uploadFileModal" data-company="FILE">Upload Whole File</a></li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -63,84 +73,89 @@
     <input type="hidden" id="reactivateCategoryId" name="Id" />
 </form>
 
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">New Category</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="createForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="create-code" class="control-label mb-0 d-block">Code</label>
-                                <input name="code" id="create-code" class="form-control form-control-sm" />
-                            </div>
-                            <div class="form-group">
-                                <label for="create-name" class="control-label mb-0 d-block">Name</label>
-                                <input name="name" id="create-name" class="form-control form-control-sm" />
-                            </div>
+@if (userAccess.CanAdd)
+{
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Category</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="createForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="create-code" class="control-label mb-0 d-block">Code</label>
+                                    <input name="code" id="create-code" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-name" class="control-label mb-0 d-block">Name</label>
+                                    <input name="name" id="create-name" class="form-control form-control-sm" />
+                                </div>
 
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-plus"></span> Add
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+}
 
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Category</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form autocomplete="off" id="editForm">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="edit-code" class="control-label mb-0 d-block">Code</label>
-                                <input name="code" id="edit-code" class="form-control form-control-sm" />
+@if (userAccess.CanEdit)
+{
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Category</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form autocomplete="off" id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="edit-code" class="control-label mb-0 d-block">Code</label>
+                                    <input name="code" id="edit-code" class="form-control form-control-sm" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-name" class="control-label mb-0 d-block">Name</label>
+                                    <input name="name" id="edit-name" class="form-control form-control-sm" />
+                                </div>
+                                <input type="hidden" id="edit-id" />
                             </div>
-                            <div class="form-group">
-                                <label for="edit-name" class="control-label mb-0 d-block">Name</label>
-                                <input name="name" id="edit-name" class="form-control form-control-sm" />
-                            </div>
-                            <input type="hidden" id="edit-id" />
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-edit"></span> Update
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <span class="fas fa-times"></span> Cancel
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+}
 
 <!-- Details Modal -->
 <div class="modal fade" id="detailsModal" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -158,6 +173,8 @@
                     <dd class="col-sm-8 modal-detail-code"></dd>
                     <dt class="col-sm-4">Name</dt>
                     <dd class="col-sm-8 modal-detail-name"></dd>
+                    <dt class="col-sm-4">Active</dt>
+                    <dd class="col-sm-8 modal-detail-isactive"></dd>
                     <dt class="col-sm-4">User Created</dt>
                     <dd class="col-sm-8 modal-detail-usercreated"></dd>
                     <dt class="col-sm-4">Date Created</dt>
@@ -176,45 +193,87 @@
 </div>
 
 
-<!-- Upload Modal -->
-<div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Upload Category</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label mb-0" for="upload-file">Excel File</label>
-                    <input type="file" id="upload-file" name="file"
-                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                           class="form-control form-control-sm" />
+
+@if (userAccess.CanUploadDownload)
+{
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload Category</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <table class="table table-striped" id="upload-table">
-                    <thead>
-                        <tr><th>Row #</th><th>Code</th><th>Name</th><th>Is Active</th><th>Status</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="DoUpload()">
-                    <span class="fas fa-upload"></span> Upload
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <span class="fas fa-times"></span> Cancel
-                </button>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-file">Excel File</label>
+                        <input type="file" id="upload-file" name="file"
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Items to upload</div>
+                        <div class="col-9 upload-item-count"></div>
+                        <div class="col-3">Done upload attempt</div>
+                        <div class="col-9 upload-done-count"></div>
+                    </div>
+                    <table class="table table-striped" id="upload-table">
+                        <thead>
+                            <tr><th>Row #</th><th>Code</th><th>Name</th><th>Status</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadFileModal" role="dialog" aria-labelledby="uploadFileModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload File</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-excel-file">Excel File</label>
+                        <input type="file" id="upload-excel-file" name="file"
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="DoFileUpload()">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         // Load List on DataTable
         var dataTable = $('.table-category').on('preXhr.dt', function (e, settings, data) {
             showLoader();
@@ -238,6 +297,16 @@
             columns: [
                 { data: "code", name: "Code" },
                 { data: "name", name: "Name" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.isActive) {
+                            return '<span class="fas fa-check text-success"></span>';
+                        } else {
+                            return '<span class="fas fa-times text-danger"></span>';
+                        }
+                    },
+                    name: "IsActive"
+                },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
                 { data: "userModified", name: "UserModified" },
@@ -307,6 +376,7 @@
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-code").html(data.code);
                 $(".modal-detail-name").html(data.name);
+                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span class="fas fa-question-circle text-primary" data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="bottom-left" role="tooltip"></span>'));
                 $(".modal-detail-commission").html(data.commissionRate);
                 $(".modal-detail-region").html(data.regionName);
                 $(".modal-detail-usercreated").html(data.userCreated);
@@ -417,107 +487,178 @@
             });
         }
 
-        $(".downloadBtn").click(function (e) {
-            window.location = "@Url.Action("DownloadFile")";
-        });
+        if (user_access.canUploadDownload) {
+            var json_of_excel;
+            var colnumber = 2; // number of columns required for upload
+            var done_upload_excel = 0;
+            var duplicate_upload = 0;
 
-
-        var json_of_excel;
-        var colnumber = 3; // number of columns required for upload
-        var done_upload_excel = 0;
-        var duplicate_upload = 0;
-
-        var opts = {
-            readAsDefault: 'ArrayBuffer',
-            dragClass: 'drag',
-            on: {
-                load: function (e, file) {
-                    var result = new Uint8Array(e.target.result);
-                    var xlsread = XLSX.read(result, { type: 'array' });
-                    var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
-                    json_of_excel = xlsjson;
+            var opts = {
+                readAsDefault: 'ArrayBuffer',
+                dragClass: 'drag',
+                on: {
+                    load: function (e, file) {
+                        var result = new Uint8Array(e.target.result);
+                        var xlsread = XLSX.read(result, { type: 'array' });
+                        var xlsjson = XLSX.utils.sheet_to_json(xlsread.Sheets[xlsread.SheetNames[0]], { defval: "" });
+                        json_of_excel = xlsjson;
+                    }
                 }
-            }
-        };
-        $("#upload-file").fileReaderJS(opts);
+            };
+            $("#upload-file").fileReaderJS(opts);
 
-        // Actions upon file selection
-        $("#upload-file").on("change", function () {
-            done_upload_excel = 0;
-            $("#upload-table tbody").html("");
-            $("#upload-table").hide();
-        });
-
-        // Actions upon Display Upload Modal
-        $(".uploadBtn").click(function (e) {
-            done_upload_excel = 0;
-            $("#upload-file").val("");
-            $("#upload-table tbody").html("");
-            $("#upload-table").hide();
-        });
-
-        function DoUpload() {
-            if (!$("#upload-file").val()) {
-                toastr.warning("Please select a file first", "Warning");
-            } if (json_of_excel.length == 0) {
-                toastr.warning("The excel file is empty", "Warning");
-            } else {
-                var columns = Object.keys(json_of_excel[0]);
+            // Actions upon file selection
+            $("#upload-file").on("change", function () {
+                done_upload_excel = 0;
                 $("#upload-table tbody").html("");
-                $("#upload-table").show();
-                duplicate_upload = 0;
-                for (var i = 0; i < json_of_excel.length; i++) {
-                    var rowNum = json_of_excel[i].__rowNum__;
-                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
-                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
-                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
-                        var cellValue = json_of_excel[i][columns[colIndex]];
-                        if (cellValue == null)
-                            cellValue = "";
-                        row$.append($('<td/>').html(cellValue));
+                $("#upload-table").hide();
+            });
+
+            // Actions upon Display Upload Modal
+            $(".uploadBtn").click(function (e) {
+                done_upload_excel = 0;
+                $("#upload-file").val("");
+                $("#upload-table tbody").html("");
+                $("#upload-table").hide();
+            });
+
+            function DoUpload() {
+                if (!$("#upload-file").val()) {
+                    toastr.error("Please select a file first");
+                } if (json_of_excel.length == 0) {
+                    toastr.error("The excel file is empty");
+                } else {
+                    var columns = Object.keys(json_of_excel[0]);
+                    $("#upload-table tbody").html("");
+                    $("#upload-table").show();
+                    duplicate_upload = 0;
+                    for (var i = 0; i < json_of_excel.length; i++) {
+                        var rowNum = json_of_excel[i].__rowNum__;
+                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                        row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                            var cellValue = json_of_excel[i][columns[colIndex]];
+                            if (cellValue == null)
+                                cellValue = "";
+                            row$.append($('<td/>').html(cellValue));
+                        }
+                        if (columns.includes("Code") == false
+                            || columns.includes("Name") == false) {
+                            row$.append($('<td/>').html("Unexpected columns"));
+                            UploadRowDone();
+                        } else {
+                            SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], rowNum);
+                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                        }
+                        $("#upload-table").append(row$);
                     }
-                    if (columns.includes("Code") == false
-                        || columns.includes("Name") == false
-                        || columns.includes("Is Active") == false) {
-                        row$.append($('<td/>').html("Unexpected columns"));
-                        UploadRowDone();
-                    } else {
-                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Is Active"], rowNum);
-                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
-                    }
-                    $("#upload-table").append(row$);
                 }
             }
-        }
 
-        function SaveXLSX(code, name, isActive, rownum) {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("UploadJson")",
-                data: {
-                    Code: code,
-                    Name: name,
-                    IsActive: isActive
-                },
-                success: function (data, status, xhr) {
-                    if (data.message == "Already exist") {
-                        $("#upload-row" + rownum + "tr").remove();
-                        duplicate_upload++;
-                    } else {
-                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+            function SaveXLSX(code, name, rownum) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadJson")",
+                    data: {
+                        Code: code,
+                        Name: name
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.message == "Already exist") {
+                            $("#upload-row" + rownum + "tr").remove();
+                            duplicate_upload++;
+                        } else {
+                            $("#upload-row" + rownum + "td").html(data.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        let message = xhr.responseJSON?.message
+                                   || xhr.responseText?.match(/(?<=:\s)(.*?)(?=\s*--->|\r?\n)/)?.[0]
+                                   || error
+                                   || "Problem sending to server. Try again";
+                        $("#upload-row" + rownum + "td").html(message);
+                    },
+                    complete: function (xhr, status) {
+                        UploadRowDone();
                     }
-                },
-                complete: function (xhr, status) {
-                    UploadRowDone();
-                }
-            });
-        }
+                });
+            }
 
-        function UploadRowDone() {
-            done_upload_excel++;
-            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
-                $("#upload-table").append('<tr><td>*</td><td colspan="3">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
-                $("#upload-file").val("");
+            function UploadRowDone() {
+                done_upload_excel++;
+                $(".upload-item-count").html(json_of_excel.length);
+                $(".upload-done-count").html(done_upload_excel);
+                $.LoadingOverlay("progress", parseInt((done_upload_excel / json_of_excel.length) * 100));
+                if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                    $("#upload-table").append('<tr><td colspan="4">Excluded because it already exist: ' + duplicate_upload + ' row(s)</tr>');
+                    $("#upload-file").val("");
+                }
+                if (done_upload_excel === json_of_excel.length) {
+                    $.LoadingOverlay("progress", 100);
+                    dataTable.ajax.reload();
+                }
+            }
+
+            $(".downloadBtn").click(function (e) {
+                window.location = "@Url.Action("DownloadFile")";
+            });
+
+            function DoFileUpload() {
+                var formData = new FormData();
+                formData.append("File", $("#upload-excel-file")[0].files[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadFileJson")",
+                    data: formData,
+                    loaderMessage: "Please wait while this completes. Whole file is being processed on server.<br><small class=\"text-muted\">Reloading the page will stop the process, which may result in some excel rows to fail.</small>",
+                    //async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    xhrFields: {
+                        responseType: 'blob'  // important for file
+                    },
+                    //enctype: "multipart/form-data",
+                    success: function (data, status, xhr) {
+                        let statusHeader = xhr.getResponseHeader("X-Status");
+                        let messageHeader = xhr.getResponseHeader("X-Message");
+                        if (statusHeader == "Error") {
+                            toastr.error(messageHeader, "Error");
+                        } else {
+                            // Create a temporary download link
+                            let blob = new Blob([data]);
+                            let url = window.URL.createObjectURL(blob);
+
+                            let a = document.createElement("a");
+                            a.href = url;
+
+                            let disposition = xhr.getResponseHeader('Content-Disposition');
+                            let fileName = "Result.xlsx";
+                            if (disposition) {
+                                // try UTF-8 encoded filename first
+                                let utf8Match = disposition.match(/filename\*=UTF-8''(.+)/);
+                                if (utf8Match && utf8Match[1]) {
+                                    fileName = decodeURIComponent(utf8Match[1]);
+                                } else {
+                                    // fallback to normal filename
+                                    let normalMatch = disposition.match(/filename="?([^";]+)"?/);
+                                    if (normalMatch && normalMatch[1]) fileName = normalMatch[1];
+                                }
+                            }
+                            a.download = fileName;
+                            a.click();
+
+                            window.URL.revokeObjectURL(url);
+
+                            dataTable.ajax.reload();
+
+                            toastr.success(messageHeader, "Success");
+
+                            $("#uploadFileModal").modal("hide");
+                        }
+                    }
+                });
             }
         }
     </script>

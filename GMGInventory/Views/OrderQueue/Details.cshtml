@@ -83,7 +83,7 @@
                 <b class="d-block">
                     @if (Model.IsValidAgent == false)
                     {
-                        <span class="text-danger" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
+                        <span class="text-danger" data-microtip-title="Invalid Agent: Unknown PK_@Model.AgentId" data-microtip-position="right" role="tooltip">
                             @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='fw-normal text-warning'>N/A</span>") : Model.Agent)
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
@@ -101,7 +101,7 @@
                 <b class="d-block">
                     @if (Model.IsValidCustomer == false)
                     {
-                        <span class="text-danger" data-microtip-title="Invalid Customer" data-microtip-position="right" role="tooltip">
+                        <span class="text-danger" data-microtip-title="Invalid Customer: Unknown PK_@Model.CustomerId" data-microtip-position="right" role="tooltip">
                             @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='fw-normal text-warning'>N/A</span>") : Model.Customer)
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
@@ -168,16 +168,9 @@
                                                     <span class="fas fa-exclamation-triangle"></span>
                                                 </span>
                                             }
-                                            else if (item.IsValidItem == false ||
-                                                     item.IsValidOldCode == false ||
-                                                     item.IsValidItemName == false ||
-                                                     item.IsValidBrand == false ||
-                                                     item.IsValidModel == false ||
-                                                     item.IsValidSize == false ||
-                                                     item.IsValidPartNumber == false ||
-                                                     item.IsValidUnit == false)
+                                            else if (item.IsValidItem == false)
                                             {
-                                                <span class="text-warning" data-microtip-title="Cannot select this row because of invalid data. Please fix the invalid data first." data-microtip-position="right" role="tooltip">
+                                                <span class="text-warning" data-microtip-title="Cannot select this row because of invalid data. Please fix the Invalid Item first." data-microtip-position="right" role="tooltip">
                                                     <span class="fas fa-exclamation-triangle"></span>
                                                 </span>
                                             }
@@ -203,36 +196,16 @@
                                                 <input type="checkbox" class="checkrow" data-row-id="@item.Id" />
                                             }
                                         </td>
+                                        <td>@item.Code</td>
+                                        <td>
+                                            @(string.IsNullOrWhiteSpace(item.OldCode) 
+                                            ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                            : item.OldCode)
+                                        </td>
                                         <td>
                                             @if (item.IsValidItem == false)
                                             {
-                                                <span class="text-warning" data-microtip-title="Invalid Code" data-microtip-position="right" role="tooltip">
-                                                    @item.Code&emsp;<span class="fas fa-exclamation-triangle"></span>
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                @item.Code
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (item.IsValidItem == true && item.IsValidOldCode == false)
-                                            {
-                                                <span class="text-warning" data-microtip-title="Invalid Old Code" data-microtip-position="right" role="tooltip">
-                                                    @item.OldCode&emsp;<span class="fas fa-exclamation-triangle"></span>
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                @(string.IsNullOrWhiteSpace(item.OldCode) 
-                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
-                                                : item.OldCode)
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (item.IsValidItem == true && item.IsValidItemName == false)
-                                            {
-                                                <span class="text-warning" data-microtip-title="Invalid Item Name" data-microtip-position="right" role="tooltip">
+                                                <span class="text-warning" data-microtip-title="Invalid Item: Unknown PK_@item.ItemId" data-microtip-position="right" role="tooltip">
                                                     @item.ItemName&emsp;<span class="fas fa-exclamation-triangle"></span>
                                                 </span>
                                             }
@@ -241,74 +214,24 @@
                                                 @item.ItemName
                                             }
                                         </td>
+                                        <td>@item.Brand</td>
                                         <td>
-                                            @if (item.IsValidItem == true && item.IsValidBrand == false)
-                                            {
-                                                <span class="text-warning" data-microtip-title="Invalid Brand" data-microtip-position="right" role="tooltip">
-                                                    @item.Brand&emsp;<span class="fas fa-exclamation-triangle"></span>
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                @item.Brand
-                                            }
+                                            @(string.IsNullOrWhiteSpace(item.Model) 
+                                            ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                            : item.Model)
                                         </td>
                                         <td>
-                                            @if (item.IsValidItem == true && item.IsValidModel == false)
-                                            {
-                                                <span class="text-warning" data-microtip-title="Invalid Model" data-microtip-position="right" role="tooltip">
-                                                    @item.Model&emsp;<span class="fas fa-exclamation-triangle"></span>
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                @(string.IsNullOrWhiteSpace(item.Model) 
-                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
-                                                : item.Model)
-                                            }
+                                            @(string.IsNullOrWhiteSpace(item.Size) 
+                                            ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                            : item.Size)
                                         </td>
                                         <td>
-                                            @if (item.IsValidItem == true && item.IsValidSize == false)
-                                            {
-                                                <span class="text-warning" data-microtip-title="Invalid Size" data-microtip-position="right" role="tooltip">
-                                                    @item.Size&emsp;<span class="fas fa-exclamation-triangle"></span>
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                @(string.IsNullOrWhiteSpace(item.Size) 
-                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
-                                                : item.Size)
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (item.IsValidItem == true && item.IsValidPartNumber == false)
-                                            {
-                                                <span class="text-warning" data-microtip-title="Invalid Part Number" data-microtip-position="right" role="tooltip">
-                                                    @item.PartNumber&emsp;<span class="fas fa-exclamation-triangle"></span>
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                @(string.IsNullOrWhiteSpace(item.PartNumber) 
-                                                ? Html.Raw("<span class='text-muted'>N/A</span>") 
-                                                : item.PartNumber)
-                                            }
+                                            @(string.IsNullOrWhiteSpace(item.PartNumber) 
+                                            ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                            : item.PartNumber)
                                         </td>
                                         <td class="text-end">@item.Quantity</td>
-                                        <td>
-                                            @if (item.IsValidItem == true && item.IsValidUnit == false)
-                                            {
-                                                <span class="text-warning" data-microtip-title="Invalid Unit" data-microtip-position="right" role="tooltip">
-                                                    @item.Unit&emsp;<span class="fas fa-exclamation-triangle"></span>
-                                                </span>
-                                            }
-                                            else
-                                            {
-
-                                                @item.Unit
-                                            }
-                                        </td>
+                                        <td>@item.Unit</td>
                                         <td class="text-end">@item.UnitPrice</td>
                                         <td>@item.Discount1%; @item.Discount2%; @item.Discount3%; @item.Discount4%; @item.Discount5%</td>
                                         <td class="text-end">@item.ExtendedPrice</td>

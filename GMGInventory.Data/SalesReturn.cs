@@ -24,6 +24,8 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(501)")]
         public string Remarks { get; set; }
 
+        public string? BarcotechReturnCode { get; set; }
+
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }
 }

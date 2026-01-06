@@ -492,6 +492,16 @@
                             </b>
                         }
                     </p>
+                    @if(!string.IsNullOrWhiteSpace(Model.AppOrderSource)) {
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.AppOrderSource)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                <a href="/OrderQueue/Details/@Model.AppOrderSource" class="text-info" target="_blank">@Model.AppOrderSource</a>
+                            </b>
+                        </p>
+                    }
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
                     <p class="text-sm">

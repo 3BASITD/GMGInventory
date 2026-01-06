@@ -1960,133 +1960,154 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
-        private async Task<string> SaveItemFromFile(ItemFileVM itemFile)
+        public async Task<string> SaveItemFromFile(ItemFileVM itemFile)
         {
-            if (string.IsNullOrWhiteSpace(itemFile.Code)) return "Item Code is required";
-            if (string.IsNullOrWhiteSpace(itemFile.Name)) return "Item Name is required";
-            if (string.IsNullOrWhiteSpace(itemFile.Size)) return "Item Size is required";
+            try
+            {
+                if (string.IsNullOrWhiteSpace(itemFile.Code)) return "Item Code is required";
+                if (string.IsNullOrWhiteSpace(itemFile.Name)) return "Item Name is required";
+                if (string.IsNullOrWhiteSpace(itemFile.Size)) return "Item Size is required";
 
-            var category = await context.Categories
-                                        .Where(s => s.Name.ToLower().Trim() == itemFile.Category.ToLower().Trim()
-                                                 || s.Code.ToLower().Trim() == itemFile.Category.ToLower().Trim())
-                                        .FirstOrDefaultAsync();
-            if (category == null) return $"Category({itemFile.Category}) not found";
+                var category = await context.Categories
+                                            .Where(s => s.Name.ToLower().Trim() == itemFile.Category.ToLower().Trim()
+                                                     || s.Code.ToLower().Trim() == itemFile.Category.ToLower().Trim())
+                                            .FirstOrDefaultAsync();
+                if (category == null) return $"Invalid Category: {itemFile.Category} not found";
 
-            var itemType = await context.ItemTypes
-                                        .Where(s => s.Name.ToLower() == itemFile.ItemType.ToLower()
-                                                 && s.Category.Id == category.Id)
-                                        .FirstOrDefaultAsync();
-            if (itemType == null) return $"Cannot find Item Type({itemFile.ItemType}) under Category({itemFile.Category})";
+                var itemType = await context.ItemTypes
+                                            .Where(s => s.Name.ToLower() == itemFile.ItemType.ToLower())
+                                            .FirstOrDefaultAsync();
+                if (itemType == null) return $"Invalid Item Type: {itemFile.ItemType} not found";
 
-            var brand = await context.Brands
-                                     .Where(s => s.Name.ToLower() == itemFile.Brand.ToLower()
-                                              && s.ItemType.Id == itemType.Id)
-                                     .FirstOrDefaultAsync();
-            if (brand == null) return $"Cannot find Brand({itemFile.Brand}) under Item Type({itemFile.ItemType})";
-
-            var unit = await context.Units
-                                    .Where(s => s.Name.ToLower() == itemFile.Unit.ToLower())
-                                    .FirstOrDefaultAsync();
-            if (unit == null) return $"Unit({itemFile.Unit}) not found";
-
-            var warehouse = await context.Warehouses
-                                         .Where(s => s.Code.ToLower() == itemFile.Warehouse.ToLower())
+                var brand = await context.Brands
+                                         .Where(s => s.Name.ToLower() == itemFile.Brand.ToLower())
                                          .FirstOrDefaultAsync();
-            if (warehouse == null) return $"Warehouse({itemFile.Warehouse}) not found";
+                if (brand == null) return $"Invalid Brand: {itemFile.Brand} not found";
 
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            var msg = new List<string>();
+                var unit = await context.Units
+                                        .Where(s => s.Name.ToLower() == itemFile.Unit.ToLower())
+                                        .FirstOrDefaultAsync();
+                if (unit == null) return $"Invalid Unit: {itemFile.Unit} not found";
 
-            var item = await context.Items.Where(s => s.Code.ToLower() == itemFile.Code.ToLower()).FirstOrDefaultAsync();
-            if (item != null)
-            {
-                item.OldCode = !string.IsNullOrWhiteSpace(itemFile.OldCode) ? itemFile.OldCode : item.OldCode;
-                item.Name = itemFile.Name;
-                item.PartNumber = !string.IsNullOrWhiteSpace(itemFile.PartNumber) ? itemFile.PartNumber : item.PartNumber;
-                item.InterchangeNumber = !string.IsNullOrWhiteSpace(itemFile.InterchangeNumber) ? itemFile.InterchangeNumber : item.InterchangeNumber;
-                item.ModelNumber = !string.IsNullOrWhiteSpace(itemFile.ModelNumber) ? itemFile.ModelNumber : item.ModelNumber;
-                item.Size = itemFile.Size;
-                item.UnitId = unit.Id;
-                item.CategoryId = category.Id;
-                item.ItemTypeId = itemType.Id;
-                item.BrandId = brand.Id;
-                item.BeginningCost = itemFile.BeginningCost != -999999 ? itemFile.BeginningCost : item.BeginningCost;
-                item.IsActive = true;
-
-                context.Items.Update(item);
-                msg.Add("Item updated");
-                await context.SaveChangesAsync(currentUserId);
-            }
-            else
-            {
-                item = new GMGInventory.Data.Item
-                {
-                    OldCode = itemFile.OldCode,
-                    Code = itemFile.Code,
-                    Name = itemFile.Name,
-                    PartNumber = itemFile.PartNumber,
-                    InterchangeNumber = itemFile.InterchangeNumber,
-                    ModelNumber = itemFile.ModelNumber,
-                    Size = itemFile.Size,
-                    UnitId = unit.Id,
-                    CategoryId = category.Id,
-                    ItemTypeId = itemType.Id,
-                    BrandId = brand.Id,
-                    BeginningCost = itemFile.BeginningCost != -999999 ? itemFile.BeginningCost
-                                  : itemFile.GrossPrice != -999999 ? itemFile.GrossPrice
-                                  : itemFile.NetPrice != -999999 ? itemFile.NetPrice
-                                  : 0,
-                    IsActive = true,
-                };
-
-                await context.Items.AddAsync(item);
-                msg.Add("Item added");
-                await context.SaveChangesAsync(currentUserId);
-            }
-
-            var itemInventory = await context.ItemInventories
-                                             .Where(s => s.Item.Id == item.Id && s.Warehouse.Id == warehouse.Id)
+                var warehouse = await context.Warehouses
+                                             .Where(s => s.Code.ToLower() == itemFile.Warehouse.ToLower())
                                              .FirstOrDefaultAsync();
-            if (itemInventory != null)
-            {
-                itemInventory.Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0;
-                context.ItemInventories.Update(itemInventory);
-                msg.Add("Item inventory updated");
-            }
-            else
-            {
-                itemInventory = new ItemInventory
+                if (warehouse == null) return $"Invalid Warehouse: {itemFile.Warehouse} not found";
+
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                var msg = new List<string>();
+
+                var oldCode = SaveItemFromFileTruncate(itemFile.OldCode, 50, msg, "Old Code");
+                var code = SaveItemFromFileTruncate(itemFile.Code, 50, msg, "Code", false);
+                var name = SaveItemFromFileTruncate(itemFile.Name, 200, msg, "Name", false);
+                var partNumber = SaveItemFromFileTruncate(itemFile.PartNumber, 200, msg, "Part Number");
+                var interchangeNumber = SaveItemFromFileTruncate(itemFile.InterchangeNumber, 200, msg, "Interchange Number");
+                var modelNumber = SaveItemFromFileTruncate(itemFile.ModelNumber, 200, msg, "Model Number");
+                var size = SaveItemFromFileTruncate(itemFile.Size, 50, msg, "Size", false);
+
+                var item = await context.Items.Where(s => s.Code.ToLower() == code.ToLower()).FirstOrDefaultAsync();
+                if (item != null)
                 {
-                    ItemId = item.Id,
-                    WarehouseId = warehouse.Id,
-                    Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0
-                };
-                await context.ItemInventories.AddAsync(itemInventory);
-                msg.Add("Item inventory added");
-            }
+                    item.OldCode = !string.IsNullOrWhiteSpace(oldCode) ? oldCode : item.OldCode;
+                    item.Name = name;
+                    item.PartNumber = !string.IsNullOrWhiteSpace(partNumber) ? partNumber : item.PartNumber;
+                    item.InterchangeNumber = !string.IsNullOrWhiteSpace(interchangeNumber) ? interchangeNumber : item.InterchangeNumber;
+                    item.ModelNumber = !string.IsNullOrWhiteSpace(modelNumber) ? modelNumber : item.ModelNumber;
+                    item.Size = size;
+                    item.UnitId = unit.Id;
+                    item.CategoryId = category.Id;
+                    item.ItemTypeId = itemType.Id;
+                    item.BrandId = brand.Id;
+                    item.BeginningCost = itemFile.BeginningCost != -999999 ? itemFile.BeginningCost : item.BeginningCost;
+                    item.IsActive = true;
 
-            var itemPrice = await context.ItemPrices
-                                         .Where(s => s.Item.Id == item.Id)
-                                         .OrderByDescending(s => s.DateCreated)
-                                         .FirstOrDefaultAsync();
-
-            if (itemPrice == null ||
-                itemPrice.RetailSellingPrice == itemFile.GrossPrice == false ||
-                itemPrice.NetSellingPrice == itemFile.NetPrice == false)
-            {
-                itemPrice = new ItemPrice
+                    context.Items.Update(item);
+                    msg.Add("Item updated");
+                    await context.SaveChangesAsync(currentUserId);
+                }
+                else
                 {
-                    ItemId = item.Id,
-                    RetailSellingPrice = itemFile.GrossPrice != -999999 ? itemFile.GrossPrice : 0,
-                    NetSellingPrice = itemFile.NetPrice != -999999 ? itemFile.NetPrice : 0
-                };
-                await context.ItemPrices.AddAsync(itemPrice);
-                msg.Add("Item price added");
+                    item = new GMGInventory.Data.Item
+                    {
+                        OldCode = oldCode,
+                        Code = code,
+                        Name = name,
+                        PartNumber = partNumber,
+                        InterchangeNumber = interchangeNumber,
+                        ModelNumber = modelNumber,
+                        Size = size,
+                        UnitId = unit.Id,
+                        CategoryId = category.Id,
+                        ItemTypeId = itemType.Id,
+                        BrandId = brand.Id,
+                        BeginningCost = itemFile.BeginningCost != -999999 ? itemFile.BeginningCost
+                                      : itemFile.GrossPrice != -999999 ? itemFile.GrossPrice
+                                      : itemFile.NetPrice != -999999 ? itemFile.NetPrice
+                                      : 0,
+                        IsActive = true,
+                    };
+
+                    await context.Items.AddAsync(item);
+                    msg.Add("Item added");
+                    await context.SaveChangesAsync(currentUserId);
+                }
+
+                var itemInventory = await context.ItemInventories
+                                                 .Where(s => s.Item.Id == item.Id && s.Warehouse.Id == warehouse.Id)
+                                                 .FirstOrDefaultAsync();
+                if (itemInventory != null)
+                {
+                    itemInventory.Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0;
+                    context.ItemInventories.Update(itemInventory);
+                    msg.Add("Item inventory updated");
+                }
+                else
+                {
+                    itemInventory = new ItemInventory
+                    {
+                        ItemId = item.Id,
+                        WarehouseId = warehouse.Id,
+                        Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0
+                    };
+                    await context.ItemInventories.AddAsync(itemInventory);
+                    msg.Add("Item inventory added");
+                }
+
+                var itemPrice = await context.ItemPrices
+                                             .Where(s => s.Item.Id == item.Id)
+                                             .OrderByDescending(s => s.DateCreated)
+                                             .FirstOrDefaultAsync();
+
+                if (itemPrice == null ||
+                    itemPrice.RetailSellingPrice == itemFile.GrossPrice == false ||
+                    itemPrice.NetSellingPrice == itemFile.NetPrice == false)
+                {
+                    itemPrice = new ItemPrice
+                    {
+                        ItemId = item.Id,
+                        RetailSellingPrice = itemFile.GrossPrice != -999999 ? itemFile.GrossPrice : 0,
+                        NetSellingPrice = itemFile.NetPrice != -999999 ? itemFile.NetPrice : 0
+                    };
+                    await context.ItemPrices.AddAsync(itemPrice);
+                    msg.Add("Item price added");
+                }
+
+                await context.SaveChangesAsync(currentUserId);
+
+                return string.Join("; ", msg);
             }
+            catch (Exception ex)
+            {
+                return SystemFormat.GetInnermostExceptionMessage(ex);
+            }
+        }
 
-            await context.SaveChangesAsync(currentUserId);
-
-            return string.Join("; ", msg);
+        private string SaveItemFromFileTruncate(string? value, int maxLength, List<string> messages, string fieldName, bool allowNull = true)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return allowNull ? null! : "";
+            if (value.Length <= maxLength) return value;
+            messages?.Add($"{fieldName ?? "Field"} truncated");
+            return value.Substring(0, maxLength);
         }
     }
 }

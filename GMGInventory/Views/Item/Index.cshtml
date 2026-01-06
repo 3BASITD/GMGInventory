@@ -1234,12 +1234,15 @@
                             $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
                         }
                     },
+                    error: function (xhr, status, error) {
+                        let message = xhr.responseJSON?.message
+                                   || xhr.responseText?.match(/(?<=:\s)(.*?)(?=\s*--->|\r?\n)/)?.[0]
+                                   || error
+                                   || "Problem sending to server. Try again";
+                        $("#upload-row" + rownum + "td").html(message);
+                    },
                     complete: function (xhr, status) {
                         UploadRowDone();
-                    },
-                    error: function (xhr, status, error) {
-                        let message = xhr.responseText.match(/(?<=:\s)(.*?)(?=\s*--->|\r?\n)/)?.[0] || "An error occurred.";
-                        $("#upload-row" + rownum + "td").html(message);
                     }
                 });
             }
@@ -1253,7 +1256,10 @@
                     $("#upload-table").append('<tr><td>*</td><td colspan="2">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
                     $("#upload-file").val("");
                 }
-                itemDT.ajax.reload();
+                if (done_upload_excel === json_of_excel.length) {
+                    $.LoadingOverlay("progress", 100);
+                    itemDT.ajax.reload();
+                }
             }
 
             $(".downloadBtn").click(function (e) {
@@ -1273,6 +1279,7 @@
                     type: "POST",
                     url: "@Url.Action("UploadFileJson")",
                     data: formData,
+                    loaderMessage: "Please wait while this completes. Whole file is being processed on server.<br><small class=\"text-muted\">Reloading the page will stop the process, which may result in some excel rows to fail.</small>",
                     //async: false,
                     cache: false,
                     contentType: false,

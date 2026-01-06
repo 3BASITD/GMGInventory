@@ -9,9 +9,9 @@ namespace GMGInventory.API.Controllers
     public class BrandController(IBrandRepository brandRepository) : ControllerBase
     {
         [HttpGet("List")]
-        public async Task<IList<APIBrand>> GetList(int? ItemTypeId)
+        public async Task<IList<APIBrand>> GetList()
         {
-            return await brandRepository.GetListAPI(ItemTypeId);
+            return await brandRepository.GetListAPI();
         }
     }
 }

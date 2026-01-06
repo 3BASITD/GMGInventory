@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -61,39 +62,31 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadJson(BrandVM brandVM)
+        public async Task<IActionResult> UploadJson(BrandFileVM brandVM)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            var responseModel = new ResponseModel();
-            if (await brandRepository.UploadCombinationExistAsync(brandVM))
+            return Json(new ResponseModel()
             {
-                responseModel.Status = "Error";
-                responseModel.Message = "Already exist";
-            }
-            else if (await brandRepository.IsBrandCodeExist(brandVM.Code))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Code already in use";
-            }
-            else
-            {
-                int? ItemTypeId = await itemTypeRepository.GetIdAsync(brandVM.ItemType);
-                if (ItemTypeId == null)
-                {
-                    responseModel.Status = "Error";
-                    responseModel.Message = "Unknown Item Type";
-                }
-                else
-                {
-                    brandVM.ItemTypeId = ItemTypeId.Value;
-                    await brandRepository.AddAsync(brandVM);
-                    responseModel.Status = "Success";
-                    responseModel.Message = "Brand successfully added";
-                }
-            }
-            return Json(responseModel);
+                Status = "Success",
+                Message = await brandRepository.SaveItemFromFile(brandVM)
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFileJson(IFormFile file)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Brands, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await brandRepository.UploadFile(file);
+
+            Response.Headers["X-Status"] = response.Status;
+            Response.Headers["X-Message"] = response.Message;
+            return File(response.Data.Content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        response.Data.FileName);
         }
 
         [HttpPost]
@@ -133,13 +126,12 @@ namespace GMGInventory.Controllers
             var dt = new DataTable("Item Types");
             dt.Columns.AddRange([
                 new DataColumn("Code"),
-                new DataColumn("Name"),
-                new DataColumn("ItemType")
+                new DataColumn("Name")
             ]);
             var brands = (await brandRepository.GetListAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var brand in brands)
             {
-                dt.Rows.Add(brand.Code, brand.Name, brand.ItemType);
+                dt.Rows.Add(brand.Code, brand.Name);
             }
 
             using XLWorkbook wb = new();

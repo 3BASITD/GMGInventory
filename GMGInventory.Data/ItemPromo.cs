@@ -4,8 +4,11 @@ namespace GMGInventory.Data
 {
     public class ItemPromo : BaseEntity
     {
-        public ItemPromo() { 
+        public ItemPromo()
+        {
+            SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
         }
+
         [ForeignKey("ItemId")]
         public int ItemId { get; set; }
         public Item Item { get; set; }
@@ -15,10 +18,12 @@ namespace GMGInventory.Data
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal PromoPrice { get; set; }
-        
+
         public DateTime EffectiveDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public bool IsActive { get; set; }
 
+
+        public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }
 }

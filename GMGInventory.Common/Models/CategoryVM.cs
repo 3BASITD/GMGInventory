@@ -13,4 +13,9 @@ namespace GMGInventory.Common.Models
         [MinLength(5)]
         public new string Name { get; set; }
     }
+
+    public class CategoryFileVM : CategoryVM
+    {
+        public string? Status { get; set; }
+    }
 }

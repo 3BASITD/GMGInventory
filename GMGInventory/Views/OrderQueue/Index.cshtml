@@ -195,7 +195,7 @@
                     data: function (data, type, dataToSet) {
                         if (data.isValidAgent == false) {
                             return `
-                                <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
+                                <span class="text-warning" data-microtip-title="Invalid Agent: Unknown PK_${data.agentId}" data-microtip-position="right" role="tooltip">
                                     ${data.agent || "<em class='fw-normal text-muted'>N/A</em>"}
                                     &emsp;<span class="fas fa-exclamation-triangle"></span>
                                 </span>`;
@@ -209,7 +209,7 @@
                     data: function (data, type, dataToSet) {
                         if (data.isValidCustomer == false) {
                             return `
-                                <span class="text-warning" data-microtip-title="Invalid Agent" data-microtip-position="right" role="tooltip">
+                                <span class="text-warning" data-microtip-title="Invalid Customer: Unknown PK_${data.customerId}" data-microtip-position="right" role="tooltip">
                                     ${data.customer || "<em class='fw-normal text-muted'>N/A</em>"}
                                     &emsp;<span class="fas fa-exclamation-triangle"></span>
                                 </span>`;

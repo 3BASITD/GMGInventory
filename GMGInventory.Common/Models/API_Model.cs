@@ -50,15 +50,9 @@ namespace GMGInventory.Common.Models
         public IEnumerable<int> LocationCodeIds { get; set; }
     }
 
-    public class APIItemType : APIGeneric
-    {
-        public int CategoryId { get; set; }
-    }
+    public class APIItemType : APIGeneric { }
 
-    public class APIBrand : APIGeneric
-    {
-        public int ItemTypeId { get; set; }
-    }
+    public class APIBrand : APIGeneric { }
 
     public class APISalesOrder
     {

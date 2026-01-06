@@ -12,9 +12,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class SalesOrderController(IAccessRepository accessRepository
-                                    , ISalesOrderRepository salesOrderRepository
-                                    , IAPIBCT_Service apiBCTService
-                                    , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
+                                    , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 
@@ -347,15 +345,6 @@ namespace GMGInventory.Controllers
             return File(stream.ToArray(),
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         DateTime.Now.ToString("yyyyMMdd") + " Sales Order.xlsx");
-        }
-
-        public async Task<IActionResult> SyncFromBarcotech(DateTime? FromDate)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechOutbound, AccessTypes.UploadDownload);
-            if (redirectResult != null) return redirectResult;
-
-            var bctOutboundItems = await apiBCTService.GetOutbound(apiBCTOptions.Value.URLOutbound, FromDate);
-            return Json(bctOutboundItems);
         }
     }
 }

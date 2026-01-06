@@ -1,5 +1,6 @@
 ﻿using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace GMGInventory.Application.Contracts
 {
@@ -7,7 +8,7 @@ namespace GMGInventory.Application.Contracts
     {
         Task<IList<BrandViewVM>> GetListAsync();
         Task<ForDataTables<BrandViewVM>> GetListDTAsync(DataTablesRequestForm form);
-        Task<IList<APIBrand>> GetListAPI(int? ItemTypeId); 
+        Task<IList<APIBrand>> GetListAPI(); 
         Task<BrandViewVM?> GetBrandViewVM(int? id);
         Task<bool> UploadCombinationExistAsync(BrandVM brandVM);
         Task<BrandVM?> GetBrandVMAsync(int? id);
@@ -21,5 +22,7 @@ namespace GMGInventory.Application.Contracts
         Task UpdateAsync(BrandVM brandVM);
         Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId);
         Task<int?> GetIdAsync(string? Name);
+        Task<ResponseModelData<FileVM>> UploadFile(IFormFile file);
+        Task<string> SaveItemFromFile(BrandFileVM brandVM);
     }
 }

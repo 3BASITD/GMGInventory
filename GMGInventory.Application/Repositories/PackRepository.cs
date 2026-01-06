@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +17,8 @@ namespace GMGInventory.Application.Repositories
         private readonly string currentUserId;
 
         public PackRepository(ApplicationDbContext context
-            , IHttpContextAccessor httpContextAccessor
-             , UserManager<User> userManager)
+                            , IHttpContextAccessor httpContextAccessor
+                            , UserManager<User> userManager)
         {
             this.context = context;
             this.userManager = userManager;
@@ -210,12 +211,13 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIPack>> GetListAPI(DateTime? PackDate)
+        public async Task<IList<APIPack>> GetListAPI()
         {
-            if (PackDate == null) PackDate = DateTime.Today;
-
+            DateTime dtNow = DateTime.Now;
+            DateTime dtTomorrow = dtNow.AddDays(1);
             var packs = from pack in context.Packs
-                         where pack.DateCreated.Date == PackDate.Value.Date
+                         where (pack.BarcotechRequestDate == null
+                         || pack.BarcotechRequestDate < dtTomorrow)
                          && pack.Status.Code.ToLower() == "posted"
                          select new APIPack
                          {
@@ -232,7 +234,18 @@ namespace GMGInventory.Application.Repositories
                                              Quantity = item.Quantity
                                          }
                          };
-            return await packs.ToListAsync();
+            var resultPacks = await packs.ToListAsync();
+            foreach (var pack in resultPacks)
+            {
+                var retrievedPack = context.Packs.Where(s => s.Id == pack.Id).First();
+                if (retrievedPack.BarcotechRequestDate == null)
+                {
+                    retrievedPack.BarcotechRequestDate = dtNow;
+                    context.SaveChanges();
+                }
+            }
+
+            return resultPacks;
         }
 
         public async Task<IList<PackItemVM>> GetItemsAsync(int packId)

@@ -46,6 +46,8 @@ namespace GMGInventory.Data
         public int? ResubmitId { get; set; }
         public virtual PurchaseReturnNew Resubmit { get; set; }
 
+        public DateTime? BarcotechRequestDate { get; set; }
+
         public ICollection<PurchaseReturnNew> PurchaseReturnResubmits { get; set; }
         public ICollection<PurchaseReturnNewLineItem> PurchasReturnLineItem { get; set; }
     }

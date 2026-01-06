@@ -79,6 +79,8 @@ namespace GMGInventory.Data
 
         public bool IsVATIncluded { get; set; }
 
+        public DateTime? BarcotechRequestDate { get; set; }
+
         public ICollection<PurchaseOrderNew> PurchaseOrderResubmits { get; set; }
         public ICollection<PurchaseOrderNewLineItem> PurchaseOrderLineItems { get; set; }
         public ICollection<PurchaseReceiving> PurchaseReceivings { get; set; }

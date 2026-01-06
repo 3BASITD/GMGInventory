@@ -237,7 +237,7 @@ namespace GMGInventory.Application.Repositories
                                       from pli in p.DefaultIfEmpty()
                                       where soli.Quantity > (pli == null ? 0 : pli.Quantity)
                                       select soli.SalesOrderId;
-
+            
             var orderVM = (from order in context.SalesOrders
                            join userc in userManager.Users on order.UserCreated equals userc.Id
                            join userm in userManager.Users on order.UserModified equals userm.Id into um
@@ -268,6 +268,9 @@ namespace GMGInventory.Application.Repositories
                                AgentCode = order.Agent.Code,
                                AgentId = order.Agent.Id,
                                AgentName = order.Agent.FirstName + " " + order.Agent.LastName,
+                               AppOrderSource = order.SalesOrderSources.Count() > 0
+                                              ? order.SalesOrderSources.First().SourceOrderNumber
+                                              : null,
                                ApprovedBy = approve.FirstName + " " + approve.LastName,
                                ApprovedDateD = order.ApprovedDate,
                                Branch = order.Customer.Branch,
@@ -438,33 +441,6 @@ namespace GMGInventory.Application.Repositories
                                                        .FirstOrDefault()
                            });
             return await orderVM.ToListAsync();
-        }
-
-        public async Task<IList<APISalesOrder>> GetListAPI(DateTime? OrderDate)
-        {
-            if (OrderDate == null) OrderDate = DateTime.Today;
-
-            var orders = from order in context.SalesOrders
-                         where order.SalesOrderDate.Date == OrderDate.Value.Date
-                         && order.ApprovedBy != null
-                         && order.ApprovedDate != null
-                         select new APISalesOrder
-                         {
-                             Id = order.Id,
-                             AgentId = order.AgentId,
-                             CustomerId = order.CustomerId,
-                             SalesOrderNumber = order.SalesOrderNumber,
-                             OrderDate = order.SalesOrderDate,
-                             LineItems = from item in order.SalesOrderLineItems
-                                         select new APISalesOrderLineItem
-                                         {
-                                             Id = item.Id,
-                                             LineNumber = item.LineNumber,
-                                             ItemId = item.ItemId,
-                                             Quantity = item.Quantity
-                                         }
-                         };
-            return await orders.ToListAsync();
         }
 
         public async Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter)

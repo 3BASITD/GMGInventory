@@ -16,10 +16,6 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(100)")]
         public string Name { get; set; }
 
-        [ForeignKey("ItemTypeId")]
-        public int ItemTypeId { get; set; }
-        public ItemType ItemType { get; set; }
-
         public bool IsActive { get; set; }
 
         public ICollection<Item> Items { get; set; }

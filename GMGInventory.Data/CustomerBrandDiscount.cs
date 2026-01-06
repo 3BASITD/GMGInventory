@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public CustomerBrandDiscount()
         {
+            SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
         }
 
         [ForeignKey("CustomerId")]
@@ -21,5 +22,7 @@ namespace GMGInventory.Data
         
         public bool IsActive { get; set; }
 
+
+        public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }
 }

@@ -1194,6 +1194,37 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("AuditLogs");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.BarcotechSync", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DatePerformed")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModuleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrimaryKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SyncStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BarcotechSyncs");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
                 {
                     b.Property<int>("Id")
@@ -1215,7 +1246,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ItemTypeId")
+                    b.Property<int?>("ItemTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -4057,7 +4088,7 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
@@ -4140,6 +4171,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("BarcotechRequestDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateCreated")
@@ -5486,6 +5520,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("ApproverId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("BarcotechRequestDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CanvasSummaryReference")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
@@ -5771,6 +5808,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("ApproverId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("BarcotechReceivingCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -5867,8 +5907,8 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("BarcotechReceivingId")
-                        .HasColumnType("int");
+                    b.Property<string>("BarcotechReceivingId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -6222,6 +6262,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("ApproverId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("BarcotechRequestDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -6555,6 +6598,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("BarcotechOutboundCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
@@ -6715,8 +6761,8 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("BarcotechOutboundId")
-                        .HasColumnType("int");
+                    b.Property<string>("BarcotechOutboundId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CustomerBrandDiscountId")
                         .HasColumnType("int");
@@ -6831,6 +6877,9 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("BarcotechReturnCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
@@ -6878,7 +6927,10 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("BarcotechReturnId")
+                    b.Property<string>("BarcotechReturnId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CustomerBrandDiscountId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateCreated")
@@ -6897,6 +6949,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ItemPromoId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -6920,9 +6975,13 @@ namespace GMGInventory.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerBrandDiscountId");
+
                     b.HasIndex("InvoiceLineItemId");
 
                     b.HasIndex("ItemId");
+
+                    b.HasIndex("ItemPromoId");
 
                     b.HasIndex("ReasonOfReturnId");
 
@@ -7677,6 +7736,9 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("BarcotechTransferCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -7720,8 +7782,8 @@ namespace GMGInventory.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("BarcotechTransferId")
-                        .HasColumnType("int");
+                    b.Property<string>("BarcotechTransferId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -8306,13 +8368,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e5bbc4d7-515e-4706-9500-d0a748879992",
+                            ConcurrencyStamp = "8425104e-ee1c-47f4-a697-e2839073cb36",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEER5hAWTvc5XAdJP/xL0AC0jSiONikDyUoVFspFvDVu6NgnwOk0tDvpNOGcEAXDCKA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEM9lae2XolCEk5D4ilOYIKNrZ1HqGAtc6r4s93KYgXyPCOZS0QmLHE9jEP5nrrwtpQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "afe83b0a-3b1b-43f6-8ddd-808a64cf77b4",
+                            SecurityStamp = "0cdf4158-9236-4f6b-a69c-bdb52af0023a",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8327,13 +8389,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c50e84f6-7601-4ad9-91a3-8b33283b8001",
+                            ConcurrencyStamp = "2812ce34-1e80-41b5-86f8-b8838401d44b",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHW08H6tb8raJggyubzxDmzwtuTTvP4DuWUe6Td4GdhCtqRTRK7CLpQi1yLdJm9S9Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOv7LnIv0k/Ga9hOlCsDEX0pAtfBPbvtPbCzxrSbAIQwIw6D0x2E5LMoJWbjMjh7Tg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1d9d2f7b-bcdd-4da0-87ec-e45bcc82eec8",
+                            SecurityStamp = "462e6548-a7a4-48b1-846c-f382017c1239",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8400,13 +8462,9 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.Brand", b =>
                 {
-                    b.HasOne("GMGInventory.Data.ItemType", "ItemType")
+                    b.HasOne("GMGInventory.Data.ItemType", null)
                         .WithMany("Brands")
-                        .HasForeignKey("ItemTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ItemType");
+                        .HasForeignKey("ItemTypeId");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Cheque", b =>
@@ -8710,13 +8768,9 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.ItemType", b =>
                 {
-                    b.HasOne("GMGInventory.Data.Category", "Category")
+                    b.HasOne("GMGInventory.Data.Category", null)
                         .WithMany("ItemTypes")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
+                        .HasForeignKey("CategoryId");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Pack", b =>
@@ -9423,6 +9477,10 @@ namespace GMGInventory.Data.Migrations
 
             modelBuilder.Entity("GMGInventory.Data.SalesReturnLineItem", b =>
                 {
+                    b.HasOne("GMGInventory.Data.CustomerBrandDiscount", "CustomerBrandDiscount")
+                        .WithMany("SalesReturnLineItems")
+                        .HasForeignKey("CustomerBrandDiscountId");
+
                     b.HasOne("GMGInventory.Data.InvoiceLineItem", "InvoiceLineItem")
                         .WithMany("SalesReturnLineItems")
                         .HasForeignKey("InvoiceLineItemId");
@@ -9432,6 +9490,10 @@ namespace GMGInventory.Data.Migrations
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.ItemPromo", "ItemPromo")
+                        .WithMany("SalesReturnLineItems")
+                        .HasForeignKey("ItemPromoId");
 
                     b.HasOne("GMGInventory.Data.ReasonOfReturn", "ReasonOfReturn")
                         .WithMany("SalesReturnLineItems")
@@ -9445,9 +9507,13 @@ namespace GMGInventory.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CustomerBrandDiscount");
+
                     b.Navigation("InvoiceLineItem");
 
                     b.Navigation("Item");
+
+                    b.Navigation("ItemPromo");
 
                     b.Navigation("ReasonOfReturn");
 
@@ -9803,6 +9869,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Customers");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.CustomerBrandDiscount", b =>
+                {
+                    b.Navigation("SalesReturnLineItems");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.CustomerPayment", b =>
                 {
                     b.Navigation("CustomerPaymentDetails");
@@ -9869,6 +9940,11 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("SalesReturnLineItems");
 
                     b.Navigation("TransferItemDetails");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.ItemPromo", b =>
+                {
+                    b.Navigation("SalesReturnLineItems");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.ItemType", b =>

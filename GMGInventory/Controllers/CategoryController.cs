@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -183,30 +184,31 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadJson(CategoryVM categoryVM)
+        public async Task<IActionResult> UploadJson(CategoryFileVM categoryVM)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            var responseModel = new ResponseModel();
-            if (await categoryRepository.UploadCombinationExistAsync(categoryVM))
+            return Json(new ResponseModel()
             {
-                responseModel.Status = "Error";
-                responseModel.Message = "Already exist";
-            }
-            else if (await categoryRepository.IsCodeExist(categoryVM.Code))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Code already in use";
-            }
-            else
-            {
-                    await categoryRepository.AddAsync(categoryVM);
-                    responseModel.Status = "Success";
-                    responseModel.Message = "Category added";
-                
-            }
-            return Json(responseModel);
+                Status = "Success",
+                Message = await categoryRepository.SaveItemFromFile(categoryVM)
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFileJson(IFormFile file)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Categories, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await categoryRepository.UploadFile(file);
+
+            Response.Headers["X-Status"] = response.Status;
+            Response.Headers["X-Message"] = response.Message;
+            return File(response.Data.Content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        response.Data.FileName);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -201,7 +202,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsCategoryInUse(int id)
         {
-            return await context.ItemTypes.AnyAsync(s => s.CategoryId == id);
+            return await context.Items.AnyAsync(s => s.CategoryId == id);
         }
 
 
@@ -236,7 +237,6 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync(currentUserId);
         }
 
-
         public async Task<bool> UploadCombinationExistAsync(CategoryVM categoryVM)
         {
             var _code = categoryVM.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim();
@@ -244,7 +244,7 @@ namespace GMGInventory.Application.Repositories
             var _name = categoryVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
             var name = _name.Length > 100 ? _name[..100] : _name;
 
-            return (await GetAllGenericVMAsync()).Any(s => s.Code.ToLower().Replace("\r","").Replace("\n","").Trim() == code
+            return (await GetAllGenericVMAsync()).Any(s => s.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim() == code
                                                         && s.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim() == name);
         }
 
@@ -257,5 +257,130 @@ namespace GMGInventory.Application.Repositories
             return await context.Categories.AnyAsync(c => c.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim() == code);
         }
 
+        public async Task<ResponseModelData<FileVM>> UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Invalid file" };
+
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+                stream.Position = 0;
+
+                using var workbook = new XLWorkbook(stream);
+                var worksheet = workbook.Worksheets.First();
+
+                var headers = worksheet.Row(1).Cells().Select(c => c.GetString().Trim()).ToList();
+                var requiredHeaders = new[] { "Code", "Name" };
+
+                var missingColumns = new List<string>();
+                foreach (var col in requiredHeaders)
+                {
+                    if (!headers.Contains(col))
+                        missingColumns.Add(col);
+                }
+                if (missingColumns.Count > 0)
+                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Missing column(s): " + string.Join(", ", missingColumns) };
+
+                int codeCol = headers.IndexOf("Code") + 1;
+                int nameCol = headers.IndexOf("Name") + 1;
+
+                var xclitems = new List<CategoryFileVM>();
+                foreach (var row in worksheet.RowsUsed().Skip(1))
+                {
+                    var xclitem = new CategoryFileVM
+                    {
+                        Code = row.Cell(codeCol).GetString(),
+                        Name = row.Cell(nameCol).GetString()
+                    };
+
+                    xclitem.Status = await SaveItemFromFile(xclitem);
+
+                    xclitems.Add(xclitem);
+                }
+
+                using var newWorkbook = new XLWorkbook();
+                var newSheet = newWorkbook.AddWorksheet("Result");
+
+                newSheet.Range("A1:C1").Merge();
+                newSheet.Cell(1, 1).MergedRange().Value = "This file is a result of item upload. Don't use this file for uploading";
+
+                newSheet.Cell(2, 1).Value = "Code";
+                newSheet.Cell(2, 2).Value = "Name";
+                newSheet.Cell(2, 3).Value = "Status";
+
+                for (int i = 0; i < xclitems.Count; i++)
+                {
+                    var p = xclitems[i];
+                    newSheet.Cell(i + 3, 1).Value = p.Code;
+                    newSheet.Cell(i + 3, 2).Value = p.Name;
+                    newSheet.Cell(i + 3, 3).Value = p.Status;
+                }
+
+                using var outStream = new MemoryStream();
+                newWorkbook.SaveAs(outStream);
+                outStream.Position = 0;
+
+                return new ResponseModelData<FileVM>
+                {
+                    Status = "Success",
+                    Message = "The Excel file has been processed. Please check the downloaded file to see the status of the results.",
+                    Data = new FileVM
+                    {
+                        FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Category Upload Processed --- {file.FileName}",
+                        Content = outStream.ToArray()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModelData<FileVM> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
+        public async Task<string> SaveItemFromFile(CategoryFileVM categoryVM)
+        {
+            try
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                if (string.IsNullOrWhiteSpace(categoryVM.Code)) return "Category Code is required";
+                if (string.IsNullOrWhiteSpace(categoryVM.Name)) return "Category Name is required";
+
+                var _code = categoryVM.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim();
+                var code = _code.Length > 10 ? _code[..10] : _code;
+                var _name = categoryVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
+                var name = _name.Length > 100 ? _name[..100] : _name;
+
+                var category = await context.Categories.Where(s => s.Code.ToLower() == code.ToLower()).FirstOrDefaultAsync();
+                if (category != null)
+                {
+                    category.Name = name;
+                    category.IsActive = true;
+
+                    context.Categories.Update(category);
+                    await context.SaveChangesAsync(currentUserId);
+                    return "Category updated";
+                }
+                else
+                {
+                    category = new Category
+                    {
+                        Code = code,
+                        Name = name,
+                        IsActive = true
+                    };
+
+                    await context.Categories.AddAsync(category);
+                    await context.SaveChangesAsync(currentUserId);
+                    return "Category added";
+                }
+            }
+            catch (Exception ex)
+            {
+                return SystemFormat.GetInnermostExceptionMessage(ex);
+            }
+        }
     }
 }

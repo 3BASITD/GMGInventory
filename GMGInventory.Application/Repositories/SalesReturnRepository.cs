@@ -1,4 +1,6 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Wordprocessing;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -15,6 +17,7 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly string currentUserId;
 
         public SalesReturnRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
@@ -23,6 +26,7 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
         public async Task<SalesReturnVM?> GetDetailsAsync(int? Id)
@@ -155,30 +159,42 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APISalesReturn>> GetListAPI(DateTime? ReturnDate)
-        {
-            if (ReturnDate == null) ReturnDate = DateTime.Today;
+        //public async Task<IList<APISalesReturn>> GetListAPI()
+        //{
+        //    DateTime dtNow = DateTime.Now;
+        //    DateTime dtTomorrow = dtNow.AddDays(1);
+        //    var sreturns = from sreturn in context.SalesReturns
+        //                   where (sreturn.BarcotechRequestDate == null
+        //                   || sreturn.BarcotechRequestDate < dtTomorrow)
+        //                   select new APISalesReturn
+        //                   {
+        //                       Id = sreturn.Id,
+        //                       SalesOrderId = sreturn.SalesOrderId,
+        //                       SalesReturnNumber = sreturn.SalesReturnNumber,
+        //                       ReturnDate = sreturn.ReturnDate,
+        //                       LineItems = from item in sreturn.SalesReturnLineItems
+        //                                   select new APISalesReturnLineItem
+        //                                   {
+        //                                       Id = item.Id,
+        //                                       ItemId = item.ItemId,
+        //                                       Quantity = item.Quantity,
+        //                                       ReasonOfReturnId = item.ReasonOfReturnId
+        //                                   }
+        //                   };
+        //    var resultSReturns = await sreturns.ToListAsync();
 
-            var sreturns = from sreturn in context.SalesReturns
-                           where ReturnDate.Value.Date == sreturn.ReturnDate.Date
-                           select new APISalesReturn
-                           {
-                               Id = sreturn.Id,
-                               SalesOrderId = sreturn.SalesOrderId,
-                               SalesReturnNumber = sreturn.SalesReturnNumber,
-                               ReturnDate = sreturn.ReturnDate,
-                               LineItems = from item in sreturn.SalesReturnLineItems
-                                           select new APISalesReturnLineItem
-                                           {
-                                               Id = item.Id,
-                                               ItemId = item.ItemId,
-                                               Quantity = item.Quantity,
-                                               ReasonOfReturnId = item.ReasonOfReturnId
-                                           }
-                           };
+        //    foreach (var sreturn in resultSReturns)
+        //    {
+        //        var retrievedsreturn = context.SalesReturns.Where(s => s.Id == sreturn.Id).First();
+        //        if (retrievedsreturn.BarcotechRequestDate == null)
+        //        {
+        //            retrievedsreturn.BarcotechRequestDate = dtNow;
+        //            context.SaveChanges();
+        //        }
+        //    }
 
-            return await sreturns.ToListAsync();
-        }
+        //    return resultSReturns;
+        //}
 
         public async Task<IList<SalesReturnItemVM>> GetItemsAsync(int salesReturnId)
         {
@@ -215,7 +231,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<ResponseModel<int>> SaveAsync(SalesReturnFormVM form)
         {
             ResponseModel<int> response = new();
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             if (await context.SalesReturns.Where(s => s.Id != form.Id && s.SalesReturnNumber == form.ReturnNumber).AnyAsync())
             {

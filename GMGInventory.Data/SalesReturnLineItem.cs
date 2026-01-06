@@ -31,6 +31,11 @@ namespace GMGInventory.Data
         public int ReasonOfReturnId { get; set; }
         public ReasonOfReturn ReasonOfReturn { get; set; }
 
-        public int? BarcotechReturnId { get; set; }
+        public int? CustomerBrandDiscountId { get; set; }
+        public CustomerBrandDiscount CustomerBrandDiscount { get; set; }
+        public int? ItemPromoId { get; set; }
+        public ItemPromo ItemPromo{ get; set; }
+
+        public string? BarcotechReturnId { get; set; }
     }
 }

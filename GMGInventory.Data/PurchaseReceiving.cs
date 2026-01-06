@@ -59,6 +59,8 @@ namespace GMGInventory.Data
         public User HashMicroMoveBy { get; set; }
         public DateTime? HashMicroMoveDate { get; set; }
 
+        public string? BarcotechReceivingCode { get; set; }
+
         public ICollection<PurchaseReceiving> PurchaseReceivingResubmits { get; set; }
         public ICollection<PurchaseReceivingLineItem> PurchaseReceivingLineItems { get; set; }
         public ICollection<PurchaseReturnNew> PurchaseReturns { get; set; }

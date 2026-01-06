@@ -21,6 +21,7 @@ namespace GMGInventory.Data
         public string Remarks { get; set; }
 
         public DateTime TransferDate { get; set; }
+        public string? BarcotechTransferCode { get; set; }
 
         public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
     }

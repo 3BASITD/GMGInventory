@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,19 +29,18 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? CategoryId, int? IncludeId)
         {
             return await context.ItemTypes
-                //.Where(s => (s.CategoryId == CategoryId && s.IsActive) || s.Id == IncludeId)
-                .Where(s => s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
-                {
-                    Id = s.Id.ToString(),
-                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
-                    Selected = IncludeId != null && IncludeId == s.Id
-                })
-                .OrderBy(s => s.Text)
-                .ToListAsync();
+                                .Where(s => s.IsActive || s.Id == IncludeId)
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
+                                    Selected = IncludeId != null && IncludeId == s.Id
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
         }
 
         public async Task<int?> GetIdAsync(string? Name)
@@ -57,8 +58,6 @@ namespace GMGInventory.Application.Repositories
                             select new ItemTypeViewVM
                             {
                                 Id = itemType.Id,
-                                Category = itemType.Category.Name,
-                                CategoryId = itemType.Category.Id,
                                 Code = itemType.Code,
                                 DateCreatedD = itemType.DateCreated,
                                 DateModifiedD = itemType.DateModified,
@@ -82,7 +81,6 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.Name.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Category.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
                                     || x.DateCreated.ToLower().Contains(form.SearchValue.ToLower())
                                     || (x.UserModified + "").ToLower().Contains(form.SearchValue.ToLower())
@@ -99,7 +97,6 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderBy(s => s.Code); break;
                         case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "Category": data = data.OrderBy(s => s.Category); break;
                         case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
                         case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
                         case "UserModified": data = data.OrderBy(s => s.UserModified); break;
@@ -113,7 +110,6 @@ namespace GMGInventory.Application.Repositories
                     {
                         case "Code": data = data.OrderByDescending(s => s.Code); break;
                         case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "NetPrice": data = data.OrderByDescending(s => s.Category); break;
                         case "PartNumber": data = data.OrderByDescending(s => s.UserCreated); break;
                         case "Quantity": data = data.OrderByDescending(s => s.DateCreatedD); break;
                         case "RetailPrice": data = data.OrderByDescending(s => s.UserModified); break;
@@ -133,17 +129,15 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIItemType>> GetListAPI(int? CategoryId)
+        public async Task<IList<APIItemType>> GetListAPI()
         {
             var itemTypes = from itemType in context.ItemTypes
                             where itemType.IsActive == true
-                            && (CategoryId == null || CategoryId == itemType.CategoryId)
                             select new APIItemType
                             {
                                 Id = itemType.Id,
                                 Code = itemType.Code,
-                                Name = itemType.Name,
-                                CategoryId = itemType.CategoryId
+                                Name = itemType.Name
                             };
             return await itemTypes.ToListAsync();
         }
@@ -161,17 +155,16 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> UploadCombinationExistAsync(ItemTypeVM itemTypeVM)
         {
             return (await GetListAsync()).Any(s => s.Code == itemTypeVM.Code
-                                                && s.Name == itemTypeVM.Name
-                                                && s.Category == s.Category);
+                                                && s.Name == itemTypeVM.Name);
         }
 
         public async Task<ItemTypeVM?> GetItemTypeVMAsync(int? id)
         {
-            var itemType = await context.ItemTypes.Include(s => s.Category).Where(s => s.Id == id).FirstOrDefaultAsync();
-            if (itemType == null)
-            {
-                return null;
-            }
+            var itemType = await context.ItemTypes
+                                        .Where(s => s.Id == id)
+                                        .FirstOrDefaultAsync();
+            if (itemType == null) return null;
+
             var itemTypeViewVM = mapper.Map<ItemTypeVM>(itemType);
             return itemTypeViewVM;
         }
@@ -188,8 +181,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsItemTypeInUse(int id)
         {
-            return await context.Brands.AnyAsync(s => s.ItemTypeId == id)
-                || await context.Items.AnyAsync(s => s.ItemTypeId == id);
+            return await context.Items.AnyAsync(s => s.ItemTypeId == id);
         }
 
         public async Task<bool> IsItemTypeIdExistAsync(int id)
@@ -221,7 +213,6 @@ namespace GMGInventory.Application.Repositories
             {
                 Code = itemTypeVM.Code,
                 Name = itemTypeVM.Name,
-                CategoryId = itemTypeVM.CategoryId,
                 IsActive = true
             };
             await context.ItemTypes.AddAsync(itemType);
@@ -239,6 +230,132 @@ namespace GMGInventory.Application.Repositories
             mapper.Map(itemTypeVM, itemType);
             context.ItemTypes.Update(itemType);
             await context.SaveChangesAsync(currentUserId);
+        }
+
+        public async Task<ResponseModelData<FileVM>> UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Invalid file" };
+
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+                stream.Position = 0;
+
+                using var workbook = new XLWorkbook(stream);
+                var worksheet = workbook.Worksheets.First();
+
+                var headers = worksheet.Row(1).Cells().Select(c => c.GetString().Trim()).ToList();
+                var requiredHeaders = new[] { "Code", "Name" };
+
+                var missingColumns = new List<string>();
+                foreach (var col in requiredHeaders)
+                {
+                    if (!headers.Contains(col))
+                        missingColumns.Add(col);
+                }
+                if (missingColumns.Count > 0)
+                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Missing column(s): " + string.Join(", ", missingColumns) };
+
+                int codeCol = headers.IndexOf("Code") + 1;
+                int nameCol = headers.IndexOf("Name") + 1;
+
+                var xclitems = new List<ItemTypeFileVM>();
+                foreach (var row in worksheet.RowsUsed().Skip(1))
+                {
+                    var xclitem = new ItemTypeFileVM
+                    {
+                        Code = row.Cell(codeCol).GetString(),
+                        Name = row.Cell(nameCol).GetString()
+                    };
+
+                    xclitem.Status = await SaveItemFromFile(xclitem);
+
+                    xclitems.Add(xclitem);
+                }
+
+                using var newWorkbook = new XLWorkbook();
+                var newSheet = newWorkbook.AddWorksheet("Result");
+
+                newSheet.Range("A1:C1").Merge();
+                newSheet.Cell(1, 1).MergedRange().Value = "This file is a result of item upload. Don't use this file for uploading";
+
+                newSheet.Cell(2, 1).Value = "Code";
+                newSheet.Cell(2, 2).Value = "Name";
+                newSheet.Cell(2, 3).Value = "Status";
+
+                for (int i = 0; i < xclitems.Count; i++)
+                {
+                    var p = xclitems[i];
+                    newSheet.Cell(i + 3, 1).Value = p.Code;
+                    newSheet.Cell(i + 3, 2).Value = p.Name;
+                    newSheet.Cell(i + 3, 3).Value = p.Status;
+                }
+
+                using var outStream = new MemoryStream();
+                newWorkbook.SaveAs(outStream);
+                outStream.Position = 0;
+
+                return new ResponseModelData<FileVM>
+                {
+                    Status = "Success",
+                    Message = "The Excel file has been processed. Please check the downloaded file to see the status of the results.",
+                    Data = new FileVM
+                    {
+                        FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Category Upload Processed --- {file.FileName}",
+                        Content = outStream.ToArray()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModelData<FileVM> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
+        public async Task<string> SaveItemFromFile(ItemTypeFileVM typeVM)
+        {
+            try
+            {
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+                if (string.IsNullOrWhiteSpace(typeVM.Code)) return "Item Type Code is required";
+                if (string.IsNullOrWhiteSpace(typeVM.Name)) return "Item Type Name is required";
+
+                var _code = typeVM.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim();
+                var code = _code.Length > 10 ? _code[..10] : _code;
+                var _name = typeVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
+                var name = _name.Length > 100 ? _name[..100] : _name;
+
+                var type = await context.ItemTypes.Where(s => s.Code.ToLower() == code.ToLower()).FirstOrDefaultAsync();
+                if (type != null)
+                {
+                    type.Name = name;
+                    type.IsActive = true;
+
+                    context.ItemTypes.Update(type);
+                    await context.SaveChangesAsync(currentUserId);
+                    return "Item Type updated";
+                }
+                else
+                {
+                    type = new ItemType
+                    {
+                        Code = code,
+                        Name = name,
+                        IsActive = true
+                    };
+
+                    await context.ItemTypes.AddAsync(type);
+                    await context.SaveChangesAsync(currentUserId);
+                    return "Item Type added";
+                }
+            }
+            catch (Exception ex)
+            {
+                return SystemFormat.GetInnermostExceptionMessage(ex);
+            }
         }
     }
 }

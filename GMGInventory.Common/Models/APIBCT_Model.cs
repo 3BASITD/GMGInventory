@@ -19,12 +19,12 @@ namespace GMGInventory.Common.Models
         public string serial_no { get; set; }
         public string qty_scan { get; set; }
         public string qty_request { get; set; }
-        public DateTime received_date { get; set; }
+        public string received_date { get; set; }
         public string received_by { get; set; }
         public string wh_code { get; set; }
         public string bin_location_code { get; set; }
         public string batch_number { get; set; }
-        public DateTime expiration_date { get; set; }
+        public string expiration_date { get; set; }
         public string remarks { get; set; }
     }
 
@@ -37,12 +37,12 @@ namespace GMGInventory.Common.Models
         public string serial_no { get; set; }
         public string qty_scan { get; set; }
         public string qty_requested { get; set; }
-        public DateTime dispatch_date { get; set; }
+        public string dispatch_date { get; set; }
         public string dispatched_by { get; set; }
         public string wh_code { get; set; }
         public string bin_location_code { get; set; }
         public string batch_number { get; set; }
-        public DateTime expiration_date { get; set; }
+        public string expiration_date { get; set; }
         public string remarks { get; set; }
     }
 
@@ -54,12 +54,12 @@ namespace GMGInventory.Common.Models
         public string serial_no { get; set; }
         public string qty_returned { get; set; }
         public string qty_requested { get; set; }
-        public DateTime return_date { get; set; }
+        public string return_date { get; set; }
         public string returned_by { get; set; }
         public string wh_code { get; set; }
         public string bin_location_code { get; set; }
         public string batch_number { get; set; }
-        public DateTime expiration_date { get; set; }
+        public string expiration_date { get; set; }
         public string remarks { get; set; }
     }
 
@@ -71,19 +71,23 @@ namespace GMGInventory.Common.Models
         public string barcode { get; set; }
         public string serial_no { get; set; }
         public string qty_transferred { get; set; }
-        public DateTime transfer_date { get; set; }
+        public string transfer_date { get; set; }
         public string transferred_by { get; set; }
         public string from_wh_code { get; set; }
         public string to_wh_code { get; set; }
         public string bin_location_code { get; set; }
         public string batch_number { get; set; }
-        public DateTime expiration_date { get; set; }
+        public string expiration_date { get; set; }
     }
 
-    public class APIBCT_Response<T>
+    public class BarcotechSyncVM
     {
-        public string status { get; set; }
-        public string message { get; set; }
-        public T data { get; set; }
+        public int Id { get; set; }
+        public string ModuleName { get; set; }
+        public string PrimaryKey { get; set; }
+        public string SyncStatus { get; set; }
+        public string? Remarks { get; set; }
+        public string DatePerformed => DatePerformedD.ToString(SystemFormat.StringDate);
+        public DateTime DatePerformedD { get; set; }
     }
 }

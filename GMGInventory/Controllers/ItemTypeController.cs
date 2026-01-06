@@ -14,9 +14,9 @@ namespace GMGInventory.Controllers
                             , IItemTypeRepository itemTypeRepository
                             , ICategoryRepository categoryRepository) : BaseController(accessRepository)
     {
-        public async Task<IActionResult> GetOptions(int? IncludeId)
+        public async Task<IActionResult> GetOptions(int? CategoryId, int? IncludeId)
         {
-            return Json(await itemTypeRepository.GetOptions(IncludeId));
+            return Json(await itemTypeRepository.GetOptions(CategoryId, IncludeId));
         }
 
         public async Task<IActionResult> Index()
@@ -61,39 +61,31 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadJson(ItemTypeVM itemTypeVM)
+        public async Task<IActionResult> UploadJson(ItemTypeFileVM itemTypeVM)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            ResponseModel responseModel = new ResponseModel();
-            if (await itemTypeRepository.UploadCombinationExistAsync(itemTypeVM))
+            return Json(new ResponseModel()
             {
-                responseModel.Status = "Error";
-                responseModel.Message = "Already exist";
-            }
-            else if (await itemTypeRepository.IsCodeExist(itemTypeVM.Code))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Code already in use";
-            }
-            else
-            {
-                int? CategoryId = await categoryRepository.GetIdAsync(itemTypeVM.Category);
-                if (CategoryId == null)
-                {
-                    responseModel.Status = "Error";
-                    responseModel.Message = "Unknown Category";
-                }
-                else
-                {
-                    itemTypeVM.CategoryId = CategoryId.Value;
-                    await itemTypeRepository.AddAsync(itemTypeVM);
-                    responseModel.Status = "Success";
-                    responseModel.Message = "Item type added";
-                }
-            }
-            return Json(responseModel);
+                Status = "Success",
+                Message = await itemTypeRepository.SaveItemFromFile(itemTypeVM)
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFileJson(IFormFile file)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await itemTypeRepository.UploadFile(file);
+
+            Response.Headers["X-Status"] = response.Status;
+            Response.Headers["X-Message"] = response.Message;
+            return File(response.Data.Content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        response.Data.FileName);
         }
 
         [HttpPost]
@@ -131,15 +123,14 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Item Types");
-            dt.Columns.AddRange(new DataColumn[3] {
+            dt.Columns.AddRange([
                 new DataColumn("Code"),
-                new DataColumn("Name"),
-                new DataColumn("Category")
-            });
+                new DataColumn("Name")
+            ]);
             var itemTypes = (await itemTypeRepository.GetListAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var itemType in itemTypes)
             {
-                dt.Rows.Add(itemType.Code, itemType.Name, itemType.Category);
+                dt.Rows.Add(itemType.Code, itemType.Name);
             }
 
             using (XLWorkbook wb = new())

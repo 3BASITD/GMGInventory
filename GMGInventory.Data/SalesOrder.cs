@@ -39,6 +39,8 @@ namespace GMGInventory.Data
         public DateTime RequiredDeliveryDate { get; set; }
         public DateTime SalesOrderDate { get; set; }
 
+
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal OverallDiscount { get; set; }
 
 
@@ -74,6 +76,8 @@ namespace GMGInventory.Data
         [ForeignKey("ResubmitId")]
         public int? ResubmitId { get; set; }
         public virtual SalesOrder Resubmit { get; set; }
+
+        public string? BarcotechOutboundCode { get; set; }
 
         public ICollection<SalesOrder> SalesOrderResubmits { get; set; }
         public ICollection<SalesOrderSourced> SalesOrderSources { get; set; }

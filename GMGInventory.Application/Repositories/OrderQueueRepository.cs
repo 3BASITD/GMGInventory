@@ -44,7 +44,9 @@ namespace GMGInventory.Application.Repositories
                          select new OrderQueueVM
                          {
                              OrderNumber = gorder.Key,
+                             AgentId = gorder.Select(s => s.AgentId).FirstOrDefault(),
                              Agent = gorder.Select(s => s.Agent).FirstOrDefault(),
+                             CustomerId = gorder.Select(s => s.CustomerId).FirstOrDefault(),
                              Customer = gorder.Select(s => s.Customer).FirstOrDefault(),
                              ExtendedPriceD = gorder.Sum(s => s.ExtendedPrice) ?? 0,
                              DateCreatedD = gorder.Select(s => s.CreatedDate).FirstOrDefault(),
@@ -139,8 +141,8 @@ namespace GMGInventory.Application.Repositories
 
             foreach (var list in pageList)
             {
-                list.IsValidAgent = list.Agent != null && context.Agents.Any(s => (s.FirstName + " " + s.LastName).ToLower() == list.Agent.ToLower());
-                list.IsValidCustomer = list.Customer != null && context.Customers.Any(s => s.Name.ToLower() == list.Customer.ToLower());
+                list.IsValidAgent = list.AgentId > 0 && context.Agents.Any(s => s.Id == list.AgentId);
+                list.IsValidCustomer = list.CustomerId > 0 && context.Customers.Any(s => s.Id == list.CustomerId);
                 var soConverts = context.SalesOrderSources
                                         .Where(s => s.SourceOrderNumber == list.OrderNumber
                                                  && (s.Status == null || s.Status.ToLower() == "added")
@@ -166,7 +168,9 @@ namespace GMGInventory.Application.Repositories
                                    .Select(s => new OrderQueueDetailsVM
                                    {
                                        OrderNumber = s.OrderNo,
+                                       AgentId = s.AgentId,
                                        Agent = s.Agent,
+                                       CustomerId = s.CustomerId,
                                        Customer = s.Customer,
                                        Instruction = s.Instruction
                                    })
@@ -197,8 +201,8 @@ namespace GMGInventory.Application.Repositories
                                                                   + "</span>"))
                          : "Pending";
 
-            order.IsValidAgent = order.Agent != null && context.Agents.Any(s => (s.FirstName + " " + s.LastName).ToLower() == order.Agent.ToLower());
-            order.IsValidCustomer = order.Customer != null && context.Customers.Any(s => s.Name.ToLower() == order.Customer.ToLower());
+            order.IsValidAgent = order.AgentId > 0 && context.Agents.Any(s => s.Id == order.AgentId);
+            order.IsValidCustomer = order.CustomerId > 0 && context.Customers.Any(s => s.Id == order.CustomerId);
             var soConverts = context.SalesOrderSources
                                     .Where(s => s.SourceOrderNumber == order.OrderNumber)
                                     .OrderBy(s => s.DateCreated)
@@ -211,6 +215,7 @@ namespace GMGInventory.Application.Repositories
                                      .Select(s => new OrderQueueItemVM
                                      {
                                          Id = s.Id,
+                                         ItemId = s.ItemId,
                                          Brand = s.Brand,
                                          Model = s.Model,
                                          OldCode = s.OldCode,
@@ -233,11 +238,12 @@ namespace GMGInventory.Application.Repositories
             foreach (var i in order.Items)
             {
                 var itm = context.Items
-                                 .Where(s => !string.IsNullOrWhiteSpace(i.Code)
-                                          && s.Code.ToLower() == i.Code.ToLower())
+                                 .Where(s => i.ItemId > 0
+                                          && s.Id == i.ItemId)
                                  .FirstOrDefault();
 
                 i.IsValidItem = itm != null;
+
                 if (itm != null)
                 {
                     var dest = (from destination in context.SalesOrderSources
@@ -249,28 +255,6 @@ namespace GMGInventory.Application.Repositories
 
                     i.SalesOrderNumber = dest == null ? null : dest.SalesOrderNumber;
                     i.SalesOrderId = dest == null ? null : dest.Id;
-
-                    var brnd = context.Brands
-                                      .Where(s => !string.IsNullOrWhiteSpace(i.Brand)
-                                               && s.Name.ToLower() == i.Brand.ToLower())
-                                      .FirstOrDefault();
-                    i.IsValidBrand = brnd != null && itm.BrandId == brnd.Id;
-
-                    i.IsValidModel = (string.IsNullOrWhiteSpace(itm.ModelNumber) && string.IsNullOrWhiteSpace(i.Model))
-                                  || (!string.IsNullOrWhiteSpace(itm.ModelNumber) && !string.IsNullOrWhiteSpace(i.Model) && itm.ModelNumber.ToLower() == i.Model.ToLower());
-                    i.IsValidOldCode = (string.IsNullOrWhiteSpace(itm.OldCode) && string.IsNullOrWhiteSpace(i.OldCode))
-                                    || (!string.IsNullOrWhiteSpace(itm.OldCode) && !string.IsNullOrWhiteSpace(i.OldCode) && itm.OldCode.ToLower() == i.OldCode.ToLower());
-                    i.IsValidItemName = (string.IsNullOrWhiteSpace(itm.Name) && string.IsNullOrWhiteSpace(i.ItemName))
-                                     || (!string.IsNullOrWhiteSpace(itm.Name) && !string.IsNullOrWhiteSpace(i.ItemName) && itm.Name.ToLower() == i.ItemName.ToLower());
-                    i.IsValidSize = (string.IsNullOrWhiteSpace(itm.Size) && string.IsNullOrWhiteSpace(i.Size))
-                                 || (!string.IsNullOrWhiteSpace(itm.Size) && !string.IsNullOrWhiteSpace(i.Size) && itm.Size.ToLower() == i.Size.ToLower());
-                    i.IsValidPartNumber = (string.IsNullOrWhiteSpace(itm.PartNumber) && string.IsNullOrWhiteSpace(i.PartNumber))
-                                       || (!string.IsNullOrWhiteSpace(itm.PartNumber) && !string.IsNullOrWhiteSpace(i.PartNumber) && itm.PartNumber.ToLower() == i.PartNumber.ToLower());
-                    var unt = context.Units
-                                     .Where(s => !string.IsNullOrWhiteSpace(i.Unit)
-                                              && s.Name.ToLower() == i.Unit.ToLower())
-                                     .FirstOrDefault();
-                    i.IsValidUnit = unt != null && itm.UnitId == unt.Id;
                 }
             }
 
@@ -295,23 +279,23 @@ namespace GMGInventory.Application.Repositories
                     Message = "Invalid Order Number. Record cannot be found"
                 };
 
-            var agent_first = orders.First().Agent;
-            var customer_first = orders.First().Customer;
+            var agent_first = orders.First().AgentId;
+            var customer_first = orders.First().CustomerId;
 
             var agent = context.Agents
-                               .Where(s => agent_first != null
-                                        && (s.FirstName + " " + s.LastName).ToLower() == agent_first.ToLower())
+                               .Where(s => agent_first > 0
+                                        && s.Id == agent_first)
                                .FirstOrDefault();
 
             var customer = context.Customers
-                                  .Where(s => customer_first != null
-                                           && s.Name.ToLower() == customer_first.ToLower())
+                                  .Where(s => customer_first > 0
+                                           && s.Id == customer_first)
                                   .FirstOrDefault();
 
             var temp = new List<string>();
 
-            if (agent == null) temp.Add($"<span class='text-muted'>Invalid Agent:</span> {agent_first}. ");
-            if (customer == null) temp.Add($"<span class='text-muted'>Invalid Customer:</span> {customer_first}. ");
+            if (agent == null) temp.Add($"<span class='text-muted'>Invalid Agent:</span> Unknown PK_{agent_first}");
+            if (customer == null) temp.Add($"<span class='text-muted'>Invalid Customer:</span> Unknown PK_{customer_first}");
 
             var latestOrder = context.SalesOrders
                                      .Where(s => s.SalesOrderNumber.StartsWith("SO")
@@ -355,73 +339,18 @@ namespace GMGInventory.Application.Repositories
             {
                 var isInvalid = false;
                 var itm = context.Items
-                                 .Where(s => !string.IsNullOrWhiteSpace(order.Code)
-                                          && s.Code.ToLower() == order.Code.ToLower())
+                                 .Where(s => order.ItemId > 0
+                                          && s.Id == order.ItemId)
                                  .FirstOrDefault();
                 if (itm == null)
                 {
-                    temp.Add($"<span class='text-muted'>Invalid Item Code:</span> {order.Code}. ");
-                    isInvalid = true;
-                }
-
-                var brnd = context.Brands
-                                  .Where(s => !string.IsNullOrWhiteSpace(order.Brand)
-                                           && s.Name.ToLower() == order.Brand.ToLower())
-                                  .FirstOrDefault();
-                if (brnd == null || itm == null || itm.BrandId != brnd.Id)
-                {
-                    temp.Add($"<span class='text-muted'>Invalid Item Brand:</span> {order.Brand}. ");
-                    isInvalid = true;
-                }
-
-                if ((!string.IsNullOrWhiteSpace(itm!.ModelNumber) || !string.IsNullOrWhiteSpace(order.Model))
-                 && (string.IsNullOrWhiteSpace(itm.ModelNumber) || string.IsNullOrWhiteSpace(order.Model) || itm.ModelNumber.ToLower() != order.Model.ToLower()))
-                    {
-                        temp.Add($"<span class='text-muted'>Invalid Item Model Number:</span> {order.Model}. ");
-                        isInvalid = true;
-                    }
-
-                if ((!string.IsNullOrWhiteSpace(itm!.OldCode) || !string.IsNullOrWhiteSpace(order.OldCode))
-                 && (string.IsNullOrWhiteSpace(itm.OldCode) || string.IsNullOrWhiteSpace(order.OldCode) || itm.OldCode.ToLower() != order.OldCode.ToLower()))
-                {
-                    temp.Add($"<span class='text-muted'>Invalid Item Old Code:</span> {order.OldCode}. ");
-                    isInvalid = true;
-                }
-
-                if ((!string.IsNullOrWhiteSpace(itm!.Name) || !string.IsNullOrWhiteSpace(order.ItemName))
-                 && (string.IsNullOrWhiteSpace(itm.Name) || string.IsNullOrWhiteSpace(order.ItemName) || itm.Name.ToLower() != order.ItemName.ToLower()))
-                {
-                    temp.Add($"<span class='text-muted'>Invalid Item Name:</span> {order.ItemName}. ");
-                    isInvalid = true;
-                }
-
-                if ((!string.IsNullOrWhiteSpace(itm!.Size) || !string.IsNullOrWhiteSpace(order.Size))
-                 && (string.IsNullOrWhiteSpace(itm.Size) || string.IsNullOrWhiteSpace(order.Size) || itm.Size.ToLower() != order.Size.ToLower()))
-                {
-                    temp.Add($"<span class='text-muted'>Invalid Item Size:</span> {order.Size}. ");
-                    isInvalid = true;
-                }
-
-                if ((!string.IsNullOrWhiteSpace(itm!.PartNumber) || !string.IsNullOrWhiteSpace(order.PartNumber))
-                 && (string.IsNullOrWhiteSpace(itm.PartNumber) || string.IsNullOrWhiteSpace(order.PartNumber) || itm.PartNumber.ToLower() != order.PartNumber.ToLower()))
-                {
-                    temp.Add($"<span class='text-muted'>Invalid Item Part Number:</span> {order.PartNumber}. ");
-                    isInvalid = true;
-                }
-
-                var unt = context.Units
-                                 .Where(s => !string.IsNullOrWhiteSpace(order.Unit)
-                                          && s.Name.ToLower() == order.Unit.ToLower())
-                                 .FirstOrDefault();
-                if (unt == null || itm == null || itm != null && itm.UnitId != unt.Id)
-                {
-                    temp.Add($"<span class='text-muted'>Invalid Item Unit:</span> {order.Unit}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Item:</span> Unknown PK_{order.ItemId}");
                     isInvalid = true;
                 }
 
                 if (order.Quantity == null || order.Quantity <= 0)
                 {
-                    temp.Add($"<span class='text-muted'>Invalid Quantity:</span> {order.Quantity}. ");
+                    temp.Add($"<span class='text-muted'>Invalid Quantity:</span> {order.Quantity}");
                     isInvalid = true;
                 }
 
