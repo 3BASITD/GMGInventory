@@ -923,5 +923,121 @@ namespace GMGInventory.Application.Repositories
         }
 
         #endregion Supplier Purchase History
+
+        #region Warehouse Transfer
+
+
+        public async Task<IList<WarehouseTransferRVM>> GetWarehouseTransfersAllAsync(ListFilterTransferModel filter)
+        {
+            var dateto = new DateTime(filter.DateTo.Value.Year, filter.DateTo.Value.Month, filter.DateTo.Value.Day, 23, 59, 59);
+            var transferVM = (from trdetail in context.TransferItemDetails
+                                                      .Include(s => s.Item)
+                              join transfer in context.TransferItems
+                                                      .Include(s => s.Source) on trdetail.TransferItemId equals transfer.Id
+                              join user in userManager.Users on transfer.UserCreated equals user.Id
+                              where (filter.DateFrom <= transfer.TransferDate.Date && transfer.TransferDate.Date <= dateto)
+                              && (filter.Brand == null || trdetail.Item.Brand.Id == filter.Brand)
+                              && (filter.Source == null || transfer.Source.Id == filter.Source)
+                              && (filter.Destination == null || transfer.Destination.Id == filter.Destination)
+                              select new WarehouseTransferRVM
+                              {
+                                  Destination = transfer.Destination.Name,
+                                  Id = transfer.Id,
+                                  ItemCode = trdetail.Item.Code,
+                                  ItemName = trdetail.Item.Name,
+                                  Quantity = trdetail.Quantity,
+                                  Source = transfer.Source.Name,
+                                  CreatedBy = user.FirstName + " " + user.LastName,
+                                  TransferDateD = transfer.TransferDate,
+                                  BrandName = trdetail.Item.Brand.Name
+                              });
+            return await transferVM.ToListAsync();
+        }
+
+        public async Task<ForDataTables<WarehouseTransferRVM>> GetWarehouseTransfersDTAsync(DataTablesRequestForm form, ListFilterTransferModel filter)
+        {
+            int totalRecord = 0;
+            int totalQuantity = 0;
+            int filterRecord = 0;
+            var data = (await GetWarehouseTransfersAllAsync(filter)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.Source.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Destination.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.TransferDate.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.CreatedBy.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Id.ToString().ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.BrandName.ToLower().Contains(form.SearchValue.ToLower()));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Id": data = data.OrderBy(s => s.Id); break;
+                        case "Source": data = data.OrderBy(s => s.Source); break;
+                        case "Destination": data = data.OrderBy(s => s.Destination); break;
+                        case "ItemCount": data = data.OrderBy(s => s.ItemCount); break;
+                        case "TransferDate": data = data.OrderBy(s => s.TransferDateD); break;
+                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
+                        case "BrandName": data = data.OrderBy(s => s.BrandName); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "Id": data = data.OrderByDescending(s => s.Id); break;
+                        case "Source": data = data.OrderByDescending(s => s.Source); break;
+                        case "Destination": data = data.OrderByDescending(s => s.Destination); break;
+                        case "ItemCount": data = data.OrderByDescending(s => s.ItemCount); break;
+                        case "TransferDate": data = data.OrderByDescending(s => s.TransferDateD); break;
+                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
+                        case "BrandName": data = data.OrderByDescending(s => s.BrandName); break;
+                        default: break;
+                    }
+                }
+            }
+            totalQuantity = data.Sum(s => s.Quantity);
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<WarehouseTransferRVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList, 
+                TotalQuantity = totalQuantity
+            };
+        }
+
+        public async Task<WarehouseTransferPVM> PrintWarehouseTransfer(ListFilterTransferModel filter)
+        {
+            var items = await GetWarehouseTransfersAllAsync(filter);
+            var brand = await context.Brands.Where(s => s.Id == filter.Brand).FirstOrDefaultAsync();
+            var origin = await context.Warehouses.Where(s => s.Id == filter.Source).FirstOrDefaultAsync();
+            var destination = await context.Warehouses.Where(s => s.Id == filter.Destination).FirstOrDefaultAsync();
+            return new WarehouseTransferPVM
+            {
+                WarehouseTransfers = items,
+                Brand = filter.Brand == null || brand == null ? "All" : brand.Name,
+                WarehouseOrigin = filter.Source == null || origin == null ? "All" : origin.Name,
+                WarehouseDestination = filter.Source == null || destination == null ? "All" : destination.Name,
+                TotalQuantityD = items.Sum(s => s.Quantity)
+            };
+        }
+
+        #endregion Warehouse Transfer
     }
 }

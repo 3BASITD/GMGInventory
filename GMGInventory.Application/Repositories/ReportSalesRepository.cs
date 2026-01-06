@@ -1457,5 +1457,128 @@ namespace GMGInventory.Application.Repositories
         }
 
         #endregion Unserved Item
+
+        #region Outbound
+
+        public async Task<IList<OutboundRVM>> GetOutbound(ListFilterSalesModel filter)
+        {  
+            var dateto = new DateTime(filter.DateTo.Value.Year, filter.DateTo.Value.Month, filter.DateTo.Value.Day,23,59,59);
+
+            var outbound = from pack in context.Packs
+                           join packitem in context.PackLineItems on pack.Id equals packitem.PackId
+                           join sales in context.SalesOrders on pack.SalesOrderId equals sales.Id
+                           join cust in context.Customers on sales.CustomerId equals cust.Id
+                           
+                           where 
+                           (pack.DateCreated >= filter.DateFrom
+                           && pack.DateCreated <= dateto)
+                           && (filter.Area == null ||cust.AreaId== filter.Area)
+                           && (filter.Region == null || cust.Area.RegionId == filter.Region)
+                           && (filter.Brand == null || packitem.Item.Brand.Id == filter.Brand)
+                           && pack.Status.Code.ToLower() == "posted"
+                           select new OutboundRVM
+                           {
+                               OldSkuCode = packitem.Item.OldCode,
+                               ItemCode = packitem.Item.Code,
+                               ItemName = packitem.Item.Name,
+                               Brand = packitem.Item.Brand.Name,
+                               QuantityD = packitem.Quantity,
+                               SalesOrderNumber = pack.SalesOrder.SalesOrderNumber,
+                               Region = cust.Area.Region.Name,
+                               Area = cust.Area.Name
+
+                           };
+           
+            return await outbound.ToListAsync();
+        }
+
+        public async Task<ForDataTables<OutboundRVM>> GetOutboundDT(DataTablesRequestForm form, ListFilterSalesModel filter)
+        {
+            int totalRecord = 0;
+            int totalQuantity = 0;
+            int filterRecord = 0;
+            var data = (await GetOutbound(filter)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(x => x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Quantity.ToString().Contains(form.SearchValue)
+                                    || x.OldSkuCode.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.SalesOrderNumber.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Region.ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Area.ToString().ToLower().Contains(form.SearchValue.ToLower())
+                                    || x.Brand.ToLower().Contains(form.SearchValue.ToLower()));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                if (form.SortColumnDirection == "asc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
+                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
+                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
+                        case "OldSkuCode": data = data.OrderBy(s => s.OldSkuCode); break;
+                        case "SalesOrderNumber": data = data.OrderBy(s => s.SalesOrderNumber); break;
+                        case "Brand": data = data.OrderBy(s => s.Brand); break;
+                        case "Region": data = data.OrderBy(s => s.Region); break;
+                        case "Area": data = data.OrderBy(s => s.Area); break;
+                        default: break;
+                    }
+                }
+                else if (form.SortColumnDirection == "desc")
+                {
+                    switch (form.SortColumn)
+                    {
+                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
+                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
+                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
+                        case "OldSkuCode": data = data.OrderByDescending(s => s.OldSkuCode); break;
+                        case "SalesOrderNumber": data = data.OrderByDescending(s => s.SalesOrderNumber); break;
+                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
+                        case "Region": data = data.OrderByDescending(s => s.Region); break;
+                        case "Area": data = data.OrderByDescending(s => s.Area); break;
+                        default: break;
+                    }
+                }
+            }
+            totalQuantity = data.Sum(s => s.QuantityD);
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<OutboundRVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList,
+                TotalQuantity = totalQuantity
+            };
+        }
+        public async Task<OutboundPVM> PrintOutbound(ListFilterSalesModel filter)
+        {
+            var items = await GetOutbound(filter);
+            var brand = await context.Brands.Where(s => s.Id == filter.Brand).FirstOrDefaultAsync();
+            var region = await context.Regions.Where(s => s.Id == filter.Region).FirstOrDefaultAsync();
+            var area = await context.Areas.Where(s => s.Id == filter.Area).FirstOrDefaultAsync();
+            return new OutboundPVM
+            {
+                Outbounds = items,
+                DateFromD = filter.DateFrom.GetValueOrDefault(),
+                DateToD = filter.DateTo.GetValueOrDefault(),
+                Brand = filter.Brand == null || brand == null ? "All" : brand.Name,
+                Region = filter.Region == null || region == null ? "All" : region.Name,
+                Area = filter.Area == null || area == null ? "All" : area.Name,
+                TotalQuantityD = items.Sum(s => s.QuantityD)
+            };
+        }
+
+        #endregion Outbound
+
     }
 }

@@ -1,0 +1,301 @@
+﻿@model IEnumerable<OutboundRVM>
+
+@{
+    ViewData["Title"] = "Daily Outbound";
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary btn-sm float-right printBtn ml-2">
+                <span class="fas fa-print"></span> Print
+            </button>
+            <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
+                <span class="fas fa-download"></span> Download
+            </button>
+            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-sales">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OldSkuCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesOrderNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Region)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Area)
+                    </th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="text-end">Total</th>
+                    <th></th>
+                    <th colspan="3" class="text-end"></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Report</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-region" class="form-label mb-0">Region</label>
+                            <select id="filter-region" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-area" class="form-label mb-0">Area</label>
+                            <select id="filter-area" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        SetDateFilter();
+        function SetDateFilter() {
+            if ($("#filter-to").val() == "") {
+                if ($("#filter-from").val() == "") {
+                    $("#filter-to").val(DateForInput(new Date()));
+                } else {
+                    var dt_from = new Date($("#filter-from").val());
+                    dt_from.setFullYear(dt_from.getFullYear() + 1);
+                    //dt_from.setMonth(dt_from.getMonth() + 1);
+                    $("#filter-to").val(DateForInput(dt_from));
+                }
+            }
+
+            if ($("#filter-from").val() == "") {
+                var dt_to = new Date($("#filter-to").val());
+                //dt_to.setFullYear(dt_to.getFullYear() - 1);
+                //dt_to.setMonth(dt_to.getMonth() - 1);
+                $("#filter-from").val(DateForInput(dt_to));
+            }
+        }
+
+        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+
+        // Load Select2 for Area
+         $("#filter-area").select2({
+             //minimumInputLength: 1,
+             placeholder: "",
+             allowClear: true,
+             templateResult: function (repo) {
+                 if (repo.loading) {
+                     return repo.text;
+                 }
+                 return $("<span> " + repo.text + "</span>");
+             },
+             ajax: {
+                 url: "@Url.Action("GetByRegionOptions", "Area")",
+                 data: function (params) {
+                     let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                     return Object.assign(base, {
+                         region: $("#filter-region").val()
+                     });
+                 }
+             },
+              dropdownParent: $("#filterModal")
+         });
+       
+
+
+        // Load Select2 for Region
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#filter-region").select2({
+                    ajax: null, //already fetched outside
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
+        // Load Select2 for Brand
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Brand")",
+            success: function (data, status, xhr) {
+                $("#filter-brand").select2({
+                    ajax: null, //already fetched outside
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "All"
+                    },
+                    dropdownParent: $('#filterModal')
+                });
+            }
+        });
+
+        // Load List on DataTable
+        var outboundDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
+            showLoader();
+        }).DataTable({
+            ajax: {
+                url: "@Url.Action("GetOutboundDT")",
+                type: "POST",
+                data: function (data) {
+                    var area = $("#filter-area").val();
+                    var region = $("#filter-region").val();
+                    var brandId = $("#filter-brand").val();
+                    console.log("Area: "+area);
+                    console.log("Region: "+region);
+
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                    if (area) data.Area= area;
+                    if (region) data.Region= region;
+                    if (brandId) data.Brand = brandId;
+                }
+            },
+            processing: true,
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "oldSkuCode", name: "OldSkuCode" },
+                { data: "itemCode", name: "ItemCode" },
+                { data: "itemName", name: "ItemName" },
+                { data: "brand", name: "Brand" },
+                { data: "quantity", name: "Quantity", className: "text-end" },
+                { data: "salesOrderNumber", name: "SalesOrderNumber" },
+                { data: "region", name: "Region" },
+                { data: "area", name: "Area" }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var json = outboundDT.ajax.json();
+                var api = this.api(), data;
+
+                $(api.column(4).footer()).html(FormatStringInteger(json.totalQuantity));
+            }
+        });
+
+        // Load functions upon DataTable load
+        outboundDT.on("draw", function () {
+            hideLoader();
+
+            $(".table-sales thead th").removeClass("text-end");
+        });
+
+        $(".btnFilter").on("click", function () {
+            outboundDT.ajax.reload();
+            $("#filterModal").modal("hide");
+        });
+
+        $(".downloadBtn").click(function (e) {
+            var urlQuery = [];
+            urlQuery.push("DateFrom=" + $("#filter-from").val());
+            urlQuery.push("DateTo=" + $("#filter-to").val());
+            if ($("#filter-region").val()) { urlQuery.push("Region=" + $("#filter-region").val()); }
+            if ($("#filter-area").val()) { urlQuery.push("Area=" + $("#filter-area").val()); }
+            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            window.location = "@Url.Action("DownloadOutbound")?" + urlQuery.join("&");
+        });
+
+        $(".printBtn").on("click", function () {
+            $.LoadingOverlay("show", {
+                image: "",
+                fontawesome: "fas fa-print"
+            });
+            var urlQuery = [];
+            urlQuery.push("DateFrom=" + $("#filter-from").val());
+            urlQuery.push("DateTo=" + $("#filter-to").val());
+            if ($("#filter-region").val()) { urlQuery.push("Region=" + $("#filter-region").val()); }
+            if ($("#filter-area").val()) { urlQuery.push("Area=" + $("#filter-area").val()); }
+            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            setTimeout(function () {
+                let win = window.open('@Url.Action("PrintOutbound")?' + urlQuery.join("&"), '');
+                var wintimer = setInterval(function () {
+                    if (win.closed) {
+                        clearInterval(wintimer);
+                        hideLoader();
+                    }
+                }, 100);
+            }, 500);
+        });
+    </script>
+    }

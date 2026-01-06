@@ -518,5 +518,78 @@ namespace GMGInventory.Controllers
         }
 
         #endregion Supplier Purchase History
+
+        #region Warehouse Transfer
+        public async Task<IActionResult> WarehouseTransfer()
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.WarehouseTransferReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.WarehouseTransferReport)).Convert();
+
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetWarehouseTransferAllDT(ListFilterTransferModel filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.WarehouseTransferReport, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            DataTablesRequestForm dtForm = new(Request.Form);
+            return Json(await reportInventoryRepository.GetWarehouseTransfersDTAsync(dtForm, filter));
+        }
+
+        public async Task<IActionResult> PrintWarehouseTransfer(ListFilterTransferModel filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.WarehouseTransferReport, AccessTypes.Print);
+            if (redirectResult != null) return redirectResult;
+
+            return View(await reportInventoryRepository.PrintWarehouseTransfer(filter));
+        }
+
+        public async Task<IActionResult> DownloadWarehouseTransfer(ListFilterTransferModel filter)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.WarehouseTransferReport, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            DataTable dt = new("WarehouseTransfers"
+                             + filter.DateFrom.GetValueOrDefault().ToString("MMddyy")
+                             + "-"
+                             + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
+            dt.Columns.AddRange([
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("Id")),
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("ItemCode")),
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("ItemName")),
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("Quantity")),
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("Source")),
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("Destination")),
+                new DataColumn(chelper.DisplayName<WarehouseTransferRVM>("TransferDate"))
+            ]);
+            var transfers = await reportInventoryRepository.GetWarehouseTransfersAllAsync(filter);
+            foreach (var transfer in transfers)
+            {
+                dt.Rows.Add(transfer.Id,
+                            transfer.ItemCode,
+                            transfer.ItemName,
+                            transfer.BrandName,
+                            transfer.Quantity,
+                            transfer.Source,
+                            transfer.Destination,
+                            transfer.TransferDate);
+            }
+
+            using XLWorkbook wb = new();
+            wb.Worksheets.Add(dt);
+            using MemoryStream stream = new();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        DateTime.Now.ToString("yyyyMMdd") + " Warehouse Transfer Report.xlsx");
+        }
+
+        #endregion Warehouse Transfer
     }
 }

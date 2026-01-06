@@ -32,5 +32,10 @@ namespace GMGInventory.Application.Contracts
         Task<IList<SupplierPurchaseRVM>> GetSupplierPurchase(ListFilterInventoryModel filter);
         Task<ForDataTables<SupplierPurchaseRVM>> GetSupplierPurchaseDT(DataTablesRequestForm form, ListFilterInventoryModel filter);
         Task<SupplierPurchasePVM> PrintSupplierPurchase(ListFilterInventoryModel filter);
+
+        Task<WarehouseTransferPVM> PrintWarehouseTransfer(ListFilterTransferModel filter);
+        Task<IList<WarehouseTransferRVM>> GetWarehouseTransfersAllAsync(ListFilterTransferModel filter);
+
+        Task<ForDataTables<WarehouseTransferRVM>> GetWarehouseTransfersDTAsync(DataTablesRequestForm form, ListFilterTransferModel filter);
     }
 }

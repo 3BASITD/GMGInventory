@@ -294,6 +294,13 @@ namespace GMGInventory.Common.Models
         public int? Warehouse { get; set; }
     }
 
+    public class ListFilterTransferModel : ListFilterCommonModel
+    {
+        public int? Brand { get; set; }
+        public int? Destination { get; set; }
+        public int? Source { get; set; }
+    }
+
     public class ListFilterSalesModel : ListFilterCommonModel
     {
         public int? Agent { get; set; }

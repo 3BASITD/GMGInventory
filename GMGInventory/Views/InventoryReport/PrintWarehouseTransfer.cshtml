@@ -1,0 +1,92 @@
+﻿@model WarehouseTransferPVM
+
+@{
+    Layout = "";
+    var title = "Warehouse Transfer";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Brand</strong>
+        <span>@Model.Brand</span>
+        <br />
+        <strong>Warehouse Origin</strong>
+        <span>@Model.WarehouseOrigin</span>
+        <br />
+        <strong>Warehouse Destination</strong>
+        <span>@Model.WarehouseDestination</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().BrandName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().Source)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().Destination)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseTransfers.First().TransferDate)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.WarehouseTransfers)
+            {
+                <tr>
+                    <td><nobr>@item.Id</nobr></td>
+                    <td>@item.ItemCode</td>
+                    <td>@item.ItemName</td>
+                    <td><nobr>@item.BrandName</nobr></td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td><nobr>@item.Source</nobr></td>
+                    <td><nobr>@item.Destination</nobr></td>
+                    <td><nobr>@item.TransferDate</nobr></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
+                <th colspan="3"></th>
+
+
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = function () {
+        setTimeout(function () {
+            window.close();
+        }, 100); 
+    };
+</script>
+</html>

@@ -537,4 +537,48 @@ namespace GMGInventory.Common.Models
         public string TotalCurrent => string.Format(SystemFormat.StringIntegerComma, TotalCurrentD);
         public int TotalCurrentD { get; set; }
     }
+
+    public class OutboundRVM
+    {
+        [Display(Name = "Old SKU COde")]
+        public string? OldSkuCode { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string ItemCode { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemName { get; set; }
+
+        [Display(Name = "Brand")]
+        public string Brand { get; set; }
+
+        [Display(Name = "Quantity")]
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
+
+        [Display(Name = "Sales Order Number")]
+        public string SalesOrderNumber { get; set; }
+
+        [Display(Name = "Region")]
+        public string Region { get; set; }
+
+        [Display(Name = "Area")]
+        public string Area { get; set; }
+
+    }
+
+    public class OutboundPVM
+    {
+        public IList<OutboundRVM> Outbounds { get; set; }
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
+        public DateTime DateFromD { get; set; }
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
+        public DateTime DateToD { get; set; }
+        public string Brand { get; set; }
+        public string Region { get; set; }
+        public string Area { get; set; }
+        public string TotalQuantity => string.Format(SystemFormat.StringIntegerComma, TotalQuantityD);
+        public int TotalQuantityD { get; set; }
+
+    }
 }

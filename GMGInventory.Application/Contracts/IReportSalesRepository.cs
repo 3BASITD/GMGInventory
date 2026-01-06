@@ -53,5 +53,9 @@ namespace GMGInventory.Application.Contracts
         Task<IList<UnservedItemRVM>> GetUnservedItem(ListFilterSalesModel filter);
         Task<ForDataTables<UnservedItemRVM>> GetUnservedItemDT(DataTablesRequestForm form, ListFilterSalesModel filter);
         Task<UnservedItemPVM> PrintUnservedItem(ListFilterSalesModel filter);
+
+        Task<IList<OutboundRVM>> GetOutbound(ListFilterSalesModel filter);
+        Task<ForDataTables<OutboundRVM>> GetOutboundDT(DataTablesRequestForm form, ListFilterSalesModel filter);
+        Task<OutboundPVM> PrintOutbound(ListFilterSalesModel filter);
     }
 }

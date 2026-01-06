@@ -1,0 +1,96 @@
+﻿@model OutboundPVM
+
+@{
+    Layout = "";
+    var title = "Daily Outbound";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMGInventory | @title</title>
+    <link rel="icon" href="~/images/box.ico" />
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+</head>
+<body>
+    <h3>@title</h3>
+    <p>
+        <strong>Brand</strong>
+        <span>@Model.Brand</span>
+        <br />
+        <strong>Region</strong>
+        <span>@Model.Region</span>
+        <br />
+        <strong>Area</strong>
+        <span>@Model.Area</span>
+        <br />
+        <strong>Date From</strong>
+        <span>@Model.DateFrom</span>
+        <br />
+        <strong>Date To</strong>
+        <span>@Model.DateTo</span>
+    </p>
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().OldSkuCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().Brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().SalesOrderNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().Region)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().Area)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Outbounds)
+            {
+                <tr>
+                    <td>@item.OldSkuCode</td>
+                    <td>@item.ItemCode</td>
+                    <td>@item.ItemName</td>
+                    <td>@item.Brand</td>
+                    <td class="right-text"><nobr>@item.Quantity</nobr></td>
+                    <td>@item.SalesOrderNumber</td>
+                    <td>@item.Region</td>
+                    <td>@item.Area</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="right-text">Total</th>
+                <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
+                <th colspan="3" class="text-end"></th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+<script type="text/javascript">
+    window.print();
+    window.onafterprint = function () {
+        setTimeout(function () {
+            window.close();
+        }, 100); 
+    };
+</script>
+</html>
