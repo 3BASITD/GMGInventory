@@ -24,7 +24,6 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.WarehouseTransfer)).Convert();
-            ViewData["BarcotechUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BarcotechTransfer)).Convert();
 
             return View();
         }

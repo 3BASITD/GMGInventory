@@ -609,9 +609,10 @@ else
             || navPages.Contains(PageNames.Suppliers.ToEnumString())
             || navPages.Contains(PageNames.Users.ToEnumString())
             || navPages.Contains(PageNames.Vehicle.ToEnumString())
-            || navPages.Contains(PageNames.AuditLogs.ToEnumString()))
+            || navPages.Contains(PageNames.AuditLogs.ToEnumString())
+            || navPages.Contains(PageNames.BarcotechSync.ToEnumString()))
         {
-            var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "HomeImage", "AuditLog" }).Contains(currentController ?? "");
+            var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "HomeImage", "AuditLog", "BarcotechSync" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuAdministration" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navAdministrationActive ? "active" : "")">
@@ -949,6 +950,24 @@ else
                                     <span class="nav-icon fas fa-clipboard-list"></span>
                                 }
                                 Audit Logs
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.BarcotechSync.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "BarcotechSync" ? "active" : "")"
+                               asp-area="" asp-controller="BarcotechSync" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">🔄</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-arrows-rotate"></span>
+                                }
+                                Barcotech Sync Status
                             </a>
                         </li>
                     }

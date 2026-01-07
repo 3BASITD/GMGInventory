@@ -12,6 +12,7 @@
     bool isApproved = status == "approved";
     bool isDisapproved = status == "disapproved";
 
+    bool canAdd = userAccess.CanAdd;
     bool canPrint = userAccess.CanPrint && !isDisapproved;
     bool canApproveDisapprove = userAccess.CanApproveDisapprove && isSubmitted;
     bool canDelete = userAccess.CanDelete && isDraft;
@@ -25,7 +26,7 @@
                        !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
                        Model.DisapprovedDate != null &&
                        Model.ResubmitId == null &&
-                       userAccess.CanAdd;
+                       canAdd;
 }
 
 @section Breadcrumb {
@@ -53,10 +54,10 @@
                 {
                     <button type="button"
                             class="btn btn-info btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title="@(isDisapproved ? "Only non-disapproved orders can be printed" : "Print access is required")"
+                            data-microtip-title="Print&#10;@(isDisapproved ? "Only non-disapproved orders can be printed" : "Print access is required")"
                             data-microtip-position="bottom-left"
                             role="tooltip">
-                        <span class="fas fa-print"></span> Print
+                        <span class="fas fa-print mr-0"></span>
                     </button>
                 }
 
@@ -76,18 +77,18 @@
                 {
                     <button type="button"
                             class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title="@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted orders can be approved")"
+                            data-microtip-title="Approve&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted orders can be approved")"
                             data-microtip-position="bottom-left"
                             role="tooltip">
-                        <span class="fas fa-check"></span> Approve
+                        <span class="fas fa-check mr-0"></span>
                     </button>
 
                     <button type="button"
                             class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title="@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted orders can be disapproved")"
+                            data-microtip-title="Disapprove&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted orders can be disapproved")"
                             data-microtip-position="bottom"
                             role="tooltip">
-                        <span class="fas fa-times"></span> Disapprove
+                        <span class="fas fa-times mr-0"></span>
                     </button>
                 }
 
@@ -103,9 +104,9 @@
                 {
                     <button type="button"
                             class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title="@(isDraft ? "Delete access is required" : "Only draft order can be deleted")"
+                            data-microtip-title="Delete&#10;@(isDraft ? "Delete access is required" : "Only draft order can be deleted")"
                             data-microtip-position="bottom" role="tooltip">
-                        <span class="fas fa-trash"></span> Delete
+                        <span class="fas fa-trash mr-0"></span>
                     </button>
                 }
                 @if (canEdit)
@@ -114,7 +115,7 @@
                         <span class="fas fa-save"></span> Save as Draft
                     </button>
                     <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
-                        <span class="fas fa-save"></span> Submit
+                        <span class="fas fa-paper-plane"></span> Submit
                     </button>
                     <input type="hidden" id="action-type" name="ActionType" value="">
                 }
@@ -122,17 +123,17 @@
                 {
                     <button type="button"
                             class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title="@(isDraft ? "Edit access is required" : "Only draft orders can be saved as draft")"
+                            data-microtip-title="Save as Draft&#10;@(isDraft ? "Edit access is required" : "Only draft orders can be saved as draft")"
                             data-microtip-position="bottom"
                             role="tooltip">
-                        <span class="fas fa-save"></span> Save as Draft
+                        <span class="fas fa-save mr-0"></span>
                     </button>
                     <button type="button"
                             class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title="@(isDraft ? "Edit access is required" : "Only draft orders can be submitted")"
+                            data-microtip-title="Submit&#10;@(isDraft ? "Edit access is required" : "Only draft orders can be submitted")"
                             data-microtip-position="bottom"
                             role="tooltip">
-                        <span class="fas fa-save"></span> Submit
+                        <span class="fas fa-paper-plane mr-0"></span>
                     </button>
                 }
 
@@ -148,10 +149,10 @@
                 {
                     <button type="button"
                             class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" 
-                            data-microtip-title="Only approved order can be packed" 
+                            data-microtip-title="Start Packing&#10;Only approved order can be packed"
                             data-microtip-position="bottom" 
                             role="tooltip">
-                        <span class="fas fa-box-open"></span> Start Packing
+                        <span class="fas fa-box-open mr-0"></span>
                     </button>
                 }
 
@@ -166,10 +167,21 @@
                 {
                     <button type="button"
                             class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title="@(Model.ResubmitId != null ? "Order already been resubmitted" : "Only disapproved orders can be resubmitted")"
+                            data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null 
+                                                                        ? "Order already been resubmitted"
+                                                                        : "Only disapproved orders can be resubmitted")"
                             data-microtip-position="bottom"
                             role="tooltip">
-                        <span class="fas fa-edit"></span> Update to Resubmit
+                        <span class="fas fa-edit mr-0"></span>
+                    </button>
+                    <button type="button"
+                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Order already been resubmitted"
+                                                                         : canAdd ? "Only disapproved orders can be resubmitted"
+                                                                         : "Add access is required")"
+                            data-microtip-position="bottom"
+                            role="tooltip">
+                        <span class="fas fa-edit mr-0"></span>
                     </button>
                 }
 
@@ -1285,7 +1297,7 @@
                 $("#add-name").val(itemname +" (" +$("#add-code").select2("data")[0].itemPromoName+ ")");
 
             }
-            else if ($("#add-code").select2("data")[0].retailPriceD > $("#add-code").select2("data")[0].netPriceD) {
+            else if ($("#add-code").select2("data")[0].retailPriceD < $("#add-code").select2("data")[0].netPriceD) { // 260107 changed to use the lowest price
                 $("#add-unit-price").val($("#add-code").select2("data")[0].retailPriceD);
                 $("#add-gross-price").val($("#add-code").select2("data")[0].retailPriceD);
                 $(".add-price-source").text("(Gross)");

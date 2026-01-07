@@ -687,12 +687,13 @@ body.dark-mode .bg-invert {
     .btn-filter::after {
         content: "";
         display: none;
-        width: 7px;
-        height: 7px;
+        width: 5px;
+        height: 22px;
         position: relative;
-        top: -10px;
+        top: 0px;
         right: -5px;
-        border-radius: 20px;
+        border-radius: 15px;
+        float: right;
     }
 
 .btn-filtered::after {
@@ -700,25 +701,55 @@ body.dark-mode .bg-invert {
     animation: pulseAnimation 1.2s ease-in-out infinite;
 }
 
+.btn-filtered:hover::after {
+    animation: none;
+    opacity: 1;
+    background-color: lime;
+}
+
 @keyframes pulseAnimation {
     0% {
         opacity: 0.75;
         transform: scale(1);
-        background-color: red;
+        background-color: limegreen;
     }
 
     50% {
         opacity: 1;
-        transform: scale(1.1);
-        background-color: orangered;
+        /*transform: scale(1.1);*/
+        background-color: lime;
     }
 
     100% {
         opacity: 0.75;
         transform: scale(1);
-        background-color: red;
+        background-color: limegreen;
     }
 }
+
+.card-tools .hover-container {
+    display: inline;
+}
+
+.display-on-hover {
+    display: inline-block; /* 🔑 REQUIRED */
+    visibility: hidden;
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+    pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.15s ease, visibility 0s linear 0.25s;
+}
+
+.hover-container:hover .display-on-hover {
+    visibility: visible;
+    opacity: 1;
+    transform: scaleX(1);
+    pointer-events: auto;
+    transition: transform 0.25s ease, opacity 0.15s ease, visibility 0s;
+}
+
+
 
 /*.btn-filtered {
     animation: beat 1.5s infinite ease-in-out;

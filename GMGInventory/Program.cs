@@ -100,7 +100,7 @@ builder.Services.AddScoped(typeof(IShippingRepository), typeof(ShippingRepositor
 builder.Services.AddScoped(typeof(ISoacrLineItemRepository), typeof(SoacrLineItemRepository));
 builder.Services.AddScoped(typeof(ISoacrRepository), typeof(SoacrRepository));
 builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
-builder.Services.AddScoped(typeof(ISyncRepository), typeof(SyncRepository));
+builder.Services.AddScoped(typeof(IBarcotechSyncRepository), typeof(BarcotechSyncRepository));
 builder.Services.AddScoped(typeof(IUnitRepository), typeof(UnitRepository));
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
