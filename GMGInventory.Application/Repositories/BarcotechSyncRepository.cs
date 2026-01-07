@@ -1,30 +1,18 @@
 ﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
-    public class SyncRepository : ISyncRepository
+    public class BarcotechSyncRepository : IBarcotechSyncRepository
     {
         private readonly ApplicationDbContext context;
 
-        public SyncRepository(ApplicationDbContext context)
+        public BarcotechSyncRepository(ApplicationDbContext context)
         {
             this.context = context;
-        }
-        public async Task<ResponseModel> SaveBarcotechStatus(BarcotechSync sync)
-        {
-            var syncStatus = await context.BarcotechSyncs
-                                          .Where(s => s.ModuleName == sync.ModuleName 
-                                                   && s.PrimaryKey == sync.PrimaryKey)
-                                          .FirstOrDefaultAsync();
-            await context.BarcotechSyncs.AddAsync(sync);
-            await context.SaveChangesAsync();
-            return new ResponseModel();
         }
 
         private async Task<IList<BarcotechSyncVM>> GetBarcotechStatusListAsync()

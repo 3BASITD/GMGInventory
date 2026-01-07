@@ -87,7 +87,7 @@ namespace GMGInventory.Common.Models
         public string PrimaryKey { get; set; }
         public string SyncStatus { get; set; }
         public string? Remarks { get; set; }
-        public string DatePerformed => DatePerformedD.ToString(SystemFormat.StringDate);
+        public string DatePerformed => DatePerformedD.ToString(SystemFormat.StringDateTime);
         public DateTime DatePerformedD { get; set; }
     }
 }

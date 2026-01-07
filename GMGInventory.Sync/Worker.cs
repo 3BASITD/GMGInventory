@@ -1,4 +1,5 @@
 using AutoMapper;
+using DocumentFormat.OpenXml.InkML;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System;
 using System.Linq.Dynamic.Core.Tokenizer;
 using System.Net.Http;
 using System.Security.Policy;
@@ -16,6 +18,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using static Humanizer.On;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Sync
 {
@@ -52,7 +55,7 @@ namespace GMGInventory.Sync
                 #region RECEIVING
                 try
                 {
-                    var receivings = await GetReceivings(settings.URLReceiving, stoppingToken);
+                    var receivings = await GetReceivings(context, settings.URLReceiving, stoppingToken);
                     foreach (var receiving in receivings)
                     {
                         await SaveReceiving(context, receiving);
@@ -60,14 +63,14 @@ namespace GMGInventory.Sync
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(SystemFormat.GetInnermostExceptionMessage(ex));
+                    await SaveExceptionError(context, "Receiving", "E1", SystemFormat.GetInnermostExceptionMessage(ex));
                 }
                 #endregion
 
                 #region OUTBOUND
                 try
                 {
-                    var outbounds = await GetOutbounds(settings.URLOutbound, stoppingToken);
+                    var outbounds = await GetOutbounds(context, settings.URLOutbound, stoppingToken);
                     foreach (var outbound in outbounds)
                     {
                         await SaveOutbound(context, outbound);
@@ -75,14 +78,14 @@ namespace GMGInventory.Sync
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(SystemFormat.GetInnermostExceptionMessage(ex));
+                    await SaveExceptionError(context, "Outbound", "E1", SystemFormat.GetInnermostExceptionMessage(ex));
                 }
                 #endregion
 
                 #region RETURN
                 try
                 {
-                    var sreturns = await GetReturns(settings.URLReturn, stoppingToken);
+                    var sreturns = await GetReturns(context, settings.URLReturn, stoppingToken);
                     foreach (var sreturn in sreturns)
                     {
                         await SaveReturn(context, sreturn);
@@ -90,14 +93,14 @@ namespace GMGInventory.Sync
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(SystemFormat.GetInnermostExceptionMessage(ex));
+                    await SaveExceptionError(context, "Return", "E1", SystemFormat.GetInnermostExceptionMessage(ex));
                 }
                 #endregion
 
                 #region TRANSFER
                 try
                 {
-                    var transfers = await GetTransfers(settings.URLTransfer, stoppingToken);
+                    var transfers = await GetTransfers(context, settings.URLTransfer, stoppingToken);
                     foreach (var transfer in transfers)
                     {
                         await SaveTransfer(context, transfer);
@@ -105,7 +108,7 @@ namespace GMGInventory.Sync
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(SystemFormat.GetInnermostExceptionMessage(ex));
+                    await SaveExceptionError(context, "Transfer", "E1", SystemFormat.GetInnermostExceptionMessage(ex));
                 }
                 #endregion
 
@@ -113,7 +116,7 @@ namespace GMGInventory.Sync
             }
         }
 
-        private async Task<IList<APIBCT_Receiving>> GetReceivings(string apiURL, CancellationToken stoppingToken)
+        private async Task<IList<APIBCT_Receiving>> GetReceivings(ApplicationDbContext context, string apiURL, CancellationToken stoppingToken)
         {
             var client = httpClientFactory.CreateClient();
 
@@ -130,6 +133,7 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
+                await SaveExceptionError(context, "Receiving", "E2", SystemFormat.GetInnermostExceptionMessage(ex));
                 logger.LogError(ex, "Barcotech API call failed for Receiving API: {url}", apiURL);
                 return new List<APIBCT_Receiving>();
             }
@@ -146,114 +150,122 @@ namespace GMGInventory.Sync
 
             if (isAdded.Count() == 0 || isAdded.First().SyncStatus.ToLower() != "success")
             {
-
                 var errors = new List<string>();
-
-                var purchaseOrder = await context.PurchaseOrderNews.Where(s => s.DocumentNumber.ToLower() == "wala pa").FirstOrDefaultAsync();
-                if (purchaseOrder == null) errors.Add($"Invalid Purchase Order, \"\" not found");
-
-                var warehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_receiving.wh_code.ToLower()).FirstOrDefaultAsync();
-                if (warehouse == null) errors.Add($"Invalid Warehouse, {api_receiving.wh_code} not found");
-
-                var item = await context.Items.Where(s => s.Code.ToLower() == api_receiving.item_code.ToLower()).FirstOrDefaultAsync();
-                if (item == null) errors.Add($"Invalid Item, {api_receiving.item_code} not found");
-
-                var orderItem = await context.PurchaseOrderNewLineItems
-                                             .Where(s => purchaseOrder != null
-                                                      && s.PurchaseOrderId == purchaseOrder.Id
-                                                      && item != null
-                                                      && s.RequestItem.Item.Id == item.Id)
-                                             .FirstOrDefaultAsync();
-                if (orderItem == null && item != null && purchaseOrder != null)
-                    errors.Add($"Invalid Order Item, {api_receiving.item_code} not found in {purchaseOrder.DocumentNumber}");
-
-                var quantity = 0;
-                if (int.TryParse(api_receiving.qty_request, out var q))
-                    quantity = q;
-                if (quantity <= 0)
-                    errors.Add($"Invalid Quantity, {api_receiving.qty_request}");
-
-                if (errors.Count() == 0)
+                var successAdd = "";
+                try
                 {
-                    var receive = await context.PurchaseReceivings
-                                               .Where(s => s.BarcotechReceivingCode == api_receiving.receiving_code)
-                                               .FirstOrDefaultAsync();
+                    var purchaseOrder = await context.PurchaseOrderNews.Where(s => s.DocumentNumber.ToLower() == "wala pa").FirstOrDefaultAsync();
+                    if (purchaseOrder == null) errors.Add($"Invalid Purchase Order: \"\" not found");
 
-                    var receivedDate = DateTime.MinValue;
-                    if (DateTime.TryParse(api_receiving.received_date, out var d))
-                        receivedDate = d;
+                    var warehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_receiving.wh_code.ToLower()).FirstOrDefaultAsync();
+                    if (warehouse == null) errors.Add($"Invalid Warehouse: {api_receiving.wh_code} not found");
 
-                    if (receive == null)
+                    var item = await context.Items.Where(s => s.Code.ToLower() == api_receiving.item_code.ToLower()).FirstOrDefaultAsync();
+                    if (item == null) errors.Add($"Invalid Item: {api_receiving.item_code} not found");
+
+                    var orderItem = await context.PurchaseOrderNewLineItems
+                                                 .Where(s => purchaseOrder != null
+                                                          && s.PurchaseOrderId == purchaseOrder.Id
+                                                          && item != null
+                                                          && s.RequestItem.Item.Id == item.Id)
+                                                 .FirstOrDefaultAsync();
+                    if (orderItem == null && item != null && purchaseOrder != null)
+                        errors.Add($"Invalid Order Item: {api_receiving.item_code} not found in {purchaseOrder.DocumentNumber}");
+
+                    var quantity = 0;
+                    if (int.TryParse(api_receiving.qty_request, out var q))
+                        quantity = q;
+                    if (quantity <= 0)
+                        errors.Add($"Invalid Quantity: {api_receiving.qty_request}");
+
+                    if (errors.Count() == 0)
                     {
-                        var status = await context.PurchaseStatuses
-                                                  .Where(s => s.Name.ToLower() == "submitted")
-                                                  .FirstAsync();
-
-                        var procurementHelper = new ProcurementHelper();
-                        var docNumber = await procurementHelper.GetNewReceiving(context, status.Name);
-
-                        receive = new PurchaseReceiving
-                        {
-                            DocumentNumber = docNumber,
-                            DeliveryReceiptNumber = " ",
-                            SalesInvoiceNumber = " ",
-                            ReceiveDate = receivedDate,
-                            Remarks = api_receiving.remarks,
-                            StatusId = status.Id,
-
-                            //PurchaseOrderId = purchaseOrder!.Id, // error pa to kasi null, antay pa sa sagot ng gmg
-
-                            WarehouseId = warehouse!.Id
-                        };
-                        await context.PurchaseReceivings.AddAsync(receive);
-                        await context.SaveChangesAsync(userId);
-                    }
-                    else
-                    {
-                        receive.ReceiveDate = receivedDate;
-                        receive.Remarks = api_receiving.remarks;
-                        context.PurchaseReceivings.Update(receive);
-                        await context.SaveChangesAsync(userId);
-                    }
-
-                    var receiveItem = await context.PurchaseReceivingLineItems
-                                                   .Where(s => s.BarcotechReceivingId == api_receiving.id)
+                        var receive = await context.PurchaseReceivings
+                                                   .Where(s => s.BarcotechReceivingCode == api_receiving.receiving_code)
                                                    .FirstOrDefaultAsync();
 
-                    if (receiveItem == null)
-                    {
-                        receiveItem = new PurchaseReceivingLineItem
+                        var receivedDate = DateTime.MinValue;
+                        if (DateTime.TryParse(api_receiving.received_date, out var d))
+                            receivedDate = d;
+
+                        if (receive == null)
                         {
-                            OrderItemId = orderItem!.Id,
-                            PurchaseReceivingId = receive.Id,
-                            Quantity = quantity,
-                            BarcotechReceivingId = api_receiving.id
-                        };
-                        await context.PurchaseReceivingLineItems.AddAsync(receiveItem);
-                        await context.SaveChangesAsync(userId);
+                            var status = await context.PurchaseStatuses
+                                                      .Where(s => s.Name.ToLower() == "submitted")
+                                                      .FirstAsync();
+
+                            var procurementHelper = new ProcurementHelper();
+                            var docNumber = await procurementHelper.GetNewReceiving(context, status.Name);
+
+                            receive = new PurchaseReceiving
+                            {
+                                DocumentNumber = docNumber,
+                                DeliveryReceiptNumber = " ",
+                                SalesInvoiceNumber = " ",
+                                ReceiveDate = receivedDate,
+                                Remarks = api_receiving.remarks,
+                                StatusId = status.Id,
+
+                                //PurchaseOrderId = purchaseOrder!.Id, // error pa to kasi null, antay pa sa sagot ng gmg
+
+                                WarehouseId = warehouse!.Id
+                            };
+                            await context.PurchaseReceivings.AddAsync(receive);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            receive.ReceiveDate = receivedDate;
+                            receive.Remarks = api_receiving.remarks;
+                            context.PurchaseReceivings.Update(receive);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        successAdd = $"{receive.Id}||{receive.DocumentNumber}";
+
+                        var receiveItem = await context.PurchaseReceivingLineItems
+                                                       .Where(s => s.BarcotechReceivingId == api_receiving.id)
+                                                       .FirstOrDefaultAsync();
+
+                        if (receiveItem == null)
+                        {
+                            receiveItem = new PurchaseReceivingLineItem
+                            {
+                                OrderItemId = orderItem!.Id,
+                                PurchaseReceivingId = receive.Id,
+                                Quantity = quantity,
+                                BarcotechReceivingId = api_receiving.id
+                            };
+                            await context.PurchaseReceivingLineItems.AddAsync(receiveItem);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            receiveItem.OrderItemId = orderItem!.Id;
+                            receiveItem.PurchaseReceivingId = receive.Id;
+                            receiveItem.Quantity = quantity;
+                            context.PurchaseReceivingLineItems.Update(receiveItem);
+                            await context.SaveChangesAsync(userId);
+                        }
                     }
-                    else
-                    {
-                        receiveItem.OrderItemId = orderItem!.Id;
-                        receiveItem.PurchaseReceivingId = receive.Id;
-                        receiveItem.Quantity = quantity;
-                        context.PurchaseReceivingLineItems.Update(receiveItem);
-                        await context.SaveChangesAsync(userId);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"Exception, {SystemFormat.GetInnermostExceptionMessage(ex)}");
                 }
 
 
-                var errorMsg = string.Join(", ", errors);
-                if (errors.Count() > 0 && isAdded.First().SyncStatus != errorMsg)
+                var errorMsg = string.Join("||", errors);
+                if (errors.Count() > 0 && (isAdded.Count() == 0 || isAdded.First().Remarks != errorMsg))
                 {
                     await context.BarcotechSyncs.AddAsync(new BarcotechSync
                     {
                         ModuleName = moduleName,
                         PrimaryKey = api_receiving.id,
-                        SyncStatus = errorMsg,
+                        SyncStatus = "Fail",
+                        Remarks = errorMsg,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
                 else if (errors.Count() == 0)
                 {
@@ -262,14 +274,15 @@ namespace GMGInventory.Sync
                         ModuleName = moduleName,
                         PrimaryKey = api_receiving.id,
                         SyncStatus = "Success",
+                        Remarks = successAdd,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
             }
         }
 
-        private async Task<IList<APIBCT_Outbound>> GetOutbounds(string apiURL, CancellationToken stoppingToken)
+        private async Task<IList<APIBCT_Outbound>> GetOutbounds(ApplicationDbContext context, string apiURL, CancellationToken stoppingToken)
         {
             var client = httpClientFactory.CreateClient();
 
@@ -286,6 +299,7 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
+                await SaveExceptionError(context, "Outbount", "E2", SystemFormat.GetInnermostExceptionMessage(ex));
                 logger.LogError(ex, "Barcotech API call failed for Outbound API: {url}", apiURL);
                 return new List<APIBCT_Outbound>();
             }
@@ -294,6 +308,7 @@ namespace GMGInventory.Sync
         private async Task SaveOutbound(ApplicationDbContext context, APIBCT_Outbound api_outbound)
         {
             var moduleName = "Outbound";
+
             var isAdded = await context.BarcotechSyncs
                                        .Where(s => s.ModuleName.ToLower() == moduleName.ToLower()
                                                 && s.PrimaryKey == api_outbound.id)
@@ -302,155 +317,164 @@ namespace GMGInventory.Sync
 
             if (isAdded.Count() == 0 || isAdded.First().SyncStatus.ToLower() != "success")
             {
-
                 var errors = new List<string>();
+                var successAdd = "";
 
-                var agent = await context.Agents.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
-                if (agent == null) errors.Add($"Invalid Agent, \"\" not found");
-
-                var customer = await context.Customers.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
-                if (customer == null) errors.Add($"Invalid Customer, \"\" not found");
-
-                var item = await context.Items.Where(s => s.Code.ToLower() == api_outbound.item_code.ToLower()).FirstOrDefaultAsync();
-                if (item == null) errors.Add($"Invalid Item, {api_outbound.item_code} not found");
-
-                var quantity = 0;
-                if (int.TryParse(api_outbound.qty_requested, out var q))
-                    quantity = q;
-                if (quantity <= 0)
-                    errors.Add($"Invalid Quantity, {api_outbound.qty_requested}");
-
-                if (errors.Count() == 0)
+                try
                 {
-                    var order = await context.SalesOrders
-                                             .Where(s => s.BarcotechOutboundCode == api_outbound.outbound_code)
-                                             .FirstOrDefaultAsync();
+                    var agent = await context.Agents.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
+                    if (agent == null) errors.Add($"Invalid Agent: \"\" not found");
 
-                    var orderDate = DateTime.MinValue;
-                    if (DateTime.TryParse(api_outbound.dispatch_date, out var d))
-                        orderDate = d;
+                    var customer = await context.Customers.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
+                    if (customer == null) errors.Add($"Invalid Customer: \"\" not found");
 
-                    if (order == null)
+                    var item = await context.Items.Where(s => s.Code.ToLower() == api_outbound.item_code.ToLower()).FirstOrDefaultAsync();
+                    if (item == null) errors.Add($"Invalid Item: {api_outbound.item_code} not found");
+
+                    var quantity = 0;
+                    if (int.TryParse(api_outbound.qty_requested, out var q))
+                        quantity = q;
+                    if (quantity <= 0)
+                        errors.Add($"Invalid Quantity: {api_outbound.qty_requested}");
+
+                    if (errors.Count() == 0)
                     {
-                        var status = await context.PurchaseStatuses
-                                                  .Where(s => s.Name.ToLower() == "submitted")
-                                                  .FirstAsync();
-
-                        var salesHelper = new SalesHelper();
-                        var soNumber = await salesHelper.GetNewOrder(context);
-
-                        order = new SalesOrder
-                        {
-                            SalesOrderNumber = soNumber,
-                            AgentId = agent!.Id,
-                            CustomerId = customer!.Id,
-                            SalesOrderDate = orderDate,
-                            RequiredDeliveryDate = orderDate,
-                            OverallDiscount = 0,
-                            WithLP = true,
-                            WithREYCONonDefective = true,
-                            WithREYCOJITLPDeliveryId = 1,
-                            Remarks = api_outbound.remarks,
-                            StatusId = status.Id,
-                            BarcotechOutboundCode = api_outbound.outbound_code
-                        };
-                        await context.SalesOrders.AddAsync(order);
-                        await context.SaveChangesAsync(userId);
-                    }
-                    else
-                    {
-                        order.AgentId = agent!.Id;
-                        order.CustomerId = customer!.Id;
-                        order.SalesOrderDate = orderDate;
-                        order.RequiredDeliveryDate = orderDate;
-                        order.Remarks = api_outbound.remarks;
-                        context.SalesOrders.Update(order);
-                        await context.SaveChangesAsync(userId);
-                    }
-
-                    var orderItem = await context.SalesOrderLineItems
-                                                 .Where(s => s.BarcotechOutboundId == api_outbound.id)
+                        var order = await context.SalesOrders
+                                                 .Where(s => s.BarcotechOutboundCode == api_outbound.outbound_code)
                                                  .FirstOrDefaultAsync();
 
-                    var orderLastLine = await context.SalesOrderLineItems
-                                                     .Where(s => s.SalesOrderId == order.Id)
-                                                     .OrderByDescending(s => s.LineNumber)
-                                                     .Select(s => s.LineNumber)
+                        var orderDate = DateTime.MinValue;
+                        if (DateTime.TryParse(api_outbound.dispatch_date, out var d))
+                            orderDate = d;
+
+                        if (order == null)
+                        {
+                            var status = await context.PurchaseStatuses
+                                                      .Where(s => s.Name.ToLower() == "submitted")
+                                                      .FirstAsync();
+
+                            var salesHelper = new SalesHelper();
+                            var soNumber = await salesHelper.GetNewOrder(context);
+
+                            order = new SalesOrder
+                            {
+                                SalesOrderNumber = soNumber,
+                                AgentId = agent!.Id,
+                                CustomerId = customer!.Id,
+                                SalesOrderDate = orderDate,
+                                RequiredDeliveryDate = orderDate,
+                                OverallDiscount = 0,
+                                WithLP = true,
+                                WithREYCONonDefective = true,
+                                WithREYCOJITLPDeliveryId = 1,
+                                Remarks = api_outbound.remarks,
+                                StatusId = status.Id,
+                                BarcotechOutboundCode = api_outbound.outbound_code
+                            };
+                            await context.SalesOrders.AddAsync(order);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            order.AgentId = agent!.Id;
+                            order.CustomerId = customer!.Id;
+                            order.SalesOrderDate = orderDate;
+                            order.RequiredDeliveryDate = orderDate;
+                            order.Remarks = api_outbound.remarks;
+                            context.SalesOrders.Update(order);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        successAdd = $"{order.Id}||{order.SalesOrderNumber}";
+
+                        var orderItem = await context.SalesOrderLineItems
+                                                     .Where(s => s.BarcotechOutboundId == api_outbound.id)
                                                      .FirstOrDefaultAsync();
 
-                    var sellingPrice = await context.ItemPrices
-                                                    .Where(s => s.ItemId == item!.Id)
-                                                    .FirstOrDefaultAsync();
+                        var orderLastLine = await context.SalesOrderLineItems
+                                                         .Where(s => s.SalesOrderId == order.Id)
+                                                         .OrderByDescending(s => s.LineNumber)
+                                                         .Select(s => s.LineNumber)
+                                                         .FirstOrDefaultAsync();
 
-                    var discount1 = await context.CustomerBrandDiscount
-                                                 .Where(s => s.CustomerId == customer!.Id
-                                                          && s.BrandId == item!.BrandId
-                                                          && s.IsActive == true)
-                                                 .FirstOrDefaultAsync();
+                        var sellingPrice = await context.ItemPrices
+                                                        .Where(s => s.ItemId == item!.Id)
+                                                        .FirstOrDefaultAsync();
 
-                    var itemPromo = await context.ItemPromo
-                                                 .Where(s => s.ItemId == item!.Id
-                                                          && s.EffectiveDate <= orderDate
-                                                          && orderDate <= s.ExpirationDate)
-                                                 .FirstOrDefaultAsync();
-                    if (orderItem == null)
-                    {
-                        orderItem = new SalesOrderLineItem
+                        var discount1 = await context.CustomerBrandDiscount
+                                                     .Where(s => s.CustomerId == customer!.Id
+                                                              && s.BrandId == item!.BrandId
+                                                              && s.IsActive == true)
+                                                     .FirstOrDefaultAsync();
+
+                        var itemPromo = await context.ItemPromo
+                                                     .Where(s => s.ItemId == item!.Id
+                                                              && s.EffectiveDate <= orderDate
+                                                              && orderDate <= s.ExpirationDate)
+                                                     .FirstOrDefaultAsync();
+                        if (orderItem == null)
                         {
-                            SalesOrderId = order.Id,
-                            ItemId = item!.Id,
-                            LineNumber = orderLastLine + 1,
-                            Quantity = quantity,
-                            SellingPrice = itemPromo != null ? itemPromo.PromoPrice
-                                         : sellingPrice == null ? 0
-                                         : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
-                                         : sellingPrice.RetailSellingPrice,
-                            Discount1 = discount1 == null ? 0
-                                      : discount1.Discount,
-                            Discount2 = 0,
-                            Discount3 = 0,
-                            Discount4 = 0,
-                            Discount5 = 0,
-                            CustomerBrandDiscountId = discount1 == null ? null
-                                                    : discount1.Id,
-                            ItemPromoId = itemPromo == null ? null
-                                        : itemPromo.Id,
-                            BarcotechOutboundId = api_outbound.id
-                        };
-                        await context.SalesOrderLineItems.AddAsync(orderItem);
-                        await context.SaveChangesAsync(userId);
+                            orderItem = new SalesOrderLineItem
+                            {
+                                SalesOrderId = order.Id,
+                                ItemId = item!.Id,
+                                LineNumber = orderLastLine + 1,
+                                Quantity = quantity,
+                                SellingPrice = itemPromo != null ? itemPromo.PromoPrice
+                                             : sellingPrice == null ? 0
+                                             : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
+                                             : sellingPrice.RetailSellingPrice,
+                                Discount1 = discount1 == null ? 0
+                                          : discount1.Discount,
+                                Discount2 = 0,
+                                Discount3 = 0,
+                                Discount4 = 0,
+                                Discount5 = 0,
+                                CustomerBrandDiscountId = discount1 == null ? null
+                                                        : discount1.Id,
+                                ItemPromoId = itemPromo == null ? null
+                                            : itemPromo.Id,
+                                BarcotechOutboundId = api_outbound.id
+                            };
+                            await context.SalesOrderLineItems.AddAsync(orderItem);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            orderItem.ItemId = item!.Id;
+                            orderItem.Quantity = quantity;
+                            orderItem.SellingPrice = itemPromo != null ? itemPromo.PromoPrice
+                                             : sellingPrice == null ? 0
+                                             : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
+                                             : sellingPrice.RetailSellingPrice;
+                            orderItem.Discount1 = discount1 == null ? 0
+                                                : discount1.Discount;
+                            orderItem.CustomerBrandDiscountId = discount1 == null ? null
+                                                              : discount1.Id;
+                            orderItem.ItemPromoId = itemPromo == null ? null
+                                                  : itemPromo.Id;
+                            context.SalesOrderLineItems.Update(orderItem);
+                            await context.SaveChangesAsync(userId);
+                        }
                     }
-                    else
-                    {
-                        orderItem.ItemId = item!.Id;
-                        orderItem.Quantity = quantity;
-                        orderItem.SellingPrice = itemPromo != null ? itemPromo.PromoPrice
-                                         : sellingPrice == null ? 0
-                                         : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
-                                         : sellingPrice.RetailSellingPrice;
-                        orderItem.Discount1 = discount1 == null ? 0
-                                            : discount1.Discount;
-                        orderItem.CustomerBrandDiscountId = discount1 == null ? null
-                                                          : discount1.Id;
-                        orderItem.ItemPromoId = itemPromo == null ? null
-                                              : itemPromo.Id;
-                        context.SalesOrderLineItems.Update(orderItem);
-                        await context.SaveChangesAsync(userId);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"Exception, {SystemFormat.GetInnermostExceptionMessage(ex)}");
                 }
 
 
-                var errorMsg = string.Join(", ", errors);
-                if (errors.Count() > 0 && isAdded.First().SyncStatus != errorMsg)
+                var errorMsg = string.Join("||", errors);
+                if (errors.Count() > 0 && (isAdded.Count() == 0 || isAdded.First().Remarks != errorMsg))
                 {
                     await context.BarcotechSyncs.AddAsync(new BarcotechSync
                     {
                         ModuleName = moduleName,
                         PrimaryKey = api_outbound.id,
-                        SyncStatus = errorMsg,
+                        SyncStatus = "Fail",
+                        Remarks = errorMsg,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
                 else if (errors.Count() == 0)
                 {
@@ -459,14 +483,15 @@ namespace GMGInventory.Sync
                         ModuleName = moduleName,
                         PrimaryKey = api_outbound.id,
                         SyncStatus = "Success",
+                        Remarks = successAdd,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
             }
         }
 
-        private async Task<IList<APIBCT_Return>> GetReturns(string apiURL, CancellationToken stoppingToken)
+        private async Task<IList<APIBCT_Return>> GetReturns(ApplicationDbContext context, string apiURL, CancellationToken stoppingToken)
         {
             var client = httpClientFactory.CreateClient();
 
@@ -483,6 +508,7 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
+                await SaveExceptionError(context, "Return", "E2", SystemFormat.GetInnermostExceptionMessage(ex));
                 logger.LogError(ex, "Barcotech API call failed for Return API: {url}", apiURL);
                 return new List<APIBCT_Return>();
             }
@@ -500,140 +526,149 @@ namespace GMGInventory.Sync
             if (isAdded.Count() == 0 || isAdded.First().SyncStatus.ToLower() != "success")
             {
                 var errors = new List<string>();
+                var successAdd = "";
 
-                errors.Add($"Invalid Return Code, \"\" not found");
-
-                var salesOrder = await context.SalesOrders.Where(s => s.SalesOrderNumber.ToLower() == "wala pa").FirstOrDefaultAsync();
-                if (salesOrder == null) errors.Add($"Invalid Sales Order, \"\" not found"); // tatanggalin
-
-                var customer = await context.Customers.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
-                if (customer == null) errors.Add($"Invalid Customer, \"\" not found");
-
-                var item = await context.Items.Where(s => s.Code.ToLower() == api_return.item_code.ToLower()).FirstOrDefaultAsync();
-                if (item == null) errors.Add($"Invalid Item, {api_return.item_code} not found");
-
-                var quantity = 0;
-                if (int.TryParse(api_return.qty_returned, out var q))
-                    quantity = q;
-                if (quantity <= 0)
-                    errors.Add($"Invalid Quantity, {api_return.qty_returned}");
-
-                if (errors.Count() == 0)
+                try
                 {
-                    var sreturn = await context.SalesReturns
-                                               .Where(s => s.BarcotechReturnCode == "wala pa")
-                                               .FirstOrDefaultAsync();
+                    errors.Add($"Invalid Return Code: \"\" not found");
 
-                    var returnDate = DateTime.MinValue;
-                    if (DateTime.TryParse(api_return.return_date, out var d))
-                        returnDate = d;
+                    var salesOrder = await context.SalesOrders.Where(s => s.SalesOrderNumber.ToLower() == "wala pa").FirstOrDefaultAsync();
+                    if (salesOrder == null) errors.Add($"Invalid Sales Order: \"\" not found"); // tatanggalin
 
-                    if (sreturn == null)
+                    var customer = await context.Customers.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
+                    if (customer == null) errors.Add($"Invalid Customer: \"\" not found");
+
+                    var item = await context.Items.Where(s => s.Code.ToLower() == api_return.item_code.ToLower()).FirstOrDefaultAsync();
+                    if (item == null) errors.Add($"Invalid Item: {api_return.item_code} not found");
+
+                    var quantity = 0;
+                    if (int.TryParse(api_return.qty_returned, out var q))
+                        quantity = q;
+                    if (quantity <= 0)
+                        errors.Add($"Invalid Quantity: {api_return.qty_returned}");
+
+                    if (errors.Count() == 0)
                     {
-                        var status = await context.PurchaseStatuses
-                                                  .Where(s => s.Name.ToLower() == "submitted")
-                                                  .FirstAsync();
-
-                        var salesHelper = new SalesHelper();
-                        var srNumber = await salesHelper.GetNewReturn(context);
-
-                        sreturn = new SalesReturn
-                        {
-                            SalesReturnNumber = srNumber,
-                            SalesOrderId = salesOrder == null ? null : salesOrder.Id,
-                            CustomerId = customer!.Id,
-                            ReturnDate = returnDate,
-                            Remarks = api_return.remarks,
-                            BarcotechReturnCode = "wala pa"
-                        };
-                        await context.SalesReturns.AddAsync(sreturn);
-                        await context.SaveChangesAsync(userId);
-                    }
-                    else
-                    {
-                        sreturn.SalesOrderId = salesOrder == null ? null : salesOrder.Id;
-                        sreturn.CustomerId = customer!.Id;
-                        sreturn.ReturnDate = returnDate;
-                        sreturn.Remarks = api_return.remarks;
-                        context.SalesReturns.Update(sreturn);
-                        await context.SaveChangesAsync(userId);
-                    }
-
-                    var returnItem = await context.SalesReturnLineItems
-                                                   .Where(s => s.BarcotechReturnId == api_return.id)
+                        var sreturn = await context.SalesReturns
+                                                   .Where(s => s.BarcotechReturnCode == "wala pa")
                                                    .FirstOrDefaultAsync();
 
-                    var sellingPrice = await context.ItemPrices
-                                                    .Where(s => s.ItemId == item!.Id)
-                                                    .FirstOrDefaultAsync();
+                        var returnDate = DateTime.MinValue;
+                        if (DateTime.TryParse(api_return.return_date, out var d))
+                            returnDate = d;
 
-                    var discount1 = await context.CustomerBrandDiscount
-                                                 .Where(s => s.CustomerId == customer!.Id
-                                                          && s.BrandId == item!.BrandId
-                                                          && s.IsActive == true)
-                                                 .FirstOrDefaultAsync();
-
-                    var itemPromo = await context.ItemPromo
-                                                 .Where(s => s.ItemId == item!.Id
-                                                          && s.EffectiveDate <= returnDate
-                                                          && returnDate <= s.ExpirationDate)
-                                                 .FirstOrDefaultAsync();
-
-                    if (returnItem == null)
-                    {
-                        returnItem = new SalesReturnLineItem
+                        if (sreturn == null)
                         {
-                            SalesReturnId = sreturn.Id,
-                            ItemId = item!.Id,
-                            Quantity = quantity,
-                            SellingPrice = itemPromo != null ? itemPromo.PromoPrice
-                                         : sellingPrice == null ? 0
-                                         : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
-                                         : sellingPrice.RetailSellingPrice,
-                            Discount1 = discount1 == null ? 0
-                                      : discount1.Discount,
-                            Discount2 = 0,
-                            CustomerBrandDiscountId = discount1 == null ? null
-                                                    : discount1.Id,
-                            ItemPromoId = itemPromo == null ? null
-                                        : itemPromo.Id,
-                            BarcotechReturnId = api_return.id
-                        };
-                        await context.SalesReturnLineItems.AddAsync(returnItem);
-                        await context.SaveChangesAsync(userId);
-                    }
-                    else
-                    {
-                        returnItem.SalesReturnId = sreturn.Id;
-                        returnItem.ItemId = item!.Id;
-                        returnItem.Quantity = quantity;
-                        returnItem.SellingPrice = itemPromo != null ? itemPromo.PromoPrice
-                                         : sellingPrice == null ? 0
-                                         : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
-                                         : sellingPrice.RetailSellingPrice;
-                        returnItem.Discount1 = discount1 == null ? 0
-                                      : discount1.Discount;
-                        returnItem.CustomerBrandDiscountId = discount1 == null ? null
-                                                    : discount1.Id;
-                        returnItem.ItemPromoId = itemPromo == null ? null
-                                        : itemPromo.Id;
-                        context.SalesReturnLineItems.Update(returnItem);
-                        await context.SaveChangesAsync(userId);
+                            var status = await context.PurchaseStatuses
+                                                      .Where(s => s.Name.ToLower() == "submitted")
+                                                      .FirstAsync();
+
+                            var salesHelper = new SalesHelper();
+                            var srNumber = await salesHelper.GetNewReturn(context);
+
+                            sreturn = new SalesReturn
+                            {
+                                SalesReturnNumber = srNumber,
+                                SalesOrderId = salesOrder == null ? null : salesOrder.Id,
+                                CustomerId = customer!.Id,
+                                ReturnDate = returnDate,
+                                Remarks = api_return.remarks,
+                                BarcotechReturnCode = "wala pa"
+                            };
+                            await context.SalesReturns.AddAsync(sreturn);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            sreturn.SalesOrderId = salesOrder == null ? null : salesOrder.Id;
+                            sreturn.CustomerId = customer!.Id;
+                            sreturn.ReturnDate = returnDate;
+                            sreturn.Remarks = api_return.remarks;
+                            context.SalesReturns.Update(sreturn);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        successAdd = $"{sreturn.Id}||{sreturn.SalesReturnNumber}";
+
+                        var returnItem = await context.SalesReturnLineItems
+                                                       .Where(s => s.BarcotechReturnId == api_return.id)
+                                                       .FirstOrDefaultAsync();
+
+                        var sellingPrice = await context.ItemPrices
+                                                        .Where(s => s.ItemId == item!.Id)
+                                                        .FirstOrDefaultAsync();
+
+                        var discount1 = await context.CustomerBrandDiscount
+                                                     .Where(s => s.CustomerId == customer!.Id
+                                                              && s.BrandId == item!.BrandId
+                                                              && s.IsActive == true)
+                                                     .FirstOrDefaultAsync();
+
+                        var itemPromo = await context.ItemPromo
+                                                     .Where(s => s.ItemId == item!.Id
+                                                              && s.EffectiveDate <= returnDate
+                                                              && returnDate <= s.ExpirationDate)
+                                                     .FirstOrDefaultAsync();
+
+                        if (returnItem == null)
+                        {
+                            returnItem = new SalesReturnLineItem
+                            {
+                                SalesReturnId = sreturn.Id,
+                                ItemId = item!.Id,
+                                Quantity = quantity,
+                                SellingPrice = itemPromo != null ? itemPromo.PromoPrice
+                                             : sellingPrice == null ? 0
+                                             : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
+                                             : sellingPrice.RetailSellingPrice,
+                                Discount1 = discount1 == null ? 0
+                                          : discount1.Discount,
+                                Discount2 = 0,
+                                CustomerBrandDiscountId = discount1 == null ? null
+                                                        : discount1.Id,
+                                ItemPromoId = itemPromo == null ? null
+                                            : itemPromo.Id,
+                                BarcotechReturnId = api_return.id
+                            };
+                            await context.SalesReturnLineItems.AddAsync(returnItem);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            returnItem.SalesReturnId = sreturn.Id;
+                            returnItem.ItemId = item!.Id;
+                            returnItem.Quantity = quantity;
+                            returnItem.SellingPrice = itemPromo != null ? itemPromo.PromoPrice
+                                             : sellingPrice == null ? 0
+                                             : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
+                                             : sellingPrice.RetailSellingPrice;
+                            returnItem.Discount1 = discount1 == null ? 0
+                                          : discount1.Discount;
+                            returnItem.CustomerBrandDiscountId = discount1 == null ? null
+                                                        : discount1.Id;
+                            returnItem.ItemPromoId = itemPromo == null ? null
+                                            : itemPromo.Id;
+                            context.SalesReturnLineItems.Update(returnItem);
+                            await context.SaveChangesAsync(userId);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    errors.Add($"Exception, {SystemFormat.GetInnermostExceptionMessage(ex)}");
+                }
 
-
-                var errorMsg = string.Join(", ", errors);
-                if (errors.Count() > 0 && isAdded.First().SyncStatus != errorMsg)
+                var errorMsg = string.Join("||", errors);
+                if (errors.Count() > 0 && (isAdded.Count() == 0 || isAdded.First().Remarks != errorMsg))
                 {
                     await context.BarcotechSyncs.AddAsync(new BarcotechSync
                     {
                         ModuleName = moduleName,
                         PrimaryKey = api_return.id,
-                        SyncStatus = errorMsg,
+                        SyncStatus = "Fail",
+                        Remarks = errorMsg,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
                 else if (errors.Count() == 0)
                 {
@@ -642,14 +677,15 @@ namespace GMGInventory.Sync
                         ModuleName = moduleName,
                         PrimaryKey = api_return.id,
                         SyncStatus = "Success",
+                        Remarks = successAdd,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
             }
         }
 
-        private async Task<IList<APIBCT_Transfer>> GetTransfers(string apiURL, CancellationToken stoppingToken)
+        private async Task<IList<APIBCT_Transfer>> GetTransfers(ApplicationDbContext context, string apiURL, CancellationToken stoppingToken)
         {
             var client = httpClientFactory.CreateClient();
 
@@ -666,6 +702,7 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
+                await SaveExceptionError(context, "Transfer", "E2", SystemFormat.GetInnermostExceptionMessage(ex));
                 logger.LogError(ex, "Barcotech API call failed for Transfer API: {url}", apiURL);
                 return new List<APIBCT_Transfer>();
             }
@@ -683,111 +720,120 @@ namespace GMGInventory.Sync
             if (isAdded.Count() == 0 || isAdded.First().SyncStatus.ToLower() != "success")
             {
                 var errors = new List<string>();
+                var successAdd = "";
 
-                var swarehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
-                if (swarehouse == null) errors.Add($"Invalid Source Warehouse, {api_transfer.from_wh_code} not found");
-
-                var dwarehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
-                if (dwarehouse == null) errors.Add($"Invalid Destination Warehouse, {api_transfer.from_wh_code} not found");
-
-                var item = await context.Items.Where(s => s.Code.ToLower() == api_transfer.item_code.ToLower()).FirstOrDefaultAsync();
-                if (item == null) errors.Add($"Invalid Item, {api_transfer.item_code} not found");
-
-                var location = await context.LocationCodes
-                                            .Where(s => s.Code.ToLower() == api_transfer.bin_location_code.ToLower()
-                                                     || s.Name.ToLower() == api_transfer.bin_location_code.ToLower())
-                                            .FirstOrDefaultAsync();
-                if (location == null)
+                try
                 {
-                    location = new Data.LocationCode
-                    {
-                        Code = api_transfer.bin_location_code,
-                        Name = api_transfer.bin_location_code,
-                        IsActive = true
-                    };
-                    await context.LocationCodes.AddAsync(location);
-                    await context.SaveChangesAsync(userId);
-                }
+                    var swarehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
+                    if (swarehouse == null) errors.Add($"Invalid Source Warehouse: {api_transfer.from_wh_code} not found");
 
-                var quantity = 0;
-                if (int.TryParse(api_transfer.qty_transferred, out var q))
-                    quantity = q;
-                if (quantity <= 0)
-                    errors.Add($"Invalid Quantity, {api_transfer.qty_transferred}");
+                    var dwarehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
+                    if (dwarehouse == null) errors.Add($"Invalid Destination Warehouse: {api_transfer.from_wh_code} not found");
 
-                if (errors.Count() == 0)
-                {
-                    var transfer = await context.TransferItems
-                                                .Where(s => s.BarcotechTransferCode == api_transfer.transfer_code)
+                    var item = await context.Items.Where(s => s.Code.ToLower() == api_transfer.item_code.ToLower()).FirstOrDefaultAsync();
+                    if (item == null) errors.Add($"Invalid Item: {api_transfer.item_code} not found");
+
+                    var location = await context.LocationCodes
+                                                .Where(s => s.Code.ToLower() == api_transfer.bin_location_code.ToLower()
+                                                         || s.Name.ToLower() == api_transfer.bin_location_code.ToLower())
                                                 .FirstOrDefaultAsync();
-
-                    var transferDate = DateTime.MinValue;
-                    if (DateTime.TryParse(api_transfer.transfer_date, out var d))
-                        transferDate = d;
-
-                    if (transfer == null)
+                    if (location == null)
                     {
-                        transfer = new TransferItem
+                        location = new Data.LocationCode
                         {
-                            SourceId = swarehouse!.Id,
-                            DestinationId = dwarehouse!.Id,
-                            Remarks = "",
-                            TransferDate = transferDate,
-                            BarcotechTransferCode = api_transfer.transfer_code
+                            Code = api_transfer.bin_location_code,
+                            Name = api_transfer.bin_location_code,
+                            IsActive = true
                         };
-                        await context.TransferItems.AddAsync(transfer);
-                        await context.SaveChangesAsync(userId);
-                    }
-                    else
-                    {
-                        transfer.SourceId = swarehouse!.Id;
-                        transfer.DestinationId = dwarehouse!.Id;
-                        transfer.Remarks = "";
-                        transfer.TransferDate = transferDate;
-                        context.TransferItems.Update(transfer);
+                        await context.LocationCodes.AddAsync(location);
                         await context.SaveChangesAsync(userId);
                     }
 
-                    var transferItem = await context.TransferItemDetails
-                                                    .Where(s => s.BarcotechTransferId == api_transfer.id)
+                    var quantity = 0;
+                    if (int.TryParse(api_transfer.qty_transferred, out var q))
+                        quantity = q;
+                    if (quantity <= 0)
+                        errors.Add($"Invalid Quantity: {api_transfer.qty_transferred}");
+
+                    if (errors.Count() == 0)
+                    {
+                        var transfer = await context.TransferItems
+                                                    .Where(s => s.BarcotechTransferCode == api_transfer.transfer_code)
                                                     .FirstOrDefaultAsync();
 
-                    if (transferItem == null)
-                    {
-                        transferItem = new TransferItemDetail
+                        var transferDate = DateTime.MinValue;
+                        if (DateTime.TryParse(api_transfer.transfer_date, out var d))
+                            transferDate = d;
+
+                        if (transfer == null)
                         {
-                            TransferItemId = transfer.Id,
-                            ItemId = item!.Id,
-                            LocationCodeId = location!.Id,
-                            Quantity = quantity,
-                            BarcotechTransferId = api_transfer.id
-                        };
-                        await context.TransferItemDetails.AddAsync(transferItem);
-                        await context.SaveChangesAsync(userId);
-                    }
-                    else
-                    {
-                        transferItem.TransferItemId = transfer.Id;
-                        transferItem.ItemId = item!.Id;
-                        transferItem.LocationCodeId = location!.Id;
-                        transferItem.Quantity = quantity;
-                        context.TransferItemDetails.Update(transferItem);
-                        await context.SaveChangesAsync(userId);
+                            transfer = new TransferItem
+                            {
+                                SourceId = swarehouse!.Id,
+                                DestinationId = dwarehouse!.Id,
+                                Remarks = "",
+                                TransferDate = transferDate,
+                                BarcotechTransferCode = api_transfer.transfer_code
+                            };
+                            await context.TransferItems.AddAsync(transfer);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            transfer.SourceId = swarehouse!.Id;
+                            transfer.DestinationId = dwarehouse!.Id;
+                            transfer.Remarks = "";
+                            transfer.TransferDate = transferDate;
+                            context.TransferItems.Update(transfer);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        successAdd = $"{transfer.Id}||{transfer.Id}";
+
+                        var transferItem = await context.TransferItemDetails
+                                                        .Where(s => s.BarcotechTransferId == api_transfer.id)
+                                                        .FirstOrDefaultAsync();
+
+                        if (transferItem == null)
+                        {
+                            transferItem = new TransferItemDetail
+                            {
+                                TransferItemId = transfer.Id,
+                                ItemId = item!.Id,
+                                LocationCodeId = location!.Id,
+                                Quantity = quantity,
+                                BarcotechTransferId = api_transfer.id
+                            };
+                            await context.TransferItemDetails.AddAsync(transferItem);
+                            await context.SaveChangesAsync(userId);
+                        }
+                        else
+                        {
+                            transferItem.TransferItemId = transfer.Id;
+                            transferItem.ItemId = item!.Id;
+                            transferItem.LocationCodeId = location!.Id;
+                            transferItem.Quantity = quantity;
+                            context.TransferItemDetails.Update(transferItem);
+                            await context.SaveChangesAsync(userId);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    errors.Add($"Exception, {SystemFormat.GetInnermostExceptionMessage(ex)}");
+                }
 
-
-                var errorMsg = string.Join(", ", errors);
-                if (errors.Count() > 0 && isAdded.First().SyncStatus != errorMsg)
+                var errorMsg = string.Join("||", errors);
+                if (errors.Count() > 0 && (isAdded.Count() == 0 || isAdded.First().Remarks != errorMsg))
                 {
                     await context.BarcotechSyncs.AddAsync(new BarcotechSync
                     {
                         ModuleName = moduleName,
                         PrimaryKey = api_transfer.id,
-                        SyncStatus = errorMsg,
+                        SyncStatus = "Fail",
+                        Remarks = errorMsg,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
                 else if (errors.Count() == 0)
                 {
@@ -796,10 +842,32 @@ namespace GMGInventory.Sync
                         ModuleName = moduleName,
                         PrimaryKey = api_transfer.id,
                         SyncStatus = "Success",
+                        Remarks = successAdd,
                         DatePerformed = DateTime.Now
                     });
-                    await context.SaveChangesAsync(userId);
+                    await context.SaveChangesAsync();
                 }
+            }
+        }
+
+        private async Task SaveExceptionError(ApplicationDbContext context, string module, string pk, string remarks)
+        {
+            var exstr = "Exception";
+            var dtNow = DateTime.Now;
+            var added = await context.BarcotechSyncs
+                                     .Where(s => s.ModuleName == module && s.PrimaryKey == pk && s.SyncStatus == exstr)
+                                     .LastOrDefaultAsync();
+            if (added == null || added.Remarks != remarks || dtNow.ToString("yyMMddHH") != added.DatePerformed.ToString("yyMMddHH"))
+            {
+                await context.BarcotechSyncs.AddAsync(new BarcotechSync
+                {
+                    ModuleName = module,
+                    PrimaryKey = pk,
+                    SyncStatus = exstr,
+                    Remarks = remarks,
+                    DatePerformed = dtNow
+                });
+                await context.SaveChangesAsync();
             }
         }
     }

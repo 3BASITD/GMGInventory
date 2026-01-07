@@ -80,12 +80,10 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Sales Order (Special)")] SalesOrderSpecial,
         [PageNamesString("Purchase Request (Automotive)")] PurchaseRequestAutomotive,
         [PageNamesString("Order Queue")] OrderQueue,
-        [PageNamesString("Purchase Request (Non-Automotive Approver #2)")] PurchaseRequestNonAutomotive,
+        [PageNamesString("Purchase Request (Non-Automotive)")] PurchaseRequestNonAutomotive,
         [PageNamesString("Warehouse Transfer Report")] WarehouseTransferReport,
         [PageNamesString("Daily Outbound Report")] DailyOutboundReport,
-        [PageNamesString("Barcotech (Pack)")] BarcotechPack,
-        [PageNamesString("Barcotech (Receiving)")] BarcotechReceiving,
-        [PageNamesString("Barcotech (Transfer)")] BarcotechTransfer
+        [PageNamesString("Barcotech Sync Status")] BarcotechSync
     }
 
     public static class PageNameExtensions

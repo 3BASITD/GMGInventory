@@ -3,25 +3,12 @@
 @{
     ViewData["Title"] = "Warehouse Transfer";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
-    var barcotechUserAccess = (ViewsAccessVM)ViewData["BarcotechUserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (barcotechUserAccess.CanUploadDownload)
-            {
-                <button class="btn btn-light text-dark btn-sm float-right ml-2" onclick="FetchFromBarcotech()">
-                    <span class="fas fa-download"></span> Fetch from Barcotech
-                </button>
-            }
-            else
-            {
-                <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Barcotech (Transfer) Upload / Download access is required." data-microtip-position="bottom-left" role="tooltip">
-                    <span class="fas fa-download"></span> Fetch from Barcotech
-                </button>
-            }
             @if (userAccess.CanAdd)
             {
                 <a asp-action="Create" class="btn btn-primary btn-sm float-right">
@@ -209,7 +196,6 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var barcotech_user_access = @Html.Raw(Json.Serialize(barcotechUserAccess));
 
         SetDateFilter();
         function SetDateFilter() {
@@ -363,52 +349,6 @@
 
                 window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
             });
-        }
-
-        if (barcotech_user_access.canUploadDownload) {
-            function FetchFromBarcotech() {
-                swal({
-                    title: "Fetch from Barcotech",
-                    text: "This action will fetch all records from Barcotech. The process may take some time, depending on the number of records to be retrieve. Are you sure you want to proceed?",
-                    icon: "warning",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $.ajax({
-                            url: "@Url.Action("FetchFromBarcotech", "Transfer")",
-                            type: "POST",
-                            data: {
-                                //FromDate: $("#").val() // wala pang filter sa api ng barcotech
-                            },
-                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the transfer, which may result in some records being transferred while others are not.</small>",
-                            success: function (data, status, xhr) {
-                                var success_ctr = 0;
-                                $("table.table-fetch tbody").html("");
-                                $.each(data, function (i, v) {
-                                    $("table.table-fetch tbody").append(`
-                                        <tr>
-                                            <td>${v.data.transfer_code}</td>
-                                            <td>${v.data.item_code}</td>
-                                            <td>${v.data.qty_transferred}</td>
-                                            <td>${v.data.transfer_date}</td>
-                                            <td>${v.data.transferred_by}</td>
-                                            <td>${v.data.from_wh_code}</td>
-                                            <td>${v.data.to_wh_code}</td>
-                                            <td>${v.data.bin_location_code}</td>
-                                            <td class="${(v.status.toLowerCase() == "success" ? "text-success" : "text-danger")}">${v.message}</td>
-                                        </tr>`);
-                                    success_ctr++;
-                                });
-                                if(success_ctr > 0) {
-                                    dataTable.ajax.reload();
-                                }
-                                $("#barcotechModal").modal("show");
-                            }
-                        });
-                    }
-                });
-            }
         }
     </script>
 }

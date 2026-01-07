@@ -5,6 +5,31 @@
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
     var userAccessAutomotive = (ViewsAccessVM)ViewData["UserAccessAutomotive"]!;
     var userAccessNonAutomotive = (ViewsAccessVM)ViewData["UserAccessNonAutomotive"]!;
+
+    var status = Model.Status.ToLowerInvariant();
+    var type = Model.Type.ToLowerInvariant();
+
+    bool isDraft = status == "draft";
+    bool isSubmitted = status == "submitted";
+    bool isDisapproved = status == "disapproved";
+
+    bool isNonAutomotive = type == "non-automotive";
+    bool isAutomotive = type == "automotive";
+
+    bool canAdd = userAccess.CanAdd;
+    bool canPrint = userAccess.CanPrint;
+    bool canDelete = userAccess.CanDelete && isDraft;
+    bool canEdit = userAccess.CanEdit && isDraft;
+    bool canApproveDisapprove = (
+                                    (isNonAutomotive && userAccessNonAutomotive.CanApproveDisapprove) ||
+                                    (isAutomotive && userAccessAutomotive.CanApproveDisapprove) ||
+                                    (!isNonAutomotive && !isAutomotive && userAccess.CanApproveDisapprove)
+                                ) && isSubmitted;
+
+    bool canRecreate = isDisapproved &&
+                       !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
+                       Model.ResubmitId == null &&
+                       canAdd;
 }
 
 @section Breadcrumb {
@@ -15,7 +40,7 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (userAccess.CanPrint)
+            @if (canPrint)
             {
                 <div class="dropdown float-right ml-2">
                     <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
@@ -29,182 +54,98 @@
             }
             else
             {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
-                    <span class="fas fa-print"></span> Print
+                <button type="button"
+                        class="btn btn-info btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Print&#10;Print access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-print mr-0"></span>
                 </button>
             }
-            @if (Model.Status.ToLower() == "draft")
+            @if (canDelete)
             {
-                @if (userAccess.CanDelete)
-                {
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-delete">
-                        <span class="fas fa-trash"></span> Delete
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-trash"></span> Delete
-                    </button>
-                }
-                @if (userAccess.CanEdit)
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                }
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-delete">
+                    <span class="fas fa-trash"></span> Delete
+                </button>
             }
-            else if (Model.Status.ToLower() == "submitted")
+            else
             {
-                @* @if (Model.Type.ToLower() == "non-automotive")
-                {
-                    @if (userAccessNonAutomotive.CanApproveDisapprove)
-                    {
-                        @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1) || string.IsNullOrWhiteSpace(Model.ApprovedBy2))
-                        {
-                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                                <span class="fas fa-times"></span> Disapprove
-                            </button>
-                            @if (string.IsNullOrWhiteSpace(Model.ApprovedBy2))
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="2" data-microtip-title="Non-automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approve #2
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #2. Waiting for Approver #1" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approved #2
-                                </button>
-                            }
-                            @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1))
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="1" data-microtip-title="Non-automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approve #1
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #1. Waiting for Approver #2" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approved #1
-                                </button>
-                            }
-                        }
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove (Non-automotive) access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-times"></span> Disapprove
-                        </button>
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove (Non-automotive) access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-check"></span> Approve #2
-                        </button>
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove (Non-automotive) access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-check"></span> Approve #1
-                        </button>
-                    }
-                }
-                else if (Model.Type.ToLower() == "automotive")
-                {
-                    @if (userAccessAutomotive.CanApproveDisapprove)
-                    {
-                        @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1) || string.IsNullOrWhiteSpace(Model.ApprovedBy2))
-                        {
-                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                                <span class="fas fa-times"></span> Disapprove
-                            </button>
-                            @if (string.IsNullOrWhiteSpace(Model.ApprovedBy2))
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="2" data-microtip-title="Automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approve #2
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #2. Waiting for Approver #1" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approved #2
-                                </button>
-                            }
-                            @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1))
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve" data-approver-number="1" data-microtip-title="Automotive need 2 approver" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approve #1
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Done Approver #1. Waiting for Approver #2" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-check"></span> Approved #1
-                                </button>
-                            }
-                        }
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove (Automotive) access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-times"></span> Disapprove
-                        </button>
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove (Automotive) access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-check"></span> Approve #2
-                        </button>
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove (Automotive) access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-check"></span> Approve #1
-                        </button>
-                    }
-                }
-                else
-                { *@
-                    @if (userAccess.CanApproveDisapprove)
-                    {
-                        @if (string.IsNullOrWhiteSpace(Model.ApprovedBy1))
-                        {
-                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                                <span class="fas fa-times"></span> Disapprove
-                            </button>
-                            <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
-                                <span class="fas fa-check"></span> Approve
-                            </button>
-                        }
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-times"></span> Disapprove
-                        </button>
-                        <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-check"></span> Approve
-                        </button>
-                    }
-                @* } *@
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Delete&#10;@(isDraft ? "Delete access is required" : "Only draft order can be deleted")"
+                        data-microtip-position="bottom" role="tooltip">
+                    <span class="fas fa-trash mr-0"></span>
+                </button>
             }
-            else if (Model.Status.ToLower() == "disapproved"
-            && !string.IsNullOrWhiteSpace(Model.DisapprovedBy)
-            && Model.ResubmitId == null)
+            @if (canEdit)
             {
-                @if (userAccess.CanAdd)
-                {
-                    <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </a>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </button>
-                }
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
+                    <span class="fas fa-save"></span> Save as Draft
+                </button>
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+                    <span class="fas fa-paper-plane"></span> Submit
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Save as Draft&#10;@(isDraft ? "Edit access is required" : "Only draft orders can be saved as draft")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-save mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Submit&#10;@(isDraft ? "Edit access is required" : "Only draft orders can be submitted")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-paper-plane mr-0"></span>
+                </button>
+            }
+            @if (canApproveDisapprove)
+            {
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
+                    <span class="fas fa-times"></span> Disapprove
+                </button>
+                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
+                    <span class="fas fa-check"></span> Approve
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Disapprove&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted request can be disapproved")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-times mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Approve&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted request can be approved")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-check mr-0"></span>
+                </button>
+            }
+            @if (canRecreate)
+            {
+                <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-edit"></span> Update to Resubmit
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Order already been resubmitted"
+                                                                     : canAdd ? "Only disapproved orders can be resubmitted"
+                                                                     : "Add access is required")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-edit mr-0"></span>
+                </button>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -707,7 +648,7 @@
                     className: "form-cell"
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
-                { 
+                {
                     data: function (data, type, dataToSet) {
                         if (!data.salesOrderId) {
                             return "<span class='text-muted'>N/A</span>";
@@ -731,7 +672,7 @@
                             return "<a href='/Customer/Details/" + data.customerId + "' class='text-info' target='_blank'>" + data.customer + "</a>";
                         }
                     },
-                    name: "Customer", 
+                    name: "Customer",
                     className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {

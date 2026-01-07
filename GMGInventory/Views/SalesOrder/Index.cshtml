@@ -16,6 +16,16 @@
                     <span class="fas fa-plus"></span> New Sales Order
                 </a>
             }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="New Sales Order&#10;Add access is required"
+                        data-microtip-position="top-left"
+                        role="tooltip">
+                    <span class="fas fa-plus mr-0"></span>
+                </button>
+            }
             <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -23,6 +33,16 @@
             {
                 <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
                     <span class="fas fa-download"></span> Download
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Download&#10;Download access is required"
+                        data-microtip-position="top-left"
+                        role="tooltip">
+                    <span class="fas fa-download mr-0"></span>
                 </button>
             }
         </div>
