@@ -273,6 +273,7 @@ namespace GMGInventory.Application.Repositories
                             Quantity = item.Quantity,
                             SalesReturnId = salesReturn.Id,
                             SellingPrice = item.SellingPrice
+                           
                         };
 
                         context.SalesReturnLineItems.Add(salesReturnLineItem);

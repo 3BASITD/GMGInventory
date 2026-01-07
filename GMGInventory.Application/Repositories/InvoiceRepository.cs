@@ -423,7 +423,7 @@ namespace GMGInventory.Application.Repositories
                              Id = invoicel.Id,
                              ItemId = item.Id,
                              ItemCode = item.Code,
-                             ItemName = item.Name,
+                             ItemName = item.Name + (orderl.ItemPromo == null ? "" : " (" + orderl.ItemPromo.Name + ")"),
                              OldItemCode = item.OldCode == null || item.OldCode == "" ? "-" : item.OldCode + "",
                              PartNumber = item.PartNumber == null || item.PartNumber == "" ? "-" : item.PartNumber + "",
                              NetPriceD = invoicel.UnitPrice,

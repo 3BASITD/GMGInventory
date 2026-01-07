@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +48,7 @@ namespace GMGInventory.Application.Repositories
                                  InvoiceDateD = iv.InvoiceDate,
                                  InvoiceNumber = iv.InvoiceNumber,
                                  ItemCode = sl.Item.Code,
-                                 ItemName = sl.Item.Name,
+                                 ItemName = sl.Item.Name + (sl.ItemPromo == null ? "" : " (" + sl.ItemPromo.Name + ")"),
                                  PartNumber = sl.Item.PartNumber + "",
                                  Quantity = sl.Quantity,
                                  SellingPriceD = sl.SellingPrice,

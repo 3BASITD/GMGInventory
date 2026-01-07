@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -253,6 +254,7 @@ namespace GMGInventory.Application.Repositories
             var itemVM = from pack in context.PackLineItems
                                               .Include(s => s.Item)
                          join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
+                         
                          where pack.PackId == packId
                          && pack.Item.Id == order.Item.Id
                          orderby pack.BoxNumber ascending, pack.PackTypeId ascending
@@ -262,7 +264,7 @@ namespace GMGInventory.Application.Repositories
                              Id = pack.Id,
                              ItemId = pack.Item.Id,
                              ItemCode = pack.Item.Code,
-                             ItemName = pack.Item.Name,
+                             ItemName = pack.Item.Name + (order.ItemPromo == null? "": " ("+order.ItemPromo.Name+")"),
                              PackType = pack.PackType.Id,
                              PackTypeName = pack.PackType.Code,
                              Quantity = pack.Quantity,
@@ -297,7 +299,7 @@ namespace GMGInventory.Application.Repositories
                              Discount2D = grp.First().order.Discount2,
                              ItemCode = grp.First().pack.Item.Code,
                              ItemId = grp.First().order.ItemId,
-                             ItemName = grp.First().pack.Item.Name,
+                             ItemName = grp.First().pack.Item.Name + (grp.First().order.ItemPromo == null ? "" : " (" + grp.First().order.ItemPromo.Name + ")"),
                              Quantity = grp.Sum(s => s.pack.Quantity),
                              SellingPriceD = grp.First().order.SellingPrice,
                              SellingPriceType = grp.First().price.RetailSellingPrice > grp.First().price.NetSellingPrice ? "Gross" : "Net"
