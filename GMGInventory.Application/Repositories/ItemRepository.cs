@@ -609,11 +609,11 @@ namespace GMGInventory.Application.Repositories
                             PartNumber = item.PartNumber,
                             InterchangeNumber = item.InterchangeNumber,
                             Size = item.Size,
-                            UnitId = item.UnitId,
-                            CategoryId = item.CategoryId,
-                            ItemTypeId = item.ItemTypeId,
-                            BrandId = item.BrandId,
-                            LocationCodeIds = item.ItemLocations.Select(a => a.LocationCodeId)
+                            UnitCode = item.Unit.Code,
+                            CategoryCode = item.Category.Code,
+                            ItemTypeCode = item.ItemType.Code,
+                            BrandCode = item.Brand.Code,
+                            LocationCodes = item.ItemLocations.Select(a => a.LocationCode.Code.Trim())
                         };
 
             return await items.ToListAsync();

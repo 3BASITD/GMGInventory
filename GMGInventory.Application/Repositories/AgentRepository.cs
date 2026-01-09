@@ -312,7 +312,7 @@ namespace GMGInventory.Application.Repositories
                              FirstName = agent.FirstName,
                              MiddleName = agent.MiddleName,
                              LastName = agent.LastName,
-                             AreaId = agent.AreaId
+                             AreaCode = agent.Area.Code.Replace("\r\n", "")
                          };
             return await agents.ToListAsync();
         }

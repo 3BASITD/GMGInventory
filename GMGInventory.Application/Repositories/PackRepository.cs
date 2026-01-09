@@ -223,7 +223,7 @@ namespace GMGInventory.Application.Repositories
                          select new APIPack
                          {
                              Id = pack.Id,
-                             SalesOrderId = pack.SalesOrderId,
+                             SalesOrderNumber = pack.SalesOrder.SalesOrderNumber,
                              PackDate = pack.DateCreated,
                              LineItems = from item in pack.PackLineItems
                                          select new APIPackLineItem
@@ -231,7 +231,7 @@ namespace GMGInventory.Application.Repositories
                                              Id = item.Id,
                                              PackType = item.PackType.Code,
                                              BoxNumber = item.BoxNumber,
-                                             ItemId = item.ItemId,
+                                             ItemCode = item.Item.Code,
                                              Quantity = item.Quantity
                                          }
                          };

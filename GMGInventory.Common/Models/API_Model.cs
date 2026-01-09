@@ -20,7 +20,7 @@ namespace GMGInventory.Common.Models
         public string FirstName { get; set; }
         public string? MiddleName { get; set; }
         public string LastName { get; set; }
-        public int AreaId { get; set; }
+        public string? AreaCode { get; set; }
     }
 
     public class APIDriver
@@ -43,11 +43,11 @@ namespace GMGInventory.Common.Models
         public string? PartNumber { get; set; }
         public string? InterchangeNumber { get; set; }
         public string Size { get; set; }
-        public int UnitId { get; set; }
-        public int CategoryId { get; set; }
-        public int ItemTypeId { get; set; }
-        public int BrandId { get; set; }
-        public IEnumerable<int> LocationCodeIds { get; set; }
+        public string? UnitCode { get; set; }
+        public string? CategoryCode { get; set; }
+        public string? ItemTypeCode { get; set; }
+        public string? BrandCode { get; set; }
+        public IEnumerable<string> LocationCodes { get; set; }
     }
 
     public class APIItemType : APIGeneric { }
@@ -75,7 +75,7 @@ namespace GMGInventory.Common.Models
     public class APIPack
     {
         public int Id { get; set; }
-        public int SalesOrderId { get; set; }
+        public string SalesOrderNumber { get; set; }
         public DateTime PackDate { get; set; }
         public IEnumerable<APIPackLineItem> LineItems { get; set; }
     }
@@ -85,7 +85,7 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
         public string PackType { get; set; }
         public int BoxNumber { get; set; }
-        public int ItemId { get; set; }
+        public string? ItemCode { get; set; }
         public int Quantity { get; set; }
     }
 
@@ -110,8 +110,8 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public string DocumentNumber { get; set; }
-        public int SupplierId { get; set; }
-        public int WarehouseId { get; set; }
+        public string? SupplierCode { get; set; }
+        public string? WarehouseCode { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? DueDate { get; set; }
         public IEnumerable<APIPurchaseLineItem> LineItems { get; set; }
@@ -128,7 +128,7 @@ namespace GMGInventory.Common.Models
     public class APIPurchaseLineItem
     {
         public int Id { get; set; }
-        public int ItemId { get; set; }
+        public string ItemCode { get; set; }
         public int Quantity { get; set; }
     }
 }

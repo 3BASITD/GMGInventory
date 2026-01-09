@@ -212,9 +212,9 @@ namespace GMGInventory.Application.Repositories
                                            select new APIPurchaseLineItem
                                            {
                                                Id = item.Id,
-                                               ItemId = item.ReceivingItem.OrderItem.RequestItem.ItemId != null
-                                                      ? item.ReceivingItem.OrderItem.RequestItem.ItemId.Value
-                                                      : -1,
+                                               ItemCode = item.ReceivingItem.OrderItem.RequestItem.ItemId != null
+                                                      ? item.ReceivingItem.OrderItem.RequestItem.Item.Code
+                                                      : "-1",
                                                Quantity = item.Quantity
                                            }
                            };

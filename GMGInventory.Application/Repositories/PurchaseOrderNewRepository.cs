@@ -266,17 +266,17 @@ namespace GMGInventory.Application.Repositories
                          {
                              Id = order.Id,
                              DocumentNumber = order.DocumentNumber,
-                             SupplierId = order.SupplierId,
-                             WarehouseId = order.DeliveryAddressId,
+                             SupplierCode = order.Supplier.Code,
+                             WarehouseCode = order.DeliveryAddress.Code,
                              OrderDate = order.OrderDate,
                              DueDate = order.DueDate,
                              LineItems = from item in order.PurchaseOrderLineItems
                                          select new APIPurchaseLineItem
                                          {
                                              Id = item.Id,
-                                             ItemId = item.RequestItem.ItemId != null
-                                                    ? item.RequestItem.ItemId.Value
-                                                    : -1,
+                                             ItemCode = item.RequestItem.ItemId != null
+                                                    ? item.RequestItem.Item.Code
+                                                    : "-1",
                                              Quantity = item.Quantity
                                          }
                          };
