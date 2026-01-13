@@ -45,7 +45,7 @@ namespace GMGInventory.Common.Models
         public string? Model { get; set; }
         public bool IsValidItem { get; set; }
 
-        public int ItemId { get; set; }
+        public string? ItemId { get; set; }
 
         [Display(Name = "Old Code")]
         public string? OldCode { get; set; }
