@@ -119,5 +119,6 @@ namespace GMGInventory.Common.Models
         public decimal Discount2 { get; set; }
         public int ReasonOfReturn { get; set; }
         public int? Invoice { get; set; }
+        public int? ItemPromoId { get; set; }
     }
 }
