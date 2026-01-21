@@ -1297,7 +1297,7 @@
                 $("#add-name").val(itemname +" (" +$("#add-code").select2("data")[0].itemPromoName+ ")");
 
             }
-            else if ($("#add-code").select2("data")[0].retailPriceD < $("#add-code").select2("data")[0].netPriceD) { // 260107 changed to use the lowest price
+            else if ($("#add-code").select2("data")[0].retailPriceD > $("#add-code").select2("data")[0].netPriceD) {
                 $("#add-unit-price").val($("#add-code").select2("data")[0].retailPriceD);
                 $("#add-gross-price").val($("#add-code").select2("data")[0].retailPriceD);
                 $(".add-price-source").text("(Gross)");

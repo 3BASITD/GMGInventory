@@ -237,9 +237,10 @@ namespace GMGInventory.Application.Repositories
 
             foreach (var i in order.Items)
             {
+                int.TryParse(i.ItemId, out int itemId);
                 var itm = context.Items
-                                 .Where(s => i.ItemId > 0
-                                          && s.Id == i.ItemId)
+                                 .Where(s => itemId > 0
+                                          && s.Id == itemId)
                                  .FirstOrDefault();
 
                 i.IsValidItem = itm != null;
@@ -338,9 +339,11 @@ namespace GMGInventory.Application.Repositories
             foreach (var order in orders)
             {
                 var isInvalid = false;
+
+                int.TryParse(order.ItemId, out int itemId);
                 var itm = context.Items
-                                 .Where(s => order.ItemId > 0
-                                          && s.Id == order.ItemId)
+                                 .Where(s => itemId > 0
+                                          && s.Id == itemId)
                                  .FirstOrDefault();
                 if (itm == null)
                 {

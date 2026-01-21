@@ -73,11 +73,7 @@ namespace GMGInventory.Data.OrderAppDB
 
         public int CustomerId { get; set; }
 
-        public int ItemId { get; set; }
-
-        public int BrandId { get; set; }
-
-        public int UnitId { get; set; }
+        public string? ItemId { get; set; }
     }
 }
 
