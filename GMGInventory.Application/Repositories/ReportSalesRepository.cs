@@ -256,7 +256,7 @@ namespace GMGInventory.Application.Repositories
                                Brand = ili.Item.Brand.Name,
                                CurrentQuantityD = ii,
                                ItemCode = ili.Item.Code,
-                               ItemName = ili.Item.Name,
+                               ItemName = ili.Item.Name + (soli.ItemPromo.Name == null ? "" : " (" + soli.ItemPromo.Name + ")"),
                                PartNumber = ili.Item.PartNumber + "",
                                QuantityD = ili.Quantity,
                                Unit = ili.Item.Unit.Name,
