@@ -54,34 +54,43 @@
                 { data: "syncStatus", name: "SyncStatus" },
                 {
                     data: function(data, type, dataToSet) {
-                        if(data.syncStatus.toLowerCase() != "success") {
+                        //if(data.syncStatus.toLowerCase() != "success") {
                             return data.remarks.split("||").join("<br />");
-                        } else {
-                            var splitRemarks = data.remarks.split("||");
-                            var id = "";
-                            var name = "";
-                            if(splitRemarks.length == 2) {
-                                var [id,name] = splitRemarks;
-                                var module = data.moduleName.toLowerCase();
+                        // } else {
+                        //     var splitRemarks = data.remarks.split("||");
+                        //     var id = "";
+                        //     var name = "";
+                        //     if(splitRemarks.length == 2) {
+                        //         var [id,name] = splitRemarks;
+                        //         var module = data.moduleName.toLowerCase();
                                 
-                                if(module == "receiving")
-                                    return `<a href='/PurchaseReceive/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
-                                if(module == "outbound")
-                                    return `<a href='/SalesOrder/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
-                                if(module == "return")
-                                    return `<a href='/SalesReturn/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
-                                if(module == "transfer")
-                                    return `<a href='/Transfer/Details/${id}' class='text-info' target='_blank'>View</a>`;
-                            }
-                            return data.remarks;
-                        }
-                        return formatValues(data.primaryKey);
+                        //         if(module == "receiving")
+                        //             return `<a href='/PurchaseReceive/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
+                        //         if(module == "outbound")
+                        //             return `<a href='/SalesOrder/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
+                        //         if(module == "return")
+                        //             return `<a href='/SalesReturn/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
+                        //         if(module == "transfer")
+                        //             return `<a href='/Transfer/Details/${id}' class='text-info' target='_blank'>View</a>`;
+                        //     }
+                        //     return data.remarks;
+                        // }
+                        // return formatValues(data.primaryKey);
                     },
-                    name: "PrimaryKey"
+                    name: "Remarks"
                 },
                 { data: "datePerformed", name: "DatePerformed" }
             ],
-            order: [[4, "desc"]]
+            order: [[4, "desc"]],
+            createdRow: function (row, data, dataIndex) {
+                if (data.syncStatus.toLowerCase() == 'exception') {
+                    $(row).addClass('table-warning');
+                } else if (data.syncStatus.toLowerCase() == 'fail') {
+                    $(row).addClass('table-danger');
+                } else if (data.syncStatus.toLowerCase() == 'success') {
+                    $(row).addClass('table-success');
+                }
+            }
         });
 
         dtLogs.on("draw", function() {

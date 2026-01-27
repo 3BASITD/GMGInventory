@@ -3,6 +3,27 @@
 @{
     ViewData["Title"] = "Purchase Order Details";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+
+    var status = Model.Status.ToLowerInvariant();
+    var type = Model.Type.ToLowerInvariant();
+
+    bool isDraft = status == "draft";
+    bool isSubmitted = status == "submitted";
+    bool isDisapproved = status == "disapproved";
+
+    bool isNonAutomotive = type == "non-automotive";
+    bool isAutomotive = type == "automotive";
+
+    bool canAdd = userAccess.CanAdd;
+    bool canPrint = userAccess.CanPrint;
+    bool canDelete = userAccess.CanDelete && isDraft;
+    bool canEdit = userAccess.CanEdit && isDraft;
+    bool canApproveDisapprove = userAccess.CanApproveDisapprove && isSubmitted;
+
+    bool canRecreate = isDisapproved &&
+                       !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
+                       Model.ResubmitId == null &&
+                       canAdd;
 }
 
 @section Breadcrumb {
@@ -13,7 +34,7 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (userAccess.CanPrint)
+            @if (canPrint)
             {
                 <div class="dropdown float-right ml-2">
                     <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
@@ -27,69 +48,96 @@
             }
             else
             {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
-                    <span class="fas fa-print"></span> Print
+                <button type="button"
+                        class="btn btn-info btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Print&#10;Print access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-print mr-0"></span>
                 </button>
             }
-            @if (Model.Status.ToLower() == "draft")
+            @if (canDelete)
             {
-                @if (userAccess.CanEdit)
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-paper-plane"></span> Submit
-                        </button>
-                }
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-delete">
+                    <span class="fas fa-trash"></span> Delete
+                </button>
             }
-            else if (Model.Status.ToLower() == "submitted"
-            && string.IsNullOrWhiteSpace(Model.ApprovedBy))
+            else
             {
-                @if (userAccess.CanApproveDisapprove)
-                {
-                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
-                        <span class="fas fa-check"></span> Approve
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                        <span class="fas fa-times"></span> Disapprove
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-check"></span> Approve
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-times"></span> Disapprove
-                        </button>
-                }
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Delete&#10;@(isDraft ? "Delete access is required" : "Only draft order can be deleted")"
+                        data-microtip-position="bottom" role="tooltip">
+                    <span class="fas fa-trash mr-0"></span>
+                </button>
             }
-            else if (Model.Status.ToLower() == "disapproved"
-            && !string.IsNullOrWhiteSpace(Model.DisapprovedBy)
-            && Model.ResubmitId == null)
+            @if (canEdit)
             {
-                @if (userAccess.CanAdd)
-                {
-                    <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </a>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </button>
-                }
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
+                    <span class="fas fa-save"></span> Save as Draft
+                </button>
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+                    <span class="fas fa-paper-plane"></span> Submit
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Save as Draft&#10;@(isDraft ? "Edit access is required" : "Only draft order can be saved as draft")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-save mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Submit&#10;@(isDraft ? "Edit access is required" : "Only draft order can be submitted")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-paper-plane mr-0"></span>
+                </button>
+            }
+            @if (canApproveDisapprove)
+            {
+                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
+                    <span class="fas fa-check"></span> Approve
+                </button>
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
+                    <span class="fas fa-times"></span> Disapprove
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Approve&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted order can be approved")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-check mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Disapprove&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted order can be disapproved")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-times mr-0"></span>
+                </button>
+            }
+            @if (canRecreate)
+            {
+                <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-edit"></span> Update to Resubmit
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Order already been resubmitted" : canAdd ? "Only disapproved order can be resubmitted" : "Add access is required")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-edit mr-0"></span>
+                </button>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -116,11 +164,11 @@
                             <strong>Resubmit Details:</strong>
                             @if (Model.ResubmitId != null)
                             {
-                                <div>This has been resubmitted. <a href="@Url.Action("Details", "PurchaseOrder", new {Id = Model.ResubmitId})" class="alert-link">View new details</a>.</div>
+                                <div>This has been resubmitted. <a href="@Url.Action("Details", "PurchaseOrder", new { Id = Model.ResubmitId })" class="alert-link">View new details</a>.</div>
                             }
                             @if (Model.ResubmitFromId != null)
                             {
-                                <div>This is a resubmission. <a href="@Url.Action("Details", "PurchaseOrder", new {Id = Model.ResubmitFromId})" class="alert-link">View previous details</a>.</div>
+                                <div>This is a resubmission. <a href="@Url.Action("Details", "PurchaseOrder", new { Id = Model.ResubmitFromId })" class="alert-link">View previous details</a>.</div>
                             }
                         </div>
                     </div>
@@ -199,10 +247,10 @@
                 </p>
             </div>
             @if (new[] {
-            "non-automotive",
-            "local purchase order",
-            "international purchase order"
-            }.Contains(Model.Type?.ToLower()))
+                        "non-automotive",
+                        "local purchase order",
+                        "international purchase order"
+                        }.Contains(Model.Type?.ToLower()))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -221,13 +269,7 @@
                         @Html.DisplayNameFor(model => model.DeliveryAddress)
                     </span>
                     <b class="d-block">
-                        @if(string.IsNullOrWhiteSpace(Model.DeliveryAddress))
-                        {
-                            <em class="text-muted">N/A</em>
-                        } else
-                        {
-                            @Model.DeliveryAddress
-                        }
+                        @(string.IsNullOrWhiteSpace(Model.DeliveryAddress) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.DeliveryAddress)
                     </b>
                 </p>
             </div>
@@ -242,9 +284,9 @@
                 </p>
             </div>
             @if (new[] {
-            "local purchase order",
-            "international purchase order"
-            }.Contains(Model.Type?.ToLower()))
+                        "local purchase order",
+                        "international purchase order"
+                        }.Contains(Model.Type?.ToLower()))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -252,14 +294,14 @@
                             @Html.DisplayNameFor(model => model.Reference)
                         </span>
                         <b class="d-block">
-                            @(Model.Reference ?? "-")
+                            @(string.IsNullOrWhiteSpace(Model.Reference) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Reference)
                         </b>
                     </p>
                 </div>
             }
             @if (!new[] {
-            "maintenance & repair"
-            }.Contains(Model.Type?.ToLower()))
+                        "maintenance & repair"
+                        }.Contains(Model.Type?.ToLower()))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -267,14 +309,14 @@
                             @Html.DisplayNameFor(model => model.Discount1)
                         </span>
                         <b class="d-block">
-                            @(Model.Discount1 ?? "-")
+                            @(string.IsNullOrWhiteSpace(Model.Discount1) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Discount1)
                         </b>
                     </p>
                 </div>
             }
             @if (new[] {
-            "local purchase order"
-            }.Contains(Model.Type?.ToLower()))
+                        "local purchase order"
+                        }.Contains(Model.Type?.ToLower()))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -282,7 +324,7 @@
                             @Html.DisplayNameFor(model => model.Discount2)
                         </span>
                         <b class="d-block">
-                            @(Model.Discount2 ?? "-")
+                            @(string.IsNullOrWhiteSpace(Model.Discount2) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Discount2)
                         </b>
                     </p>
                 </div>
@@ -293,15 +335,15 @@
                             @Html.DisplayNameFor(model => model.Discount3)
                         </span>
                         <b class="d-block">
-                            @(Model.Discount3 ?? "-")
+                            @(string.IsNullOrWhiteSpace(Model.Discount3) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Discount3)
                         </b>
                     </p>
                 </div>
             }
 
             @if (!new[] {
-            "maintenance & repair"
-            }.Contains(Model.Type?.ToLower()))
+                        "maintenance & repair"
+                        }.Contains(Model.Type?.ToLower()))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -321,7 +363,7 @@
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? "N/A" : Model.Remarks)
+                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Remarks)
                     </b>
                 </p>
             </div>
@@ -413,14 +455,24 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Purchase Request Item(s)</span>
-                        @if (Model!.Status.ToLower() == "draft" && userAccess.CanAdd)
-                        {
-                            <div class="card-tools">
+                        <div class="card-tools">
+                            @if (isDraft && canAdd)
+                            {
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
                                     <span class="fas fa-plus"></span> Add Item
                                 </button>
-                            </div>
-                        }
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                                        data-microtip-title="Add Item&#10;@(canAdd ? "Only draft order can add items" : "Add access is required")"
+                                        data-microtip-position="bottom"
+                                        role="tooltip">
+                                    <span class="fas fa-plus mr-0"></span>
+                                </button>
+                            }
+                        </div>
                     </div>
                     <div class="card-body">
                         <table class="table table-head-fixed table-striped table-hover table-item">
@@ -615,7 +667,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Cost Modal Update Cost History -->
     <div class="modal fade" id="costHistoryModal" role="dialog" aria-labelledby="costHistoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
@@ -626,32 +678,31 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                    <div class="modal-body">
-                        <table class="table table-striped table-hover table-cost-history">
-                            <thead>
-                                <tr>
-                                    <th>Previous Cost</th>
-                                    <th>New Cost</th>
-                                    <th>Remarks</th>
-                                    <th>Created By</th>
-                                    <th>Date Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-hover table-cost-history">
+                        <thead>
+                            <tr>
+                                <th>Previous Cost</th>
+                                <th>New Cost</th>
+                                <th>Remarks</th>
+                                <th>Created By</th>
+                                <th>Date Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-     <!-- Quantity Modal Update Quantity of already Approved Purchase Order -->
+    <!-- Quantity Modal Update Quantity of already Approved Purchase Order -->
     <div class="modal fade" id="quantityModal" role="dialog" aria-labelledby="quantityModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -717,8 +768,8 @@
             </div>
         </div>
     </div>
-    
-      <!-- Quantity Modal Update Quantity History -->
+
+    <!-- Quantity Modal Update Quantity History -->
     <div class="modal fade" id="quantityHistoryModal" role="dialog" aria-labelledby="quantityHistoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -728,32 +779,31 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                    <div class="modal-body">
-                        <table class="table table-striped table-hover table-quantity-history">
-                            <thead>
-                                <tr>
-                                    <th>Previous Quantity</th>
-                                    <th>New Quantity</th>
-                                    <th>Remarks</th>
-                                    <th>Created By</th>
-                                    <th>Date Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                    </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-hover table-quantity-history">
+                        <thead>
+                            <tr>
+                                <th>Previous Quantity</th>
+                                <th>New Quantity</th>
+                                <th>Remarks</th>
+                                <th>Created By</th>
+                                <th>Date Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-  
+
 }
 
 @section Scripts {
@@ -811,8 +861,8 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        if (po_data.status.toLowerCase() == "draft" 
-                         && po_data.requestType.toLowerCase() == "non-automotive" 
+                        if (po_data.status.toLowerCase() == "draft"
+                         && po_data.requestType.toLowerCase() == "non-automotive"
                          && po_data.requestPurpose.toLowerCase() == "one-time purchase") {
                             if (data.itemDescription == "") {
                                 return '<textarea class="form-control form-control-sm expandable-textarea description is-invalid" style="width: 100%;">' + data.itemDescription + '</textarea><label class="text-danger text-xs fw-lighter fst-italic m-0">Item description is required.</label>';
@@ -858,7 +908,7 @@
                 },
                 {
                     data: "totalAmount",
-                    name: "TotalAmount", 
+                    name: "TotalAmount",
                     className: "form-cell",
                     render: function (data, type, row) {
                         if (type === 'display') {
@@ -941,7 +991,7 @@
 
                     rowData.lineNumber = newLineNumber;
                     itemDT.row(row).data(rowData);
-                    
+
                     itemDT.order([1, 'asc']).draw();
                 });
 
@@ -963,12 +1013,12 @@
 
                     rowData.lineNumber = newLineNumber;
                     itemDT.row(row).data(rowData);
-                    
+
                     itemDT.order([1, 'asc']).draw();
                 });
 
-                if (po_data.status.toLowerCase() == "draft" 
-                 && po_data.requestType.toLowerCase() == "non-automotive" 
+                if (po_data.status.toLowerCase() == "draft"
+                 && po_data.requestType.toLowerCase() == "non-automotive"
                  && po_data.requestPurpose.toLowerCase() == "one-time purchase") {
                     $(".description").off("change").on("change", function () {
                         var row = itemDT.row($(this).closest('tr'));
@@ -1030,20 +1080,20 @@
 
                     $("#quantityModal").modal("show");
                 });
-            
+
                 $(".btn-history-cost").off("click").on("click", function() {
                     var row = $(this).parents('tr');
                     var rowData = itemDT.row(row).data();
-                    
+
                     $("#cost-item").val(rowData.itemDescription);
                     $("#cost-item").data("POItemId", rowData.id);
                     HistoryCost()
                 });
-            
+
                 $(".btn-history-quantity").off("click").on("click", function() {
                     var row = $(this).parents('tr');
                     var rowData = itemDT.row(row).data();
-                    
+
                     $("#quantity-item").val(rowData.itemDescription);
                     $("#quantity-item").data("POItemId", rowData.id);
                     HistoryQuantity();
@@ -1111,7 +1161,7 @@
                                     "<strong>" + repo.text + "</strong><br />" +
                                     "<small>" +
                                     "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
-                                    (repo.disabled ? ("Already Ordered On: " + repo.orderedOn) 
+                                    (repo.disabled ? ("Already Ordered On: " + repo.orderedOn)
                                                    : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit + "<br />" +
                                                       "Latest Cost from Approved PO: " + (repo.previousCost || "none"))) +
                                     "<br />"  +
@@ -1354,8 +1404,8 @@
                 var new_quantity = parseInt($("#quantity-new").val());
                 $("#quantity-total").val(po_data.currency.split("/")[0].trim() + " " + FormatStringDecimal(new_quantity * parseFloat($("#quantity-cost").val().replace(",", ""))));
             });
-            
-            
+
+
             // Validation for Cost Modal
             var validateCost = $("#form-cost").validate({
                 rules: {
@@ -1406,7 +1456,7 @@
                     }
                 });
             }
-            
+
             $(".btn-cost-history").on("click", HistoryCost);
 
             function HistoryCost() {
@@ -1589,6 +1639,33 @@
                                 Id: po_data.id,
                                 reason: confirm
                             },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        if (user_access.canDelete) {
+            $(".btn-details-delete").on("click", function () {
+                swal({
+                    title: "Delete Purchase Order",
+                    text: "Continue to delete this purchase order?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        $.ajax({
+                            url: "@Url.Action("DeleteJson")",
+                            type: "POST",
+                            data: { Id: po_data.id },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
                                     window.location.reload();

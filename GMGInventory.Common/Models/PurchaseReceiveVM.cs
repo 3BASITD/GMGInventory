@@ -22,6 +22,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "PO Number")]
         public string PONumber { get; set; }
         public int POId { get; set; }
+        public string POWarehouse { get; set; }
+        public int POWarehouseId { get; set; }
 
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
@@ -34,6 +36,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }
         public int WarehouseId { get; set; }
+        public bool IsSameWarehouse { get; set; }
 
         [Display(Name = "Delivery Receipt Number")]
         public string DRNumber { get; set; }

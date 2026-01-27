@@ -16,6 +16,7 @@ namespace GMGInventory.Application.Contracts
         Task<Select2Model<JsonPurchaseOptionModel>> GetPurchaseOrderOptions2(string search, int page);
         Task<ResponseModel> ApproveAsync(int requestId);
         Task<ResponseModel> DisapproveAsync(int requestId, string? reason);
+        Task<ResponseModel> DeleteAsync(int receiveId);
         Task<string> GetNewDocumentNumber();
         Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseOrderItemOptions(int PurchaseOrderId);
         Task<ResponseModelData<int>> AddAPI(PurchaseReceiveFormAPIVM form);

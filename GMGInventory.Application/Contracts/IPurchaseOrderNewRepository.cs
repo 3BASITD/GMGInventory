@@ -24,6 +24,6 @@ namespace GMGInventory.Application.Contracts
         Task<IList<POItemQuantityVM>> GetQuantityUpdateListAsync(int orderItemId);
         Task<ResponseModel> ApproveAsync(int orderId);
         Task<ResponseModel> DisapproveAsync(int orderId, string? reason);
-        Task<ResponseModel> DeleteAsync(int requestId);
+        Task<ResponseModel> DeleteAsync(int orderId);
     }
 }

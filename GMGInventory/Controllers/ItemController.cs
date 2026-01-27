@@ -70,6 +70,11 @@ namespace GMGInventory.Controllers
             itemFilterVM.ItemTypes = new(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
             itemFilterVM.Brands = new(await brandRepository.GetAllActiveBrandAsync(-1), "Id", "Name");
             itemFilterVM.Warehouses = new(await warehouseRepository.GetAllActiveWarehouseAsync(-1), "Id", "Name");
+            itemFilterVM.ActiveStatus = new(new[]
+            {
+                new { Id = 1, Name = "Active" },
+                new { Id = 0, Name = "Inactive" }
+            }, "Id", "Name");
             ViewData["ItemFilter"] = itemFilterVM;
             return View();
         }
@@ -341,10 +346,11 @@ namespace GMGInventory.Controllers
                 new DataColumn("Quantity on Hand"),
                 new DataColumn("Beginning Cost"),
                 new DataColumn("Gross Price"),
-                new DataColumn("Net Price")
+                new DataColumn("Net Price"),
+                new DataColumn("Is Active")
             ]);
             //var items = await itemRepository.GetAllFileAsync();
-            var items = (await itemRepository.GetAllAsync(filter)).Where(s => s.IsActive == true);
+            var items = await itemRepository.GetAllAsync(filter);
 
             foreach (var item in items)
             {
@@ -363,7 +369,8 @@ namespace GMGInventory.Controllers
                             item.QuantityD,
                             item.BeginningCostD,
                             item.RetailPriceD,
-                            item.NetPriceD);
+                            item.NetPriceD,
+                            item.IsActive ? "Yes" : "No");
             }
 
             using XLWorkbook wb = new();

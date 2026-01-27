@@ -40,6 +40,12 @@
                                 <option></option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label asp-for="ActiveStatusId" class="control-label mb-0"></label>
+                            <select asp-for="ActiveStatusId" asp-items="@Model?.ActiveStatus" class="select2filter" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>

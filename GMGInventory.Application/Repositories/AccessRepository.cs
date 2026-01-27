@@ -43,7 +43,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<RolesPagesVM> GetRolesPagesAsync(string RoleId)
         {
-            var role = context.Roles.Where(s => s.Id == RoleId).FirstOrDefault();
+            var role = context.Roles.Where(s => s.Id == RoleId).OrderBy(s => s.Id).FirstOrDefault();
             var accesses = from p in context.Pages
                            from a in context.Accesses.Where(s => s.PageId == p.Id && s.RoleId == RoleId).DefaultIfEmpty()
                            orderby p.PageGroup.Id ascending, p.OrderNumber ascending
@@ -165,7 +165,10 @@ namespace GMGInventory.Application.Repositories
 
                         foreach (var access in accesses)
                         {
-                            var acc = await context.Accesses.Where(s => s.PageId == access.PageId && s.RoleId == RoleId).FirstOrDefaultAsync();
+                            var acc = await context.Accesses
+                                                   .Where(s => s.PageId == access.PageId && s.RoleId == RoleId)
+                                                   .OrderBy(s => s.Id)
+                                                   .FirstOrDefaultAsync();
                             if (acc == null)
                             {
                                 var newAccess = new Access

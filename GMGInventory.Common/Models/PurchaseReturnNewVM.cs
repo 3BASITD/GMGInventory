@@ -29,6 +29,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }
+        public int WarehouseId { get; set; }
+        public bool IsSameWarehouse { get; set; }
 
         [Display(Name = "DR Number")]
         public string DRNumber { get; set; }
@@ -97,6 +99,7 @@ namespace GMGInventory.Common.Models
     {
         public int ReceivingId { get; set; }
         public DateTime DateReturn { get; set; }
+        public int WarehouseId { get; set; }
         public string Remarks { get; set; }
         public string Status { get; set; }
         public int? ResubmitId { get; set; }

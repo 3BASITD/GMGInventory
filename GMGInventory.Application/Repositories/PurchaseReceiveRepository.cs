@@ -1,12 +1,13 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -153,6 +154,8 @@ namespace GMGInventory.Application.Repositories
                               DocumentNumber = receive.DocumentNumber,
                               PONumber = receive.PurchaseOrder.DocumentNumber,
                               POId = receive.PurchaseOrder.Id,
+                              POWarehouse = receive.PurchaseOrder.DeliveryAddress.Code,
+                              POWarehouseId = receive.PurchaseOrder.DeliveryAddress.Id,
                               Supplier = receive.PurchaseOrder.Supplier.Name,
                               SupplierId = receive.PurchaseOrder.Supplier.Id,
                               Term = receive.PurchaseOrder.Term.Name,
@@ -166,6 +169,7 @@ namespace GMGInventory.Application.Repositories
                               PurchaseOrderType = receive.PurchaseOrder.Type.Name,
                               Warehouse = receive.Warehouse.Code,
                               WarehouseId = receive.Warehouse.Id,
+                              IsSameWarehouse = receive.PurchaseOrder.DeliveryAddressId == receive.WarehouseId,
                               Status = receive.Status.Code,
                               ReceiveDateD = receive.ReceiveDate,
                               Remarks = receive.Remarks,
@@ -328,25 +332,35 @@ namespace GMGInventory.Application.Repositories
         }
         public async Task<ResponseModel> SaveItemsAsync(IList<PurchaseReceiveLineItemVM> Items, int receiveId, string? status = null)
         {
-            var response = new ResponseModel();
-
-            var request = await context.PurchaseReceivings.Where(s => s.Id == receiveId).FirstOrDefaultAsync();
-
-            if (request == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase receive";
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(status))
+                var request = await context.PurchaseReceivings
+                                           .Include(s => s.Status)
+                                           .Where(s => s.Id == receiveId)
+                                           .FirstOrDefaultAsync();
+
+                if (request == null)
                 {
-                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
-                    request.StatusId = statusId;
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase receive" };
                 }
-
-                try
+                else
                 {
+                    if (!string.IsNullOrWhiteSpace(status))
+                    {
+                        int? statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).FirstOrDefault();
+                        if (statusId != null)
+                            request.StatusId = statusId;
+
+                        if (request.DocumentNumber.StartsWith("D") && request.Status.Name.ToLower() == "draft" && status.ToLower() != "draft")
+                        {
+                            var procurementHelper = new ProcurementHelper();
+                            var docNumber = await procurementHelper.GetNewReceiving(context, status);
+                            request.DocumentNumber = docNumber;
+
+                            await context.SaveChangesAsync(currentUserId);
+                        }
+                    }
+
                     var citems = context.PurchaseReceivingLineItems.Where(s => s.PurchaseReceivingId == receiveId);
                     // add item
                     // check items not in db
@@ -384,76 +398,80 @@ namespace GMGInventory.Application.Repositories
 
                     await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "Receive item(s) successfully saved";
-                }
-                catch (Exception ex)
-                {
-                    response.Status = "Error";
-                    response.Message = SystemFormat.GetInnermostExceptionMessage(ex);
+                    return new ResponseModel { Status = "Success", Message = "Receive item(s) successfully saved" };
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel<int>> AddAsync(PurchaseReceiveSaveVM form, List<PurchaseReceiveLineItemVM> Items)
         {
-            var response = new ResponseModel<int>();
-
-            var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
-            if (status == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid status.";
-                response.NewRow = -1;
-            }
-            else
-            {
-                var purchaseOrder = await context.PurchaseOrderNews
-                                                   .Where(s => s.Id == form.PurchaseOrderId)
-                                                   .FirstOrDefaultAsync();
-                var previousReceive = await context.PurchaseReceivings
-                                                      .Where(s => s.Id == form.ResubmitId)
-                                                      .FirstOrDefaultAsync();
-
-                var receive = new PurchaseReceiving
+                var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
+                if (status == null)
                 {
-                    DocumentNumber = form.DocumentNumber,
-                    DeliveryReceiptNumber = form.DeliveryReceiptNumber,
-                    SalesInvoiceNumber = form.SalesInvoiceNumber,
-                    ReceiveDate = form.DateReceived,
-                    Remarks = form.Remarks,
-                    StatusId = status.Id,
-                    ResubmitId = form.ResubmitId,
-
-                    PurchaseOrderId = purchaseOrder!.Id,
-                    WarehouseId = purchaseOrder!.DeliveryAddressId
-                };
-                await context.PurchaseReceivings.AddAsync(receive);
-                await context.SaveChangesAsync(currentUserId);
-
-                if (previousReceive != null)
-                {
-                    var statusResubmitted = await context.PurchaseStatuses
-                                                         .Where(s => s.Name.ToLower() == "resubmitted")
-                                                         .FirstOrDefaultAsync();
-                    previousReceive.ResubmitId = receive.Id;
-                    if (statusResubmitted != null)
-                    {
-                        previousReceive.StatusId = statusResubmitted.Id;
-                    }
-                    context.PurchaseReceivings.Update(previousReceive);
-                    await context.SaveChangesAsync(currentUserId);
+                    return new ResponseModel<int> { Status = "Error", Message = "Invalid status", NewRow = -1 };
                 }
+                else
+                {
+                    var purchaseOrder = await context.PurchaseOrderNews
+                                                       .Where(s => s.Id == form.PurchaseOrderId)
+                                                       .FirstOrDefaultAsync();
+                    var previousReceive = await context.PurchaseReceivings
+                                                          .Where(s => s.Id == form.ResubmitId)
+                                                          .FirstOrDefaultAsync();
+                    var procurementHelper = new ProcurementHelper();
 
-                await SaveItemsAsync(Items, receive.Id);
+                    var docNumber = previousReceive == null
+                                  ? await procurementHelper.GetNewReceiving(context, form.Status)
+                                  : previousReceive.DocumentNumber.Split("-D")[0];
 
-                response.Status = "Success";
-                response.Message = form.Status.ToLower() == "draft" ? "Purchase receive saved as draft." : "Purchase receive successfully submitted.";
-                response.NewRow = receive.Id;
+                    var receive = new PurchaseReceiving
+                    {
+                        DocumentNumber = docNumber,
+                        DeliveryReceiptNumber = form.DeliveryReceiptNumber,
+                        SalesInvoiceNumber = form.SalesInvoiceNumber,
+                        ReceiveDate = form.DateReceived,
+                        Remarks = form.Remarks,
+                        StatusId = status.Id,
+                        PurchaseOrderId = purchaseOrder!.Id,
+                        WarehouseId = form.WarehouseId
+                    };
+                    await context.PurchaseReceivings.AddAsync(receive);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    if (previousReceive != null)
+                    {
+                        var statusResubmitted = await context.PurchaseStatuses
+                                                             .Where(s => s.Name.ToLower() == "resubmitted")
+                                                             .FirstOrDefaultAsync();
+                        previousReceive.ResubmitId = receive.Id;
+                        if (statusResubmitted != null)
+                        {
+                            previousReceive.StatusId = statusResubmitted.Id;
+                        }
+                        context.PurchaseReceivings.Update(previousReceive);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+
+                    await SaveItemsAsync(Items, receive.Id);
+
+                    return new ResponseModel<int>
+                    {
+                        Status = "Success",
+                        Message = form.Status.ToLower() == "draft" ? "Purchase receive saved as draft." : "Purchase receive successfully submitted.",
+                        NewRow = receive.Id
+                    };
+                }
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel<int> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex), NewRow = -1 };
+            }
         }
 
         public async Task<IList<JsonOptionsModel>> GetPurchaseOrderOptions(int? SelectedId)
@@ -544,132 +562,198 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> ApproveAsync(int receivingId)
         {
-            var response = new ResponseModel();
-
-            var receive = context.PurchaseReceivings.Where(s => s.Id == receivingId).FirstOrDefault();
-            if (receive == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase receive";
-            }
-            else
-            {
-                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
-
-                if (!string.IsNullOrWhiteSpace(receive.ApproverId))
+                var receive = context.PurchaseReceivings.Where(s => s.Id == receivingId).FirstOrDefault();
+                if (receive == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase receive already approved.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase receive" };
                 }
                 else
                 {
-                    if (string.IsNullOrWhiteSpace(receive.ApproverId))
-                        receive.ApproverId = currentUserId;
+                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
 
-                    receive.StatusId = statusId;
-
-                    context.PurchaseReceivings.Update(receive);
-
-                    var preceiveItems = await context.PurchaseReceivingLineItems
-                        .Include(x => x.PurchaseReceiving)
-                        .Include(x => x.OrderItem).ThenInclude(x => x.RequestItem)
-                        .Where(s => s.PurchaseReceivingId == receivingId).ToListAsync();
-
-                    foreach (var receiving in preceiveItems)
+                    if (!string.IsNullOrWhiteSpace(receive.ApproverId))
                     {
-                        var itemId = receiving.OrderItem.RequestItem.ItemId;
-                        if (itemId != null)
+                        return new ResponseModel { Status = "Error", Message = "Purchase receive already approved" };
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(receive.ApproverId))
+                            receive.ApproverId = currentUserId;
+
+                        receive.StatusId = statusId;
+
+                        context.PurchaseReceivings.Update(receive);
+
+                        var preceiveItems = await context.PurchaseReceivingLineItems
+                            .Include(x => x.PurchaseReceiving)
+                            .Include(x => x.OrderItem).ThenInclude(x => x.RequestItem)
+                            .Where(s => s.PurchaseReceivingId == receivingId).ToListAsync();
+
+                        foreach (var receiving in preceiveItems)
                         {
-                            var warehouseId = receiving.PurchaseReceiving.WarehouseId;
-
-                            var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).FirstOrDefaultAsync();
-
-                            var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
-
-                            var countHistory = new PhysicalCountHistory
+                            var itemId = receiving.OrderItem.RequestItem.ItemId;
+                            if (itemId != null)
                             {
-                                ItemId = itemId ?? 0,
-                                QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory != null ? itemInventory.Quantity : 0,
-                                QuantityTo = previousCount != null ? previousCount.QuantityTo + receiving.Quantity : receiving.Quantity,
-                                Remarks = "Purchase Receiving",
-                                WarehouseId = warehouseId
-                            };
-                            context.PhysicalCountHistories.Add(countHistory);
+                                var warehouseId = receiving.PurchaseReceiving.WarehouseId;
 
-                            if (itemInventory != null)
-                            {
-                                itemInventory.Quantity += receiving.Quantity;
-                                context.ItemInventories.Update(itemInventory);
-                            }
-                            else
-                            {
-                                var newItemInventory = new ItemInventory
+                                var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).FirstOrDefaultAsync();
+
+                                var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == itemId).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
+
+                                var countHistory = new PhysicalCountHistory
                                 {
                                     ItemId = itemId ?? 0,
-                                    Quantity = receiving.Quantity,
+                                    QuantityFrom = previousCount != null ? previousCount.QuantityTo : itemInventory != null ? itemInventory.Quantity : 0,
+                                    QuantityTo = previousCount != null ? previousCount.QuantityTo + receiving.Quantity : receiving.Quantity,
+                                    Remarks = "Purchase Receiving",
                                     WarehouseId = warehouseId
                                 };
-                                await context.ItemInventories.AddAsync(newItemInventory);
+                                context.PhysicalCountHistories.Add(countHistory);
+
+                                if (itemInventory != null)
+                                {
+                                    itemInventory.Quantity += receiving.Quantity;
+                                    context.ItemInventories.Update(itemInventory);
+                                }
+                                else
+                                {
+                                    var newItemInventory = new ItemInventory
+                                    {
+                                        ItemId = itemId ?? 0,
+                                        Quantity = receiving.Quantity,
+                                        WarehouseId = warehouseId
+                                    };
+                                    await context.ItemInventories.AddAsync(newItemInventory);
+                                }
                             }
                         }
+                        ;
+                        await context.SaveChangesAsync(currentUserId);
                     }
-                    ;
-                    await context.SaveChangesAsync(currentUserId);
+                    return new ResponseModel { Status = "Success", Message = "Purchase receive successfully approved" };
                 }
-                response.Status = "Success";
-                response.Message = "Purchase receive successfully approved.";
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> DisapproveAsync(int receivingId, string? reason)
         {
-            var response = new ResponseModel();
-
-
-            var receive = context.PurchaseReceivings.Where(s => s.Id == receivingId).FirstOrDefault();
-            if (receive == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid Purchase Receiving. Record cannot be found";
-            }
-            else
-            {
-                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
-
-                if (!string.IsNullOrWhiteSpace(receive.DisapproverId))
+                var receive = context.PurchaseReceivings.Where(s => s.Id == receivingId).FirstOrDefault();
+                if (receive == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase receive already disapproved.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Receiving. Record cannot be found" };
                 }
                 else
                 {
-                    receive.DisapproverId = currentUserId;
-                    receive.DisapprovedReason = reason;
-                    receive.StatusId = statusId;
+                    if (!string.IsNullOrWhiteSpace(receive.DisapproverId))
+                    {
+                        return new ResponseModel { Status = "Error", Message = "Purchase receive already disapproved" };
+                    }
+                    else
+                    {
+                        var tempDocumentNumber = receive.DocumentNumber + "-D";
+                        var latestDisapprovedReceiving = context.PurchaseReceivings
+                                                                .Where(s => s.DocumentNumber.StartsWith(tempDocumentNumber))
+                                                                .OrderByDescending(s => s.DocumentNumber)
+                                                                .Select(s => s.DocumentNumber)
+                                                                .FirstOrDefault();
+                        var latestDisapprovedDocumentNumber = latestDisapprovedReceiving == null
+                                                            ? 0
+                                                            : int.Parse(latestDisapprovedReceiving.Replace(tempDocumentNumber, ""));
+                        var disapprovedDocumentNumber = tempDocumentNumber + string.Format("{0:00}", latestDisapprovedDocumentNumber + 1);
 
-                    context.PurchaseReceivings.Update(receive);
-                    await context.SaveChangesAsync(currentUserId);
+                        int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
-                    response.Status = "Success";
-                    response.Message = "Purchase receive successfully disapproved.";
+                        receive.DocumentNumber = disapprovedDocumentNumber;
+                        receive.DisapproverId = currentUserId;
+                        receive.DisapprovedReason = reason;
+                        receive.StatusId = statusId;
+
+                        context.PurchaseReceivings.Update(receive);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Success", Message = "Purchase receive successfully disapproved" };
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
 
-            return response;
+        public async Task<ResponseModel> DeleteAsync(int receivingId)
+        {
+            try
+            {
+                var existingReceiving = await context.PurchaseReceivings
+                                                     .Include(s => s.Status)
+                                                     .Where(s => s.Id == receivingId)
+                                                     .FirstOrDefaultAsync();
+
+                if (existingReceiving == null)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Receiving. Record can not be found" };
+                }
+                else if (existingReceiving.Status.Name.ToLower() != "draft")
+                {
+                    return new ResponseModel { Status = "Error", Message = "Only draft can be deleted." };
+                }
+                else if (existingReceiving.HashMicroMoveId != null)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Record already copied to HashMicro. Delete cannot proceed" };
+                }
+                else
+                {
+
+                    var previousReceiving = await context.PurchaseReceivings
+                                                         .Where(s => s.ResubmitId == receivingId)
+                                                         .FirstOrDefaultAsync();
+                    if (previousReceiving != null)
+                    {
+                        var statusDisapproved = await context.PurchaseStatuses
+                                                             .Where(s => s.Name.ToLower() == "disapproved")
+                                                             .FirstAsync();
+                        previousReceiving.ResubmitId = null;
+                        previousReceiving.StatusId = statusDisapproved.Id;
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+
+                    var receivingItems = await context.PurchaseReceivingLineItems
+                                                      .Where(s => s.PurchaseReceivingId == receivingId)
+                                                      .ToListAsync();
+
+                    context.PurchaseReceivingLineItems.RemoveRange(receivingItems);
+
+                    context.PurchaseReceivings.Remove(existingReceiving);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    return new ResponseModel { Status = "Success", Message = "Purchase Receiving successfully deleted" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel
+                {
+                    Status = "Error",
+                    Message = SystemFormat.GetInnermostExceptionMessage(ex)
+                };
+            }
         }
 
         public async Task<string> GetNewDocumentNumber()
         {
-            var docNumberPrefix = $"RR{DateTime.Now.Year.ToString().Substring(2)}-";
-            var lastDocument = await context.PurchaseReceivings
-                                            .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
-                                            .OrderByDescending(s => s.DocumentNumber)
-                                            .Select(s => s.DocumentNumber)
-                                            .FirstOrDefaultAsync();
+            var procurementHelper = new ProcurementHelper();
 
-            int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
-            return $"{docNumberPrefix}{docNumberLast + 1:D6}";
+            var docNumber = await procurementHelper.GetNewReceiving(context, "submitted");
+            return docNumber;
         }
 
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseOrderItemOptions(int PurchaseOrderId)
@@ -697,71 +781,82 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModelData<int>> AddAPI(PurchaseReceiveFormAPIVM form)
         {
-
-            var purchaseOrder = await context.PurchaseOrderNews
-                                             .Where(s => s.Id == form.PurchaseOrderId || s.DocumentNumber == form.PurchaseOrderNumber)
-                                             .Include(s => s.Status)
-                                             .FirstOrDefaultAsync();
-            if (purchaseOrder == null)
-                return new ResponseModelData<int>
-                {
-                    Status = "Error",
-                    Message = "Invalid Purchase Order. Record cannot be found",
-                    Data = -1
-                };
-            if (purchaseOrder.Status.Code.ToLower() != "approved")
-                return new ResponseModelData<int>
-                {
-                    Status = "Error",
-                    Message = $"Purchase Order cannot be used with current status: {purchaseOrder.Status.Code}",
-                    Data = -1
-                };
-
-            var checkItems = CheckItem(form);
-            if (checkItems != null)
-                return new ResponseModelData<int>
-                {
-                    Status = "Error",
-                    Message = checkItems,
-                    Data = -1
-                };
-
-            var receive = new PurchaseReceiving
+            try
             {
-                DocumentNumber = await GetNewDocumentNumber(),
-                PurchaseOrderId = purchaseOrder.Id,
-                DeliveryReceiptNumber = form.DeliveryReceiptNumber,
-                SalesInvoiceNumber = form.SalesInvoiceNumber,
-                ReceiveDate = form.DateReceived,
-                Remarks = form.Remarks,
-                StatusId = await context.PurchaseStatuses
-                                        .Where(s => s.Name.ToLower() == "draft")
-                                        .Select(s => s.Id)
-                                        .FirstAsync()
-            };
-            await context.PurchaseReceivings.AddAsync(receive);
-            await context.SaveChangesAsync(currentUserId);
+                var purchaseOrder = await context.PurchaseOrderNews
+                                                 .Where(s => s.Id == form.PurchaseOrderId || s.DocumentNumber == form.PurchaseOrderNumber)
+                                                 .Include(s => s.Status)
+                                                 .FirstOrDefaultAsync();
+                if (purchaseOrder == null)
+                    return new ResponseModelData<int>
+                    {
+                        Status = "Error",
+                        Message = "Invalid Purchase Order. Record cannot be found",
+                        Data = -1
+                    };
+                if (purchaseOrder.Status.Code.ToLower() != "approved")
+                    return new ResponseModelData<int>
+                    {
+                        Status = "Error",
+                        Message = $"Purchase Order cannot be used with current status: {purchaseOrder.Status.Code}",
+                        Data = -1
+                    };
 
-            foreach (var item in form.Items)
-            {
-                var itemTemp = await context.Items.Where(s => s.Id == item.ItemId || s.Code == item.ItemCode || s.Name == item.ItemName).FirstAsync();
-                var oitemTemp = await context.PurchaseOrderNewLineItems.Where(s => s.PurchaseOrderId == purchaseOrder.Id && s.RequestItem.ItemId == itemTemp.Id).FirstAsync();
-                PurchaseReceivingLineItem receiveItem = new()
+                var checkItems = CheckItem(form);
+                if (checkItems != null)
+                    return new ResponseModelData<int>
+                    {
+                        Status = "Error",
+                        Message = checkItems,
+                        Data = -1
+                    };
+
+                var receive = new PurchaseReceiving
                 {
-                    OrderItemId = oitemTemp.Id,
-                    PurchaseReceivingId = purchaseOrder.Id,
-                    Quantity = item.Quantity
+                    DocumentNumber = await GetNewDocumentNumber(),
+                    PurchaseOrderId = purchaseOrder.Id,
+                    DeliveryReceiptNumber = form.DeliveryReceiptNumber,
+                    SalesInvoiceNumber = form.SalesInvoiceNumber,
+                    ReceiveDate = form.DateReceived,
+                    Remarks = form.Remarks,
+                    StatusId = await context.PurchaseStatuses
+                                            .Where(s => s.Name.ToLower() == "draft")
+                                            .Select(s => s.Id)
+                                            .FirstAsync()
                 };
-                await context.PurchaseReceivingLineItems.AddAsync(receiveItem);
+                await context.PurchaseReceivings.AddAsync(receive);
                 await context.SaveChangesAsync(currentUserId);
-            }
 
-            return new ResponseModelData<int>
+                foreach (var item in form.Items)
+                {
+                    var itemTemp = await context.Items.Where(s => s.Id == item.ItemId || s.Code == item.ItemCode || s.Name == item.ItemName).FirstAsync();
+                    var oitemTemp = await context.PurchaseOrderNewLineItems.Where(s => s.PurchaseOrderId == purchaseOrder.Id && s.RequestItem.ItemId == itemTemp.Id).FirstAsync();
+                    PurchaseReceivingLineItem receiveItem = new()
+                    {
+                        OrderItemId = oitemTemp.Id,
+                        PurchaseReceivingId = purchaseOrder.Id,
+                        Quantity = item.Quantity
+                    };
+                    await context.PurchaseReceivingLineItems.AddAsync(receiveItem);
+                    await context.SaveChangesAsync(currentUserId);
+                }
+
+                return new ResponseModelData<int>
+                {
+                    Status = "Success",
+                    Message = "Purchase receive saved as draft.",
+                    Data = receive.Id
+                };
+            }
+            catch (Exception ex)
             {
-                Status = "Success",
-                Message = "Purchase receive saved as draft.",
-                Data = receive.Id
-            };
+                return new ResponseModelData<int>
+                {
+                    Status = "Error",
+                    Message = SystemFormat.GetInnermostExceptionMessage(ex),
+                    Data = -1
+                };
+            }
         }
 
         public string? CheckItem(PurchaseReceiveFormAPIVM form)

@@ -1,13 +1,8 @@
-
-
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Sync;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -21,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.Configure<APIBCTSettings>(builder.Configuration.GetSection("APIBCTSettings"));
 
 builder.Services.AddHttpClient();
+builder.Services.AddWindowsService();
 builder.Services.AddHostedService<Worker>();
 
 var host = builder.Build();

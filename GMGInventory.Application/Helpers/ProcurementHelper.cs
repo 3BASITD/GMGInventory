@@ -1,13 +1,5 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Wordprocessing;
-using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
+﻿using GMGInventory.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GMGInventory.Application.Helpers
 {

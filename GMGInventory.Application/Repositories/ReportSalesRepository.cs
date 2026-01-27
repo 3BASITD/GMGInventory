@@ -31,7 +31,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
                            && (filter.Item == null || ili.Item.Id == filter.Item)
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new AgentSalesPerItemRVM
                            {
                                Agent = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
@@ -140,7 +140,7 @@ namespace GMGInventory.Application.Repositories
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new BrandSalesRVM
                            {
                                AgentCode = ili.Invoice.SalesOrder.Agent.Code,
@@ -249,7 +249,7 @@ namespace GMGInventory.Application.Repositories
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new BestSellingItemRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -393,7 +393,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CommissionRVM
                            {
                                AgentId = ili.Invoice.SalesOrder.Agent.Id,
@@ -541,7 +541,7 @@ namespace GMGInventory.Application.Repositories
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Region == null || (ili.Invoice.SalesOrder.Customer.Area != null && ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CustomerSalesRankingRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -645,7 +645,7 @@ namespace GMGInventory.Application.Repositories
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
                            && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new CustomerSalesRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -999,7 +999,7 @@ namespace GMGInventory.Application.Repositories
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new SalesAgentAreaRVM
                            {
                                AgentId = ili.Invoice.SalesOrder.Agent.Id,
@@ -1118,7 +1118,7 @@ namespace GMGInventory.Application.Repositories
                            let discount2 = (100 - soli.Discount2) / 100
                            where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
                            && ili.Invoice.InvoiceDate.Date <= filter.DateTo
-                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
                            select new SalesReportBasisRVM
                            {
                                Code = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Code

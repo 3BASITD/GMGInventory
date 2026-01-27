@@ -72,7 +72,12 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="return-warehouse" class="form-label mb-0">Warehouse</label>
-                        <input type="text" id="return-warehouse" name="Warehouse" class="form-control form-control-sm" readonly="readonly" />
+                        <div class="form-switch float-right text-xs">
+                            <input type="checkbox" id="return-same-warehouse" class="form-check-input" checked="checked" disabled="disabled" />
+                            <label for="return-same-warehouse" class="form-check-label">Same with Purchase Receiving</label>
+                        </div>
+                        <input type="text" id="return-warehouse" class="form-control form-control-sm" readonly="readonly" />
+                        <select id="return-warehouse-select" name="Warehouse" class="form-select form-select-sm" style="width: 100%"></select>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
@@ -160,6 +165,13 @@
                 },
                 success: function (data, status, xhr) {
                     $("#return-document-number").val(data.documentNumber);
+
+                    $("#return-warehouse").val(data.poWarehouse);
+                    $("#return-warehouse").data("Id", data.poWarehouseId);
+                    $("#return-warehouse").data("selectedId", data.warehouseId);
+                    $("#return-same-warehouse").prop("disabled", false);
+                    loadWarehouse(data.warehouseId, data.isSameWarehouse);
+
                     $("#return-date-returned").val(data.returnDate3);
                     $("#return-remarks").val(data.remarks);
                     loadRRNumber(data.poNumber);
@@ -180,6 +192,7 @@
                 }
             });
             loadRRNumber(-1);
+            loadSelect2Warehouse(null, true);
         }
 
         var itemDT = $('.table-item').DataTable({
@@ -347,8 +360,14 @@
                         $("#return-currency").val("");
                         $("#return-currency").removeData("Id");
                         $("#return-currency-rate").val("");
-                        $("#return-warehouse").val("");
+
+                        //$("#return-warehouse").val("");
                         $("#return-warehouse").removeData("Id");
+                        $("#return-warehouse").removeData("selectedId");
+                        loadWarehouse(2, true);
+                        $("#return-same-warehouse").prop("disabled", true);
+                        $("#return-same-warehouse").prop("checked", true);
+
                         $("#return-drnumber").val("");
                         $("#return-sinumber").val("");
                         itemDT.clear().draw();
@@ -361,6 +380,50 @@
                 }
             });
         }
+
+        function loadWarehouse(selectedId, isSame) {
+            if ($.fn.select2 && !$("#return-warehouse-select").hasClass("select2-hidden-accessible")) {
+                loadSelect2Warehouse(selectedId, isSame);
+            } else {
+                $("#return-warehouse-select").val(selectedId).trigger("change");
+            }
+            $("#return-warehouse").toggleClass("d-none", isSame);
+            $("#return-warehouse-select").next(".select2-container").toggleClass("d-none", !isSame);
+        }
+
+        function loadSelect2Warehouse(selectedId, isSame) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Warehouse")",
+                data: {
+                    IncludeId: selectedId
+                },
+                success: function (data, status, xhr) {
+                    $("#return-warehouse-select").select2({
+                        ajax: null, //already fetched outside
+                        data: data,
+                        minimumResultsForSearch: -1,
+                        templateResult: function (repo) {
+                            if (repo.loading) {
+                                return repo.text;
+                            }
+                            return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                        }
+                    });
+
+                    $("#return-same-warehouse").prop("checked", isSame);
+                    $("#return-warehouse").data("Id", selectedId);
+                    $("#return-warehouse").toggleClass("d-none", !isSame);
+                    $("#return-warehouse-select").next(".select2-container").toggleClass("d-none", isSame);
+                }
+            });
+        }
+
+        $("#return-same-warehouse").on("change",function() {
+            $("#return-warehouse").toggleClass("d-none", !$(this).prop("checked"));
+            $("#return-warehouse-select").next(".select2-container").toggleClass("d-none", $(this).prop("checked"));
+            $("#return-warehouse-select").val($("#return-warehouse").data("selectedId") || $("#return-warehouse").data("Id")).trigger("change");
+        });
 
         // Load purchase receiving for select2
         function loadRRDetails() {
@@ -378,8 +441,11 @@
                     $("#return-currency").val(data.currency);
                     $("#return-currency").data("Id", data.currencyId);
                     $("#return-currency-rate").val(data.currencyRate);
+
                     $("#return-warehouse").val(data.warehouse);
-                    $("#return-warehouse").data("Id", data.warehouse);
+                    $("#return-warehouse").data("Id", data.warehouseId);
+                    $("#return-same-warehouse").prop("disabled", false);
+
                     $("#return-drnumber").val(data.drNumber);
                     $("#return-sinumber").val(data.siNumber);
                 },
@@ -504,6 +570,7 @@
                     url: "@Url.Action("AddJson")",
                     data: {
                         ReceivingId: $("#return-rrnumber").val(),
+                        WarehouseId: $("#return-warehouse-select").val(),
                         DateReturn: $("#return-date-returned").val(),
                         Remarks: $("#return-remarks").val(),
                         Status: $("#action-type").val(),

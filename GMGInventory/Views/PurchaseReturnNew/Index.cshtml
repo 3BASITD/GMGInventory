@@ -15,6 +15,16 @@
                     <span class="fas fa-plus"></span> New Purchase Return
                 </a>
             }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="New Purchase Return&#10;Add access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-plus mr-0"></span>
+                </button>
+            }
             <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -22,6 +32,16 @@
             {
                 <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
                     <span class="fas fa-download"></span> Download
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Download&#10;Download access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-download mr-0"></span>
                 </button>
             }
         </div>
@@ -227,17 +247,22 @@
                 { data: "siNumber", name: "SINumber" },
                 { data: "status", name: "Status" },
                 { data: "returnDate", name: "ReturnDate" },
-                { data: "remarks", name: "Remarks" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.remarks || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "Remarks"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
-                        if (data.status.toLowerCase() == "draft" && data.orderBy == $("#current-user-nickname").val()) {
-                            if (user_access.canDelete) {
-                                actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
-                            }
-                        }
+                        // if (data.status.toLowerCase() == "draft" && data.orderBy == $("#current-user-nickname").val()) {
+                        //     if (user_access.canDelete) {
+                        //         actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
+                        //     }
+                        // }
                         return actions + "</div>";
                     }
                 }
@@ -245,7 +270,8 @@
             order: [[8, "desc"]],
             createdRow: function (row, data, dataIndex) {
                 if (data.status.toLowerCase() == 'resubmitted') {
-                    $(row).addClass('text-muted');
+                    $(row).addClass('table-danger');
+                    $(row).find("td").addClass('text-muted');
                 } else if (data.status.toLowerCase() == 'disapproved') {
                     $(row).addClass('table-danger');
                     $(row).find('td:eq(7)').addClass('text-danger');

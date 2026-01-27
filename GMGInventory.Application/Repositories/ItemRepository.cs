@@ -420,7 +420,7 @@ namespace GMGInventory.Application.Repositories
                                               .Where(s => s.DateCreated.Date <= DateTime.Now)
                                               .OrderByDescending(s => s.DateCreated)
                                               .FirstOrDefault()
-                              where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                              where (filter.ActiveStatusId == null || (filter.ActiveStatusId == 1 && item.IsActive == true) || (filter.ActiveStatusId == 0 && item.IsActive == false))
                                   && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
                                   && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
                                   && (filter.BrandId == null || filter.BrandId == item.BrandId)
@@ -457,7 +457,7 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 var itemsVM = from item in context.Items
-                              where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
+                              where (filter.ActiveStatusId == null || (filter.ActiveStatusId == 1 && item.IsActive == true) || (filter.ActiveStatusId == 0 && item.IsActive == false))
                                   && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
                                   && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
                                   && (filter.BrandId == null || filter.BrandId == item.BrandId)
@@ -1836,8 +1836,7 @@ namespace GMGInventory.Application.Repositories
                 var worksheet = workbook.Worksheets.First();
 
                 var headers = worksheet.Row(1).Cells().Select(c => c.GetString().Trim()).ToList();
-                var requiredHeaders = new[] { "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse", "Model Number", "Category", "Item Type",
-                    "Brand", "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price"};
+                var requiredHeaders = new[] { "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse", "Model Number", "Category", "Item Type", "Brand", "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price", "Is Active" };
 
                 var missingColumns = new List<string>();
                 foreach (var col in requiredHeaders)
@@ -1864,6 +1863,7 @@ namespace GMGInventory.Application.Repositories
                 int beginningCostCol = headers.IndexOf("Beginning Cost") + 1;
                 int grossPriceCol = headers.IndexOf("Gross Price") + 1;
                 int netPriceCol = headers.IndexOf("Net Price") + 1;
+                int isActiveCol = headers.IndexOf("Is Active") + 1;
 
                 var xclitems = new List<ItemFileVM>();
                 foreach (var row in worksheet.RowsUsed().Skip(1))
@@ -1885,7 +1885,8 @@ namespace GMGInventory.Application.Repositories
                         Quantity = int.TryParse(row.Cell(quantityOnHandCol).GetString().Replace(",", ""), out int quantity) ? quantity : -999999,
                         BeginningCost = decimal.TryParse(row.Cell(beginningCostCol).GetString().Replace(",", ""), out decimal cost) ? cost : -999999,
                         GrossPrice = decimal.TryParse(row.Cell(grossPriceCol).GetString().Replace(",", ""), out decimal gprice) ? gprice : -999999,
-                        NetPrice = decimal.TryParse(row.Cell(netPriceCol).GetString().Replace(",", ""), out decimal nprice) ? nprice : -999999
+                        NetPrice = decimal.TryParse(row.Cell(netPriceCol).GetString().Replace(",", ""), out decimal nprice) ? nprice : -999999,
+                        IsActive = row.Cell(isActiveCol).GetString().Trim().ToLower() == "yes"
                     };
 
                     xclitem.Status = await SaveItemFromFile(xclitem);
@@ -1896,7 +1897,7 @@ namespace GMGInventory.Application.Repositories
                 using var newWorkbook = new XLWorkbook();
                 var newSheet = newWorkbook.AddWorksheet("Result");
 
-                newSheet.Range("A1:Q1").Merge();
+                newSheet.Range("A1:R1").Merge();
                 newSheet.Cell(1, 1).MergedRange().Value = "This file is a result of item upload. Don't use this file for uploading";
 
                 newSheet.Cell(2, 1).Value = "Code";
@@ -1915,7 +1916,8 @@ namespace GMGInventory.Application.Repositories
                 newSheet.Cell(2, 14).Value = "Beginning Cost";
                 newSheet.Cell(2, 15).Value = "Gross Price";
                 newSheet.Cell(2, 16).Value = "Net Price";
-                newSheet.Cell(2, 17).Value = "Status for Uploading";
+                newSheet.Cell(2, 17).Value = "Is Active";
+                newSheet.Cell(2, 18).Value = "Status for Uploading";
 
                 for (int i = 0; i < xclitems.Count; i++)
                 {
@@ -1936,7 +1938,8 @@ namespace GMGInventory.Application.Repositories
                     newSheet.Cell(i + 3, 14).Value = p.BeginningCost;
                     newSheet.Cell(i + 3, 15).Value = p.GrossPrice;
                     newSheet.Cell(i + 3, 16).Value = p.NetPrice;
-                    newSheet.Cell(i + 3, 17).Value = p.Status;
+                    newSheet.Cell(i + 3, 17).Value = p.IsActive ? "Yes" : "No";
+                    newSheet.Cell(i + 3, 18).Value = p.Status;
                 }
 
                 using var outStream = new MemoryStream();
@@ -2019,7 +2022,7 @@ namespace GMGInventory.Application.Repositories
                     item.ItemTypeId = itemType.Id;
                     item.BrandId = brand.Id;
                     item.BeginningCost = itemFile.BeginningCost != -999999 ? itemFile.BeginningCost : item.BeginningCost;
-                    item.IsActive = true;
+                    item.IsActive = itemFile.IsActive;
 
                     context.Items.Update(item);
                     msg.Add("Item updated");
@@ -2044,7 +2047,7 @@ namespace GMGInventory.Application.Repositories
                                       : itemFile.GrossPrice != -999999 ? itemFile.GrossPrice
                                       : itemFile.NetPrice != -999999 ? itemFile.NetPrice
                                       : 0,
-                        IsActive = true,
+                        IsActive = itemFile.IsActive,
                     };
 
                     await context.Items.AddAsync(item);

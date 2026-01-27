@@ -4,6 +4,26 @@
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
     var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
     var hashMicroUserAccess = (ViewsAccessVM)ViewData["HashMicroUserAccess"]!;
+
+    var status = Model.Status.ToLowerInvariant();
+
+    bool isHashMicroMoved = Model.HashMicroMoveId != null;
+    bool isDraft = status == "draft";
+    bool isSubmitted = status == "submitted";
+    bool isApproved = status == "approved";
+    bool isDisapproved = status == "disapproved";
+
+    bool canHashMicroSync = hashMicroUserAccess.CanUploadDownload && (isDraft || isSubmitted || isApproved);
+    bool canAdd = userAccess.CanAdd;
+    bool canPrint = userAccess.CanPrint;
+    bool canDelete = userAccess.CanDelete && isDraft && !isHashMicroMoved;
+    bool canEdit = userAccess.CanEdit && isDraft;
+    bool canApproveDisapprove = userAccess.CanApproveDisapprove && isSubmitted;
+
+    bool canRecreate = isDisapproved &&
+                       !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
+                       Model.ResubmitId == null &&
+                       canAdd;
 }
 
 @section Breadcrumb {
@@ -14,13 +34,12 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (Model.Status.ToLower() == "draft" || Model.Status.ToLower() == "submitted" || Model.Status.ToLower() == "approved")
+            @if (canHashMicroSync)
             {
-
-                @if (Model.HashMicroMoveId != null)
+                @if (isHashMicroMoved)
                 {
                     <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="ViewHashMicro()" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-cloud"></span>
+                        <span class="fas fa-cloud mr-0"></span>
                     </button>
                 }
                 else
@@ -30,7 +49,17 @@
                     </button>
                 }
             }
-            @if (userAccess.CanPrint)
+            else
+            {
+                <button type="button"
+                        class="btn btn-light text-dark btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Move to HashMicro&#10;@(isDraft || isSubmitted || isApproved ? "Upload Hash Micro access is required" : "Only draft / submitted / approved receiving can be moved")"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-upload mr-0"></span>
+                </button>
+            }
+            @if (canPrint)
             {
                 <div class="dropdown float-right ml-2">
                     <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuPrint" data-bs-toggle="dropdown" aria-expanded="false">
@@ -44,66 +73,96 @@
             }
             else
             {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
-                    <span class="fas fa-print"></span> Print
+                <button type="button"
+                        class="btn btn-info btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Print&#10;Print access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-print mr-0"></span>
                 </button>
             }
-            @if (Model.Status.ToLower() == "draft")
+            @if (canDelete)
             {
-                @if (userAccess.CanEdit)
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                }
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-delete">
+                    <span class="fas fa-trash"></span> Delete
+                </button>
             }
-            else if (Model.Status.ToLower() == "submitted" && (string.IsNullOrWhiteSpace(Model.ApprovedBy)))
+            else
             {
-                @if (userAccess.CanApproveDisapprove)
-                {
-                    <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
-                        <span class="fas fa-check"></span> Approve
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
-                        <span class="fas fa-times"></span> Disapprove
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-check"></span> Approve
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Approve / Disapprove access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-times"></span> Disapprove
-                    </button>
-                }
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Delete&#10;@(isHashMicroMoved ? "Record already copied to HashMicro. Delete cannot proceed" : isDraft ? "Delete access is required" : "Only draft receiving can be deleted")"
+                        data-microtip-position="bottom" role="tooltip">
+                    <span class="fas fa-trash mr-0"></span>
+                </button>
             }
-            else if (Model.Status.ToLower() == "disapproved" && !string.IsNullOrWhiteSpace(Model?.DisapprovedBy) && Model?.ResubmitId == null)
+            @if (canEdit)
             {
-                @if (userAccess.CanAdd)
-                {
-                    <a href="@Url.Action("Create")/@Model?.Id" class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </a>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </button>
-                }
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 btn-details-save">
+                    <span class="fas fa-save"></span> Save as Draft
+                </button>
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 btn-details-submit">
+                    <span class="fas fa-paper-plane"></span> Submit
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Save as Draft&#10;@(isDraft ? "Edit access is required" : "Only draft receiving can be saved as draft")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-save mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Submit&#10;@(isDraft ? "Edit access is required" : "Only draft receiving can be submitted")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-paper-plane mr-0"></span>
+                </button>
+            }
+            @if (canApproveDisapprove)
+            {
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-disapprove">
+                    <span class="fas fa-times"></span> Disapprove
+                </button>
+                <button type="button" class="btn btn-success btn-sm float-right ml-2 btn-details-approve">
+                    <span class="fas fa-check"></span> Approve
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Disapprove&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted receiving can be disapproved")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-times mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Approve&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted receiving can be approved")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-check mr-0"></span>
+                </button>
+            }
+            @if (canRecreate)
+            {
+                <a href="@Url.Action("Create")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-edit"></span> Update to Resubmit
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Receiving already been resubmitted" : canAdd ? "Only disapproved receiving can be resubmitted" : "Add access is required")"
+                        data-microtip-position="bottom"
+                        role="tooltip">
+                    <span class="fas fa-edit mr-0"></span>
+                </button>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -111,30 +170,30 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy) || Model?.ResubmitFromId != null)
+        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) || Model.ResubmitFromId != null)
         {
             <div class="row">
-                @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy))
+                @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
                 {
                     <div class="col-12">
                         <div class="alert alert-danger text-sm" role="alert">
                             <strong>Reason of Disapproval:</strong>
-                            @(string.IsNullOrWhiteSpace(Model?.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                            @(string.IsNullOrWhiteSpace(Model.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
                         </div>
                     </div>
                 }
-                @if (Model?.ResubmitId != null || Model?.ResubmitFromId != null)
+                @if (Model.ResubmitId != null || Model.ResubmitFromId != null)
                 {
                     <div class="col-12">
                         <div class="alert alert-info text-sm" role="alert">
                             <strong>Resubmit Details:</strong>
-                            @if (Model?.ResubmitId != null)
+                            @if (Model.ResubmitId != null)
                             {
-                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseReceive", new { Id = Model?.ResubmitId })" class="alert-link">here</a>.</div>
+                                <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "PurchaseReceive", new { Id = Model.ResubmitId })" class="alert-link">here</a>.</div>
                             }
-                            @if (Model?.ResubmitFromId != null)
+                            @if (Model.ResubmitFromId != null)
                             {
-                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseReceive", new { Id = Model?.ResubmitFromId })" class="alert-link">here</a>.</div>
+                                <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "PurchaseReceive", new { Id = Model.ResubmitFromId })" class="alert-link">here</a>.</div>
                             }
                         </div>
                     </div>
@@ -148,7 +207,7 @@
                         @Html.DisplayNameFor(model => model.DocumentNumber)
                     </span>
                     <b class="d-block">
-                        @Model?.DocumentNumber
+                        @Model.DocumentNumber
                     </b>
                 </p>
             </div>
@@ -159,7 +218,7 @@
                         @Html.DisplayNameFor(model => model.PONumber)
                     </span>
                     <b class="d-block" id="receive-poNumber">
-                        @Model?.PONumber
+                        @Model.PONumber
                     </b>
                 </p>
             </div>
@@ -170,7 +229,7 @@
                         @Html.DisplayNameFor(model => model.ReceiveDate)
                     </span>
                     <b class="d-block">
-                        @Model?.ReceiveDate
+                        @Model.ReceiveDate
                     </b>
                 </p>
             </div>
@@ -180,7 +239,7 @@
                         @Html.DisplayNameFor(model => model.SINumber)
                     </span>
                     <b class="d-block" id="receive-siNumber">
-                        @Model?.SINumber
+                        @Model.SINumber
                     </b>
                 </p>
             </div>
@@ -190,20 +249,17 @@
                         @Html.DisplayNameFor(model => model.DRNumber)
                     </span>
                     <b class="d-block" id="receive-drNumber">
-                        @Model?.DRNumber
+                        @Model.DRNumber
                     </b>
                 </p>
             </div>
-
-
-
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Warehouse)
                     </span>
                     <b class="d-block">
-                        @Model?.Warehouse
+                        @Model.Warehouse
                     </b>
                 </p>
             </div>
@@ -213,12 +269,11 @@
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
                     <b class="d-block">
-                        @Model?.Remarks
+                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Remarks)
                     </b>
                 </p>
             </div>
-
-            @if (!string.IsNullOrWhiteSpace(Model?.ApprovedBy))
+            @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -226,13 +281,12 @@
                             @Html.DisplayNameFor(model => model.ApprovedBy)
                         </span>
                         <b class="d-block">
-                            @Model?.ApprovedBy
+                            @Model.ApprovedBy
                         </b>
                     </p>
                 </div>
             }
-
-            @if (!string.IsNullOrWhiteSpace(Model?.DisapprovedBy))
+            @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -240,19 +294,18 @@
                             @Html.DisplayNameFor(model => model.DisapprovedBy)
                         </span>
                         <b class="d-block">
-                            @Model?.DisapprovedBy
+                            @Model.DisapprovedBy
                         </b>
                     </p>
                 </div>
             }
-
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Status)
                     </span>
                     <b class="d-block" id="receive-status">
-                        @Model?.Status
+                        @Model.Status
                     </b>
                 </p>
             </div>
@@ -262,7 +315,7 @@
                         @Html.DisplayNameFor(model => model.UserCreated)
                     </span>
                     <b class="d-block">
-                        @Model?.UserCreated
+                        @Model.UserCreated
                     </b>
                 </p>
             </div>
@@ -272,11 +325,11 @@
                         @Html.DisplayNameFor(model => model.DateCreated)
                     </span>
                     <b class="d-block">
-                        @Model?.DateCreated
+                        @Model.DateCreated
                     </b>
                 </p>
             </div>
-            @if (!string.IsNullOrWhiteSpace(Model?.UserModified))
+            @if (!string.IsNullOrWhiteSpace(Model.UserModified))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -284,12 +337,12 @@
                             @Html.DisplayNameFor(model => model.UserModified)
                         </span>
                         <b class="d-block">
-                            @Model?.UserModified
+                            @Model.UserModified
                         </b>
                     </p>
                 </div>
             }
-            @if (!string.IsNullOrWhiteSpace(Model?.DateModified))
+            @if (!string.IsNullOrWhiteSpace(Model.DateModified))
             {
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -297,7 +350,7 @@
                             @Html.DisplayNameFor(model => model.DateModified)
                         </span>
                         <b class="d-block">
-                            @Model?.DateModified
+                            @Model.DateModified
                         </b>
                     </p>
                 </div>
@@ -633,6 +686,33 @@
                                 Id: ro_data.id,
                                 reason: confirm
                             },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        if (user_access.canDelete) {
+            $(".btn-details-delete").on("click", function () {
+                swal({
+                    title: "Delete Purchase Receiving",
+                    text: "Continue to delete this purchase receiving?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        $.ajax({
+                            url: "@Url.Action("DeleteJson")",
+                            type: "POST",
+                            data: { Id: ro_data.id },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
                                     window.location.reload();

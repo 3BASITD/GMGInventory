@@ -169,6 +169,10 @@
     color: #1f2d3d !important;
 }
 
+.dark-mode .text-muted, .text-muted {
+    color: #6c757d !important;
+}
+
 .dark-mode .card .card .nav-tabs .nav-item.show .nav-link,
 .dark-mode .card .card .nav-tabs .nav-link.active {
     background-color: #3f474e;

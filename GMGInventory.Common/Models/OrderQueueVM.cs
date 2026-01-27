@@ -26,7 +26,7 @@ namespace GMGInventory.Common.Models
         public string Status { get; set; }
 
         [Display(Name = "Date Created")]
-        public string? DateCreated => DateCreatedD == null ? null : DateCreatedD.Value.ToString(SystemFormat.StringDate);
+        public string? DateCreated => DateCreatedD == null ? null : DateCreatedD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateCreatedD { get; set; }
     }
 

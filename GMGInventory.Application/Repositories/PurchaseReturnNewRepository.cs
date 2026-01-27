@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -31,12 +31,12 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<JsonOptionsModel>> GetPurchaseReceivingOptions(int? SelectedId)
         {
             var receivings = from receiveItems in context.PurchaseReceivingLineItems
-                         let returnItems = receiveItems.PurchaseReturnLineItem
-                                        .Where(a => a.PurchaseReturn.Status.Name.ToLower() == "approved")
-                                        .Select(a => (int?)a.Quantity)
-                                        .Sum() ?? 0
-                         where returnItems != receiveItems.Quantity
-                         select receiveItems.PurchaseReceivingId;
+                             let returnItems = receiveItems.PurchaseReturnLineItem
+                                            .Where(a => a.PurchaseReturn.Status.Name.ToLower() == "approved")
+                                            .Select(a => (int?)a.Quantity)
+                                            .Sum() ?? 0
+                             where returnItems != receiveItems.Quantity
+                             select receiveItems.PurchaseReceivingId;
 
 
             return await context.PurchaseReceivings
@@ -97,15 +97,10 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<string> GetNewDocumentNumber()
         {
-            var docNumberPrefix = $"RO{DateTime.Now.Year % 100:D2}";
-            var lastDocument = await context.PurchaseReturnNews
-                                            .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
-                                            .OrderByDescending(s => s.DocumentNumber)
-                                            .Select(s => s.DocumentNumber)
-                                            .FirstOrDefaultAsync();
+            var procurementHelper = new ProcurementHelper();
 
-            int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
-            return $"{docNumberPrefix}{docNumberLast + 1:D6}";
+            var docNumber = await procurementHelper.GetNewReturn(context, "submitted");
+            return docNumber;
         }
 
         public async Task<IList<PurchaseReturnNewVM>> GetListAsync(PurchaseReturnFilter filter)
@@ -122,7 +117,7 @@ namespace GMGInventory.Application.Repositories
                                Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Code,
                                RRNumber = retrn.PurchaseReceive.DocumentNumber,
                                PONumber = retrn.PurchaseReceive.PurchaseOrder.DocumentNumber,
-                               Warehouse = retrn.PurchaseReceive.Warehouse.Code,
+                               Warehouse = retrn.Warehouse.Code,
                                DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,
                                SINumber = retrn.PurchaseReceive.SalesInvoiceNumber,
                                Status = retrn.Status.Code,
@@ -254,30 +249,32 @@ namespace GMGInventory.Application.Repositories
                               Currency = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,
                               CurrencyCode = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,
                               CurrencyRateD = retrn.PurchaseReceive.PurchaseOrder.CurrencyRate,
-                              Warehouse = retrn.PurchaseReceive.Warehouse.Name,
+                              Warehouse = retrn.Warehouse.Name,
+                              WarehouseId = retrn.Warehouse.Id,
+                              IsSameWarehouse = retrn.PurchaseReceive.WarehouseId == retrn.WarehouseId,
                               DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,
                               SINumber = retrn.PurchaseReceive.SalesInvoiceNumber,
                               Status = retrn.Status.Code,
                               ReturnDateD = retrn.ReturnDate,
                               Remarks = retrn.Remarks,
-                              ApprovedBy = retrn.ApproverId == null ? null : SystemFormat.Name(retrn.Approver.FirstName, retrn.Approver.LastName, retrn.Approver.Nickname),
-                              DisapprovedBy = retrn.DisapproverId == null ? null : SystemFormat.Name(retrn.Disapprover.FirstName, retrn.Disapprover.LastName, retrn.Disapprover.Nickname),
+                              ApprovedBy = retrn.ApproverId == null ? null : (retrn.Approver.FirstName + " " + retrn.Approver.LastName),
+                              DisapprovedBy = retrn.DisapproverId == null ? null : (retrn.Disapprover.FirstName + " " + retrn.Disapprover.LastName),
                               DisapprovedReason = retrn.DisapprovedReason,
                               ResubmitId = retrn.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
-                              UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
+                              UserCreated = userc.FirstName + " " + userc.LastName,
                               DateCreatedD = retrn.DateCreated,
-                              UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
+                              UserModified = userm == null ? null : (userm.FirstName + " " + userm.LastName),
                               DateModifiedD = retrn.DateModified
                           };
             return await details.FirstOrDefaultAsync();
         }
-        
+
         public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemsFromRRListAsync(int purchaseReceivingId) // for create
         {
             var returnVM = from receive in context.PurchaseReceivingLineItems
-                            let retrn = context.PurchaseReturnNewLineItems
-                                         .Where(s => s.ReceivingItemId == receive.Id).FirstOrDefault()
+                           let retrn = context.PurchaseReturnNewLineItems
+                                        .Where(s => s.ReceivingItemId == receive.Id).FirstOrDefault()
                            let item = receive.OrderItem.RequestItem.Item
 
                            where receive.PurchaseReceivingId == purchaseReceivingId
@@ -350,7 +347,7 @@ namespace GMGInventory.Application.Repositories
                 rvm.LineNumber = rvms.IndexOf(rvm) + 1;
 
             return rvms;
-        } 
+        }
         public async Task<IList<PurchaseReturnNewLineItemVM>> GetItemListAsync(int purchaseReturnId)  // for printing 
         {
             var receiveId = await context.PurchaseReturnNews
@@ -456,78 +453,95 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel<int>> AddAsync(PurchaseReturnNewSaveVM form, List<PurchaseReturnNewLineItemVM> Items)
         {
-            var response = new ResponseModel<int>();
-
-            var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
-            if (status == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid status.";
-                response.NewRow = -1;
-            }
-            else
-            {
-                var previousRetrn = await context.PurchaseReturnNews
-                                                 .Where(s => s.Id == form.ResubmitId)
-                                                 .FirstOrDefaultAsync();
-
-                var docNumber = previousRetrn == null
-                              ? await GetNewDocumentNumber()
-                              : previousRetrn.DocumentNumber;
-
-                var retrn = new PurchaseReturnNew
+                var status = await context.PurchaseStatuses.Where(s => s.Name.ToLower() == form.Status.ToLower()).FirstOrDefaultAsync();
+                if (status == null)
                 {
-                    DocumentNumber = docNumber,
-                    PurchaseReceiveId = form.ReceivingId,
-                    ReturnDate = form.DateReturn,
-                    Remarks = form.Remarks,
-                    StatusId = status.Id
-                };
-                await context.PurchaseReturnNews.AddAsync(retrn);
-                await context.SaveChangesAsync(currentUserId);
-
-                if (previousRetrn != null)
-                {
-                    var statusResubmitted = await context.PurchaseStatuses
-                                                         .Where(s => s.Name.ToLower() == "resubmitted")
-                                                         .FirstAsync();
-                    previousRetrn.ResubmitId = retrn.Id;
-                    previousRetrn.StatusId = statusResubmitted.Id;
-                    context.PurchaseReturnNews.Update(previousRetrn);
-                    await context.SaveChangesAsync(currentUserId);
+                    return new ResponseModel<int> { Status = "Error", Message = "Invalid status", NewRow = -1 };
                 }
+                else
+                {
+                    var previousRetrn = await context.PurchaseReturnNews
+                                                     .Where(s => s.Id == form.ResubmitId)
+                                                     .FirstOrDefaultAsync();
 
-                await SaveItemsAsync(Items, retrn.Id);
+                    var procurementHelper = new ProcurementHelper();
 
-                response.Status = "Success";
-                response.Message = form.Status.ToLower() == "draft" ? "Purchase return saved as draft." : "Purchase return successfully submitted.";
-                response.NewRow = retrn.Id;
+                    var docNumber = previousRetrn == null
+                                  ? await procurementHelper.GetNewReturn(context, form.Status)
+                                  : previousRetrn.DocumentNumber.Split("-D")[0];
+
+                    var retrn = new PurchaseReturnNew
+                    {
+                        DocumentNumber = docNumber,
+                        PurchaseReceiveId = form.ReceivingId,
+                        ReturnDate = form.DateReturn,
+                        Remarks = form.Remarks,
+                        StatusId = status.Id,
+                        WarehouseId = form.WarehouseId
+                    };
+                    await context.PurchaseReturnNews.AddAsync(retrn);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    if (previousRetrn != null)
+                    {
+                        var statusResubmitted = await context.PurchaseStatuses
+                                                             .Where(s => s.Name.ToLower() == "resubmitted")
+                                                             .FirstAsync();
+                        previousRetrn.ResubmitId = retrn.Id;
+                        previousRetrn.StatusId = statusResubmitted.Id;
+                        context.PurchaseReturnNews.Update(previousRetrn);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
+
+                    await SaveItemsAsync(Items, retrn.Id);
+
+                    return new ResponseModel<int>
+                    {
+                        Status = "Success",
+                        Message = form.Status.ToLower() == "draft" ? "Purchase return saved as draft." : "Purchase return successfully submitted.",
+                        NewRow = retrn.Id
+                    };
+                }
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel<int> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex), NewRow = -1 };
+            }
         }
 
         public async Task<ResponseModel> SaveItemsAsync(IList<PurchaseReturnNewLineItemVM> Items, int returnId, string? status = null)
         {
-            var response = new ResponseModel();
-
-            var retrn = await context.PurchaseReturnNews.Where(s => s.Id == returnId).FirstOrDefaultAsync();
-
-            if (retrn == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase return";
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(status))
+                var retrn = await context.PurchaseReturnNews
+                                         .Include(s => s.Status)
+                                         .Where(s => s.Id == returnId)
+                                         .FirstOrDefaultAsync();
+
+                if (retrn == null)
                 {
-                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
-                    retrn.StatusId = statusId;
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase return" };
                 }
-
-                try
+                else
                 {
+                    if (!string.IsNullOrWhiteSpace(status))
+                    {
+                        int? statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).FirstOrDefault();
+                        if (statusId != null)
+                            retrn.StatusId = statusId;
+
+                        if (retrn.DocumentNumber.StartsWith("D") && retrn.Status.Name.ToLower() == "draft" && status.ToLower() != "draft")
+                        {
+                            var procurementHelper = new ProcurementHelper();
+                            var docNumber = await procurementHelper.GetNewReturn(context, status);
+                            retrn.DocumentNumber = docNumber;
+
+                            await context.SaveChangesAsync(currentUserId);
+                        }
+                    }
+
                     Items = Items.Where(s => s.ToReturn).ToList();
 
                     var citems = context.PurchaseReturnNewLineItems.Where(s => s.PurchaseReturnId == returnId);
@@ -565,133 +579,150 @@ namespace GMGInventory.Application.Repositories
 
                     await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "Return item(s) successfully saved";
-                }
-                catch (Exception ex)
-                {
-                    response.Status = "Error";
-                    response.Message = SystemFormat.GetInnermostExceptionMessage(ex);
+                    return new ResponseModel { Status = "Success", Message = "Return item(s) successfully saved" };
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> ApproveAsync(int returnId)
         {
-            var response = new ResponseModel();
-
-            var retrn = context.PurchaseReturnNews.Where(s => s.Id == returnId).FirstOrDefault();
-            if (retrn == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase return";
-            }
-            else
-            {
-                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
-
-                if (!string.IsNullOrWhiteSpace(retrn.ApproverId))
+                var retrn = context.PurchaseReturnNews.Where(s => s.Id == returnId).FirstOrDefault();
+                if (retrn == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase return already approved.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase return" };
                 }
                 else
                 {
-                    retrn.ApproverId = currentUserId;
-                    retrn.StatusId = statusId;
+                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "approved").Select(s => s.Id).First();
 
-                    context.PurchaseReturnNews.Update(retrn);
-                    await context.SaveChangesAsync(currentUserId);
+                    if (!string.IsNullOrWhiteSpace(retrn.ApproverId))
+                    {
+                        return new ResponseModel { Status = "Error", Message = "Purchase return already approved" };
+                    }
+                    else
+                    {
+                        retrn.ApproverId = currentUserId;
+                        retrn.StatusId = statusId;
 
-                    response.Status = "Success";
-                    response.Message = "Purchase return successfully approved.";
+                        context.PurchaseReturnNews.Update(retrn);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Success", Message = "Purchase return successfully approved." };
+                    }
                 }
             }
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> DisapproveAsync(int returnId, string? reason)
         {
-            var response = new ResponseModel();
-
-
-            var retrn = context.PurchaseReturnNews.Where(s => s.Id == returnId).FirstOrDefault();
-            if (retrn == null)
+            try
             {
-                response.Status = "Error";
-                response.Message = "Invalid purchase return";
-            }
-            else
-            {
-                int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
-
-                if (!string.IsNullOrWhiteSpace(retrn.DisapproverId))
+                var retrn = context.PurchaseReturnNews.Where(s => s.Id == returnId).FirstOrDefault();
+                if (retrn == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase return already disapproved.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid purchase return" };
                 }
                 else
                 {
-                    retrn.DisapproverId = currentUserId;
-                    retrn.DisapprovedReason = reason;
-                    retrn.StatusId = statusId;
+                    if (!string.IsNullOrWhiteSpace(retrn.DisapproverId))
+                    {
+                        return new ResponseModel { Status = "Error", Message = "Purchase return already disapproved" };
+                    }
+                    else
+                    {
+                        var tempDocumentNumber = retrn.DocumentNumber + "-D";
+                        var latestDisapprovedReturn = context.PurchaseReturnNews
+                                                             .Where(s => s.DocumentNumber.StartsWith(tempDocumentNumber))
+                                                             .OrderByDescending(s => s.DocumentNumber)
+                                                             .Select(s => s.DocumentNumber)
+                                                             .FirstOrDefault();
+                        var latestDisapprovedDocumentNumber = latestDisapprovedReturn == null
+                                                            ? 0
+                                                            : int.Parse(latestDisapprovedReturn.Replace(tempDocumentNumber, ""));
+                        var disapprovedDocumentNumber = tempDocumentNumber + string.Format("{0:00}", latestDisapprovedDocumentNumber + 1);
 
-                    context.PurchaseReturnNews.Update(retrn);
-                    await context.SaveChangesAsync(currentUserId);
+                        int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
 
-                    response.Status = "Success";
-                    response.Message = "Purchase return successfully disapproved.";
+                        retrn.DocumentNumber = disapprovedDocumentNumber;
+                        retrn.DisapproverId = currentUserId;
+                        retrn.DisapprovedReason = reason;
+                        retrn.StatusId = statusId;
+
+                        context.PurchaseReturnNews.Update(retrn);
+                        await context.SaveChangesAsync(currentUserId);
+
+                        return new ResponseModel { Status = "Success", Message = "Purchase return successfully disapproved" };
+                    }
                 }
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
         }
 
         public async Task<ResponseModel> DeleteAsync(int returnId)
         {
-            var response = new ResponseModel();
             try
             {
-                var existingRequest = await context.PurchaseRequests
-                                                   .Include(s => s.Status)
-                                                   .FirstOrDefaultAsync(pr => pr.Id == returnId);
+                var existingReturn = await context.PurchaseReturnNews
+                                                     .Include(s => s.Status)
+                                                     .Where(s => s.Id == returnId)
+                                                     .FirstOrDefaultAsync();
 
-                if (existingRequest == null)
+                if (existingReturn == null)
                 {
-                    response.Status = "Error";
-                    response.Message = "Purchase request not found.";
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Return. Record can not be found" };
                 }
-                else if (existingRequest.Status.Name != "Draft")
+                else if (existingReturn.Status.Name.ToLower() != "draft")
                 {
-                    response.Status = "Error";
-                    response.Message = "Only draft can be deleted.";
+                    return new ResponseModel { Status = "Error", Message = "Only draft can be deleted." };
                 }
                 else
                 {
-                    var resubmittedOrder = await context.PurchaseRequests
-                                                        .Where(s => s.ResubmitId == existingRequest.Id)
-                                                        .FirstOrDefaultAsync();
-                    if (resubmittedOrder != null)
+                    var previousReturn = await context.PurchaseReturnNews
+                                                      .Where(s => s.ResubmitId == returnId)
+                                                      .FirstOrDefaultAsync();
+                    if (previousReturn != null)
                     {
-                        resubmittedOrder.ResubmitId = null;
+                        var statusDisapproved = await context.PurchaseStatuses
+                                                             .Where(s => s.Name.ToLower() == "disapproved")
+                                                             .FirstAsync();
+                        previousReturn.ResubmitId = null;
+                        previousReturn.StatusId = statusDisapproved.Id;
                         await context.SaveChangesAsync(currentUserId);
                     }
 
-                    context.PurchaseRequests.Remove(existingRequest);
+                    var receivingItems = await context.PurchaseReturnNewLineItems
+                                                      .Where(s => s.PurchaseReturnId == returnId)
+                                                      .ToListAsync();
+
+                    context.PurchaseReturnNewLineItems.RemoveRange(receivingItems);
+
+                    context.PurchaseReturnNews.Remove(existingReturn);
                     await context.SaveChangesAsync(currentUserId);
 
-                    response.Status = "Success";
-                    response.Message = "Purchase request successfully deleted.";
+                    return new ResponseModel { Status = "Success", Message = "Purchase Return successfully deleted" };
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                response.Status = "Error";
-                response.Message = "An error occurred while deleting the purchase request.";
+                return new ResponseModel
+                {
+                    Status = "Error",
+                    Message = SystemFormat.GetInnermostExceptionMessage(ex)
+                };
             }
-
-            return response;
         }
     }
 }

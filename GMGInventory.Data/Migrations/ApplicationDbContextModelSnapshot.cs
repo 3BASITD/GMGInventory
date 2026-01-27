@@ -1039,18 +1039,6 @@ namespace GMGInventory.Data.Migrations
                             PageId = 80,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
-                        },
-                        new
-                        {
-                            Id = 81,
-                            CanAdd = false,
-                            CanDelete = false,
-                            CanEdit = false,
-                            CanView = true,
-                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PageId = 81,
-                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
-                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -6312,7 +6300,7 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("UserModified")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("WarehouseId")
+                    b.Property<int>("WarehouseId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -8368,13 +8356,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8425104e-ee1c-47f4-a697-e2839073cb36",
+                            ConcurrencyStamp = "168f2c81-2f42-4a2f-8ab3-70e7304d6ba4",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEM9lae2XolCEk5D4ilOYIKNrZ1HqGAtc6r4s93KYgXyPCOZS0QmLHE9jEP5nrrwtpQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMTAz2D5KRFccYk5z1PFlLMeis5BZLObwRlh2G9SixJ1cHvbFnVfOdfgMd8mzKwtRA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0cdf4158-9236-4f6b-a69c-bdb52af0023a",
+                            SecurityStamp = "454faad8-68f7-465d-8f68-8e1c172c2294",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8389,13 +8377,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2812ce34-1e80-41b5-86f8-b8838401d44b",
+                            ConcurrencyStamp = "705a35ba-a992-4f3d-a6cd-3356d696ed2e",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOv7LnIv0k/Ga9hOlCsDEX0pAtfBPbvtPbCzxrSbAIQwIw6D0x2E5LMoJWbjMjh7Tg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL3pm8GzBxo92jQ1Ncdvk28xhevUWz1QzUPviunTRJbL3g7S2qd2tbfvZ31GdTLoXw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "462e6548-a7a4-48b1-846c-f382017c1239",
+                            SecurityStamp = "06abd314-267b-4ac8-92ab-f0cc8d727071",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9287,9 +9275,11 @@ namespace GMGInventory.Data.Migrations
                         .WithMany("PurchaseReturns")
                         .HasForeignKey("SupplierId");
 
-                    b.HasOne("GMGInventory.Data.Warehouse", null)
+                    b.HasOne("GMGInventory.Data.Warehouse", "Warehouse")
                         .WithMany("PurchaseReturns")
-                        .HasForeignKey("WarehouseId");
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Approver");
 
@@ -9300,6 +9290,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Resubmit");
 
                     b.Navigation("Status");
+
+                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.PurchaseReturnNewLineItem", b =>

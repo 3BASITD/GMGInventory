@@ -34,7 +34,7 @@
         </div>
         <div class="card-body">
             <div class="row">
-                  <div class="col-12 col-md-4 col-sm-6">
+                <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="receive-docNumber" class="form-label mb-0">Document Number</label>
                         <input type="text" id="receive-docNumber" name="DocumentNumber" class="form-control form-control-sm" readonly="readonly" />
@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
-                        <label for="receive-deliveryReceiptNumber" class="form-label mb-0">Delivery Receipt Number</label>
+                        <label for="receive-dRNumber" class="form-label mb-0">Delivery Receipt Number</label>
                         <input type="text" id="receive-dRNumber" name="DeliveryReceiptNumber" class="form-control form-control-sm" />
                     </div>
                 </div>
@@ -70,8 +70,13 @@
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
                         <label for="receive-warehouse" class="form-label mb-0">Warehouse</label>
-                        <input type="text" id="receive-warehouse" name="Warehouse" class="form-control form-control-sm" readonly="readonly" />
-                    </div>
+                        <div class="form-switch float-right text-xs">
+                            <input type="checkbox" id="receive-same-warehouse" class="form-check-input" checked="checked" disabled="disabled" />
+                            <label for="receive-same-warehouse" class="form-check-label">Same with Purchase Order</label>
+                        </div>
+                        <input type="text" id="receive-warehouse" class="form-control form-control-sm" readonly="readonly" />
+                        <select id="receive-warehouse-select" name="Warehouse" style="width: 100%"></select>
+                    </div> 
                 </div>
                 <div class="col-12 col-md-4 col-sm-6">
                     <div class="form-group">
@@ -137,7 +142,7 @@
                     </div>
                 </div>
             </div>
-         
+
 
             <div class="row">
                 <div class="col-12">
@@ -203,8 +208,16 @@
                 success: function (data, status, xhr) {
                     $("#receive-docNumber").val(data.documentNumber);
                     //$("#receive-poNumber").val(data.poNumber);
+                    $("#receive-dRNumber").val(data.drNumber);
+                    $("#receive-sINumber").val(data.siNumber);
                     $("#receive-supplier").val(data.supplier);
-                    $("#receive-warehouse").val(data.warehouse);
+                    
+                    $("#receive-warehouse").val(data.poWarehouse);
+                    $("#receive-warehouse").data("Id", data.poWarehouseId);
+                    $("#receive-warehouse").data("selectedId", data.warehouseId);
+                    $("#receive-same-warehouse").prop("disabled", false);
+                    loadWarehouse(data.warehouseId, data.isSameWarehouse);
+
                     $("#receive-term").val(data.term);
                     $("#receive-currency").val(data.currency);
                     $("#receive-currencyRate").val(data.currencyRate);
@@ -234,6 +247,7 @@
             $("#receive-poNumber").prop('disabled', false);
             loadDocumentNumber();
             loadPONumberOptions(-1, null);
+            loadSelect2Warehouse(null, true);
         }
 
         var itemDT = $('.table-item').DataTable({
@@ -283,7 +297,7 @@
                 },
                 { data: "unitCode", name: "UnitCode", className: "form-cell" },
                 { data: "unitCost", name: "UnitCost", className: "form-cell", visible: user_accessBasic.canView ? false : true },
-                { 
+                {
                     data: "totalAmount",
                     name: "TotalAmount",
                     className: "form-cell",
@@ -418,9 +432,15 @@
                 }
             }).off("select2:select").on("select2:select", function () {
                 loadPODetails();
+                $("#receive-same-warehouse").prop("disabled", false);
             }).off("select2:unselecting").on("select2:unselecting", function () {
                 $("#receive-supplier").val("");
-                $("#receive-warehouse").val("");
+                //$("#receive-warehouse").val("");
+                $("#receive-warehouse").removeData("Id");
+                $("#receive-warehouse").removeData("selectedId");
+                loadWarehouse(2, true);
+                $("#receive-same-warehouse").prop("disabled", true);
+                $("#receive-same-warehouse").prop("checked", true);
                 $("#receive-term").val("");
                 $("#receive-currency").val("");
                 $("#receive-currencyRate").val("0");
@@ -441,7 +461,51 @@
                 loadPODetails();
             }
         }
-     
+
+        function loadWarehouse(selectedId, isSame) {
+            if ($.fn.select2 && !$("#receive-warehouse-select").hasClass("select2-hidden-accessible")) {
+                loadSelect2Warehouse(selectedId, isSame);
+            } else {
+                $("#receive-warehouse-select").val(selectedId).trigger("change");
+            }
+            $("#receive-warehouse").toggleClass("d-none", isSame);
+            $("#receive-warehouse-select").next(".select2-container").toggleClass("d-none", !isSame);
+        }
+
+        function loadSelect2Warehouse(selectedId, isSame) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "Warehouse")",
+                data: {
+                    IncludeId: selectedId
+                },
+                success: function (data, status, xhr) {
+                    $("#receive-warehouse-select").select2({
+                        ajax: null, //already fetched outside
+                        data: data,
+                        minimumResultsForSearch: -1,
+                        templateResult: function (repo) {
+                            if (repo.loading) {
+                                return repo.text;
+                            }
+                            return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                        }
+                    });
+
+                    $("#receive-same-warehouse").prop("checked", isSame);
+                    $("#receive-warehouse").data("Id", selectedId);
+                    $("#receive-warehouse").toggleClass("d-none", !isSame);
+                    $("#receive-warehouse-select").next(".select2-container").toggleClass("d-none", isSame);
+                }
+            });
+        }
+
+        $("#receive-same-warehouse").on("change",function() {
+            $("#receive-warehouse").toggleClass("d-none", !$(this).prop("checked"));
+            $("#receive-warehouse-select").next(".select2-container").toggleClass("d-none", $(this).prop("checked"));
+            $("#receive-warehouse-select").val($("#receive-warehouse").data("selectedId") || $("#receive-warehouse").data("Id")).trigger("change");
+        });
+
         function loadPODetails() {
             $.ajax({
                 type: "POST",
@@ -451,7 +515,13 @@
                 },
                 success: function (data, status, xhr) {
                     $("#receive-supplier").val(data.supplier);
-                    $("#receive-warehouse").val(data.deliveryAddress);
+                    
+                    $("#receive-warehouse").val(data.deliveryName);
+                    $("#receive-warehouse").data("Id", data.deliveryAddressId);
+                    $("#receive-same-warehouse").prop("disabled", false);
+
+                    //loadWarehouse(data.deliveryAddressId, true);
+                    
                     $("#receive-term").val(data.term);
                     $("#receive-currency").val(data.currency);
                     $("#receive-currencyRate").val(data.currencyRate);
@@ -500,8 +570,8 @@
                             itemId: v.itemId,
                             itemDescription: v.itemDescription,
                             purchaseReceivingId: v.purchaseReceivingId,
-                            quantity: FormatStringInteger(0), 
-                            quantityD: 0,  
+                            quantity: FormatStringInteger(0),
+                            quantityD: 0,
                             toReceiveQuantity: v.toReceiveQuantity,
                             toReceiveQuantityD: v.toReceiveQuantityD,
                             unitCode: v.unitCode,
@@ -545,7 +615,7 @@
                 DeliveryReceiptNumber: {
                     required: "Please enter Delivery Receipt Number.",
                     maxlength: "Delivery Receipt Number can not exceed 100 characters."
-                }, 
+                },
                 SalesInvoiceNumber: {
                     required: "Please enter Sales Invoice Number.",
                     maxlength: "Sales Invoice Number can not exceed 100 characters."
@@ -580,12 +650,12 @@
                         PurchaseOrderId: $("#receive-poNumber").val(),
                         DeliveryReceiptNumber: $("#receive-dRNumber").val(),
                         SalesInvoiceNumber: $("#receive-sINumber").val(),
+                        WarehouseId: $("#receive-warehouse-select").val(),
                         DateReceived: $("#date-received").val(),
                         Status: $("#action-type").val(),
                         Remarks: $("#receive-remarks").val(),
                         ResubmitId: $("#resubmitPRId").val(),
                         Items: GetItemsToReceive()
-
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {

@@ -1,9 +1,8 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -154,16 +153,11 @@ namespace GMGInventory.Application.Repositories
         {
             var purchaseType = await context.PurchaseOrderTypes.Where(s => s.Id == TypeId).FirstOrDefaultAsync();
 
-            var typeCode = purchaseType == null ? "" : $"{purchaseType.Code}-";
-            var docNumberPrefix = $"{typeCode}PO{DateTime.Now.Year}-";
-            var lastDocument = await context.PurchaseOrderNews
-                                            .Where(s => s.DocumentNumber.StartsWith(docNumberPrefix))
-                                            .OrderByDescending(s => s.DocumentNumber)
-                                            .Select(s => s.DocumentNumber)
-                                            .FirstOrDefaultAsync();
+            var procurementHelper = new ProcurementHelper();
 
-            int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
-            return $"{docNumberPrefix}{docNumberLast + 1:D4}";
+            var docNumber = await procurementHelper.GetNewOrder(context, purchaseType?.Code ?? "", "submitted");
+            return docNumber;
+
         }
 
         public async Task<IList<PurchaseOrderNewVM>> GetListAsync(PurchaseOrderFilter filter)
@@ -500,10 +494,11 @@ namespace GMGInventory.Application.Repositories
                         var previousOrder = await context.PurchaseOrderNews
                                                          .Where(s => s.Id == form.ResubmitId)
                                                          .FirstOrDefaultAsync();
+                        var procurementHelper = new ProcurementHelper();
 
                         var docNumber = previousOrder == null
-                                      ? await GetNewDocumentNumber(form.TypeId)
-                                      : previousOrder.DocumentNumber;
+                                      ? await procurementHelper.GetNewOrder(context, type.Code, form.Status)
+                                      : previousOrder.DocumentNumber.Split("-D")[0];
 
                         var order = new PurchaseOrderNew
                         {
@@ -543,7 +538,12 @@ namespace GMGInventory.Application.Repositories
 
                         await SaveItemsAsync(Items, order.Id);
 
-                        return new ResponseModel<int> { Status = "Success", Message = form.Status.ToLower() == "draft" ? "Purchase order saved as draft." : "Purchase order successfully submitted.", NewRow = order.Id };
+                        return new ResponseModel<int>
+                        {
+                            Status = "Success",
+                            Message = form.Status.ToLower() == "draft" ? "Purchase order saved as draft." : "Purchase order successfully submitted.",
+                            NewRow = order.Id
+                        };
                     }
                 }
             }
@@ -557,8 +557,11 @@ namespace GMGInventory.Application.Repositories
         {
             try
             {
-
-                var order = await context.PurchaseOrderNews.Where(s => s.Id == orderId).FirstOrDefaultAsync();
+                var order = await context.PurchaseOrderNews
+                                         .Include(s => s.Status)
+                                         .Include(s => s.Type)
+                                         .Where(s => s.Id == orderId)
+                                         .FirstOrDefaultAsync();
 
                 if (order == null)
                 {
@@ -568,8 +571,18 @@ namespace GMGInventory.Application.Repositories
                 {
                     if (!string.IsNullOrWhiteSpace(status))
                     {
-                        int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).First();
-                        order.StatusId = statusId;
+                        int? statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == status.ToLower()).Select(s => s.Id).FirstOrDefault();
+                        if (statusId != null)
+                            order.StatusId = statusId;
+
+                        if (order.DocumentNumber.StartsWith("D") && order.Status.Name.ToLower() == "draft" && status.ToLower() != "draft")
+                        {
+                            var procurementHelper = new ProcurementHelper();
+                            var docNumber = await procurementHelper.GetNewOrder(context, order.Type.Code, status);
+                            order.DocumentNumber = docNumber;
+
+                            await context.SaveChangesAsync(currentUserId);
+                        }
                     }
                     foreach (var rename in Items)
                     {
@@ -857,14 +870,26 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
-                    int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
-
                     if (!string.IsNullOrWhiteSpace(order.DisapproverId))
                     {
                         return new ResponseModel { Status = "Error", Message = "Purchase order already disapproved." };
                     }
                     else
                     {
+                        var tempDocumentNumber = order.DocumentNumber + "-D";
+                        var latestDisapprovedOrder = context.PurchaseOrderNews
+                                                            .Where(s => s.DocumentNumber.StartsWith(tempDocumentNumber))
+                                                            .OrderByDescending(s => s.DocumentNumber)
+                                                            .Select(s => s.DocumentNumber)
+                                                            .FirstOrDefault();
+                        var latestDisapprovedDocumentNumber = latestDisapprovedOrder == null
+                                                            ? 0
+                                                            : int.Parse(latestDisapprovedOrder.Replace(tempDocumentNumber, ""));
+                        var disapprovedDocumentNumber = tempDocumentNumber + string.Format("{0:00}", latestDisapprovedDocumentNumber + 1);
+
+                        int statusId = context.PurchaseStatuses.Where(s => s.Name.ToLower() == "disapproved").Select(s => s.Id).First();
+
+                        order.DocumentNumber = disapprovedDocumentNumber;
                         order.DisapproverId = currentUserId;
                         order.DisapprovedReason = reason;
                         order.StatusId = statusId;
@@ -882,37 +907,48 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
-        public async Task<ResponseModel> DeleteAsync(int requestId)
+        public async Task<ResponseModel> DeleteAsync(int orderId)
         {
             try
             {
-                var existingRequest = await context.PurchaseRequests
-                                                   .Include(s => s.Status)
-                                                   .FirstOrDefaultAsync(pr => pr.Id == requestId);
+                var existingOrder = await context.PurchaseOrderNews
+                                                 .Include(s => s.Status)
+                                                 .FirstOrDefaultAsync(pr => pr.Id == orderId);
 
-                if (existingRequest == null)
+                if (existingOrder == null)
                 {
-                    return new ResponseModel { Status = "Error", Message = "Purchase request not found." };
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Receiving. Record can not be found" };
                 }
-                else if (existingRequest.Status.Name.ToLower() != "draft")
+                else if (existingOrder.Status.Name.ToLower() != "draft")
                 {
-                    return new ResponseModel { Status = "Error", Message = "Only draft can be deleted." };
+                    return new ResponseModel { Status = "Error", Message = "Only draft can be deleted" };
                 }
                 else
                 {
-                    var resubmittedOrder = await context.PurchaseRequests
-                                                        .Where(s => s.ResubmitId == existingRequest.Id)
-                                                        .FirstOrDefaultAsync();
-                    if (resubmittedOrder != null)
+
+                    var previousOrder = await context.PurchaseOrderNews
+                                                         .Where(s => s.ResubmitId == orderId)
+                                                         .FirstOrDefaultAsync();
+                    if (previousOrder != null)
                     {
-                        resubmittedOrder.ResubmitId = null;
+                        var statusDisapproved = await context.PurchaseStatuses
+                                                             .Where(s => s.Name.ToLower() == "disapproved")
+                                                             .FirstAsync();
+                        previousOrder.ResubmitId = null;
+                        previousOrder.StatusId = statusDisapproved.Id;
                         await context.SaveChangesAsync(currentUserId);
                     }
 
-                    context.PurchaseRequests.Remove(existingRequest);
+                    var orderItems = await context.PurchaseOrderNewLineItems
+                                                      .Where(s => s.PurchaseOrderId == orderId)
+                                                      .ToListAsync();
+
+                    context.PurchaseOrderNewLineItems.RemoveRange(orderItems);
+
+                    context.PurchaseOrderNews.Remove(existingOrder);
                     await context.SaveChangesAsync(currentUserId);
 
-                    return new ResponseModel { Status = "Success", Message = "Purchase request successfully deleted." };
+                    return new ResponseModel { Status = "Success", Message = "Purchase Order successfully deleted" };
                 }
             }
             catch (Exception ex)

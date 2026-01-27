@@ -26,13 +26,16 @@ namespace GMGInventory.Common.Models
         public int? WarehouseId { get; set; }
         public SelectList? Warehouses { get; set; }
 
+        [Display(Name = "Status")]
+        public int? ActiveStatusId { get; set; }
+        public SelectList? ActiveStatus { get; set; }
+
         public int? ItemId { get; set; }
         public string? ItemKeyword { get; set; }
         public string? ItemNameKeyword { get; set; }
 
         public string? ModelNumber { get; set; }
         public string? Size { get; set; }
-        public bool ActiveOnly { get; set; } = false;
         public bool? IsTable { get; set; }
     }
 

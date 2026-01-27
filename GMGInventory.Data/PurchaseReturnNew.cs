@@ -19,6 +19,10 @@ namespace GMGInventory.Data
 
         public DateTime ReturnDate { get; set; }
 
+        [ForeignKey("WarehouseId")]
+        public int WarehouseId { get; set; }
+        public virtual Warehouse Warehouse { get; set; }
+
         [Column(TypeName = "nvarchar(501)")]
         public string? Remarks { get; set; }
 

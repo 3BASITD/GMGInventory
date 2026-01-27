@@ -188,6 +188,7 @@ namespace GMGInventory.Application.Repositories
                             || customer.Code.ToLower().Contains(search.ToLower())
                             || customer.Name.ToLower().Contains(search.ToLower()))
                             && (agent == null || customer.AgentId == agent)
+                            && customer.IsActive == true
                             orderby customer.Code ascending
                             select new JsonCustomerOptionsModel
                             {

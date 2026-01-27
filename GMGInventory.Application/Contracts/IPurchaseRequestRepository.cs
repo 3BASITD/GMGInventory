@@ -17,7 +17,7 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> SaveItemsAsync(IList<PurchaseRequestLineItemVM> Items, int requestId, string? status = null);
         Task<ResponseModel> ApproveAsync(int requestId, int? approverNumber = null);
         Task<ResponseModel> DisapproveAsync(int requestId, string? reason);
-        Task<ResponseModelData<string>> DeleteAsync(int requestId);
+        Task<ResponseModel> DeleteAsync(int requestId);
         Task<string?> GetPurchaseRequestType(int? Id);
     }
 }

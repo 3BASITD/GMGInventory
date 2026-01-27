@@ -72,7 +72,7 @@
             {
                 <button type="button"
                         class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Delete&#10;@(isDraft ? "Delete access is required" : "Only draft order can be deleted")"
+                        data-microtip-title="Delete&#10;@(isDraft ? "Delete access is required" : "Only draft request can be deleted")"
                         data-microtip-position="bottom" role="tooltip">
                     <span class="fas fa-trash mr-0"></span>
                 </button>
@@ -90,14 +90,14 @@
             {
                 <button type="button"
                         class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Save as Draft&#10;@(isDraft ? "Edit access is required" : "Only draft orders can be saved as draft")"
+                        data-microtip-title="Save as Draft&#10;@(isDraft ? "Edit access is required" : "Only draft request can be saved as draft")"
                         data-microtip-position="bottom"
                         role="tooltip">
                     <span class="fas fa-save mr-0"></span>
                 </button>
                 <button type="button"
-                        class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Submit&#10;@(isDraft ? "Edit access is required" : "Only draft orders can be submitted")"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Submit&#10;@(isDraft ? "Edit access is required" : "Only draft request can be submitted")"
                         data-microtip-position="bottom"
                         role="tooltip">
                     <span class="fas fa-paper-plane mr-0"></span>
@@ -139,9 +139,7 @@
             {
                 <button type="button"
                         class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Order already been resubmitted"
-                                                                     : canAdd ? "Only disapproved orders can be resubmitted"
-                                                                     : "Add access is required")"
+                        data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Request already been resubmitted" : canAdd ? "Only disapproved request can be resubmitted" : "Add access is required")"
                         data-microtip-position="bottom"
                         role="tooltip">
                     <span class="fas fa-edit mr-0"></span>
@@ -242,14 +240,9 @@
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Remarks)
                     </span>
-                    @if (string.IsNullOrWhiteSpace(Model.Remarks))
-                    {
-                        <em class="text-muted d-block">N/A</em>
-                    }
-                    else
-                    {
-                        <b class="d-block">@Model.Remarks</b>
-                    }
+                    <b class="d-block">
+                        @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Remarks)
+                    </b>
                 </p>
             </div>
             @* @if (Model.Type.ToLower() == "non-automotive" || Model.Type.ToLower() == "automotive")
@@ -379,17 +372,27 @@
                 <div class="card">
                     <div class="card-header bg-light">
                         <span class="card-title">Purchase Request Item(s)</span>
-                        @if (Model.Status.ToLower() == "draft" && userAccess.CanAdd)
-                        {
-                            <div class="card-tools">
+                        <div class="card-tools">
+                            @if (isDraft && canAdd)
+                            {
                                 <button type="button" class="btn btn-secondary btn-sm float-right soBtn ml-2" data-bs-toggle="modal" data-bs-target="#soModal">
                                     <span class="fas fa-plus"></span> Add SO Item(s)
                                 </button>
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
                                     <span class="fas fa-plus"></span> Add Item
                                 </button>
-                            </div>
-                        }
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                                        data-microtip-title="Add Item&#10;@(canAdd ? "Only draft order can add items" : "Add access is required")"
+                                        data-microtip-position="bottom"
+                                        role="tooltip">
+                                    <span class="fas fa-plus mr-0"></span>
+                                </button>
+                            }
+                        </div>
                     </div>
                     <div class="card-body">
                         <table class="table table-head-fixed table-striped table-hover table-item">
