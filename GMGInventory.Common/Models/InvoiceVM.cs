@@ -240,6 +240,7 @@ namespace GMGInventory.Common.Models
         public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
         public decimal GrossPriceNoDiscountD => QuantityD * NetPriceD;
         public string ReferenceNumber { get; set; }
+        public int? ItemPromoId { get; set; } 
     }
 
     //public class InvoiceFormUpdateVM

@@ -209,7 +209,7 @@ namespace GMGInventory.Application.Repositories
                              ReasonOfReturn = rturn.ReasonOfReturn.Name,
                              ItemId = rturn.Item.Id,
                              ItemCode = rturn.Item.Code,
-                             ItemName = rturn.Item.Name,
+                             ItemName = rturn.Item.Name + (rturn.ItemPromo == null ? "" : " (" + rturn.ItemPromo.Name + ")"),
                              Quantity = rturn.Quantity,
                              ReferenceNumber = rturn.InvoiceLineItemId == null ? "TBR" : (rturn.InvoiceLineItem!.Invoice.ControlNumber + (rturn.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "draft" ? " (DRAFT)" : "")),
                              Unit = rturn.Item.Unit.Code
@@ -272,7 +272,8 @@ namespace GMGInventory.Application.Repositories
                             ItemId = item.Item,
                             Quantity = item.Quantity,
                             SalesReturnId = salesReturn.Id,
-                            SellingPrice = item.SellingPrice
+                            SellingPrice = item.SellingPrice,
+                            ItemPromoId = item.ItemPromoId
                            
                         };
 

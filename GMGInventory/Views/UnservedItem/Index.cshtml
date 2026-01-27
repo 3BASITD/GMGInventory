@@ -28,10 +28,10 @@
                         @Html.DisplayNameFor(model => model.Item)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.OldSKU)
+                        @Html.DisplayNameFor(model => model.ItemName)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.ItemName)
+                        @Html.DisplayNameFor(model => model.OldSKU)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.OrderDate)
@@ -188,8 +188,8 @@
             },
             columns: [
                 { data: "item", name: "Item" },
-                { data: "oldSKU", name: "OldSKU" },
                 { data: "itemName", name: "ItemName" },
+                { data: "oldSKU", name: "OldSKU" },
                 { data: "orderDate", name: "OrderDate" },
                 { data: "salesOrderNumber", name: "SalesOrderNumber" },
                 { data: "customer", name: "Customer" },

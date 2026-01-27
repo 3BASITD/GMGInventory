@@ -431,7 +431,8 @@ namespace GMGInventory.Application.Repositories
                              QuantityOfPack = pack,
                              Unit = item.Unit.Code,
                              SellingPriceType = price.RetailSellingPrice > price.NetSellingPrice ? "Gross" : "Net",
-                             ReferenceNumber = invoicel.Invoice.ControlNumber
+                             ReferenceNumber = invoicel.Invoice.ControlNumber,
+                             ItemPromoId = orderl.ItemPromoId
                          };
             return await itemVM.ToListAsync();
         }
