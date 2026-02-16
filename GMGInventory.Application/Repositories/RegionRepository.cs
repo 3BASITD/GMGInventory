@@ -23,6 +23,44 @@ namespace GMGInventory.Application.Repositories
             this.userManager = userManager;
         }
 
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            var regions = from rgn in context.Regions
+                          where rgn.IsActive || rgn.Id == IncludeId
+                          orderby rgn.Name
+                          select new JsonOptionsModel
+                          {
+                              Id = rgn.Id.ToString(),
+                              Text = rgn.Name,
+                              Selected = IncludeId != null && IncludeId == rgn.Id
+                          };
+            return await regions.ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        {
+            var areas = await context.Regions
+                                     .Where(s => s.IsActive 
+                                              && (string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower()))))
+                                     .Select(s => new JsonNameOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Code,
+                                         Name = s.Name
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = areasFiltered,
+                total_count = areas.Count
+            };
+        }
+
         public async Task<IList<RegionVM>> GetAllRegionAsync()
         {
             var regions = from region in context.Regions
@@ -79,20 +117,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> IsRegionInUse(int id)
         {
             return await context.Areas.AnyAsync(s => s.RegionId == id);
-        }
-
-        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId, bool IncludeLocal, bool IncludeInternational)
-        {
-            var regions = from rgn in context.Regions
-                          where rgn.IsActive || rgn.Id == IncludeId
-                          orderby rgn.Name
-                          select new JsonOptionsModel
-                          {
-                              Id = rgn.Id.ToString(),
-                              Text = rgn.Name,
-                              Selected = IncludeId != null && IncludeId == rgn.Id
-                          };
-            return await regions.ToListAsync();
         }
 
         public async Task<int?> GetIdAsync(string? Name)

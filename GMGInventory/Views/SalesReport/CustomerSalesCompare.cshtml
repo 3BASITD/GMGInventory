@@ -21,7 +21,7 @@
             <a class="btn btn-secondary btn-sm float-right ml-2" asp-action="CustomerSales">
                 <span class="fas fa-not-equal"></span> Cancel Compare
             </a>
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -131,6 +131,12 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter1-brand-name" class="form-label mb-0">Brand Name</label>
+                            <input type="text" id="filter1-brand-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
@@ -176,6 +182,12 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter2-brand-name" class="form-label mb-0">Brand Name</label>
+                            <input type="text" id="filter2-brand-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
@@ -193,7 +205,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -201,6 +214,11 @@
 
 @section Scripts {
     <script>
+
+        var date_today = new Date();
+        var date_month_ago = new Date();
+        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
+
         SetDateFilter1();
         SetDateFilter2();
         function SetDateFilter1() {
@@ -245,6 +263,62 @@
 
         $("#filter1-to, #filter1-from").on("focusout", SetDateFilter1);
         $("#filter2-to, #filter2-from").on("focusout", SetDateFilter2);
+
+        // Load Select2 for Brand Filter 1
+        $("#filter1-brand").select2({
+            //minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        $("#filter1-brand").on("select2:select", function () {
+            $("#filter1-brand-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter1-brand").on("select2:unselecting", function (e) {
+            $("#filter1-brand-name").val("");
+        });
+
+        // Load Select2 for Brand Filter 2
+        $("#filter2-brand").select2({
+            //minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        $("#filter2-brand").on("select2:select", function () {
+            $("#filter2-brand-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter2-brand").on("select2:unselecting", function (e) {
+            $("#filter2-brand-name").val("");
+        });
 
         // Load Select2 for Customer Filter 1
         $("#filter1-customer").select2({
@@ -296,38 +370,126 @@
             $("#filter2-customer-name").val("");
         });
 
-        // Load Select2 for Brand Filter 1
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Brand")",
-            success: function (data, status, xhr) {
-                $("#filter1-brand").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
+        function ApplyFilter() {
+            salesDT1.ajax.reload(() => {
+                salesDT2.ajax.reload(() => {
+                    $("#filterModal").modal("hide");
+                    checkDefaultFilter();
                 });
-                $("#filter2-brand").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
+            });
+        }
+
+        function ResetFilter() {
+            resetToDefaultDTFilter();
+
+            salesDT1.ajax.reload(() => {
+                salesDT2.ajax.reload(() => {
+                    $("#filterModal").modal("hide");
+                    checkDefaultFilter();
                 });
-            }
-        });
+            });
+        }
+
+        function createDefaultTableState() {
+            return {
+                order: [[0, "asc"]],
+                page: 0,
+                length: 10,
+                search: { search: "" },
+                BrandId: "",
+                BrandCode: "",
+                Brand: "",
+                CustomerId: "",
+                CustomerCode: "",
+                Customer: "",
+                DateFrom: DateForInput(date_month_ago),
+                DateTo: DateForInput(date_today)
+            };
+        }
+
+        var defaultDTState = {
+            table1: createDefaultTableState(),
+            table2: createDefaultTableState()
+        };
+
+        function hasTableChanged(dt, defaults, prefix) {
+            return (
+                JSON.stringify(dt.order()) !== JSON.stringify(defaults.order) ||
+                dt.page.info().start !== defaults.page ||
+                dt.page.len() !== defaults.length ||
+                (dt.search() || "") !== defaults.search.search ||
+                $(`#filter${prefix}-brand`).val() !== defaults.BrandId ||
+                $(`#filter${prefix}-customer`).val() !== defaults.CustomerId ||
+                $(`#filter${prefix}-from`).val() !== defaults.DateFrom ||
+                $(`#filter${prefix}-to`).val() !== defaults.DateTo
+            );
+        }
+        function checkDefaultFilter() {
+                var changed = hasTableChanged(salesDT1, defaultDTState.table1, 1) ||
+                              hasTableChanged(salesDT2, defaultDTState.table2, 2);
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function setDefaultDTFilter(dt, defaults, prefix) {
+            $(`#filter${prefix}-brand`).val(defaults.BrandId).trigger('change');
+            $(`#filter${prefix}-brand-name`).val(defaults.Brand);
+            $(`#filter${prefix}-customer`).val(defaults.CustomerId).trigger('change');
+            $(`#filter${prefix}-customer-name`).val(defaults.Customer);
+            $(`#filter${prefix}-from`).val(defaults.DateFrom);
+            $(`#filter${prefix}-to`).val(defaults.DateTo);
+
+            dt.state.clear();
+            dt.order(defaults.order);
+            dt.page(defaults.page);
+            dt.search(defaults.search.search);
+        }
+
+        function resetToDefaultDTFilter() {
+            setDefaultDTFilter(salesDT1, defaultDTState.table1, 1);
+            setDefaultDTFilter(salesDT2, defaultDTState.table2, 2);
+        }
 
         // Load List 1 on DataTable
         var salesDT1 = $('.table-sales1').on('preXhr.dt', function (e, settings, data) {
             showBatchLoader("sales1");
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.BrandId = $('#filter1-brand').val();
+                data.BrandCode = $('#filter1-brand option:selected').text();
+                data.Brand = $('#filter1-brand-name').val();
+                data.CustomerId = $('#filter1-customer').val();
+                data.CustomerCode = $('#filter1-customer option:selected').text();
+                data.Customer = $('#filter1-customer-name').val();
+                data.DateFrom = $('#filter1-from').val();
+                data.DateTo = $('#filter1-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.BrandId) {
+                    var brandOption = new Option(data.BrandCode, data.BrandId, true, true);
+                    $(brandOption).data('data', {
+                        id: data.BrandId,
+                        text: data.BrandCode,
+                        name: data.Brand
+                    });
+                    $("#filter1-brand").append(brandOption).trigger('change');
+                    $("#filter1-brand-name").val(data.Brand);
+                }
+                if(data.CustomerId) {
+                    var customerOption = new Option(data.CustomerCode, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.CustomerCode,
+                        name: data.Customer
+                    });
+                    $("#filter1-customer").append(customerOption).trigger('change');
+                    $("#filter1-customer-name").val(data.Customer);
+                }
+                $('#filter1-from').val(data.DateFrom);
+                $('#filter1-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetCustomerSalesDT")",
                 type: "POST",
@@ -365,6 +527,7 @@
         // Load functions upon DataTable load
         salesDT1.on("draw", function () {
             hideBatchLoader("sales1");
+            checkDefaultFilter();
 
             //$(".table-sales1 thead th").removeClass("text-end");
         });
@@ -373,6 +536,41 @@
         var salesDT2 = $('.table-sales2').on('preXhr.dt', function (e, settings, data) {
             showBatchLoader("sales2");
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.BrandId = $('#filter2-brand').val();
+                data.BrandCode = $('#filter2-brand option:selected').text();
+                data.Brand = $('#filter2-brand-name').val();
+                data.CustomerId = $('#filter2-customer').val();
+                data.CustomerCode = $('#filter2-customer option:selected').text();
+                data.Customer = $('#filter2-customer-name').val();
+                data.DateFrom = $('#filter2-from').val();
+                data.DateTo = $('#filter2-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.BrandId) {
+                    var brandOption = new Option(data.BrandCode, data.BrandId, true, true);
+                    $(brandOption).data('data', {
+                        id: data.BrandId,
+                        text: data.BrandCode,
+                        name: data.Brand
+                    });
+                    $("#filter2-brand").append(brandOption).trigger('change');
+                    $("#filter2-brand-name").val(data.Brand);
+                }
+                if(data.CustomerId) {
+                    var customerOption = new Option(data.CustomerCode, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.CustomerCode,
+                        name: data.Customer
+                    });
+                    $("#filter2-customer").append(customerOption).trigger('change');
+                    $("#filter2-customer-name").val(data.Customer);
+                }
+                $('#filter2-from').val(data.DateFrom);
+                $('#filter2-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetCustomerSalesDT")",
                 type: "POST",
@@ -410,6 +608,7 @@
         // Load functions upon DataTable load
         salesDT2.on("draw", function () {
             hideBatchLoader("sales2");
+            checkDefaultFilter();
 
             //$(".table-sales1 thead th").removeClass("text-end");
         });

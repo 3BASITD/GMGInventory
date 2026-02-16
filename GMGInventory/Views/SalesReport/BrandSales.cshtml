@@ -14,7 +14,7 @@
             <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
                 <span class="fas fa-download"></span> Download
             </button>
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -70,10 +70,24 @@
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
+                            <label for="filter-agent-name" class="form-label mb-0">Agent Name</label>
+                            <input type="text" id="filter-agent-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
                             <label for="filter-brand" class="form-label mb-0">Brand</label>
                             <select id="filter-brand" style="width:100%">
                                 <option></option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-brand-name" class="form-label mb-0">Brand Name</label>
+                            <input type="text" id="filter-brand-name" class="form-control form-control-sm" readonly="readonly" />
                         </div>
                     </div>
                 </div>
@@ -93,7 +107,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -101,6 +116,11 @@
 
 @section Scripts {
     <script>
+
+        var date_today = new Date();
+        var date_year_ago = new Date();
+        date_year_ago.setYear(date_year_ago.getFullYear() - 1);
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -125,45 +145,156 @@
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
         // Load Select2 for Agent
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Agent")",
-            success: function (data, status, xhr) {
-                $("#filter-agent").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-agent").select2({
+            minimumInputLength: 1,
+            allowClear: true,
+            placeholder: 'All',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Agent")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        $("#filter-agent").on("select2:select", function () {
+            $("#filter-agent-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-agent").on("select2:unselecting", function (e) {
+            $("#filter-agent-name").val("");
         });
 
         // Load Select2 for Brand
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Brand")",
-            success: function (data, status, xhr) {
-                $("#filter-brand").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-brand").select2({
+            //minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
         });
+
+        $("#filter-brand").on("select2:select", function () {
+            $("#filter-brand-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-brand").on("select2:unselecting", function (e) {
+            $("#filter-brand-name").val("");
+        });
+
+        function ApplyFilter() {
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            resetToDefaultDTFilter();
+
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            AgentId: "",
+            AgentCode: "",
+            Agent: "",
+            BrandId: "",
+            BrandCode: "",
+            Brand: "",
+            DateFrom: DateForInput(date_year_ago),
+            DateTo: DateForInput(date_today),
+        };
+
+        function checkDefaultFilter() {
+            var changed = JSON.stringify(salesDT.order()) != JSON.stringify(defaultDTState.order) ||
+                          salesDT.page.info().start != defaultDTState.page ||
+                          salesDT.page.len() != defaultDTState.length ||
+                          (salesDT.search() || "") != defaultDTState.search.search ||
+                          $("#filter-agent").val() != defaultDTState.AgentId ||
+                          $("#filter-brand").val() != defaultDTState.BrandId ||
+                          $('#filter-from').val() != defaultDTState.DateFrom ||
+                          $('#filter-to').val() != defaultDTState.DateTo;
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-agent').val(defaultDTState.AgentId).trigger('change');
+            $("#filter-agent-name").val(defaultDTState.Agent);
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $("#filter-brand-name").val(defaultDTState.Brand);
+            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-to').val(defaultDTState.DateTo);
+
+            salesDT.state.clear();
+            salesDT.order(defaultDTState.order);
+            salesDT.page(defaultDTState.page);
+            salesDT.search(defaultDTState.search.search);
+        }
 
         // Load List on DataTable
         var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.AgentId = $('#filter-agent').val();
+                data.AgentCode = $('#filter-agent option:selected').text();
+                data.Agent = $('#filter-agent-name').val();
+                data.BrandId = $('#filter-brand').val();
+                data.BrandCode = $('#filter-brand option:selected').text();
+                data.Brand = $('#filter-brand-name').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.AgentId) {
+                    var agentOption = new Option(data.AgentCode, data.AgentId, true, true);
+                    $(agentOption).data('data', {
+                        id: data.AgentId,
+                        text: data.AgentCode,
+                        name: data.Agent
+                    });
+                    $("#filter-agent").append(agentOption).trigger('change');
+                    $("#filter-agent-name").val(data.Agent);
+                }
+                if(data.BrandId) {
+                    var brandOption = new Option(data.BrandCode, data.BrandId, true, true);
+                    $(brandOption).data('data', {
+                        id: data.BrandId,
+                        text: data.BrandCode,
+                        name: data.Brand
+                    });
+                    $("#filter-brand").append(brandOption).trigger('change');
+                    $("#filter-brand-name").val(data.Brand);
+                }
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetBrandSalesDT")",
                 type: "POST",
@@ -195,13 +326,14 @@
                 var json = salesDT.ajax.json();
                 var api = this.api(), data;
 
-                $(api.column(2  ).footer()).html(FormatStringDecimal(json.totalAmount));
+                $(api.column(2).footer()).html(FormatStringDecimal(json.totalAmount));
             }
         });
 
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
+            checkDefaultFilter();
 
             $(".table-sales thead th").removeClass("text-end");
         });

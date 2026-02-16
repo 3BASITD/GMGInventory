@@ -14,7 +14,7 @@
             <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
                 <span class="fas fa-download"></span> Download
             </button>
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -94,6 +94,12 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-area-name" class="form-label mb-0">Area Name</label>
+                            <input type="text" id="filter-area-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
                 </div>
                  <div class="row">
                     <div class="col-12 col-sm-6">
@@ -127,7 +133,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -135,8 +142,11 @@
 
 @section Scripts {
     <script>
-        //$("#filter-from").val('2022-04-01'); // for testing only, remove on prod
-        //$("#filter-to").val('2022-04-31'); // for testing only, remove on prod
+
+        var date_today = new Date();
+        var date_month_ago = new Date();
+        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -186,28 +196,38 @@
         });
 
         // Load Select2 for Area
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Area")",
-            success: function (data, status, xhr) {
-                $("#filter-area").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-area").select2({
+            //minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Area")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        $("#filter-area").on("select2:select", function () {
+            $("#filter-area-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-area").on("select2:unselecting", function (e) {
+            $("#filter-area-name").val("");
         });
 
          // Load Select2 for Customer
         $("#filter-customer").select2({
             minimumInputLength: 1,
             allowClear: true,
-            placeholder: '<empty>',
+            placeholder: 'All',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -228,10 +248,122 @@
             $("#filter-customer-name").val("");
         });
 
+        function ApplyFilter() {
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            resetToDefaultDTFilter();
+
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            AgentId: "",
+            AgentCode: "",
+            Agent: "",
+            AreaId: "",
+            AreaCode: "",
+            Area: "",
+            CustomerId: "",
+            CustomerCode: "",
+            Customer: "",
+            DateFrom: DateForInput(date_month_ago),
+            DateTo: DateForInput(date_today),
+        };
+
+        function checkDefaultFilter() {
+            var changed = JSON.stringify(salesDT.order()) != JSON.stringify(defaultDTState.order) ||
+                          salesDT.page.info().start != defaultDTState.page ||
+                          salesDT.page.len() != defaultDTState.length ||
+                          (salesDT.search() || "") != defaultDTState.search.search ||
+                          $("#filter-agent").val() != defaultDTState.AgentId ||
+                          $("#filter-area").val() != defaultDTState.AreaId ||
+                          $("#filter-customer").val() != defaultDTState.CustomerId ||
+                          $('#filter-from').val() != defaultDTState.DateFrom ||
+                          $('#filter-to').val() != defaultDTState.DateTo;
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-agent').val(defaultDTState.AgentId).trigger('change');
+            $("#filter-agent-name").val(defaultDTState.Agent);
+            $('#filter-area').val(defaultDTState.AreaId).trigger('change');
+            $("#filter-area-name").val(defaultDTState.Area);
+            $('#filter-customer').val(defaultDTState.CustomerId).trigger('change');
+            $("#filter-customer-name").val(defaultDTState.Customer);
+            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-to').val(defaultDTState.DateTo);
+
+            salesDT.state.clear();
+            salesDT.order(defaultDTState.order);
+            salesDT.page(defaultDTState.page);
+            salesDT.search(defaultDTState.search.search);
+        }
+
         // Load List on DataTable
         var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.AgentId = $('#filter-agent').val();
+                data.AgentCode = $('#filter-agent option:selected').text();
+                data.Agent = $('#filter-agent-name').val();
+                data.AreaId = $('#filter-area').val();
+                data.AreaCode = $('#filter-area option:selected').text();
+                data.Area = $('#filter-area-name').val();
+                data.CustomerId = $('#filter-customer').val();
+                data.CustomerCode = $('#filter-customer option:selected').text();
+                data.Customer = $('#filter-customer-name').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.AgentId) {
+                    var agentOption = new Option(data.AgentCode, data.AgentId, true, true);
+                    $(agentOption).data('data', {
+                        id: data.AgentId,
+                        text: data.AgentCode,
+                        name: data.Agent
+                    });
+                    $("#filter-agent").append(agentOption).trigger('change');
+                    $("#filter-agent-name").val(data.Agent);
+                }
+                if(data.AreaId) {
+                    var areaOption = new Option(data.AreaCode, data.AreaId, true, true);
+                    $(areaOption).data('data', {
+                        id: data.AreaId,
+                        text: data.AreaCode
+                    });
+                    $("#filter-area").append(areaOption).trigger('change');
+                    $("#filter-area-name").val(data.Area);
+                }
+                if(data.CustomerId) {
+                    var customerOption = new Option(data.CustomerCode, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.CustomerCode,
+                        name: data.Customer
+                    });
+                    $("#filter-customer").append(customerOption).trigger('change');
+                    $("#filter-customer-name").val(data.Customer);
+                }
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetCommissionDT")",
                 type: "POST",
@@ -293,6 +425,7 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
+            checkDefaultFilter();
 
             $(".table-sales thead th").removeClass("text-end");
 

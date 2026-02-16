@@ -14,7 +14,7 @@
             <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
                 <span class="fas fa-download"></span> Download
             </button>
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -67,6 +67,12 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-region-name" class="form-label mb-0">Region Name</label>
+                            <input type="text" id="filter-region-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-6">
@@ -84,7 +90,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -92,6 +99,11 @@
 
 @section Scripts {
     <script>
+
+        var date_today = new Date();
+        var date_year_ago = new Date();
+        date_year_ago.setYear(date_year_ago.getFullYear() - 1);
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -115,28 +127,113 @@
 
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
-        // Load Select2 for Brand
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Region")",
-            success: function (data, status, xhr) {
-                $("#filter-region").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "All"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        // Load Select2 for Region
+        $("#filter-region").select2({
+            //minimumInputLength: 1,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "All"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Region")"
+            },
+            dropdownParent: $('#filterModal')
         });
+
+        $("#filter-region").on("select2:select", function () {
+            $("#filter-region-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-region").on("select2:unselecting", function (e) {
+            $("#filter-region-name").val("");
+        });
+
+        function ApplyFilter() {
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            resetToDefaultDTFilter();
+
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            RegionId: "",
+            RegionCode: "",
+            Region: "",
+            DateFrom: DateForInput(date_year_ago),
+            DateTo: DateForInput(date_today),
+        };
+
+        function checkDefaultFilter() {
+            var changed = JSON.stringify(salesDT.order()) != JSON.stringify(defaultDTState.order) ||
+                          salesDT.page.info().start != defaultDTState.page ||
+                          salesDT.page.len() != defaultDTState.length ||
+                          (salesDT.search() || "") != defaultDTState.search.search ||
+                          $("#filter-region").val() != defaultDTState.RegionId ||
+                          $('#filter-from').val() != defaultDTState.DateFrom ||
+                          $('#filter-to').val() != defaultDTState.DateTo;
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-region').val(defaultDTState.RegionId).trigger('change');
+            $("#filter-region-name").val(defaultDTState.Region);
+            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-to').val(defaultDTState.DateTo);
+
+            salesDT.state.clear();
+            salesDT.order(defaultDTState.order);
+            salesDT.page(defaultDTState.page);
+            salesDT.search(defaultDTState.search.search);
+        }
 
         // Load List on DataTable
         var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.RegionId = $('#filter-region').val();
+                data.RegionCode = $('#filter-region option:selected').text();
+                data.Region = $('#filter-region-name').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.RegionId) {
+                    var regionOption = new Option(data.RegionCode, data.RegionId, true, true);
+                    $(regionOption).data('data', {
+                        id: data.RegionId,
+                        text: data.RegionCode,
+                        name: data.Region
+                    });
+                    $("#filter-region").append(regionOption).trigger('change');
+                    $("#filter-region-name").val(data.Region);
+                }
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetCustomerSalesRankingDT")",
                 type: "POST",
@@ -173,6 +270,7 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
+            checkDefaultFilter();
 
             $(".table-sales thead th").removeClass("text-end");
         });

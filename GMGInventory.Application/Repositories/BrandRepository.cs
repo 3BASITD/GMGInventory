@@ -28,6 +28,45 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
+        public async Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId)
+        {
+            return await context.Brands
+                                .Where(s => s.IsActive || s.Id == IncludeId)
+                                .Select(s => new JsonNameOptionsModel
+                                {
+                                    Id = s.Id.ToString(),
+                                    Text = s.Name,
+                                    Name = s.Name,
+                                    Selected = IncludeId != null && IncludeId == s.Id
+                                })
+                                .OrderBy(s => s.Text)
+                                .ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        {
+            var areas = await context.Brands
+                                     .Where(s => s.IsActive
+                                              && (string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower()))))
+                                     .Select(s => new JsonNameOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Code,
+                                         Name = s.Name
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var areasFiltered = areas.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = areasFiltered,
+                total_count = areas.Count
+            };
+        }
+
         public async Task<IList<BrandViewVM>> GetListAsync()
         {
             var brands = from brand in context.Brands
@@ -211,21 +250,6 @@ namespace GMGInventory.Application.Repositories
             mapper.Map(brandVM, brand);
             context.Brands.Update(brand);
             await context.SaveChangesAsync(currentUserId);
-        }
-
-        public async Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId)
-        {
-            return await context.Brands
-                                .Where(s => s.IsActive || s.Id == IncludeId)
-                                .Select(s => new JsonNameOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.Name,
-                                    Name = s.Name,
-                                    Selected = IncludeId != null && IncludeId == s.Id
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
         }
 
         public async Task<int?> GetIdAsync(string? Name)

@@ -169,7 +169,11 @@
     color: #1f2d3d !important;
 }
 
-.dark-mode .text-muted, .text-muted {
+.text-muted {
+    color: #938A82 !important;
+}
+
+.dark-mode .text-muted {
     color: #6c757d !important;
 }
 

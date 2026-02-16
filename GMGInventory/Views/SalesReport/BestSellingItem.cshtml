@@ -14,7 +14,7 @@
             <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
                 <span class="fas fa-download"></span> Download
             </button>
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -111,7 +111,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -119,6 +120,11 @@
 
 @section Scripts {
     <script>
+
+        var date_today = new Date();
+        var date_year_ago = new Date();
+        date_year_ago.setYear(date_year_ago.getFullYear() - 1);
+
         SetDateFilter();
         function SetDateFilter() {
             if ($("#filter-to").val() == "") {
@@ -160,10 +166,76 @@
             }
         });
 
+        function ApplyFilter() {
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            resetToDefaultDTFilter();
+
+            salesDT.ajax.reload(() => {
+                $("#filterModal").modal("hide");
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Basis: "Amount",
+            BrandId: "",
+            DateFrom: DateForInput(date_year_ago),
+            DateTo: DateForInput(date_today),
+        };
+
+        function checkDefaultFilter() {
+            var changed = JSON.stringify(salesDT.order()) != JSON.stringify(defaultDTState.order) ||
+                          salesDT.page.info().start != defaultDTState.page ||
+                          salesDT.page.len() != defaultDTState.length ||
+                          (salesDT.search() || "") != defaultDTState.search.search ||
+                          $("#filter-basis").val() != defaultDTState.Basis ||
+                          $("#filter-brand").val() != defaultDTState.BrandId ||
+                          $('#filter-from').val() != defaultDTState.DateFrom ||
+                          $('#filter-to').val() != defaultDTState.DateTo;
+
+            $(".btn-filter").toggleClass('btn-filtered', changed);
+            $(".btnReset").toggle(changed);
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-basis').val(defaultDTState.Basis);
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-to').val(defaultDTState.DateTo);
+
+            salesDT.state.clear();
+            salesDT.order(defaultDTState.order);
+            salesDT.page(defaultDTState.page);
+            salesDT.search(defaultDTState.search.search);
+        }
+
         // Load List on DataTable
         var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
             showLoader();
         }).DataTable({
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.Basis = $('#filter-basis').val();
+                data.BrandId = $('#filter-brand').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                $('#filter-basis').val(data.Basis || "Amount");
+                $('#filter-brand').val(data.BrandId || "").trigger('change');
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetBestSellingItemDT")",
                 type: "POST",
@@ -210,6 +282,7 @@
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
             hideLoader();
+            checkDefaultFilter();
 
             $(".table-sales thead th").removeClass("text-end");
 
