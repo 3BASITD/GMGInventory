@@ -18,7 +18,6 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<CheckRegisterRVM>> GetCheckRegister(ListFilterCustomerModel filter)
         {
             var checks = from check in context.SOACRChecks
-                                              .Include(s => s.CustomerPayment).ThenInclude(s => s.Customer)
                          where filter.DateFrom <= check.CheckDate
                          && check.CheckDate <= filter.DateTo
                          && (filter.Customer == null || check.CustomerPayment.Customer.Id == filter.Customer)

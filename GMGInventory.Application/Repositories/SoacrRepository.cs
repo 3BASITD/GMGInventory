@@ -56,6 +56,7 @@ namespace GMGInventory.Application.Repositories
                 //return soacrl;
                 var soacr = from soa in context.SOACRs
                             let invoiceTotals = soa.SOACRLineItems
+                                                   .Where(s => s.Invoice.Status.Code.ToLower() == "invoiced")
                                                    .SelectMany(scli => scli.Invoice
                                                                            .InvoiceLineItems
                                                                            .Join(context.SalesOrderLineItems,
@@ -494,6 +495,7 @@ namespace GMGInventory.Application.Repositories
                       let inv = (from ili in sl.Invoice.InvoiceLineItems
                                  join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
                                                                       equals new { soli.SalesOrderId, soli.ItemId }
+                                 where ili.Invoice.Status.Code.ToLower() == "invoiced"
                                  let discount1 = (100 - soli.Discount1) / 100
                                  let discount2 = (100 - soli.Discount2) / 100
                                  select (decimal?)ili.Quantity * ili.UnitPrice * discount1 * discount2).Sum() ?? 0

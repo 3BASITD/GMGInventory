@@ -29,28 +29,28 @@ namespace GMGInventory.Application.Repositories
                                            .Where(s => s.PurchaseOrderId == porder.PurchaseOrderId)
                                            .FirstOrDefault()
 
-                           where (filter.Status == null || filter.Status == "" || filter.Status.ToLower() == "all" || porder.PurchaseOrder.Status.Name.ToLower() == filter.Status.ToLower())
+                           where (filter.Status == null || filter.Status == "" || filter.Status.Trim().ToLower() == "all" || porder.PurchaseOrder.Status.Name.Trim().ToLower() == filter.Status.Trim().ToLower())
                            && filter.DateFrom <= (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date
                            && (porder.PurchaseOrder.DateModified ?? porder.PurchaseOrder.DateCreated).Date <= filter.DateTo
-                           && (filter.Item == null || pRequest.Item.Id == filter.Item || (filter.Item == 0 && pRequest.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                           && (filter.Item == null || pRequest.Item.Id == filter.Item || (filter.Item == 0 && pRequest.Item.Code.Trim().ToLower().Contains((filter.ItemKeyword + "").Trim().ToLower())))
                            && (filter.Supplier == null || porder.PurchaseOrder.Supplier.Id == filter.Supplier)
-                           && (!filter.Unserved  || pRequest.Quantity - porder.Quantity > 0)
+                           && (!filter.Unserved || pRequest.Quantity - porder.Quantity > 0)
 
                            select new PurchaseOrderRVM
                            {
                                Item = pRequest.Item.Code,
                                ItemDescription = pRequest.ItemDescription,
                                Quantity = porder.Quantity,
-                               Unit = pRequest.Item.Unit.Code, 
+                               Unit = pRequest.Item.Unit.Code,
                                UnitCost = porder.UnitCost,
                                DocumentNumber = porder.PurchaseOrder.DocumentNumber,
                                Supplier = porder.PurchaseOrder.Supplier.Name,
                                OrderDateD = porder.PurchaseOrder.OrderDate,
-                               UnservedQuantity =  pRequest.Quantity - porder.Quantity,
+                               UnservedQuantity = pRequest.Quantity - porder.Quantity,
                                UnservedAmount = (pRequest.Quantity - porder.Quantity) * porder.UnitCost
                            };
 
-           
+
             return await porderVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseOrderRVM>> GetPurchaseOrderDT(DataTablesRequestForm form, ListFilterPurchaseOrderModel filter)
@@ -63,22 +63,24 @@ namespace GMGInventory.Application.Repositories
             var data = (await GetPurchaseOrder(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
-           
-            // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
-            {
-                data = data.Where(x =>   x.Item != null && x.Item.ToLower().Contains(form.SearchValue.ToLower())
-                                      || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue.ToLower())
-                                      || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue.ToLower())
-                                      || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                      || x.Supplier!.ToLower().Contains(form.SearchValue.ToLower())
-                                      || x.OrderDate.ToString().ToLower().Contains(form.SearchValue.ToLower()));
-            }
 
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
+            {
+                data = data.Where(s => new[]
+                {
+                    s.Item,
+                    s.ItemDescription,
+                    s.Unit,
+                    s.DocumentNumber,
+                    s.Supplier,
+                    s.OrderDate
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
+            }
             // get total count of records after search
             filterRecord = data.Count();
             //sort default data
-            data = data.OrderByDescending(s => s.OrderDateD); 
+            data = data.OrderByDescending(s => s.OrderDateD);
 
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
@@ -171,9 +173,9 @@ namespace GMGInventory.Application.Repositories
                                                 .Where(s => s.OrderItemId == poItems.Id)
                                                 .FirstOrDefault()
 
-                            where (filter.Status == null || filter.Status == "" || filter.Status.ToLower() == "all" || preturn.PurchaseReturn.Status.Name.ToLower() == filter.Status.ToLower())
+                            where (filter.Status == null || filter.Status == "" || filter.Status.Trim().ToLower() == "all" || preturn.PurchaseReturn.Status.Name.Trim().ToLower() == filter.Status.Trim().ToLower())
                              && filter.DateFrom <= preturn.PurchaseReturn.ReturnDate.Date && preturn.PurchaseReturn.ReturnDate.Date <= filter.DateTo
-                            && (filter.Item == null || preceiving.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceiving.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                            && (filter.Item == null || preceiving.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceiving.OrderItem.RequestItem.Item.Code.Trim().ToLower().Contains((filter.ItemKeyword + "").Trim().ToLower())))
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
 
                             select new PurchaseReturnRVM
@@ -205,17 +207,18 @@ namespace GMGInventory.Application.Repositories
             totalRecord = data.Count();
 
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.Item.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue.ToLower()));
-
+                data = data.Where(s => new[]
+                {
+                    s.Item,
+                    s.ItemDescription,
+                    s.Unit,
+                    s.DocumentNumber,
+                    s.Supplier,
+                    s.ReturnDate
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
-
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
@@ -304,26 +307,29 @@ namespace GMGInventory.Application.Repositories
                              let poItems = context.PurchaseOrderNewLineItems
                                                 .Where(s => s.Id == preceive.OrderItemId)
                                                 .FirstOrDefault()
-                             where (filter.Status == null || filter.Status == "" || filter.Status.ToLower() == "all" || preceive.PurchaseReceiving.Status.Name.ToLower() == filter.Status.ToLower())
+                             where (filter.Status == null || filter.Status == "" || filter.Status.Trim().ToLower() == "all" || preceive.PurchaseReceiving.Status.Name.Trim().ToLower() == filter.Status.Trim().ToLower())
                                && filter.DateFrom <= preceive.PurchaseReceiving.ReceiveDate.Date && preceive.PurchaseReceiving.ReceiveDate.Date <= filter.DateTo
-                            && (filter.Item == null || preceive.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceive.OrderItem.RequestItem.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                            && (filter.Item == null || preceive.OrderItem.RequestItem.Item.Id == filter.Item || (filter.Item == 0 && preceive.OrderItem.RequestItem.Item.Code.Trim().ToLower().Contains((filter.ItemKeyword + "").Trim().ToLower())))
                             && (filter.Supplier == null || poItems.PurchaseOrder.Supplier.Id == filter.Supplier)
-                            select new PurchaseReceivingRVM
-                            {
-                                Item = preceive.OrderItem.RequestItem.Item.Code,
-                                                 ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
-                                                 Quantity = preceive.Quantity,
-                                                 Unit = preceive.OrderItem.RequestItem.Item.Unit.Code,
-                                                 UnitCost = preceive.OrderItem.UnitCost,
-                                                 TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
-                                                 DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
-                                                 Supplier = poItems.PurchaseOrder.Supplier.Name,
-                                                 ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
-                                                 UnservedQuantity = poItems.Quantity - preceive.Quantity,
-                                                 UnservedAmount = (poItems.Quantity - preceive.Quantity) * preceive.OrderItem.UnitCost
-                                             };
+                             select new PurchaseReceivingRVM
+                             {
+                                 Item = preceive.OrderItem.RequestItem.Item.Code,
+                                 ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
+                                 Quantity = preceive.Quantity,
+                                 Unit = preceive.OrderItem.RequestItem.Item.Unit.Code,
+                                 UnitCost = preceive.OrderItem.UnitCost,
+                                 TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
+                                 DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
+                                 Supplier = poItems.PurchaseOrder.Supplier.Name,
+                                 //ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
+                                 ReturnDateD = (from rtrn in preceive.PurchaseReturnLineItem
+                                                orderby rtrn.PurchaseReturn.ReturnDate descending
+                                                select rtrn.PurchaseReturn.ReturnDate.Date).First(),
+                                 UnservedQuantity = poItems.Quantity - preceive.Quantity,
+                                 UnservedAmount = (poItems.Quantity - preceive.Quantity) * preceive.OrderItem.UnitCost
+                             };
 
-            return  await preceiveVM.ToListAsync();
+            return await preceiveVM.ToListAsync();
         }
         public async Task<ForDataTables<PurchaseReceivingRVM>> GetPurchaseReceivingDT(DataTablesRequestForm form, ListFilterReturnReceivingModel filter)
         {
@@ -337,16 +343,18 @@ namespace GMGInventory.Application.Repositories
             totalRecord = data.Count();
 
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.Item != null && x.Item.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemDescription != null && x.ItemDescription.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Unit != null && x.Unit.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ReturnDate.ToString().ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Item,
+                    s.ItemDescription,
+                    s.Unit,
+                    s.DocumentNumber,
+                    s.Supplier,
+                    s.ReturnDate
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
-
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
@@ -416,7 +424,7 @@ namespace GMGInventory.Application.Repositories
             var item = await context.Items.Where(s => s.Id == filter.Item).FirstOrDefaultAsync();
             return new PurchaseReceivingPVM
             {
-                Contents =  items,
+                Contents = items,
                 GroupBy = filter.GroupBy,
                 DateFromD = filter.DateFrom.GetValueOrDefault(),
                 DateToD = filter.DateTo.GetValueOrDefault(),

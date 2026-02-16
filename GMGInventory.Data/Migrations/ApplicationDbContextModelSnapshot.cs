@@ -5550,7 +5550,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
@@ -5600,6 +5600,9 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("DeliveryModeId");
 
                     b.HasIndex("DisapproverId");
+
+                    b.HasIndex("DocumentNumber")
+                        .IsUnique();
 
                     b.HasIndex("ResubmitId");
 
@@ -5817,7 +5820,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("HashMicroMoveById")
                         .HasColumnType("nvarchar(450)");
@@ -5871,6 +5874,9 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("ApproverId");
 
                     b.HasIndex("DisapproverId");
+
+                    b.HasIndex("DocumentNumber")
+                        .IsUnique();
 
                     b.HasIndex("HashMicroMoveById");
 
@@ -5957,7 +5963,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PurposeDefinition")
                         .HasColumnType("nvarchar(250)");
@@ -5994,6 +6000,9 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("Approver2Id");
 
                     b.HasIndex("DisapproverId");
+
+                    b.HasIndex("DocumentNumber")
+                        .IsUnique();
 
                     b.HasIndex("PurposeId");
 
@@ -6273,7 +6282,7 @@ namespace GMGInventory.Data.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("PurchaseReceiveId")
                         .HasColumnType("int");
@@ -6308,6 +6317,9 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("ApproverId");
 
                     b.HasIndex("DisapproverId");
+
+                    b.HasIndex("DocumentNumber")
+                        .IsUnique();
 
                     b.HasIndex("PurchaseReceiveId");
 
@@ -6589,6 +6601,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("BarcotechOutboundCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("BarcotechRequestDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
@@ -6864,6 +6879,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("BarcotechRequestDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("BarcotechReturnCode")
                         .HasColumnType("nvarchar(max)");
@@ -8356,13 +8374,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "168f2c81-2f42-4a2f-8ab3-70e7304d6ba4",
+                            ConcurrencyStamp = "5bdf9412-27f6-43ac-8679-ec6a5acff4be",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMTAz2D5KRFccYk5z1PFlLMeis5BZLObwRlh2G9SixJ1cHvbFnVfOdfgMd8mzKwtRA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEO8ZAqe7a1izeCy1xAHOnNQFtEp0Vw3PRUedgjprptsqxW7T8zWVYVCHejLyW2ntig==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "454faad8-68f7-465d-8f68-8e1c172c2294",
+                            SecurityStamp = "09ba319a-d091-4086-9a66-a6c6ce39bec0",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8377,13 +8395,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "705a35ba-a992-4f3d-a6cd-3356d696ed2e",
+                            ConcurrencyStamp = "de8f2f63-067d-40e7-9892-45ff8f383755",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL3pm8GzBxo92jQ1Ncdvk28xhevUWz1QzUPviunTRJbL3g7S2qd2tbfvZ31GdTLoXw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKW4Pl5dHL1sp60SNuOUx+fqF6uVu8Hl+wdoRygAM+zom/qWBxqJH7TsWslGTYjSsA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "06abd314-267b-4ac8-92ab-f0cc8d727071",
+                            SecurityStamp = "4200a8cd-59c8-4371-943a-7a21436e9b4b",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

@@ -62,10 +62,10 @@ namespace GMGInventory.Common.Models
         public int? DriverId { get; set; }
         public int? VehicleId { get; set; }
 
-        [Display(Name = "Vehicle")]
+        [Display(Name = "Fleet / Plate Number")]
         public string? VehicleName { get; set; }
 
-        [Display(Name = "Order Received by Customer(VISMIN)")]
+        [Display(Name = "Date Received")]
         public string? DateReceive => DateReceiveD == null ? null: DateReceiveD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateReceiveD { get; set; }
 

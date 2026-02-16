@@ -79,6 +79,8 @@ namespace GMGInventory.Data
 
         public string? BarcotechOutboundCode { get; set; }
 
+        public DateTime? BarcotechRequestDate { get; set; }
+
         public ICollection<SalesOrder> SalesOrderResubmits { get; set; }
         public ICollection<SalesOrderSourced> SalesOrderSources { get; set; }
         public ICollection<Invoice> Invoices { get; set; }

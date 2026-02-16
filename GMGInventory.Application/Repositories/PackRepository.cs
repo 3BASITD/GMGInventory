@@ -215,10 +215,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<APIPack>> GetListAPI()
         {
             DateTime dtNow = DateTime.Now;
-            DateTime dtTomorrow = dtNow.AddDays(1);
+            DateTime dtYesterday = dtNow.AddDays(-1);
             var packs = from pack in context.Packs
                          where (pack.BarcotechRequestDate == null
-                         || pack.BarcotechRequestDate < dtTomorrow)
+                         || pack.BarcotechRequestDate > dtYesterday)
                          && pack.Status.Code.ToLower() == "posted"
                          select new APIPack
                          {

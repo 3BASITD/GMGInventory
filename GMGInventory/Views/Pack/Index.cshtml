@@ -169,7 +169,8 @@
                             actions += '<a href="@Url.Action("Create", "SalesInvoice")/' + data.id + '" class="btn btn-primary btn-xs invoiceBtn" type="button" data-microtip-title="Start Invoice" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-file-invoice"></span></a>';
                         }
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[1, "desc"]]

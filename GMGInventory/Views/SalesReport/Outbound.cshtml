@@ -24,6 +24,9 @@
             <thead>
                 <tr>
                     <th>
+                        @Html.DisplayNameFor(model => model.InvoiceDate)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.OldSkuCode)
                     </th>
                     <th>
@@ -51,7 +54,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="4" class="text-end">Total</th>
+                    <th colspan="5" class="text-end">Total</th>
                     <th></th>
                     <th colspan="3" class="text-end"></th>
                 </tr>
@@ -237,6 +240,7 @@
                 return: true,
             },
             columns: [
+                { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "oldSkuCode", name: "OldSkuCode" },
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemName", name: "ItemName" },
@@ -250,7 +254,7 @@
                 var json = outboundDT.ajax.json();
                 var api = this.api(), data;
 
-                $(api.column(4).footer()).html(FormatStringInteger(json.totalQuantity));
+                $(api.column(5).footer()).html(FormatStringInteger(json.totalQuantity));
             }
         });
 

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -58,8 +58,8 @@ namespace GMGInventory.Application.Repositories
                              FaxNumber = forward.FaxNumber,
                              DateCreatedD = forward.DateCreated,
                              DateModifiedD = forward.DateModified,
-                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                             UserCreated = userc.FirstName + " " + userc.LastName,
+                             UserModified = userm == null ? null : (userm.FirstName + " " + userm.LastName)
                          };
             return await forwarders.ToListAsync();
         }
@@ -74,12 +74,15 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x =>  x.Name.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Address.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserModified.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateModified.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Name,
+                    s.Address,
+                    s.UserCreated,
+                    s.DateCreated,
+                    s.UserModified,
+                    s.DateModified
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -112,6 +115,16 @@ namespace GMGInventory.Application.Repositories
                         default: break;
                     }
                 }
+            }
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
+                {
+                    "DateCreated" => isAsc ? data.OrderBy(s => s.DateCreatedD) : data.OrderByDescending(s => s.DateCreatedD),
+                    "DateModified" => isAsc ? data.OrderBy(s => s.DateModifiedD) : data.OrderByDescending(s => s.DateModifiedD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();

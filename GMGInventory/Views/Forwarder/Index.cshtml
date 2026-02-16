@@ -273,11 +273,26 @@
             },
             columns: [
                 { data: "name", name: "Name" },
-                { data: "address", name: "Address" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.address || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "Address"
+                },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
-                { data: "userModified", name: "UserModified" },
-                { data: "dateModified", name: "DateModified" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.userModified || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "UserModified"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateModified || '<em class="text-muted">n/a</em>';
+                    },
+                    name: "DateModified"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -297,7 +312,8 @@
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[0, "asc"]]
@@ -348,13 +364,13 @@
             $('.detailsBtn').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-name").html(data.name);
-                $(".modal-detail-address").html(data.address == "" ? "-" : data.address);
-                $(".modal-detail-phone").html(data.phoneNumber == "" ? "-" : data.phoneNumber);
-                $(".modal-detail-fax").html(data.faxNumber == "" ? "-" : data.faxNumber);
+                $(".modal-detail-address").html(data.address || '<em class="text-muted">n/a</em>');
+                $(".modal-detail-phone").html(data.phoneNumber || '<em class="text-muted">n/a</em>');
+                $(".modal-detail-fax").html(data.faxNumber || '<em class="text-muted">n/a</em>');
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
-                $(".modal-detail-usermodified").html(data.userModified);
-                $(".modal-detail-datemodified").html(data.dateModified);
+                $(".modal-detail-usermodified").html(data.userModified || '<em class="text-muted">n/a</em>');
+                $(".modal-detail-datemodified").html(data.dateModified || '<em class="text-muted">n/a</em>');
             });
 
             if (user_access.canEdit) {

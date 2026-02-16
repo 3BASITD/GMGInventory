@@ -62,7 +62,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Unit Price")]
         public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD ?? 0);
         public decimal? UnitPriceD { get; set; }
-        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD ?? 0);
+        public string Quantity => QuantityD == null ? "0" : string.Format(SystemFormat.StringIntegerComma, QuantityD.Value);
         public int? QuantityD { get; set; }
 
         [Display(Name = "Discount 1")]

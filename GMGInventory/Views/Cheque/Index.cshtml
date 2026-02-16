@@ -551,7 +551,8 @@
                         actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" data-microtip-title="Delete Cheque" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[0, "desc"]]

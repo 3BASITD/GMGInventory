@@ -1073,8 +1073,8 @@
                     }
                     return $(`
                         <strong>${repo.text}</strong><br />
-                        <small class='text-muted'>Customer: ${repo.customerName}</small><br />
-                        <small class='text-muted'>Purchase Order: ${repo.purchaseOrder || "<em>N/A</em>"}</small>`);
+                        <small>Customer: ${repo.customerName}</small><br />
+                        <small>Purchase Order: ${repo.purchaseOrder || "<span class='text-muted'>N/A</span>"}</small>`);
                 },
                 ajax: {
                     url: "@Url.Action("GetSalesOrderUnservedOnlyOptions", "SalesOrder")",
@@ -1144,9 +1144,11 @@
                         data: function (data, type, dataToSet) {
                             if (data.toRequest == true) {
                                 if (data.requestQuantityD > data.remainingQuantityD) {
-                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Requesting higher than ' + data.remainingQuantityD + ' unserved order quantity.</label>';
+                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Requesting higher than unserved quantity</label>';
                                 } else if (data.requestQuantityD == 0) {
-                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not request an item with 0 quantity.</label>';
+                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot request an item with 0 quantity</label>';
+                                } else if (isNaN(data.requestQuantityD) || data.requestQuantityD < 0) {
+                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Invalid quantity</label>';
                                 } else {
                                     return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" />';
                                 }
@@ -1196,7 +1198,8 @@
 
                     var data = this.data();
                     data.toRequest = isChecked;
-                    this.data(data);
+                    data.requestQuantityD = 0;
+                    this.data(data).draw(false);
                 });
             }
 
@@ -1369,7 +1372,7 @@
                 });
                 if (rowIndexes.length > 0) {
                     var soMatch = data.salesOrderNumber != "" && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text ? " of " + data.salesOrderNumber : "";
-                    toastr.warning($("#add-name").val() + soMatch + " has already been added", "Duplicate");
+                    toastr.error($("#add-name").val() + soMatch + " has already been added", "Duplicate");
                 } else {
                     itemDT.row.add({
                         customer: $("#add-so-customer").val(),
@@ -1404,6 +1407,10 @@
                     return row.toRequest == true;
                 });
 
+                var duplicateRows = [];
+                var zeroRows = [];
+                var invalidQuantityRows = [];
+                var successRows = [];
                 rowsToAdd.forEach(function (row) {
                     var soRow = {
                         customer: $("#addso-customer").val(),
@@ -1432,14 +1439,25 @@
                     });
 
                     if (exists){
-                        toastr.warning(soRow.itemDescription + " of " + soRow.salesOrderNumber + " has already been added", "Duplicate");
-                    } else if (soRow.quantityD <= 0) {
-                        toastr.warning("Invalid quantity for " + soRow.itemDescription, "Error");
+                        duplicateRows.push(soRow.itemDescription + " of " + soRow.salesOrderNumber);
+                    } else if (soRow.quantityD == 0) {
+                        zeroRows.push(soRow.itemDescription);
+                    } else if (soRow.quantityD < 0) {
+                        invalidQuantityRows.push(soRow.itemDescription);
                     } else {
                         itemDT.row.add(soRow);
-                        toastr.success("Added " + soRow.itemDescription + " on Purchase Request Item(s)", "Success");
+                        successRows.push(soRow.itemDescription);
                     }
                 });
+
+                if (duplicateRows.length)
+                    toastr.warning("<ul><li>" + duplicateRows.join("</li><li>") + "</li></ul>", "DUPLICATE: The following item(s) are already added");
+                if (zeroRows.length)
+                    toastr.error("<ul><li>" + zeroRows.join("</li><li>") + "</li></ul>", "ERROR: The following item(s) have 0 quantity");
+                if (invalidQuantityRows.length)
+                    toastr.error("<ul><li>" + invalidQuantityRows.join("</li><li>") + "</li></ul>", "ERROR: The following item(s) have invalid quantity");
+                if (successRows.length)
+                    toastr.success("<ul><li>" + successRows.join("</li><li>") + "</li></ul>", "SUCCESS: The following item(s) have successfully added on Purchase Request Item(s)");
 
                 itemDT.draw();
             }

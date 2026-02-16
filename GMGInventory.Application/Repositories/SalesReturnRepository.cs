@@ -36,6 +36,7 @@ namespace GMGInventory.Application.Repositories
                            join userm in userManager.Users on ret.UserModified equals userm.Id into um
                            from userm in um.DefaultIfEmpty()
                            where ret.Id == Id
+                           && ret.SalesReturnLineItems.Any(s=>s.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced")
                            select new SalesReturnVM
                            {
                                CustomerId = ret.SalesOrder != null ? ret.SalesOrder.Customer.Id 
@@ -159,42 +160,42 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        //public async Task<IList<APISalesReturn>> GetListAPI()
-        //{
-        //    DateTime dtNow = DateTime.Now;
-        //    DateTime dtTomorrow = dtNow.AddDays(1);
-        //    var sreturns = from sreturn in context.SalesReturns
-        //                   where (sreturn.BarcotechRequestDate == null
-        //                   || sreturn.BarcotechRequestDate < dtTomorrow)
-        //                   select new APISalesReturn
-        //                   {
-        //                       Id = sreturn.Id,
-        //                       SalesOrderId = sreturn.SalesOrderId,
-        //                       SalesReturnNumber = sreturn.SalesReturnNumber,
-        //                       ReturnDate = sreturn.ReturnDate,
-        //                       LineItems = from item in sreturn.SalesReturnLineItems
-        //                                   select new APISalesReturnLineItem
-        //                                   {
-        //                                       Id = item.Id,
-        //                                       ItemId = item.ItemId,
-        //                                       Quantity = item.Quantity,
-        //                                       ReasonOfReturnId = item.ReasonOfReturnId
-        //                                   }
-        //                   };
-        //    var resultSReturns = await sreturns.ToListAsync();
+        public async Task<IList<APISalesReturn>> GetListAPI()
+        {
+            DateTime dtNow = DateTime.Now;
+            DateTime dtYesterday = dtNow.AddDays(-1);
+            var sreturns = from sreturn in context.SalesReturns
+                           where (sreturn.BarcotechRequestDate == null
+                           || sreturn.BarcotechRequestDate > dtYesterday)
+                           select new APISalesReturn
+                           {
+                               Id = sreturn.Id,
+                               SalesOrderId = sreturn.SalesOrderId,
+                               SalesReturnNumber = sreturn.SalesReturnNumber,
+                               ReturnDate = sreturn.ReturnDate,
+                               LineItems = from item in sreturn.SalesReturnLineItems
+                                           select new APISalesReturnLineItem
+                                           {
+                                               Id = item.Id,
+                                               ItemId = item.ItemId,
+                                               Quantity = item.Quantity,
+                                               ReasonOfReturnId = item.ReasonOfReturnId
+                                           }
+                           };
+            var resultSReturns = await sreturns.ToListAsync();
 
-        //    foreach (var sreturn in resultSReturns)
-        //    {
-        //        var retrievedsreturn = context.SalesReturns.Where(s => s.Id == sreturn.Id).First();
-        //        if (retrievedsreturn.BarcotechRequestDate == null)
-        //        {
-        //            retrievedsreturn.BarcotechRequestDate = dtNow;
-        //            context.SaveChanges();
-        //        }
-        //    }
+            foreach (var sreturn in resultSReturns)
+            {
+                var retrievedsreturn = context.SalesReturns.Where(s => s.Id == sreturn.Id).First();
+                if (retrievedsreturn.BarcotechRequestDate == null)
+                {
+                    retrievedsreturn.BarcotechRequestDate = dtNow;
+                    context.SaveChanges();
+                }
+            }
 
-        //    return resultSReturns;
-        //}
+            return resultSReturns;
+        }
 
         public async Task<IList<SalesReturnItemVM>> GetItemsAsync(int salesReturnId)
         {

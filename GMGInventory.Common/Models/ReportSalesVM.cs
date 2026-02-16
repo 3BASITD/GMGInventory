@@ -540,8 +540,12 @@ namespace GMGInventory.Common.Models
 
     public class OutboundRVM
     {
-        [Display(Name = "Old SKU COde")]
+        [Display(Name = "Old SKU / Code")]
         public string? OldSkuCode { get; set; }
+
+        [Display(Name = "Invoice Date")]
+        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
+        public DateTime InvoiceDateD { get; set; }
 
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }

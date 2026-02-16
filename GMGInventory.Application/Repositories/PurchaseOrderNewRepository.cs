@@ -82,30 +82,53 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? RegionId, int? SelectedId)
         {
-            var requests = from prli in context.PurchaseRequestLineItems
-                           let poli = prli.PurchaseOrderLineItems
-                                          .Where(a => a.PurchaseOrder.Status.Name.ToLower() == "approved")
-                                          .Select(a => (int?)a.Quantity)
-                                          .Sum() ?? 0
-                           where poli != prli.Quantity
-                           && (RegionId == null || prli.SalesOrder.SalesOrderLineItems.First().SalesOrder.Customer.Area.Region.Id == RegionId)
-                           select prli.PurchaseRequestId;
+            //var requests = from prli in context.PurchaseRequestLineItems
+            //               let poli = prli.PurchaseOrderLineItems
+            //                              .Where(a => a.PurchaseOrder.Status.Name.ToLower() == "approved")
+            //                              .Select(a => (int?)a.Quantity)
+            //                              .Sum() ?? 0
+            //               where poli != prli.Quantity
+            //               && (RegionId == null || prli.SalesOrder.SalesOrderLineItems.First().SalesOrder.Customer.Area.Region.Id == RegionId)
+            //               select prli.PurchaseRequestId;
 
 
-            return await context.PurchaseRequests
-                                .Include(s => s.Status)
-                                .Where(s => s.TypeId == RequestTypeId
-                                         && (RequestPurposeId == null || s.PurposeId == RequestPurposeId)
-                                         && s.Status.Name.ToLower() == "approved"
-                                         && requests.Contains(s.Id))
-                                .Select(s => new JsonOptionsModel
-                                {
-                                    Id = s.Id.ToString(),
-                                    Text = s.DocumentNumber,
-                                    Selected = SelectedId != null && s.Id == SelectedId
-                                })
-                                .OrderBy(s => s.Text)
-                                .ToListAsync();
+            //return await context.PurchaseRequests
+            //                    .Include(s => s.Status)
+            //                    .Where(s => s.TypeId == RequestTypeId
+            //                             && (RequestPurposeId == null || s.PurposeId == RequestPurposeId)
+            //                             && s.Status.Name.ToLower() == "approved"
+            //                             && requests.Contains(s.Id))
+            //                    .Select(s => new JsonOptionsModel
+            //                    {
+            //                        Id = s.Id.ToString(),
+            //                        Text = s.DocumentNumber,
+            //                        Selected = SelectedId != null && s.Id == SelectedId
+            //                    })
+            //                    .OrderBy(s => s.Text)
+            //                    .ToListAsync();
+            var query = from pr in context.PurchaseRequests.AsNoTracking()
+                        where pr.TypeId == RequestTypeId
+                           && (RequestPurposeId == null || pr.PurposeId == RequestPurposeId)
+                           && pr.Status.Name == "Approved"
+                           && pr.PurchaseRequestLineItems.Any(prli =>
+                                prli.Quantity !=
+                                prli.PurchaseOrderLineItems
+                                    .Where(poli => poli.PurchaseOrder.Status.Name == "Approved")
+                                    .Sum(poli => ((int?)poli.Quantity) ?? 0)
+                                              && (RegionId == null ||
+                                                  prli.SalesOrder
+                                                      .SalesOrderLineItems
+                                                      .Any(sol => sol.SalesOrder.Customer.Area.Region.Id == RegionId))
+                           )
+                        select new JsonOptionsModel
+                        {
+                            Id = pr.Id.ToString(),
+                            Text = pr.DocumentNumber,
+                            Selected = SelectedId != null && pr.Id == SelectedId
+                        };
+
+            return await query.OrderBy(x => x.Text).ToListAsync();
+
         }
 
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
@@ -251,10 +274,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<APIPurchaseOrder>> GetListAPI()
         {
             DateTime dtNow = DateTime.Now;
-            DateTime dtTomorrow = dtNow.AddDays(1);
+            DateTime dtYesterday = dtNow.AddDays(-1);
             var orders = from order in context.PurchaseOrderNews
                          where (order.BarcotechRequestDate == null
-                         || order.BarcotechRequestDate < dtTomorrow)
+                         || order.BarcotechRequestDate > dtYesterday)
                          && order.Status.Code.ToLower() == "approved"
                          select new APIPurchaseOrder
                          {

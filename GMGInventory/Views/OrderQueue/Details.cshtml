@@ -17,7 +17,7 @@
             {
                 @if (userAccess.CanEdit == false)
                 {
-                    <button type="button" class="btn btn-danger btn-sm float-right ui-state-disabled" data-microtip-title="Ignore All&#10;Edit access is required." data-microtip-position="bottom-left" role="tooltip">
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore All&#10;Edit access is required." data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-broom"></span> 
                     </button>
                 }
@@ -25,7 +25,7 @@
                      || Model.IsValidCustomer == false
                      || Model.Items.Any(s=>s.IsValidItem == false))
                 {
-                    <button type="button" class="btn btn-danger btn-sm float-right ui-state-disabled" data-microtip-title="Ignore All&#10;Record contains invalid data." data-microtip-position="bottom-left" role="tooltip">
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore All&#10;Record contains invalid data." data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-broom"></span>
                     </button>
                 }
@@ -38,7 +38,7 @@
             }
             else
             {
-                <button type="button" class="btn btn-danger btn-sm float-right ui-state-disabled" data-microtip-title="Ignore All&#10;Action not allowed, only permitted for pending status" data-microtip-position="bottom-left" role="tooltip">
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore All&#10;Action not allowed, only permitted for pending status" data-microtip-position="bottom-left" role="tooltip">
                     <span class="fas fa-broom"></span>
                 </button>
             }
@@ -46,7 +46,7 @@
             {
                 @if (userAccess.CanAdd == false)
                 {
-                    <button type="button" class="btn btn-success btn-sm float-right ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Add access is required." data-microtip-position="bottom-left" role="tooltip">
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Add access is required." data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-plus"></span>
                     </button>
                 }
@@ -54,13 +54,13 @@
                      || Model.IsValidCustomer == false
                      || Model.Items.Any(s=>s.IsValidItem == false))
                 {
-                    <button type="button" class="btn btn-success btn-sm float-right ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Record contains invalid data." data-microtip-position="bottom-left" role="tooltip">
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Record contains invalid data." data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-plus"></span>
                     </button>
                 }
                 else if(Model.Items.Where(s => s.SalesOrderNumber != null).Count() == Model.Items.Count())
                 {
-                    <button type="button" class="btn btn-success btn-sm float-right ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Nothing to add anymore. All items have been added to the sales order" data-microtip-position="bottom-left" role="tooltip">
+                    <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Nothing to add anymore. All items have been added to the sales order" data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-plus"></span>
                     </button>
                 }
@@ -73,11 +73,11 @@
             }
             else
             {
-                <button type="button" class="btn btn-success btn-sm float-right ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Action not allowed, order is already marked ignore." data-microtip-position="bottom-left" role="tooltip">
+                <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Action not allowed, order is already marked ignore." data-microtip-position="bottom-left" role="tooltip">
                     <span class="fas fa-plus"></span>
                 </button>
             }
-            <a class="btn btn-light btn-sm float-right" asp-action="Index">
+            <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
             </a>
         </div>

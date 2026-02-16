@@ -698,7 +698,7 @@
                 { data: "name", name: "Name" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.oldCode ?? '<em class="text-muted">N/A</em>';
+                        return data.oldCode ?? '<span class="text-muted">N/A</span>';
                     },
                     name: "OldCode"
                 },
@@ -768,7 +768,8 @@
                             }
                         }
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[1, "asc"]]

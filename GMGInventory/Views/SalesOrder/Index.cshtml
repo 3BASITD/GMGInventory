@@ -525,7 +525,8 @@
                             actions += '<a href="@Url.Action("Create", "Pack")/' + data.id + '?page=SalesOrder" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-box-open"></span></a>';
                         }
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             //order: [[5, "desc"], [6, "desc"]]

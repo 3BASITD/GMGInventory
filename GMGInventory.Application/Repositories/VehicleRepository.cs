@@ -205,8 +205,7 @@ namespace GMGInventory.Application.Repositories
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
 
-                //if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.VehicleId == Id))
-                if (false)
+                if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.VehicleId == Id))
                 {
                     // is in use by other record
                     oldVehicle.IsActive = false;

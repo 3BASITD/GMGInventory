@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Dynamic.Core;
 using System.Reflection.Emit;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -939,17 +940,17 @@ namespace GMGInventory.Application.Repositories
 
             ResponseModel response = new();
 
-            if (await CheckItemPromoDuration(itemPromoVM.ItemId, itemPromoVM.EffectiveDateD, itemPromoVM.ExpirationDateD))
-            {
-                response.Status = "Error";
-                response.Message = "Item Promo duration overlaps with an existing active promo.";
-
-                return response;
-            }
-
             var itemPromo = await context.ItemPromo.Where(s => s.Id == itemPromoVM.Id).FirstOrDefaultAsync();
             if (itemPromo == null)
             {
+                if (await CheckItemPromoDuration(null, itemPromoVM.ItemId, itemPromoVM.EffectiveDateD, itemPromoVM.ExpirationDateD))
+                {
+                    response.Status = "Error";
+                    response.Message = "Item Promo duration overlaps with an existing active promo.";
+
+                    return response;
+                }
+
                 itemPromo = new Data.ItemPromo
                 {
                     ItemId = itemPromoVM.ItemId,
@@ -970,6 +971,14 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
+                if (await CheckItemPromoDuration(itemPromo.Id, itemPromoVM.ItemId, itemPromoVM.EffectiveDateD, itemPromoVM.ExpirationDateD))
+                {
+                    response.Status = "Error";
+                    response.Message = "Item Promo duration overlaps with an existing active promo.";
+
+                    return response;
+                }
+
                 itemPromo.Name = itemPromoVM.Name;
                 itemPromo.PromoPrice = itemPromoVM.PromoPriceD;
                 itemPromo.EffectiveDate = itemPromoVM.EffectiveDateD;
@@ -991,7 +1000,7 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
 
-            if (await CheckItemPromoDuration(itemId, Start, End))
+            if (await CheckItemPromoDuration(Id, itemId, Start, End))
             {
                 response.Status = "Error";
                 response.Message = "Item Promo duration overlaps with an existing active promo.";
@@ -1024,7 +1033,8 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
             var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
-            var isItemPromoSales = await context.SalesOrderLineItems.Where(i => i.ItemPromoId == Id).AnyAsync();
+            var isItemPromoUsed = await context.SalesOrderLineItems.Where(i => i.ItemPromoId == Id).AnyAsync()
+                               || await context.SalesReturnLineItems.Where(i => i.ItemPromoId == Id).AnyAsync();
 
             if (itemPromo == null)
             {
@@ -1034,7 +1044,7 @@ namespace GMGInventory.Application.Repositories
 
             else
             {
-                if (isItemPromoSales || (itemPromo.EffectiveDate < DateTime.Now))
+                if (isItemPromoUsed || (itemPromo.EffectiveDate < DateTime.Now))
                 {
                     itemPromo.IsActive = false;
                     context.ItemPromo.Update(itemPromo);
@@ -1042,10 +1052,7 @@ namespace GMGInventory.Application.Repositories
 
                     response.Status = "Success";
                     response.Message = "Item Promo successfully deactivated";
-
-
                 }
-
                 else
                 {
                     context.ItemPromo.Remove(itemPromo);
@@ -1532,11 +1539,13 @@ namespace GMGInventory.Application.Repositories
             return await promoVM.ToListAsync();
         }
 
-        public async Task<bool> CheckItemPromoDuration(int itemId, DateTime start, DateTime end)
+        public async Task<bool> CheckItemPromoDuration(int? selfId, int itemId, DateTime start, DateTime end)
         {
-            return await context.ItemPromo.AnyAsync(s => s.ItemId == itemId
-                                                     && ((s.EffectiveDate <= start && s.ExpirationDate >= start) || (s.EffectiveDate <= end && s.ExpirationDate >= end) || (s.EffectiveDate >= start && s.ExpirationDate >= end) || (s.EffectiveDate >= start && s.ExpirationDate <= end))
-                                                     && s.IsActive);
+            return await context.ItemPromo.AnyAsync(s => s.Id != selfId &&
+                                                         s.ItemId == itemId &&
+                                                         s.IsActive && 
+                                                         s.EffectiveDate <= end &&
+                                                         s.ExpirationDate >= start);
 
         }
 

@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -441,6 +442,46 @@ namespace GMGInventory.Application.Repositories
                                                        .FirstOrDefault()
                            });
             return await orderVM.ToListAsync();
+        }
+
+        public async Task<IList<APISalesOrder>> GetListAPI()
+        {
+            DateTime dtNow = DateTime.Now;
+            DateTime dtYesterday = dtNow.AddDays(-1);
+
+            var orders = from order in context.SalesOrders
+                         where (order.BarcotechRequestDate == null
+                         || order.BarcotechRequestDate > dtYesterday)
+                         && order.ApprovedBy != null
+                         && order.ApprovedDate != null
+                         select new APISalesOrder
+                         {
+                             Id = order.Id,
+                             AgentId = order.AgentId,
+                             CustomerId = order.CustomerId,
+                             SalesOrderNumber = order.SalesOrderNumber,
+                             OrderDate = order.SalesOrderDate,
+                             LineItems = from item in order.SalesOrderLineItems
+                                         select new APISalesOrderLineItem
+                                         {
+                                             Id = item.Id,
+                                             LineNumber = item.LineNumber,
+                                             ItemCode = item.Item.Code,
+                                             Quantity = item.Quantity
+                                         }
+                         };
+            var resultOrders = await orders.ToListAsync();
+            foreach (var order in resultOrders)
+            {
+                var retrievedOrder = context.SalesOrders.Where(s => s.Id == order.Id).First();
+                if (retrievedOrder.BarcotechRequestDate == null)
+                {
+                    retrievedOrder.BarcotechRequestDate = dtNow;
+                    context.SaveChanges();
+                }
+            }
+
+            return resultOrders;
         }
 
         public async Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter)

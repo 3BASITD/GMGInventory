@@ -177,8 +177,7 @@ namespace GMGInventory.Application.Repositories
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
 
-                //if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.ServiceLevelAgreementId == Id))
-                if (false)
+                if (await context.SalesOrders.AnyAsync(s => s.ServiceLevelAgreementId == Id))
                 {
                     // is in use by other record
                     oldServiceLevelAgreement.IsActive = false;

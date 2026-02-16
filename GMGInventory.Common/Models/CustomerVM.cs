@@ -286,7 +286,7 @@ namespace GMGInventory.Common.Models
         public decimal? Discount { get; set; }
 
         [Display(Name = "Date Created")]
-        public string? DateCreated => DateCreatedD.Value.ToString(SystemFormat.StringDate);
+        public string? DateCreated => DateCreatedD == null ? "" : DateCreatedD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DateCreatedD { get; set; }
 
         [Display(Name = "Created By")]
@@ -301,6 +301,9 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Is Active")]
         public bool? IsActive { get; set; }
+
+        [Display(Name = "Status")]
+        public string Status { get; set; }
 
     }
 

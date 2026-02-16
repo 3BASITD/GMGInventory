@@ -233,46 +233,47 @@ namespace GMGInventory.Common.Models
         public DateTime? DateModifiedD { get; set; }
     }
 
-    public class SalesOrderPrintVM : SalesOrderDetailsVM
+    public class SalesOrderPrintVM //: SalesOrderDetailsVM
     {
-        public SalesOrderDetailsVM Details
-        {
-            set
-            {
-                AgentCode = value.AgentCode;
-                AgentId = value.AgentId;
-                AgentName = value.AgentName;
-                ApprovedBy = value.ApprovedBy;
-                ApprovedDateD = value.ApprovedDateD;
-                CreditTerms = value.CreditTerms;
-                CustomerAddress = value.CustomerAddress;
-                CustomerCode = value.CustomerCode;
-                CustomerId = value.CustomerId;
-                CustomerName = value.CustomerName;
-                CustomerContactNumber = value.CustomerContactNumber;
-                CustomerContactPerson = value.CustomerContactPerson;
-                ForwarderId = value.ForwarderId;
-                Forwarder = value.Forwarder;
-                DisapprovedBy = value.DisapprovedBy;
-                DisapprovedDateD = value.DisapprovedDateD;
-                DisapprovedReason = value.DisapprovedReason;
-                Id = value.Id;
-                OrderDateD = value.OrderDateD;
-                OutstandingBalanceD = value.OutstandingBalanceD;
-                PONumber = value.PONumber;
-                Remarks = value.Remarks;
-                ShippingAddress = value.ShippingAddress;
-                SONumber = value.SONumber;
-                Status = value.Status;
-                AccountStatus = value.AccountStatus;
-                Region = value.Region;
-                RequiredDeliveryDateD = value.RequiredDeliveryDateD;
-                UserCreated = value.UserCreated;
-                DateCreatedD = value.DateCreatedD;
-                UserModified = value.UserModified;
-                DateModifiedD = value.DateModifiedD;
-            }
-        }
+        //public SalesOrderDetailsVM Details
+        //{
+        //    set
+        //    {
+        //        AgentCode = value.AgentCode;
+        //        AgentId = value.AgentId;
+        //        AgentName = value.AgentName;
+        //        ApprovedBy = value.ApprovedBy;
+        //        ApprovedDateD = value.ApprovedDateD;
+        //        CreditTerms = value.CreditTerms;
+        //        CustomerAddress = value.CustomerAddress;
+        //        CustomerCode = value.CustomerCode;
+        //        CustomerId = value.CustomerId;
+        //        CustomerName = value.CustomerName;
+        //        CustomerContactNumber = value.CustomerContactNumber;
+        //        CustomerContactPerson = value.CustomerContactPerson;
+        //        ForwarderId = value.ForwarderId;
+        //        Forwarder = value.Forwarder;
+        //        DisapprovedBy = value.DisapprovedBy;
+        //        DisapprovedDateD = value.DisapprovedDateD;
+        //        DisapprovedReason = value.DisapprovedReason;
+        //        Id = value.Id;
+        //        OrderDateD = value.OrderDateD;
+        //        OutstandingBalanceD = value.OutstandingBalanceD;
+        //        PONumber = value.PONumber;
+        //        Remarks = value.Remarks;
+        //        ShippingAddress = value.ShippingAddress;
+        //        SONumber = value.SONumber;
+        //        Status = value.Status;
+        //        AccountStatus = value.AccountStatus;
+        //        Region = value.Region;
+        //        RequiredDeliveryDateD = value.RequiredDeliveryDateD;
+        //        UserCreated = value.UserCreated;
+        //        DateCreatedD = value.DateCreatedD;
+        //        UserModified = value.UserModified;
+        //        DateModifiedD = value.DateModifiedD;
+        //    }
+        //}
+        public SalesOrderDetailsVM Details { get; set; }
         public IList<SalesOrderItemVM> Items { get; set; }
         public string TotalQuantity => string.Format(SystemFormat.StringIntegerComma, TotalQuantityD);
         public int TotalQuantityD => Items.Sum(s => s.QuantityD);

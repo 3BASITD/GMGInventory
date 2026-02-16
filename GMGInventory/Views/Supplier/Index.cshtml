@@ -506,13 +506,13 @@
                 { data: "dateCreated", name: "DateCreated" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.userModified ? data.userModified : "<em class='text-muted'>N/A</em>";
+                        return data.userModified ? data.userModified : "<span class='text-muted'>N/A</span>";
                     },
                     name: "UserModified"
                 },
                 { 
                     data: function (data, type, dataToSet) {
-                        return data.dateModified ? data.dateModified : "<em class='text-muted'>N/A</em>";
+                        return data.dateModified ? data.dateModified : "<span class='text-muted'>N/A</span>";
                     },
                     name: "DateModified"
                 },
@@ -536,7 +536,8 @@
                         }
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[0, "asc"]]

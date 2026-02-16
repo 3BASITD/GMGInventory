@@ -26,6 +26,8 @@ namespace GMGInventory.Data
 
         public string? BarcotechReturnCode { get; set; }
 
+        public DateTime? BarcotechRequestDate { get; set; }
+
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }
 }

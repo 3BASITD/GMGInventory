@@ -196,11 +196,11 @@
                         if (data.isValidAgent == false) {
                             return `
                                 <span class="text-warning" data-microtip-title="Invalid Agent: Unknown PK_${data.agentId}" data-microtip-position="right" role="tooltip">
-                                    ${data.agent || "<em class='fw-normal text-muted'>N/A</em>"}
+                                    ${data.agent || "<span class='fw-normal text-muted'>N/A</span>"}
                                     &emsp;<span class="fas fa-exclamation-triangle"></span>
                                 </span>`;
                         } else {
-                            return data.agent || "<em class='fw-normal text-muted'>N/A</em>";
+                            return data.agent || "<span class='fw-normal text-muted'>N/A</span>";
                         }
                     },
                     name: "Agent"
@@ -210,11 +210,11 @@
                         if (data.isValidCustomer == false) {
                             return `
                                 <span class="text-warning" data-microtip-title="Invalid Customer: Unknown PK_${data.customerId}" data-microtip-position="right" role="tooltip">
-                                    ${data.customer || "<em class='fw-normal text-muted'>N/A</em>"}
+                                    ${data.customer || "<span class='fw-normal text-muted'>N/A</span>"}
                                     &emsp;<span class="fas fa-exclamation-triangle"></span>
                                 </span>`;
                         } else {
-                            return data.customer || "<em class='fw-normal text-muted'>N/A</em>";
+                            return data.customer || "<span class='fw-normal text-muted'>N/A</span>";
                         }
                     },
                     name: "Customer"
@@ -247,7 +247,8 @@
                         }*/
                         actions += '</div>';
                         return actions;
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[0, "desc"]]

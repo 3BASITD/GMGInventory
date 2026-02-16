@@ -68,7 +68,7 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public int LineNumber { get; set; }
-        public int ItemId { get; set; }
+        public string ItemCode { get; set; }
         public int Quantity { get; set; }
     }
 

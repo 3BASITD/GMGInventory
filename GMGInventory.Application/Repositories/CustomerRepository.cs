@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -870,8 +871,8 @@ namespace GMGInventory.Application.Repositories
                                  DateModifiedD = brandDiscount.DateModified,
                                  CreatedBy = userc == null ? "" : SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  ModifiedBy = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                                 IsActive = brandDiscount.IsActive
-
+                                 IsActive = brandDiscount.IsActive,
+                                 Status = brandDiscount == null ? "None" : brandDiscount.IsActive ? "Active" : "Inactive"
                              };
             return await customerVM.ToListAsync();
         }
@@ -1289,6 +1290,7 @@ namespace GMGInventory.Application.Repositories
                                            join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
                                            join soa in context.SOACRs on sli.SOACRId equals soa.Id
                                            where cp.SOACRId == soa.Id
+                                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
                                            select new
                                            {
                                                Amount = ili.Quantity * ili.UnitPrice

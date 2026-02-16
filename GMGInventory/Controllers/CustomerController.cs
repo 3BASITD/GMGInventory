@@ -370,7 +370,9 @@ namespace GMGInventory.Controllers
 
                 new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("BrandName")),
                 new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("Discount")),
-                new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("CreatedBy"))
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("CreatedBy")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("DateCreated")),
+                new DataColumn(chelper.DisplayName<CustomerBrandDiscountDowloadVM>("Status"))
             ]);
             var cbds = await customerRepository.GetCustomerBrandDiscountDownload(id);
             foreach (var cbd in cbds)
@@ -378,7 +380,9 @@ namespace GMGInventory.Controllers
                 dt.Rows.Add(
                             cbd.BrandName,
                             cbd.DiscountRate,
-                            cbd.CreatedBy
+                            cbd.CreatedBy,
+                            cbd.DateCreated,
+                            cbd.Status
 
                             );
             }

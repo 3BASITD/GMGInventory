@@ -193,10 +193,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<APIPurchaseReturn>> GetListAPI()
         {
             DateTime dtNow = DateTime.Now;
-            DateTime dtTomorrow = dtNow.AddDays(1);
+            DateTime dtYesterday = dtNow.AddDays(-1);
             var preturns = from preturn in context.PurchaseReturnNews
                            where (preturn.BarcotechRequestDate == null
-                           || preturn.BarcotechRequestDate < dtTomorrow)
+                           || preturn.BarcotechRequestDate > dtYesterday)
                            && preturn.Status.Code.ToLower() == "approved"
                            select new APIPurchaseReturn
                            {

@@ -51,18 +51,18 @@
                             <span class="title">Document Classification:</span>
                             <span class="desc">
                                 @title.ToUpper()
-                                @if (Model.Status.ToLower() != "approved")
+                                @if (Model.Details.Status.ToLower() != "approved")
                                 {
-                                    @("(" + Model.Status + ")")
+                                    @("(" + Model.Details.Status + ")")
                                 }
                             </span>
                         </div>
                         <div class="sub-col center w-40pc">
                             <span class="title">SO Date:</span>
-                            <span class="desc">@Model.OrderDate</span>
+                            <span class="desc">@Model.Details.OrderDate</span>
                             <hr />
                             <span class="title">SO No.:</span>
-                            <span class="desc">@Model.SONumber</span>
+                            <span class="desc">@Model.Details.SONumber</span>
                         </div>
                     </div>
                 </td>
@@ -73,39 +73,39 @@
                         <div class="sub-col w-50pc">
                             <div class="label">
                                 <span>Customer Name:</span>
-                                <strong class="detail">@Model.CustomerName</strong>
+                                <strong class="detail">@Model.Details.CustomerName</strong>
                             </div>
                             <div class="label">
                                 <span>Contact Person:</span>
-                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactPerson) ? "N/A" : Model.CustomerContactPerson)</strong>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.Details.CustomerContactPerson) ? "N/A" : Model.Details.CustomerContactPerson)</strong>
                             </div>
                             <div class="label">
                                 <span>Contact No.:</span>
-                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerContactNumber) ? "N/A" : Model.CustomerContactNumber)</strong>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.Details.CustomerContactNumber) ? "N/A" : Model.Details.CustomerContactNumber)</strong>
                             </div>
                             <div class="label">
                                 <span>Address:</span>
-                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</strong>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.Details.CustomerAddress) ? "N/A" : Model.Details.CustomerAddress)</strong>
                             </div>
                             <div class="label">
                                 <span>Payment Terms:</span>
-                                <strong class="detail">@Model.CreditTerms</strong>
+                                <strong class="detail">@Model.Details.CreditTerms</strong>
                             </div>
                             <div class="label">
                                 <span>Purchase Order #:</span>
-                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.PONumber) ? "N/A" : Model.PONumber)</strong>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.Details.PONumber) ? "N/A" : Model.Details.PONumber)</strong>
                             </div>
                             <div class="label">
                                 <span>With L/P:</span>
-                                <strong class="detail">@Model.WithLP</strong>
+                                <strong class="detail">@Model.Details.WithLP</strong>
                             </div>
                             <div class="label">
                                 <span>With REYCO Non-Defective:</span>
-                                <strong class="detail">@Model.WithREYCONonDefective</strong>
+                                <strong class="detail">@Model.Details.WithREYCONonDefective</strong>
                             </div>
                             <div class="label">
                                 <span>With REYCO JIT L/P Delivery:</span>
-                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.WithREYCOJITLPDelivery) ? "N/A" : Model.WithREYCOJITLPDelivery)</strong>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.Details.WithREYCOJITLPDelivery) ? "N/A" : Model.Details.WithREYCOJITLPDelivery)</strong>
                             </div>
                         </div>
                         <div class="sub-col w-50pc">
@@ -119,31 +119,31 @@
                             </div>
                             <div class="label">
                                 <span>Agent Code:</span>
-                                <strong class="detail">@Model.AgentCode</strong>
+                                <strong class="detail">@Model.Details.AgentCode</strong>
                             </div>
                             <div class="label">
                                 <span>Agent Name:</span>
-                                <strong class="detail">@Model.AgentName</strong>
+                                <strong class="detail">@Model.Details.AgentName</strong>
                             </div>
                             <div class="label">
                                 <span>Forwarder:</span>
-                                <strong class="detail">@Model.Forwarder</strong>
+                                <strong class="detail">@Model.Details.Forwarder</strong>
                             </div>
                             <div class="label">
                                 <span>Region:</span>
-                                <strong class="detail">@Model.Region</strong>
+                                <strong class="detail">@Model.Details.Region</strong>
                             </div>
                             <div class="label">
                                 <span>RDD:</span>
-                                <strong class="detail">@Model.RequiredDeliveryDate</strong>
+                                <strong class="detail">@Model.Details.RequiredDeliveryDate</strong>
                             </div>
                             <div class="label">
                                 <span>SLA:</span>
-                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.ServiceLevelAgreement) ? "N/A" : Model.ServiceLevelAgreement)</strong>
+                                <strong class="detail">@(string.IsNullOrWhiteSpace(Model.Details.ServiceLevelAgreement) ? "N/A" : Model.Details.ServiceLevelAgreement)</strong>
                             </div>
                             <div class="label">
                                 <span>Overall Discount:</span>
-                                <strong class="detail">@Model.OverallDiscount</strong>
+                                <strong class="detail">@Model.Details.OverallDiscount</strong>
                             </div>
                         </div>
                     </div>
@@ -153,7 +153,7 @@
                 <td colspan="9">
                     <dl>
                         <dt>Remarks:</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(Model?.Remarks) ? "N/A" : Model.Remarks)</dd>
+                        <dd>@(string.IsNullOrWhiteSpace(Model.Details.Remarks) ? "N/A" : Model.Details.Remarks)</dd>
                     </dl>
                 </td>
             </tr>
@@ -161,7 +161,7 @@
                 <td colspan="9">
                     <dl>
                         <dt>Special Instruction:</dt>
-                        <dd>@(string.IsNullOrWhiteSpace(Model?.SpecialInstruction) ? "N/A" : Model.SpecialInstruction)</dd>
+                        <dd>@(string.IsNullOrWhiteSpace(Model.Details.SpecialInstruction) ? "N/A" : Model.Details.SpecialInstruction)</dd>
                     </dl>
                 </td>
             </tr>
@@ -237,11 +237,11 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th class="center-text"><nobr>@Model?.TotalQuantity</nobr></th>
+                <th class="center-text"><nobr>@Model.TotalQuantity</nobr></th>
                 <th></th>
                 <th></th>
                 <th></th>
-                <th class="right-text"><nobr>@Model?.TotalGrossPrice</nobr></th>
+                <th class="right-text"><nobr>@Model.TotalGrossPrice</nobr></th>
             </tr>
             <tr>
                 <td colspan="9">
@@ -250,24 +250,24 @@
                     <div class="two-column">
                         <div class="column center-text">
                             <dl>
-                                <dd>@Model.UserCreated</dd>
+                                <dd>@Model.Details.UserCreated</dd>
                                 <dt>Prepared By</dt>
                             </dl>
                         </div>
-                        @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
+                        @if (!string.IsNullOrWhiteSpace(Model.Details.ApprovedBy))
                         {
                             <div class="column center-text">
                                 <dl>
-                                    <dd>@Model.ApprovedBy</dd>
+                                    <dd>@Model.Details.ApprovedBy</dd>
                                     <dt>Approved By</dt>
                                 </dl>
                             </div>
                         }
-                        @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                        @if (!string.IsNullOrWhiteSpace(Model.Details.DisapprovedBy))
                         {
                             <div class="column center-text">
                                 <dl>
-                                    <dd>@Model.DisapprovedBy</dd>
+                                    <dd>@Model.Details.DisapprovedBy</dd>
                                     <dt>Disapproved By</dt>
                                 </dl>
                             </div>

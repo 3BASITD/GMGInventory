@@ -26,12 +26,12 @@ namespace GMGInventory.Application.Repositories
                                                                 equals new { soli.SalesOrderId, soli.ItemId }
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
                            && (filter.Item == null || ili.Item.Id == filter.Item)
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new AgentSalesPerItemRVM
                            {
                                Agent = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
@@ -57,7 +57,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -72,7 +72,7 @@ namespace GMGInventory.Application.Repositories
                     s.PriceD.ToString(),
                     s.Quantity,
                     s.QuantityD.ToString()
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -136,11 +136,11 @@ namespace GMGInventory.Application.Repositories
                                                                 equals new {soli.SalesOrderId, soli.ItemId}
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new BrandSalesRVM
                            {
                                AgentCode = ili.Invoice.SalesOrder.Agent.Code,
@@ -176,7 +176,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -185,7 +185,7 @@ namespace GMGInventory.Application.Repositories
                     s.Amount,
                     s.AmountD.ToString(),
                     s.Brand
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -245,11 +245,11 @@ namespace GMGInventory.Application.Repositories
                                            .Sum(s => (int?)s.Quantity) ?? 0
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new BestSellingItemRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -301,7 +301,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -318,7 +318,7 @@ namespace GMGInventory.Application.Repositories
                     s.Unit,
                     s.UnitPrice,
                     s.UnitPriceD.ToString()
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -388,12 +388,12 @@ namespace GMGInventory.Application.Repositories
                                                                 equals new {soli.SalesOrderId, soli.ItemId}
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new CommissionRVM
                            {
                                AgentId = ili.Invoice.SalesOrder.Agent.Id,
@@ -456,7 +456,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -471,7 +471,7 @@ namespace GMGInventory.Application.Repositories
                     s.CommissionAmount2D.ToString(),
                     s.InvoiceAmount,
                     s.InvoiceAmountD.ToString()
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -538,10 +538,10 @@ namespace GMGInventory.Application.Repositories
                                                                 equals new {soli.SalesOrderId,soli.ItemId}
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Region == null || (ili.Invoice.SalesOrder.Customer.Area != null && ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new CustomerSalesRankingRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -576,7 +576,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -586,7 +586,7 @@ namespace GMGInventory.Application.Repositories
                     s.CustomerName,
                     s.Rank,
                     s.RankD.ToString()
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -641,11 +641,11 @@ namespace GMGInventory.Application.Repositories
                                                                 equals new {soli.SalesOrderId, soli.ItemId}
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
                            && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new CustomerSalesRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -681,7 +681,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -690,7 +690,7 @@ namespace GMGInventory.Application.Repositories
                     s.Brand,
                     s.CustomerCode,
                     s.CustomerName
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -743,11 +743,11 @@ namespace GMGInventory.Application.Repositories
         {
 
             var invoices = from invoice in context.Invoices
-                           where filter.DateFrom <= invoice.InvoiceDate.Date
-                           && invoice.InvoiceDate.Date <= filter.DateTo
-                           && (filter.InvoiceNumberFrom == null || invoice.ControlNumber.CompareTo(filter.InvoiceNumberFrom) >= 0)
-                           && (filter.InvoiceNumberTo == null || invoice.ControlNumber.CompareTo(filter.InvoiceNumberTo) <= 0)
-                           && (filter.StatusCode == null || invoice.Status.Code.ToLower() == filter.StatusCode.ToLower())
+                           where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
+                           && (filter.InvoiceNumberFrom == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberFrom.Trim().ToLower()) >= 0)
+                           && (filter.InvoiceNumberTo == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberTo.Trim().ToLower()) <= 0)
+                           && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
                            select new DailySalesRVM
                            {
                                Agent = invoice.SalesOrder.Agent.FirstName
@@ -781,7 +781,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -794,7 +794,7 @@ namespace GMGInventory.Application.Repositories
                     s.InvoiceDate,
                     s.InvoiceNumber,
                     s.Term
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -841,7 +841,7 @@ namespace GMGInventory.Application.Repositories
                     s.InvoiceDate,
                     s.InvoiceNumber,
                     s.Term
-                }.Any(a => a != null && a.ToLower().Contains(filter.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains(filter.SearchValue.Trim().ToLower())));
             }
             if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortColumnDirection))
             {
@@ -879,11 +879,11 @@ namespace GMGInventory.Application.Repositories
         {
 
             var invoices = from invoice in context.Invoices
-                           where filter.DateFrom <= invoice.InvoiceDate.Date
-                           && invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
-                           && (filter.StatusCode == null || invoice.Status.Code.ToLower() == filter.StatusCode.ToLower())
+                           && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
                            && (filter.Region2 == null ||
                               (filter.Region2 == "ML" && (invoice.SalesOrder.Customer.Area.Region.Code == "MM"
                                                        || invoice.SalesOrder.Customer.Area.Region.Code == "LUZ")) ||
@@ -921,7 +921,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -934,7 +934,7 @@ namespace GMGInventory.Application.Repositories
                     s.InvoiceDate,
                     s.InvoiceNumber,
                     s.Status
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -995,11 +995,11 @@ namespace GMGInventory.Application.Repositories
                                                                 equals new {soli.SalesOrderId, soli.ItemId}
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new SalesAgentAreaRVM
                            {
                                AgentId = ili.Invoice.SalesOrder.Agent.Id,
@@ -1046,7 +1046,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -1057,7 +1057,7 @@ namespace GMGInventory.Application.Repositories
                     s.SalesD.ToString(),
                     s.PercentSales,
                     s.PercentSalesD.ToString()
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -1116,9 +1116,9 @@ namespace GMGInventory.Application.Repositories
                                                                 equals new {soli.SalesOrderId, soli.ItemId}
                            let discount1 = (100 - soli.Discount1) / 100
                            let discount2 = (100 - soli.Discount2) / 100
-                           where filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                           && ili.Invoice.InvoiceDate.Date <= filter.DateTo
-                           //&& ili.Invoice.Status.Code.ToLower() == "invoiced"
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
+                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
                            select new SalesReportBasisRVM
                            {
                                Code = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Code
@@ -1155,7 +1155,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -1163,7 +1163,7 @@ namespace GMGInventory.Application.Repositories
                     s.Name,
                     s.Amount,
                     s.AmountD.ToString(),
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -1212,16 +1212,17 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<SalesReturnRVM>> GetSalesReturn(ListFilterSalesModel filter)
         {
             var sreturns = from sreturn in context.SalesReturnLineItems
-                           where filter.DateFrom <= sreturn.SalesReturn.ReturnDate.Date
-                           && sreturn.SalesReturn.ReturnDate.Date <= filter.DateTo
-                           && (filter.Customer == null || sreturn.SalesReturn.SalesOrder.Customer.Id == filter.Customer)
-                           && (filter.Item == null || sreturn.Item.Id == filter.Item || (filter.Item == 0 && sreturn.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower())))
+                           where (filter.DateFrom == null || filter.DateFrom <= sreturn.SalesReturn.ReturnDate.Date)
+                           && (filter.DateTo == null || sreturn.SalesReturn.ReturnDate.Date <= filter.DateTo)
+                           && (filter.Customer == null || sreturn.SalesReturn.SalesOrder!.Customer.Id == filter.Customer)
+                           && (filter.Item == null || sreturn.Item.Id == filter.Item || (filter.Item == 0 && sreturn.Item.Code.Trim().ToLower().Contains((filter.ItemKeyword + "").Trim().ToLower())))
+                           //&& sreturn.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
                            select new SalesReturnRVM
                            {
                                Agent = sreturn.InvoiceLineItem == null ? "" : sreturn.InvoiceLineItem.Invoice.SalesOrder.Agent.Code,
                                Brand = sreturn.Item.Brand.Name,
                                ControlNumber = sreturn.InvoiceLineItem == null ? "TBR" : sreturn.InvoiceLineItem.Invoice.ControlNumber,
-                               Customer = sreturn.SalesReturn.SalesOrder.Customer.Name,
+                               Customer = sreturn.SalesReturn.SalesOrder!.Customer.Name,
                                ItemCode = sreturn.Item.Code,
                                ItemName = sreturn.Item.Name,
                                ItemType = sreturn.Item.ItemType.Code,
@@ -1247,7 +1248,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -1267,7 +1268,7 @@ namespace GMGInventory.Application.Repositories
                     s.SINumber,
                     s.SRNumber,
                     s.Unit,
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -1343,9 +1344,9 @@ namespace GMGInventory.Application.Repositories
                           let inventory = context.ItemInventories
                                                  .Where(s => s.ItemId == soline.ItemId)
                                                  .Sum(s => (int?)s.Quantity) ?? 0
-                          where filter.DateFrom <= so.DateCreated.Date
-                          && so.DateCreated.Date <= filter.DateTo
-                          && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
+                          where (filter.DateFrom == null || filter.DateFrom <= so.SalesOrderDate.Date)
+                          && (filter.DateTo == null || so.SalesOrderDate.Date <= filter.DateTo)
+                         && (filter.Brand == null || soline.Item.Brand.Id == filter.Brand)
 
                           select new UnservedItemRVM
                           {
@@ -1394,7 +1395,7 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
                 data = data.Where(s => new[]
                 {
@@ -1407,7 +1408,7 @@ namespace GMGInventory.Application.Repositories
                     s.Pending,
                     s.PendingD.ToString(),
                     s.ReplenishDate
-                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
@@ -1461,34 +1462,25 @@ namespace GMGInventory.Application.Repositories
         #region Outbound
 
         public async Task<IList<OutboundRVM>> GetOutbound(ListFilterSalesModel filter)
-        {  
-            var dateto = new DateTime(filter.DateTo.Value.Year, filter.DateTo.Value.Month, filter.DateTo.Value.Day,23,59,59);
-
-            var outbound = from pack in context.Packs
-                           join packitem in context.PackLineItems on pack.Id equals packitem.PackId
-                           join sales in context.SalesOrders on pack.SalesOrderId equals sales.Id
-                           join cust in context.Customers on sales.CustomerId equals cust.Id
-                           
-                           where 
-                           (pack.DateCreated >= filter.DateFrom
-                           && pack.DateCreated <= dateto)
-                           && (filter.Area == null ||cust.AreaId== filter.Area)
-                           && (filter.Region == null || cust.Area.RegionId == filter.Region)
-                           && (filter.Brand == null || packitem.Item.Brand.Id == filter.Brand)
-                           && pack.Status.Code.ToLower() == "posted"
+        { 
+            var outbound = from ili in context.InvoiceLineItems
+                           where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
+                           && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
+                           && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
+                           && (filter.Region == null || ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region)
                            select new OutboundRVM
                            {
-                               OldSkuCode = packitem.Item.OldCode,
-                               ItemCode = packitem.Item.Code,
-                               ItemName = packitem.Item.Name,
-                               Brand = packitem.Item.Brand.Name,
-                               QuantityD = packitem.Quantity,
-                               SalesOrderNumber = pack.SalesOrder.SalesOrderNumber,
-                               Region = cust.Area.Region.Name,
-                               Area = cust.Area.Name
-
+                               InvoiceDateD = ili.Invoice.InvoiceDate,
+                               OldSkuCode = ili.Item.OldCode,
+                               ItemCode = ili.Item.Code,
+                               ItemName = ili.Item.Name,
+                               Brand = ili.Item.Brand.Name,
+                               QuantityD = ili.Quantity,
+                               SalesOrderNumber = ili.Invoice.SalesOrder.SalesOrderNumber,
+                               Region = ili.Invoice.SalesOrder.Customer.Area.Region.Name,
+                               Area = ili.Invoice.SalesOrder.Customer.Area.Name
                            };
-           
             return await outbound.ToListAsync();
         }
 
@@ -1501,52 +1493,33 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
-                                    || x.OldSkuCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.SalesOrderNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Region.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Area.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Brand.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.InvoiceDate,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.QuantityD.ToString(),
+                    s.OldSkuCode,
+                    s.SalesOrderNumber,
+                    s.Region,
+                    s.Area,
+                    s.Brand
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
-                        case "OldSkuCode": data = data.OrderBy(s => s.OldSkuCode); break;
-                        case "SalesOrderNumber": data = data.OrderBy(s => s.SalesOrderNumber); break;
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "Region": data = data.OrderBy(s => s.Region); break;
-                        case "Area": data = data.OrderBy(s => s.Area); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
-                        case "OldSkuCode": data = data.OrderByDescending(s => s.OldSkuCode); break;
-                        case "SalesOrderNumber": data = data.OrderByDescending(s => s.SalesOrderNumber); break;
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "Region": data = data.OrderByDescending(s => s.Region); break;
-                        case "Area": data = data.OrderByDescending(s => s.Area); break;
-                        default: break;
-                    }
-                }
+                    "InvoiceDate" => isAsc ? data.OrderBy(s => s.InvoiceDateD) : data.OrderByDescending(s => s.InvoiceDateD),
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             totalQuantity = data.Sum(s => s.QuantityD);
             //pagination

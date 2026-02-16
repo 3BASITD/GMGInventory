@@ -337,7 +337,8 @@ namespace GMGInventory.Common.Models
         public int ItemCount { get; set; }
 
         [Display(Name = "Quantity")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
 
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }

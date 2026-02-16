@@ -5,6 +5,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -63,49 +64,31 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.MaintainingQuantityD.ToString().Contains(form.SearchValue)
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityOnHandD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Brand,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.MaintainingQuantityD + "",
+                    s.PartNumber,
+                    s.QuantityOnHandD + "",
+                    s.Unit
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "MaintainingQuantity": data = data.OrderBy(s => s.MaintainingQuantityD); break;
-                        case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "QuantityOnHand": data = data.OrderBy(s => s.QuantityOnHandD); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "MaintainingQuantity": data = data.OrderByDescending(s => s.MaintainingQuantityD); break;
-                        case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "QuantityOnHand": data = data.OrderByDescending(s => s.QuantityOnHandD); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        default: break;
-                    }
-                }
+                    "MaintainingQuantity" => isAsc ? data.OrderBy(s => s.MaintainingQuantityD) : data.OrderByDescending(s => s.MaintainingQuantityD),
+                    "QuantityOnHand" => isAsc ? data.OrderBy(s => s.QuantityOnHandD) : data.OrderByDescending(s => s.QuantityOnHandD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //get total maintaining quantity of data in table
             totalMaintainingQuantity = data.Sum(s => s.MaintainingQuantityD);
@@ -179,55 +162,33 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Date.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemType.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Brand,
+                    s.Date,
+                    s.DocumentNumber,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.ItemType,
+                    s.PartNumber,
+                    s.QuantityD.ToString(),
+                    s.Unit
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "Date": data = data.OrderBy(s => s.DateD); break;
-                        case "DocumentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderBy(s => s.ItemType); break;
-                        case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "Date": data = data.OrderByDescending(s => s.DateD); break;
-                        case "DocumentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderByDescending(s => s.ItemType); break;
-                        case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        default: break;
-                    }
-                }
+                    "Date" => isAsc ? data.OrderBy(s => s.DateD) : data.OrderByDescending(s => s.DateD),
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //get total quantity of data in table
             totalQuantity = data.Sum(s => s.QuantityD);
@@ -295,52 +256,34 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.AmountD.ToString().Contains(form.SearchValue)
-                                    || x.Date.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DocumentNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Item.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UnitCostD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.AmountD.ToString(),
+                    s.Date,
+                    s.DocumentNumber,
+                    s.Item,
+                    s.QuantityD.ToString(),
+                    s.Supplier,
+                    s.Unit,
+                    s.UnitCostD.ToString()
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderBy(s => s.AmountD); break;
-                        case "Date": data = data.OrderBy(s => s.DateD); break;
-                        case "DocumentNumber": data = data.OrderBy(s => s.DocumentNumber); break;
-                        case "Item": data = data.OrderBy(s => s.Item); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
-                        case "Supplier": data = data.OrderBy(s => s.Supplier); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "UnitCost": data = data.OrderBy(s => s.UnitCostD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Amount": data = data.OrderByDescending(s => s.AmountD); break;
-                        case "Date": data = data.OrderByDescending(s => s.DateD); break;
-                        case "DocumentNumber": data = data.OrderByDescending(s => s.DocumentNumber); break;
-                        case "Item": data = data.OrderByDescending(s => s.Item); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
-                        case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "UnitCost": data = data.OrderByDescending(s => s.UnitCostD); break;
-                        default: break;
-                    }
-                }
+                    "Amount" => isAsc ? data.OrderBy(s => s.AmountD) : data.OrderByDescending(s => s.AmountD),
+                    "Date" => isAsc ? data.OrderBy(s => s.DateD) : data.OrderByDescending(s => s.DateD),
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "UnitCost" => isAsc ? data.OrderBy(s => s.UnitCostD) : data.OrderByDescending(s => s.UnitCostD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //get total amount of data in table
             totalAmount = data.Sum(s => s.AmountD);
@@ -408,49 +351,30 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemType.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PartNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Brand,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.ItemType,
+                    s.PartNumber,
+                    s.QuantityD.ToString(),
+                    s.Unit
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderBy(s => s.ItemType); break;
-                        case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderByDescending(s => s.ItemType); break;
-                        case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        default: break;
-                    }
-                }
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //get total quantity of data in table
             totalQuantity = data.Sum(s => s.QuantityD);
@@ -608,37 +532,31 @@ namespace GMGInventory.Application.Repositories
                                     || x.OutD.ToString().Contains(form.SearchValue)
                                     || x.TransactionType.ToLower().Contains(form.SearchValue.ToLower()));
             }
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
+            {
+                data = data.Where(s => new[]
+                {
+                    s.Date,
+                    s.DetailsRemarks,
+                    s.InD.ToString(),
+                    s.Item,
+                    s.OutD.ToString(),
+                    s.TransactionType
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
+            }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Date": data = data.OrderBy(s => s.DateD); break;
-                        case "DetailsRemarks": data = data.OrderBy(s => s.DetailsRemarks); break;
-                        case "In": data = data.OrderBy(s => s.InD); break;
-                        case "Item": data = data.OrderBy(s => s.Item); break;
-                        case "Out": data = data.OrderBy(s => s.OutD); break;
-                        case "TransactionType": data = data.OrderBy(s => s.TransactionType); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Date": data = data.OrderByDescending(s => s.DateD); break;
-                        case "DetailsRemarks": data = data.OrderByDescending(s => s.DetailsRemarks); break;
-                        case "In": data = data.OrderByDescending(s => s.In); break;
-                        case "Item": data = data.OrderByDescending(s => s.Item); break;
-                        case "Out": data = data.OrderByDescending(s => s.Out); break;
-                        case "TransactionType": data = data.OrderByDescending(s => s.TransactionType); break;
-                        default: break;
-                    }
-                }
+                    "Date" => isAsc ? data.OrderBy(s => s.DateD) : data.OrderByDescending(s => s.DateD),
+                    "In" => isAsc ? data.OrderBy(s => s.InD) : data.OrderByDescending(s => s.InD),
+                    "Out" => isAsc ? data.OrderBy(s => s.OutD) : data.OrderByDescending(s => s.OutD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //get total quantity of in in table
             totalQuantityIn = data.Sum(s => s.InD);
@@ -717,55 +635,34 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemType.ToLower().Contains(form.SearchValue.ToLower())
-                                    || (x.PartNumber + "").ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityOnHand.ToString().Contains(form.SearchValue)
-                                    || x.TotalCostD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UnitCostD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Brand,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.ItemType,
+                    s.PartNumber,
+                    s.QuantityOnHandD.ToString(),
+                    s.TotalCostD.ToString(),
+                    s.Unit,
+                    s.UnitCostD.ToString()
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderBy(s => s.ItemType); break;
-                        case "PartNumber": data = data.OrderBy(s => s.PartNumber); break;
-                        case "QuantityOnHand": data = data.OrderBy(s => s.QuantityOnHand); break;
-                        case "TotalCost": data = data.OrderBy(s => s.TotalCostD); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "UnitCost": data = data.OrderBy(s => s.UnitCostD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "ItemType": data = data.OrderByDescending(s => s.ItemType); break;
-                        case "PartNumber": data = data.OrderByDescending(s => s.PartNumber); break;
-                        case "QuantityOnHand": data = data.OrderByDescending(s => s.QuantityOnHand); break;
-                        case "TotalCost": data = data.OrderByDescending(s => s.TotalCostD); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "UnitCost": data = data.OrderByDescending(s => s.UnitCostD); break;
-                        default: break;
-                    }
-                }
+                    "QuantityOnHand" => isAsc ? data.OrderBy(s => s.QuantityOnHandD) : data.OrderByDescending(s => s.QuantityOnHandD),
+                    "TotalCost" => isAsc ? data.OrderBy(s => s.TotalCostD) : data.OrderByDescending(s => s.TotalCostD),
+                    "UnitCost" => isAsc ? data.OrderBy(s => s.UnitCostD) : data.OrderByDescending(s => s.UnitCostD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
@@ -834,58 +731,35 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.Brand.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Currency.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PurchaseDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TotalPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Unit.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UnitPriceD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Brand,
+                    s.Currency,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.PurchaseDate,
+                    s.QuantityD.ToString(),
+                    s.Supplier,
+                    s.TotalPriceD.ToString(),
+                    s.Unit,
+                    s.UnitPriceD.ToString()
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderBy(s => s.Brand); break;
-                        case "Currency": data = data.OrderBy(s => s.Currency); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "PurchaseDate": data = data.OrderBy(s => s.PurchaseDateD); break;
-                        case "Quantity": data = data.OrderBy(s => s.Quantity); break;
-                        case "Supplier": data = data.OrderBy(s => s.Supplier); break;
-                        case "TotalPrice": data = data.OrderBy(s => s.TotalPriceD); break;
-                        case "Unit": data = data.OrderBy(s => s.Unit); break;
-                        case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Brand": data = data.OrderByDescending(s => s.Brand); break;
-                        case "Currency": data = data.OrderByDescending(s => s.Currency); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "PurchaseDate": data = data.OrderByDescending(s => s.PurchaseDateD); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.Quantity); break;
-                        case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
-                        case "TotalPrice": data = data.OrderByDescending(s => s.TotalPriceD); break;
-                        case "Unit": data = data.OrderByDescending(s => s.Unit); break;
-                        case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
-                        default: break;
-                    }
-                }
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "TotalPrice" => isAsc ? data.OrderBy(s => s.TotalPriceD) : data.OrderByDescending(s => s.TotalPriceD),
+                    "UnitPrice" => isAsc ? data.OrderBy(s => s.UnitPriceD) : data.OrderByDescending(s => s.UnitPriceD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //get total quantity of data in table
             totalQuantity = data.Sum(s => s.QuantityD);
@@ -945,7 +819,7 @@ namespace GMGInventory.Application.Repositories
                                   Id = transfer.Id,
                                   ItemCode = trdetail.Item.Code,
                                   ItemName = trdetail.Item.Name,
-                                  Quantity = trdetail.Quantity,
+                                  QuantityD = trdetail.Quantity,
                                   Source = transfer.Source.Name,
                                   CreatedBy = user.FirstName + " " + user.LastName,
                                   TransferDateD = transfer.TransferDate,
@@ -963,53 +837,34 @@ namespace GMGInventory.Application.Repositories
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            if (!string.IsNullOrWhiteSpace((form.SearchValue + "").Trim()))
             {
-                data = data.Where(x => x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Quantity.ToString().Contains(form.SearchValue)
-                                    || x.Source.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Destination.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TransferDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.CreatedBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Id.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.BrandName.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.ItemCode,
+                    s.ItemName,
+                    s.QuantityD.ToString(),
+                    s.Source,
+                    s.Destination,
+                    s.TransferDate,
+                    s.CreatedBy,
+                    s.BrandName
+                }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Id": data = data.OrderBy(s => s.Id); break;
-                        case "Source": data = data.OrderBy(s => s.Source); break;
-                        case "Destination": data = data.OrderBy(s => s.Destination); break;
-                        case "ItemCount": data = data.OrderBy(s => s.ItemCount); break;
-                        case "TransferDate": data = data.OrderBy(s => s.TransferDateD); break;
-                        case "CreatedBy": data = data.OrderBy(s => s.CreatedBy); break;
-                        case "BrandName": data = data.OrderBy(s => s.BrandName); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Id": data = data.OrderByDescending(s => s.Id); break;
-                        case "Source": data = data.OrderByDescending(s => s.Source); break;
-                        case "Destination": data = data.OrderByDescending(s => s.Destination); break;
-                        case "ItemCount": data = data.OrderByDescending(s => s.ItemCount); break;
-                        case "TransferDate": data = data.OrderByDescending(s => s.TransferDateD); break;
-                        case "CreatedBy": data = data.OrderByDescending(s => s.CreatedBy); break;
-                        case "BrandName": data = data.OrderByDescending(s => s.BrandName); break;
-                        default: break;
-                    }
-                }
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    //case "ItemCount": data = data.OrderBy(s => s.ItemCount); break; itemcount????
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
-            totalQuantity = data.Sum(s => s.Quantity);
+            totalQuantity = data.Sum(s => s.QuantityD);
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<WarehouseTransferRVM>
@@ -1034,7 +889,7 @@ namespace GMGInventory.Application.Repositories
                 Brand = filter.Brand == null || brand == null ? "All" : brand.Name,
                 WarehouseOrigin = filter.Source == null || origin == null ? "All" : origin.Name,
                 WarehouseDestination = filter.Source == null || destination == null ? "All" : destination.Name,
-                TotalQuantityD = items.Sum(s => s.Quantity)
+                TotalQuantityD = items.Sum(s => s.QuantityD)
             };
         }
 

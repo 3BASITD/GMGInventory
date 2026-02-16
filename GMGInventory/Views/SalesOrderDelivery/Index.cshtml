@@ -67,13 +67,23 @@
                         @Html.DisplayNameFor(model => model.Representative)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.VehicleName)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Remarks)
                     </th>
-                    
-                    
-                    
-                    
-                    
+                    <th>
+                        @Html.DisplayNameFor(model => model.CreatedBy)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CreatedDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ModifiedBy)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ModifiedDate)
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -305,7 +315,7 @@
 </div>
 
 <!-- Action Modal -->
-<div class="modal fade" id="actionModal" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+@* <div class="modal fade" id="actionModal" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -339,7 +349,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 
 @section Scripts {
     <script>
@@ -538,7 +548,7 @@
                 { data: "salesOrderDate", name: "SalesOrderDate" },
                 {
                   data: function (data, type, dataToSet) {
-                        return data.poNumber == null ? "N/A" : data.poNumber;
+                        return data.poNumber == null ? "<span class='text-muted'>N/A</span>" : data.poNumber;
                   },
                   name: "PONumber"
                 },
@@ -550,44 +560,74 @@
                 { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.dateReceive == null ? "N/A" : data.dateReceive;
+                        return data.dateReceive == null ? "<span class='text-muted'>N/A</span>" : data.dateReceive;
                     },
                     name: "DateReceive"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.datePickup == null ? "N/A" : data.datePickup;
+                        return data.datePickup == null ? "<span class='text-muted'>N/A</span>" : data.datePickup;
                     },
                     name: "DatePickup"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.dateDeliver == null ? "N/A" : data.dateDeliver;
+                        return data.dateDeliver == null ? "<span class='text-muted'>N/A</span>" : data.dateDeliver;
                     }, name: "DateDeliver"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.forwarder == null ? "N/A" : data.forwarder;
+                        return data.forwarder == null ? "<span class='text-muted'>N/A</span>" : data.forwarder;
                     },
                     name: "Forwarder"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.waybillNumber == null ? "N/A" : data.waybillNumber;
+                        return data.waybillNumber == null ? "<span class='text-muted'>N/A</span>" : data.waybillNumber;
                     },
                     name: "WaybillNumber"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.representative == null ? "N/A" : data.representative;
+                        return data.representative == null ? "<span class='text-muted'>N/A</span>" : data.representative;
                     },
                     name: "Representative"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.remarks == null ? "N/A" : data.remarks;
+                        return data.vehicleName == null ? "<span class='text-muted'>N/A</span>" : data.vehicleName;
+                    },
+                    name: "VehicleName"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.remarks == null ? "<span class='text-muted'>N/A</span>" : data.remarks;
                     },
                     name: "Remarks"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.createdBy == null ? "<span class='text-muted'>N/A</span>" : data.createdBy;
+                    },
+                    name: "CreatedBy"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.createdDate == null ? "<span class='text-muted'>N/A</span>" : data.createdDate;
+                    },
+                    name: "CreatedDate"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.modifiedBy == null ? "<span class='text-muted'>N/A</span>" : data.modifiedBy;
+                    },
+                    name: "ModifiedBy"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.modifiedDate == null ? "<span class='text-muted'>N/A</span>" : data.modifiedDate;
+                    },
+                    name: "ModifiedDate"
                 },
                 {
                     orderable: false,
@@ -597,9 +637,10 @@
                         if (user_access.canEdit && data.salesOrderStatus.toLowerCase() != "disapproved") {
                             actions += '<button class="btn btn-warning btn-xs editBtn" onclick="ShowEdit(' + data.id + ')" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                         }
-                        actions += '<button class="btn btn-info btn-xs actionBtn" onclick="ShowAction(\'' + data.createdBy + '\', \'' + data.createdDate + '\', \'' + data.modifiedBy + '\', \'' + data.modifiedDate + '\')" data-microtip-title="History" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-history"></span></button>';
+                        //actions += '<button class="btn btn-info btn-xs actionBtn" onclick="ShowAction(\'' + data.createdBy + '\', \'' + data.createdDate + '\', \'' + data.modifiedBy + '\', \'' + data.modifiedDate + '\')" data-microtip-title="History" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-history"></span></button>';
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[0, "desc"]]
@@ -628,23 +669,21 @@
                 $("#delivery-forwarder").val(data.forwarderId);
                 $("#delivery-forwarder").trigger("change");
 
-                if(data.vehicleId){
-                var vehicleOption = new Option(data.vehicleName, data.vehicleId, true, true);
-                $("#delivery-vehicle").append(vehicleOption).trigger('change');
-                }
-                else{
+                if (data.vehicleId) {
+                    var vehicleOption = new Option(data.vehicleName, data.vehicleId, true, true);
+                    $("#delivery-vehicle").append(vehicleOption).trigger('change');
+                } else {
                     $("#delivery-vehicle").val(null).trigger('change');
                 }
                // $("#delivery-vehicle").val(data.vehicleId);
                // $("#delivery-vehicle").trigger("change");
 
-               if(data.driverId){
-                var driverOption = new Option(data.representative, data.driverId, true, true);
-                $("#delivery-driver").append(driverOption).trigger('change');
-               }
-               else{
+               if (data.driverId) {
+                   var driverOption = new Option(data.representative, data.driverId, true, true);
+                   $("#delivery-driver").append(driverOption).trigger('change');
+               } else {
                     $("#delivery-driver").val(null).trigger('change');
-                }
+               }
                 //$("#delivery-driver").val(data.driverId);
                 //$("#delivery-driver").trigger("change");
             }
@@ -754,13 +793,13 @@
             });
         }
 
-        function ShowAction(usercreated, datecreated, usermodified, datemodified) {
-            $(".action-created-by").text(usercreated);
-            $(".action-created-date").text(datecreated);
-            $(".action-modified-by").text(usermodified);
-            $(".action-modified-date").text(datemodified);
-            $("#actionModal").modal("show");
-        }
+        // function ShowAction(usercreated, datecreated, usermodified, datemodified) {
+        //     $(".action-created-by").text(usercreated);
+        //     $(".action-created-date").text(datecreated);
+        //     $(".action-modified-by").text(usermodified);
+        //     $(".action-modified-date").text(datemodified);
+        //     $("#actionModal").modal("show");
+        // }
 
         if (user_access.canUploadDownload) {
             $(".downloadBtn").click(function (e) {

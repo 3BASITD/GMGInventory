@@ -24,6 +24,11 @@ namespace GMGInventory.Application.Helpers
                 var splitLastDocument = lastDocument.Split("-D");
                 lastDocument = splitLastDocument[0];
             }
+            if (lastDocument != null && lastDocument.Contains("."))
+            {
+                var splitLastDocument = lastDocument.Split(".");
+                lastDocument = splitLastDocument[0];
+            }
 
             int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
             return $"{docNumberPrefix}{(docNumberLast + 1).ToString("D4")}";
@@ -45,6 +50,11 @@ namespace GMGInventory.Application.Helpers
             if (lastDocument != null && lastDocument.Contains("-D"))
             {
                 var splitLastDocument = lastDocument.Split("-D");
+                lastDocument = splitLastDocument[0];
+            }
+            if (lastDocument != null && lastDocument.Contains("."))
+            {
+                var splitLastDocument = lastDocument.Split(".");
                 lastDocument = splitLastDocument[0];
             }
 
@@ -70,6 +80,11 @@ namespace GMGInventory.Application.Helpers
                 var splitLastDocument = lastDocument.Split("-D");
                 lastDocument = splitLastDocument[0];
             }
+            if (lastDocument != null && lastDocument.Contains("."))
+            {
+                var splitLastDocument = lastDocument.Split(".");
+                lastDocument = splitLastDocument[0];
+            }
 
             int.TryParse(lastDocument?.Replace(docNumberPrefix, "") ?? "0", out int docNumberLast);
             return $"{docNumberPrefix}{docNumberLast + 1:D6}";
@@ -91,6 +106,11 @@ namespace GMGInventory.Application.Helpers
             if (lastDocument != null && lastDocument.Contains("-D"))
             {
                 var splitLastDocument = lastDocument.Split("-D");
+                lastDocument = splitLastDocument[0];
+            }
+            if (lastDocument != null && lastDocument.Contains("."))
+            {
+                var splitLastDocument = lastDocument.Split(".");
                 lastDocument = splitLastDocument[0];
             }
 

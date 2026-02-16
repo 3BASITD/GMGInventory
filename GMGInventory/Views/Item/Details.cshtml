@@ -42,18 +42,18 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Name)
+                        @Html.DisplayNameFor(model => model.OldCode)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.Name
+                        @Model?.OldCode
                     </b>
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.PartNumber)
+                        @Html.DisplayNameFor(model => model.Name)
                     </span>
                     <b class="d-block form-gayahin">
-                        @(string.IsNullOrWhiteSpace(Model?.PartNumber) ? "-" : Model.PartNumber)
+                        @Model?.Name
                     </b>
                 </p>
                 <p class="text-sm">
@@ -74,6 +74,14 @@
                 </p>
             </div>
             <div class="col-3">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.PartNumber)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model?.PartNumber) ? "-" : Model.PartNumber)
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Category)
@@ -100,14 +108,6 @@
                 </p>
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.BeginningCost)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @(string.IsNullOrWhiteSpace(Model?.BeginningCost) ? "N/A" : Model.BeginningCost)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
                         Location Codes
                     </span>
                     <div style="display:flex">
@@ -119,6 +119,14 @@
                 </p>
             </div>
             <div class="col-3">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.BeginningCost)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model?.BeginningCost) ? "N/A" : Model.BeginningCost)
+                    </b>
+                </p>
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.UnitCode)
@@ -1195,7 +1203,8 @@
 
                         actions = '<div class="btn-group" role="group" aria-label="Table Actions">' + actions + '</div>';
                         return actions + "</div>";
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[0, "asc"]]
@@ -1467,7 +1476,8 @@
                                 actions += '<div data-microtip-title="Adjust Quantity" data-microtip-position="bottom-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><span class="fas fa-pencil-alt"></span></button></div>';
                             }
                         return actions;
-                    }
+                    },
+                    responsivePriority: 1
                 }
             ],
             order: [[0, "asc"]]

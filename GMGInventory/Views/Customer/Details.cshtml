@@ -95,36 +95,6 @@
                     </b>
                 </p>
             </div>
-            @* <div class="col-12 col-md-4 col-sm-6">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.ContactPerson)
-            </span>
-            <b class="d-block details-contact-person">
-            @(string.IsNullOrWhiteSpace(Model?.ContactPerson) ? "N/A" : Model?.ContactPerson)
-            </b>
-            </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.ContactNumber)
-            </span>
-            <b class="d-block details-contact-number">
-            @(string.IsNullOrWhiteSpace(Model?.ContactNumber) ? "N/A" : Model?.ContactNumber)
-            </b>
-            </p>
-            </div>
-            <div class="col-12 col-md-4 col-sm-6">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.Address)
-            </span>
-            <b class="d-block details-address">
-            @(string.IsNullOrWhiteSpace(Model?.Address) ? "N/A" : Model?.Address)
-            </b>
-            </p>
-            </div> *@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -145,16 +115,6 @@
                     </b>
                 </p>
             </div>
-            @* <div class="col-12 col-md-4 col-sm-6">
-            <p class="text-sm">
-            <span class="text-muted">
-            @Html.DisplayNameFor(model => model.FaxNumber)
-            </span>
-            <b class="d-block details-fax-number">
-            @(string.IsNullOrWhiteSpace(Model?.FaxNumber) ? "N/A" : Model?.FaxNumber)
-            </b>
-            </p>
-            </div> *@
             <div class="col-12 col-md-4 col-sm-6">
                 <p class="text-sm">
                     <span class="text-muted">
@@ -795,7 +755,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Brand Discount</h5>
+                <h5 class="modal-title">Brand Discount</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -828,7 +788,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <span class="fas fa-plus"></span> Add
+                        <span class="fas fa-save"></span> Save
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <span class="fas fa-times"></span> Cancel
@@ -1123,7 +1083,8 @@
                         }
                         return actions + '</div>';
                     },
-                    className: "form-cell"
+                    className: "form-cell",
+                    responsivePriority: 1
                 }
 
             ],
@@ -1271,7 +1232,7 @@
                             
                             }
                             if (user_access.canDelete) {
-                                actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-discount" data-microtip-title="Delete Brand Discount" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-discount" data-microtip-title="Delete / Deactivate Brand Discount" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
                             }
                         } 
                         
@@ -1282,7 +1243,8 @@
                         }
                         return actions + '</div>';
                     },
-                    className: "form-cell"
+                    className: "form-cell",
+                    responsivePriority: 1
                 }
 
             ],

@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
+    [Index(nameof(DocumentNumber), IsUnique = true)]
     public class PurchaseOrderNew : BaseEntity
     {
         public PurchaseOrderNew()

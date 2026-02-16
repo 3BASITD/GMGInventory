@@ -36,6 +36,9 @@
         <thead>
             <tr>
                 <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().InvoiceDate)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.Outbounds.First().OldSkuCode)
                 </th>
                 <th>
@@ -65,6 +68,7 @@
             @foreach (var item in Model.Outbounds)
             {
                 <tr>
+                    <td>@item.InvoiceDate</td>
                     <td>@item.OldSkuCode</td>
                     <td>@item.ItemCode</td>
                     <td>@item.ItemName</td>
@@ -78,7 +82,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="4" class="right-text">Total</th>
+                <th colspan="5" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
                 <th colspan="3" class="text-end"></th>
             </tr>

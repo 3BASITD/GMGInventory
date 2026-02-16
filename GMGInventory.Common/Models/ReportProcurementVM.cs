@@ -126,8 +126,8 @@ namespace GMGInventory.Common.Models
     public class PurchaseReceivingRVM
     {
         [Display(Name = "Date Received")]
-        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDateTime);
-        public DateTime ReturnDateD { get; set; }
+        public string ReturnDate => ReturnDateD == null ? "" : ReturnDateD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? ReturnDateD { get; set; }
 
         [Display(Name = "Receiving Doc Number")]
         public string ReceivingDocumentNumber { get; set; }

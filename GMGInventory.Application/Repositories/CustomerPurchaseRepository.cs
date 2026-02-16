@@ -2,6 +2,7 @@
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 
 namespace GMGInventory.Application.Repositories
@@ -38,7 +39,8 @@ namespace GMGInventory.Application.Repositories
                                 && filter.DateFrom <= iv.InvoiceDate.Date
                                 && iv.InvoiceDate.Date <= filter.DateTo
                                 //&& iv.Status.Name == "Invoice Submitted"
-                                && iv.StatusId == 8
+                                //&& iv.StatusId == 8
+                                && iv.Status.Code.ToLower() == "invoiced"
                              select new CustomerPurchaseVM
                              {
                                  Brand = sl.Item.Brand.Code,

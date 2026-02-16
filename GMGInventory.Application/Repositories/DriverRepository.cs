@@ -224,7 +224,7 @@ namespace GMGInventory.Application.Repositories
                                              .Where(s => s.Id == Id)
                                              .FirstOrDefaultAsync();
                 if (oldDriver == null)
-                    return new ResponseModel { Status = "Error", Message = "Invalid driver, failed to reactivate" };
+                    return new ResponseModel { Status = "Error", Message = "Invalid record, driver cannot be found" };
 
                 if (oldDriver.IsActive == false)
                     return new ResponseModel { Status = "Error", Message = "Driver already inactive" };
@@ -232,10 +232,8 @@ namespace GMGInventory.Application.Repositories
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
 
-                //if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.DriverId == Id))
-                if (false)
+                if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.DriverId == Id))
                 {
-                    // is in use by other record
                     oldDriver.IsActive = false;
                     context.Drivers.Update(oldDriver);
                     await context.SaveChangesAsync(currentUserId);
@@ -264,7 +262,7 @@ namespace GMGInventory.Application.Repositories
                                              .Where(s => s.Id == Id)
                                              .FirstOrDefaultAsync();
                 if (oldDriver == null)
-                    return new ResponseModel { Status = "Error", Message = "Invalid driver, failed to reactivate" };
+                    return new ResponseModel { Status = "Error", Message = "Invalid record, driver cannot be found" };
 
                 if (oldDriver.IsActive)
                     return new ResponseModel { Status = "Error", Message = "Driver already active" };

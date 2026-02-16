@@ -303,7 +303,7 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
-                await SaveExceptionError(context, "Outbount", "E2", SystemFormat.GetInnermostExceptionMessage(ex));
+                await SaveExceptionError(context, "Outbound ", "E2", SystemFormat.GetInnermostExceptionMessage(ex));
                 logger.LogError(ex, "Barcotech API call failed for Outbound API: {url}", apiURL);
                 return new List<APIBCT_Outbound>();
             }
