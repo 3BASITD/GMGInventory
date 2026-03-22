@@ -18,5 +18,7 @@ namespace GMGInventory.Data
         [ForeignKey("PackTypeId")]
         public int PackTypeId { get; set; }
         public PackType PackType { get; set; }
+
+        public string? BarcotechOutboundId { get; set; }
     }
 }

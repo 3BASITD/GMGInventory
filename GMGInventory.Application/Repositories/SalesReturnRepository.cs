@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
@@ -36,9 +37,10 @@ namespace GMGInventory.Application.Repositories
                            join userm in userManager.Users on ret.UserModified equals userm.Id into um
                            from userm in um.DefaultIfEmpty()
                            where ret.Id == Id
-                           && ret.SalesReturnLineItems.Any(s=>s.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced")
+                           && ret.SalesReturnLineItems.Any(s=> (s.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft"))
                            select new SalesReturnVM
                            {
+                               BIRInvoiceNumber = string.Join(",", ret.SalesReturnLineItems.Select(s => s.InvoiceLineItem.Invoice.ControlNumber)),
                                CustomerId = ret.SalesOrder != null ? ret.SalesOrder.Customer.Id 
                                           : ret.Customer != null ? ret.Customer.Id 
                                           : null,
@@ -80,6 +82,7 @@ namespace GMGInventory.Application.Repositories
                           join user in userManager.Users on ret.UserCreated equals user.Id
                           select new SalesReturnVM
                           {
+                              BIRInvoiceNumber = string.Join(", ", ret.SalesReturnLineItems.Select(s => s.InvoiceLineItem == null ? "" : "<a href='/SalesInvoice/Details/" + s.InvoiceLineItem.Invoice.Id + "' class='link-info' target='_blank'>" + s.InvoiceLineItem.Invoice.ControlNumber + "</a>")),
                               CustomerId = ret.SalesOrder != null ? ret.SalesOrder.Customer.Id 
                                          : ret.Customer != null ? ret.Customer.Id 
                                          : null,
@@ -92,7 +95,7 @@ namespace GMGInventory.Application.Repositories
                               Id = ret.Id,
                               Remarks = string.IsNullOrWhiteSpace(ret.Remarks) ? null : ret.Remarks,
                               ReturnDateD = ret.ReturnDate,
-                              SONumber = ret.SalesOrder == null ? null : ret.SalesOrder.SalesOrderNumber,
+                              SONumber = ret.SalesOrder == null ? null : "<a href='/SalesOrder/Details/" + ret.SalesOrder.Id + "' class='link-info' target='_blank'>" + ret.SalesOrder.SalesOrderNumber + "</a>",
                               SRNumber = ret.SalesReturnNumber
                           };
 
@@ -111,10 +114,11 @@ namespace GMGInventory.Application.Repositories
             {
                 data = data.Where(s => new[]
                 {
+                    s.BIRInvoiceNumber,
                     s.CustomerCode,
                     s.CustomerName,
                     s.Id.ToString(),
-                    s.Remarks + "",
+                    s.Remarks,
                     s.ReturnDate,
                     s.SRNumber
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
@@ -212,7 +216,7 @@ namespace GMGInventory.Application.Repositories
                              ItemCode = rturn.Item.Code,
                              ItemName = rturn.Item.Name + (rturn.ItemPromo == null ? "" : " (" + rturn.ItemPromo.Name + ")"),
                              Quantity = rturn.Quantity,
-                             ReferenceNumber = rturn.InvoiceLineItemId == null ? "TBR" : (rturn.InvoiceLineItem!.Invoice.ControlNumber + (rturn.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "draft" ? " (DRAFT)" : "")),
+                             ReferenceNumber = rturn.InvoiceLineItemId == null ? "TBR" : (rturn.InvoiceLineItem!.Invoice.ControlNumber + (rturn.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft" ? " (DRAFT)" : "")),
                              Unit = rturn.Item.Unit.Code
                          };
             return await itemVM.ToListAsync();

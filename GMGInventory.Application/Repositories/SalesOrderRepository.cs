@@ -1,11 +1,13 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
@@ -135,7 +137,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderInvoicedOptions(string search, int page)
         {
             var orders = from order in context.SalesOrders
-                         where order.Invoices.Any(s => s.Status.Code.ToLower() == "invoiced")
+                         where order.Invoices.Any(s => (s.Status.Code.Trim().ToLower() == "invoiced" || s.Status.Code.Trim().ToLower() == "draft"))
                          && (string.IsNullOrWhiteSpace(search)
                          || order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())
                          || order.Invoices.Any(s => s.InvoiceNumber.ToLower().Trim().Contains(search.ToLower().Trim()))
@@ -183,7 +185,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
             var customerInvoices = from inv in context.InvoiceLineItems
-                                   where inv.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
                                                                        equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
@@ -212,7 +214,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
-                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       where (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
                                        group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
@@ -359,6 +361,22 @@ namespace GMGInventory.Application.Repositories
 
             var users = userManager.Users;
 
+            var DateFrom = filter.DateFrom == null ? DateTime.Today.AddYears(-1) : filter.DateFrom.Value.Date;
+            var DateTo = filter.DateTo == null ? DateTime.Today : filter.DateTo.Value.Date;
+            if (DateFrom > DateTo) (DateFrom, DateTo) = (DateTo, DateFrom);
+            var FiledBy = filter.FiledBy == null ? "everyone" : filter.FiledBy.ToLower();
+
+
+            var filteredOrder = from order in context.SalesOrders
+                                where (filter.AgentId == null || order.AgentId == filter.AgentId)
+                                && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
+                                && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
+                                && DateFrom <= order.SalesOrderDate.Date
+                                && order.SalesOrderDate.Date <= DateTo
+                                && (filter.Status == null || filter.Status == order.Status.Id)
+                                && (filter.FiledBy == null || FiledBy != "me" || (FiledBy == "me" && order.UserCreated == currentUserId))
+                                select order;
+
             var orderIncompletePack = from soli in context.SalesOrderLineItems
                                       join pli in context.PackLineItems on new { soli.SalesOrderId, soli.ItemId } equals new { pli.Pack.SalesOrderId, pli.ItemId } into p
                                       from pli in p.DefaultIfEmpty()
@@ -366,19 +384,11 @@ namespace GMGInventory.Application.Repositories
                                       select soli.SalesOrderId;
 
 
-            var orderVM = (from order in context.SalesOrders
-                           join user in users on order.UserCreated equals user.Id
+            var orderVM = (from order in filteredOrder
                            join approvedby in users on order.ApprovedBy equals approvedby.Id into ab
                            from approvedby in ab.DefaultIfEmpty()
                            join disapprovedby in users on order.DisapprovedBy equals disapprovedby.Id into db
                            from disapprovedby in db.DefaultIfEmpty()
-                           where (filter.AgentId == null || order.AgentId == filter.AgentId)
-                           && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
-                           && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
-                           && filter.DateFrom <= order.SalesOrderDate.Date
-                           && order.SalesOrderDate.Date <= filter.DateTo
-                           && (filter.Status == null || filter.Status == order.Status.Id)
-                           && (filter.FiledBy == null || filter.FiledBy.ToLower() != "me" || (filter.FiledBy.ToLower() == "me" && order.UserCreated == currentUserId))
                            select new SalesOrderVM
                            {
                                CustomerId = order.Customer.Id,
@@ -388,10 +398,15 @@ namespace GMGInventory.Application.Repositories
                                OrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
-                               TotalAmountD = order.SalesOrderLineItems.Sum(s => s.Quantity
-                                                                               * s.SellingPrice
-                                                                               * (100 - s.Discount1) / 100
-                                                                               * (100 - s.Discount2) / 100),
+                               TotalAmountD = order.SalesOrderLineItems.Sum(s => 
+                                   s.Quantity
+                                   * s.SellingPrice
+                                   * (100 - s.Discount1) / 100
+                                   * (100 - s.Discount2) / 100
+                                   * (100 - (s.Discount3 == null ? 0 : s.Discount3.Value)) / 100
+                                   * (100 - (s.Discount4 == null ? 0 : s.Discount4.Value)) / 100
+                                   * (100 - (s.Discount5 == null ? 0 : s.Discount5.Value)) / 100
+                               ),
                                CustomerAddress = order.Customer
                                                       .ShippingAddresses
                                                       .Where(s => s.IsDefault == true)
@@ -430,7 +445,7 @@ namespace GMGInventory.Application.Repositories
                                                                                   Status = s.PurchaseRequest.Status.Name
                                                                               })
                                                                               .Distinct()
-                                                                              .Select(s => $"<a href='/PurchaseRequest/Details/{s.Id}' class='text-info' target='_blank'>{s.Number}</a>-[{s.Status}]")),
+                                                                              .Select(s => $"<a href='/PurchaseRequest/Details/{s.Id}' class='link-info' target='_blank'>{s.Number}</a>-[{s.Status}]")),
                                ServiceLevelAgreement = order.ServiceLevelAgreement.Name,
                                WithLP = order.WithLP,
                                WithREYCONonDefective = order.WithREYCONonDefective,
@@ -441,7 +456,7 @@ namespace GMGInventory.Application.Repositories
                                                        .Select(s => s.SalesOrderSource.SourceOrderNumber)
                                                        .FirstOrDefault()
                            });
-            return await orderVM.ToListAsync();
+            return orderVM.ToList();
         }
 
         public async Task<IList<APISalesOrder>> GetListAPI()
@@ -578,7 +593,8 @@ namespace GMGInventory.Application.Repositories
                                                        .Sum(s => (int?)s.Quantity) ?? 0
                                 let packedQuantity = context.PackLineItems
                                                             .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
-                                                                     && s.ItemId == order.ItemId)
+                                                                     && s.ItemId == order.ItemId
+                                                                     && s.Pack.Status.Code.Trim().ToLower() == "posted")
                                                             .Sum(s => (int?)s.Quantity) ?? 0
                                 let invoicedQuantity = context.InvoiceLineItems
                                                               .Where(s => s.Invoice.SalesOrderId == order.SalesOrderId
@@ -610,10 +626,10 @@ namespace GMGInventory.Application.Repositories
                                     NetPriceD = price == null ? 0 : price.NetSellingPrice,
                                     QuantityD = order.Quantity,
                                     PackedQuantityD = packedQuantity,
+                                    ReturnedQuantityD = returnedQuantity,
                                     RemainingQuantityD = order.Quantity - packedQuantity,
                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                     SellingPriceD = order.SellingPrice,
-                                    ServedQuantityD = packedQuantity - returnedQuantity,
                                     Unit = order.Item.Unit.Code,
                                     ItemPromoId = order.ItemPromoId
                                 }).ToListAsync();
@@ -987,20 +1003,32 @@ namespace GMGInventory.Application.Repositories
                                      .FirstOrDefaultAsync();
             if (order == null) return new ResponseModel { Status = "Error", Message = "Sales Order cannot be found" };
 
-            if (order.Status.Name.ToLower() != "sales order draft") return new ResponseModel { Status = "Error", Message = "Cannot delete sales order that are not draft" };
+            if (order.Status.Name.ToLower() != "sales order draft") return new ResponseModel { Status = "Error", Message = "Only draft can be deleted." };
 
-            context.SalesOrders.Remove(order);
+            var pack = await context.Packs
+                                    .Where(s => s.SalesOrderId == Id)
+                                    .FirstOrDefaultAsync();
+            if (pack != null) return new ResponseModel { Status = "Error", Message = "Sales Order already used in Pack. Delete cannot proceed" };
+
+            var delivery = await context.SalesOrderDeliveryMonitorings
+                                        .Where(s => s.SalesOrderId == Id)
+                                        .FirstOrDefaultAsync();
+            if (delivery != null)
+                context.SalesOrderDeliveryMonitorings.Remove(delivery);
+
             var items = await context.SalesOrderLineItems
                                      .Where(s => s.SalesOrderId == Id)
                                      .ToListAsync();
 
             context.SalesOrderLineItems.RemoveRange(items);
-            var delivery = await context.SalesOrderDeliveryMonitorings
-                                        .Where(s => s.SalesOrderId == Id)
-                                        .FirstOrDefaultAsync();
 
-            if (delivery != null)
-                context.SalesOrderDeliveryMonitorings.Remove(delivery);
+            var source = await context.SalesOrderSources
+                                      .Where(s => s.SalesOrderId == Id)
+                                      .FirstOrDefaultAsync();
+            if (source != null)
+                context.SalesOrderSources.Remove(source);
+
+            context.SalesOrders.Remove(order);
 
             await context.SaveChangesAsync(currentUserId);
 
@@ -1090,12 +1118,14 @@ namespace GMGInventory.Application.Repositories
                 var inventory = await context.ItemInventories
                                              .Where(s => s.ItemId == soItem.ItemId && s.Warehouse.IsMain == true)
                                              .FirstOrDefaultAsync();
+                var inventoryQuantity = 0;
                 if (inventory == null)
                 {
                     return false;
                 }
                 else if (inventory.Quantity >= quantity)
                 {
+                    inventoryQuantity = inventory.Quantity;
                     inventory.Quantity -= quantity;
                 }
                 else
@@ -1104,6 +1134,17 @@ namespace GMGInventory.Application.Repositories
                 }
                 context.SalesOrderLineItems.Update(soItem);
                 context.ItemInventories.Update(inventory);
+                await context.SaveChangesAsync(currentUserId);
+
+                var countHistoryDestination = new PhysicalCountHistory
+                {
+                    ItemId = soItem.ItemId,
+                    QuantityFrom = inventoryQuantity,
+                    QuantityTo = inventory.Quantity,
+                    Remarks = "Update Served SO Item",
+                    WarehouseId = inventory.WarehouseId
+                };
+                context.PhysicalCountHistories.Add(countHistoryDestination);
                 await context.SaveChangesAsync(currentUserId);
                 return true;
             }

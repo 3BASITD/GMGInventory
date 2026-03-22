@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Purchase Return Details";
+    ViewData["TitleDetails"] = $"[{Model.DocumentNumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 
     var status = Model.Status.ToLowerInvariant();
@@ -188,7 +189,11 @@
                         @Html.DisplayNameFor(model => model.RRNumber)
                     </span>
                     <b class="d-block">
-                        @Model.RRNumber
+                        @Html.ActionLink(Model.RRNumber,
+                                        "Details",
+                                        "PurchaseReceive",
+                                        new { @Id = Model.RRId },
+                                        new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -198,7 +203,11 @@
                         @Html.DisplayNameFor(model => model.PONumber)
                     </span>
                     <b class="d-block">
-                        @Model.PONumber
+                        @Html.ActionLink(Model.PONumber,
+                                        "Details",
+                                        "PurchaseOrder",
+                                        new { @Id = Model.POId },
+                                        new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -208,7 +217,11 @@
                         @Html.DisplayNameFor(model => model.Supplier)
                     </span>
                     <b class="d-block">
-                        @Model.Supplier
+                        @Html.ActionLink(Model.Supplier,
+                                        "Details",
+                                        "Supplier",
+                                        new { @Id = Model.SupplierId },
+                                        new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -238,7 +251,11 @@
                         @Html.DisplayNameFor(model => model.Warehouse)
                     </span>
                     <b class="d-block">
-                        @Model.Warehouse
+                        @Html.ActionLink(Model.Warehouse,
+                                        "Details",
+                                        "Warehouse",
+                                        new { @Id = Model.WarehouseId },
+                                        new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -519,7 +536,8 @@
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                         }
                     },
                     name: "ItemCode",

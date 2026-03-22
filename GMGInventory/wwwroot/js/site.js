@@ -95,6 +95,8 @@
     });
 
     $(document).ajaxSend(function (event, jqxhr, settings) {
+        if (settings.isDataTableRequest) return;
+
         var msg = settings.loaderMessage || "";
 
         $.LoadingOverlay("show", {
@@ -115,12 +117,14 @@
 
     var requestURL = "";
     $(document).ajaxComplete(function (event, jqxhr, settings) {
+        if (settings.isDataTableRequest) return;
+
         $.LoadingOverlay("hide");
         reloadInputNumberRule();
         requestURL = settings.url;
     });
 
-    $(document).ajaxStop(function (event, jqxhr, settings) {
+    $(document).ajaxStop(function () {
         $.LoadingOverlay("hide");
         reloadInputNumberRule();
 

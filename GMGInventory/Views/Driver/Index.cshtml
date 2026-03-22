@@ -217,11 +217,18 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         var driverDT = $('.table-drivers').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetDriversDT")",
-                type: "POST"
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -239,19 +246,19 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.licenseNumber || '<em class="text-muted">n/a</em>';
+                        return data.licenseNumber || '<em class="text-muted">N/A</em>';
                     },
                     name: "LicenseNumber"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.restriction || '<em class="text-muted">n/a</em>';
+                        return data.restriction || '<em class="text-muted">N/A</em>';
                     },
                     name: "Restriction"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.licenseDateExpiration || '<em class="text-muted">n/a</em>';
+                        return data.licenseDateExpiration || '<em class="text-muted">N/A</em>';
                     },
                     name: "LicenseDateExpiration"
                 },
@@ -283,7 +290,7 @@
         });
 
         driverDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $('.btn-details').click(function (e) {
                 var data = driverDT.row($(this).parents('tr')).data();
@@ -291,13 +298,13 @@
                 $(".details-firstname").html(data.firstName);
                 $(".details-lastname").html(data.lastName);
                 $(".details-nickname").html(data.nickname);
-                $(".details-number").html(data.licenseNumber || '<em class="text-muted">n/a</em>');
-                $(".details-restriction").html(data.restriction || '<em class="text-muted">n/a</em>');
-                $(".details-expiration").html(data.licenseDateExpiration || '<em class="text-muted">n/a</em>');
+                $(".details-number").html(data.licenseNumber || '<em class="text-muted">N/A</em>');
+                $(".details-restriction").html(data.restriction || '<em class="text-muted">N/A</em>');
+                $(".details-expiration").html(data.licenseDateExpiration || '<em class="text-muted">N/A</em>');
                 $(".details-created-by").html(data.userCreated);
                 $(".details-created-date").html(data.dateCreated);
-                $(".details-modified-by").html(data.userModified || '<em class="text-muted">n/a</em>');
-                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">n/a</em>');
+                $(".details-modified-by").html(data.userModified || '<em class="text-muted">N/A</em>');
+                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">N/A</em>');
 
                 $("#detailsModal").modal("show");
             });

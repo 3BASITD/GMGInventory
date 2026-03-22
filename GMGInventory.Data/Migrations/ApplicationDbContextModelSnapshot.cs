@@ -1039,6 +1039,18 @@ namespace GMGInventory.Data.Migrations
                             PageId = 80,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 81,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 81,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
                 });
 
@@ -4161,6 +4173,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("BarcotechOutboundCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("BarcotechRequestDate")
                         .HasColumnType("datetime2");
 
@@ -4221,6 +4236,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("BarcotechOutboundId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("BoxNumber")
                         .HasColumnType("int");
@@ -6598,9 +6616,6 @@ namespace GMGInventory.Data.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("BarcotechOutboundCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("BarcotechRequestDate")
                         .HasColumnType("datetime2");
 
@@ -6763,9 +6778,6 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("BarcotechOutboundId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CustomerBrandDiscountId")
                         .HasColumnType("int");
@@ -8374,13 +8386,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5bdf9412-27f6-43ac-8679-ec6a5acff4be",
+                            ConcurrencyStamp = "40eff676-893f-41df-a961-d240fa2ad9e1",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO8ZAqe7a1izeCy1xAHOnNQFtEp0Vw3PRUedgjprptsqxW7T8zWVYVCHejLyW2ntig==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGCwqh47rWmg7z2dqaxM/JOkWN1cuj9VlQlQ0XdgSvWQ9OR1RPjcit93M2T9HfnrUw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "09ba319a-d091-4086-9a66-a6c6ce39bec0",
+                            SecurityStamp = "9e67c721-2b2e-498f-a368-cd8d70563020",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8395,13 +8407,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "de8f2f63-067d-40e7-9892-45ff8f383755",
+                            ConcurrencyStamp = "8494b7d4-1204-486b-8885-fc4981dcdeed",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKW4Pl5dHL1sp60SNuOUx+fqF6uVu8Hl+wdoRygAM+zom/qWBxqJH7TsWslGTYjSsA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP207oFipoamOmpkX2YrBG6nnTCXD3RF3ZOiTdcWi5+37mjP9WrYqTN4kRsC6RVolg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4200a8cd-59c8-4371-943a-7a21436e9b4b",
+                            SecurityStamp = "7f92d0dd-0272-46e2-9d23-8425ed65cec6",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

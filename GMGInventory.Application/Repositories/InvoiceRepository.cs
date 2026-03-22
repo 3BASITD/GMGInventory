@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -111,6 +112,7 @@ namespace GMGInventory.Application.Repositories
                               && (string.IsNullOrWhiteSpace(search)
                               || invoice.InvoiceNumber.ToLower().Contains(search.ToLower())
                               || invoice.ControlNumber.ToLower().Contains(search.ToLower()))
+                              && (invoice.Status.Code.Trim().ToLower() == "invoiced" || invoice.Status.Code.Trim().ToLower() == "draft")
                            orderby invoice.ControlNumber ascending
                            select new JsonNameStatusOptionsModel
                            {
@@ -156,6 +158,7 @@ namespace GMGInventory.Application.Repositories
                                  //      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
                                  //      + " " + invoice.SalesOrder.Agent.LastName,
                                  Agent = invoice.SalesOrder.Agent.Code,
+                                 AgentId = invoice.SalesOrder.Agent.Id,
                                  Branch = invoice.SalesOrder.Customer.Branch,
                                  ControlNumber = invoice.ControlNumber,
                                  CustomerAddress = invoice.SalesOrder
@@ -165,6 +168,7 @@ namespace GMGInventory.Application.Repositories
                                                           .Select(s => s.Address)
                                                           .FirstOrDefault(),
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
+                                 CustomerId = invoice.SalesOrder.Customer.Id,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
                                  InvoiceDateD = invoice.InvoiceDate,
@@ -178,6 +182,7 @@ namespace GMGInventory.Application.Repositories
                                  PriorityD = invoice.SalesOrder.Customer.Priority,
                                  Remarks = invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
+                                 SalesOrderId = invoice.SalesOrder.Id,
                                  Status = invoice.Status.Code,
                                  TIN = invoice.SalesOrder.Customer.TIN,
                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
@@ -208,6 +213,7 @@ namespace GMGInventory.Application.Repositories
                                  //      + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName)
                                  //      + " " + invoice.SalesOrder.Agent.LastName,
                                  Agent = invoice.SalesOrder.Agent.Code,
+                                 AgentId = invoice.SalesOrder.Agent.Id,
                                  ControlNumber = invoice.ControlNumber,
                                  CustomerAddress = invoice.SalesOrder
                                                           .Customer
@@ -216,6 +222,7 @@ namespace GMGInventory.Application.Repositories
                                                           .Select(s => s.Address)
                                                           .FirstOrDefault(),
                                  CustomerCode = invoice.SalesOrder.Customer.Code,
+                                 CustomerId = invoice.SalesOrder.Customer.Id,
                                  CustomerName = invoice.SalesOrder.Customer.Name,
                                  Id = invoice.Id,
                                  InvoiceDateD = invoice.InvoiceDate,
@@ -229,6 +236,7 @@ namespace GMGInventory.Application.Repositories
                                  PriorityD = invoice.SalesOrder.Customer.Priority,
                                  Remarks = invoice.Remarks,
                                  SONumber = invoice.SalesOrder.SalesOrderNumber,
+                                 SalesOrderId = invoice.SalesOrder.Id,
                                  Status = invoice.Status.Code,
                                  TIN = invoice.SalesOrder.Customer.TIN,
                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
@@ -260,6 +268,7 @@ namespace GMGInventory.Application.Repositories
                               //      + (pack.SalesOrder.Agent.MiddleName == null ? "" : " " + pack.SalesOrder.Agent.MiddleName)
                               //      + " " + pack.SalesOrder.Agent.LastName,
                               Agent = pack.SalesOrder.Agent.Code,
+                              AgentId = pack.SalesOrder.Agent.Id,
                               CustomerAddress = pack.SalesOrder
                                                     .Customer
                                                     .ShippingAddresses
@@ -267,6 +276,7 @@ namespace GMGInventory.Application.Repositories
                                                     .Select(s => s.Address)
                                                     .FirstOrDefault(),
                               CustomerCode = pack.SalesOrder.Customer.Code,
+                              CustomerId = pack.SalesOrder.Customer.Id,
                               CustomerName = pack.SalesOrder.Customer.Name,
                               Id = pack.Id,
                               PackNumber = pack.Id,
@@ -274,6 +284,7 @@ namespace GMGInventory.Application.Repositories
                               PONumber = pack.SalesOrder.PurchaseOrder,
                               PriorityD = pack.SalesOrder.Customer.Priority,
                               SONumber = pack.SalesOrder.SalesOrderNumber,
+                              SalesOrderId = pack.SalesOrder.Id,
                               Status = pack.Status.Code,
                               TIN = pack.SalesOrder.Customer.TIN
                           });
@@ -287,14 +298,15 @@ namespace GMGInventory.Application.Repositories
                            && filter.DateFrom <= inv.InvoiceDate.Date
                            && inv.InvoiceDate.Date <= filter.DateTo
                            && (filter.StatusCode == null
-                           || (filter.StatusCode.ToLower() == "draft" && inv.Status.Name.ToLower() == "invoice draft" && inv.UserCreated == currentUserId)
-                           || (filter.StatusCode.ToLower() == "posted" && inv.Status.Name.ToLower() == "invoice submitted")
-                           || (filter.StatusCode.ToLower() == "cancelled" && inv.Status.Name.ToLower() == "cancelled invoice"))
+                           || (filter.StatusCode.Trim().ToLower() == "draft" && inv.Status.Name.ToLower() == "invoice draft" && inv.UserCreated == currentUserId)
+                           || (filter.StatusCode.Trim().ToLower() == "posted" && inv.Status.Name.ToLower() == "invoice submitted")
+                           || (filter.StatusCode.Trim().ToLower() == "cancelled" && inv.Status.Name.ToLower() == "cancelled invoice"))
                            orderby inv.Id descending
                            select new InvoiceVM
                            {
                                BIRInvoiceNumber = inv.ControlNumber,
                                Customer = inv.SalesOrder.Customer.Name,
+                               CustomerId = inv.SalesOrder.Customer.Id,
                                Id = inv.Id,
                                InvoiceDateD = inv.InvoiceDate,
                                InvoiceDueDateD = inv.DueDate == null ? inv.InvoiceDate : inv.DueDate.Value,
@@ -303,6 +315,7 @@ namespace GMGInventory.Application.Repositories
                                PackNumber = inv.PackId,
                                PriorityD = inv.SalesOrder.Customer.Priority,
                                SONumber = inv.SalesOrder.SalesOrderNumber,
+                               SalesOrderId = inv.SalesOrder.Id,
                                Status = inv.Status.Code,
                                TotalAmountD = (from invli in inv.InvoiceLineItems
                                                join order in context.SalesOrders on invli.Invoice.SalesOrderId equals order.Id
@@ -381,12 +394,12 @@ namespace GMGInventory.Application.Repositories
                 }
             }
             var totalInvoicedRecord = await context.Invoices
-                                                   .Where(s => s.Status.Code.ToLower() == "invoiced"
+                                                   .Where(s => (s.Status.Code.Trim().ToLower() == "invoiced" || s.Status.Code.Trim().ToLower() == "draft")
                                                             && filter.DateFrom <= s.InvoiceDate.Date
                                                             && s.InvoiceDate.Date <= filter.DateTo)
                                                    .CountAsync();
             var totalInvoicedNotMovedRecord = await context.Invoices
-                                                           .Where(s => s.Status.Code.ToLower() == "invoiced"
+                                                           .Where(s => (s.Status.Code.Trim().ToLower() == "invoiced" || s.Status.Code.Trim().ToLower() == "draft")
                                                                     && filter.DateFrom <= s.InvoiceDate.Date
                                                                     && s.InvoiceDate.Date <= filter.DateTo
                                                                     && s.HashMicroMoveById == null)
@@ -559,7 +572,7 @@ namespace GMGInventory.Application.Repositories
 
                 //foreach (var packItem in packItems)
                 //{
-                //    var warehouseId = context.Warehouses.Where(x => x.Code.ToLower() == "main").Select(x => x.Id).FirstOrDefault();
+                //    var warehouseId = context.Warehouses.Where(x => x.Code.Trim().ToLower() == "main").Select(x => x.Id).FirstOrDefault();
                 //    var itemInventory = await context.ItemInventories.Where(s => s.WarehouseId == warehouseId && s.ItemId == packItem.ItemId).FirstOrDefaultAsync();
                 //    var previousCount = await context.PhysicalCountHistories.Where(s => s.WarehouseId == warehouseId && s.ItemId == packItem.ItemId).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
 
@@ -772,6 +785,72 @@ namespace GMGInventory.Application.Repositories
                         NewRow = invoice.Id
                     };
                 }
+            }
+        }
+
+        public async Task<ResponseModel> CancelAsync(int? Id)
+        {
+            try
+            {
+                var invoice = await context.Invoices
+                                           .Include(s => s.Status)
+                                           .Where(s => s.Id == Id)
+                                           .FirstOrDefaultAsync();
+
+                if (invoice == null)
+                    return new ResponseModel { Status = "Error", Message = "Invalid Record, Invoice cannot be found" };
+
+                if (invoice.Status.Code.Trim().ToLower() != "invoiced")
+                    return new ResponseModel { Status = "Error", Message = "Only invoiced record can be cancelled" };
+
+                var usedInSOACR = await context.SOACRLineItems.AnyAsync(s => s.InvoiceId == Id);
+                if (usedInSOACR)
+                    return new ResponseModel { Status = "Error", Message = "Invoice already used in SOA/CR. Cannot cancel" };
+                var usedInCustomerPayment = await context.CustomerPaymentDetails.AnyAsync(s => s.InvoiceId == Id);
+                if (usedInCustomerPayment)
+                    return new ResponseModel { Status = "Error", Message = "Invoice already used in Payment. Cannot cancel" };
+
+                var draftStatus = await context.Statuses
+                                               .Where(s => s.Name.Trim().ToLower() == "invoice draft")
+                                               .Select(s => s.Id)
+                                               .FirstAsync();
+
+                invoice.StatusId = draftStatus;
+
+                context.Invoices.Update(invoice);
+                await context.SaveChangesAsync(currentUserId);
+
+                return new ResponseModel { Status = "Success", Message = "Invoice successfully cancelled" };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
+        public async Task<ResponseModel> DeleteAsync(int? Id)
+        {
+            try
+            {
+                var invoice = await context.Invoices
+                                           .Include(s => s.Status)
+                                           .Where(s => s.Id == Id)
+                                           .FirstOrDefaultAsync();
+
+                if (invoice == null)
+                    return new ResponseModel { Status = "Error", Message = "Invalid Record, Invoice cannot be found" };
+
+                if (invoice.Status.Code.Trim().ToLower() != "draft")
+                    return new ResponseModel { Status = "Error", Message = "Only draft record can be deleted" };
+
+                context.Invoices.Remove(invoice);
+                await context.SaveChangesAsync(currentUserId);
+
+                return new ResponseModel { Status = "Success", Message = "Invoice successfully deleted" };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
             }
         }
     }

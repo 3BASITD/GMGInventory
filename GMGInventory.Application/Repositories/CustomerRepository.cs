@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -34,7 +35,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptions(string search, int page)
         {
             var customerInvoices = from inv in context.InvoiceLineItems
-                                   where inv.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } 
                                                                        equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
@@ -47,7 +48,7 @@ namespace GMGInventory.Application.Repositories
                                        InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2)) ?? 0
                                    };
             var customerPayments = from pay in context.CustomerPaymentDetails
-                                   where pay.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (pay.Invoice.Status.Code.Trim().ToLower() == "invoiced" || pay.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    group pay by pay.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
@@ -56,7 +57,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
-                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       where (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
                                        group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
@@ -68,7 +69,7 @@ namespace GMGInventory.Application.Repositories
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
-                                where s.Invoice.Status.Code.ToLower() == "invoiced"
+                                where (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft")
                                 group s by s.Invoice.SalesOrder.Customer.Id into g
                                 select new
                                 {
@@ -127,7 +128,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetByAgentOptions(string search, int page, int? agent)
         {
             var customerInvoices = from inv in context.InvoiceLineItems
-                                   where inv.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } 
                                                                        equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
@@ -140,7 +141,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
-                                   where pay.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (pay.Invoice.Status.Code.Trim().ToLower() == "invoiced" || pay.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    group pay by pay.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
@@ -149,7 +150,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
-                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       where (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
                                        group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
@@ -161,7 +162,7 @@ namespace GMGInventory.Application.Repositories
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
-                                where s.Invoice.Status.Code.ToLower() == "invoiced"
+                                where (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft")
                                 group s by s.Invoice.SalesOrder.Customer.Id into g
                                 select new
                                 {
@@ -228,7 +229,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptionsWithOrder(string search, int page)
         {
             var customerInvoices = from inv in context.InvoiceLineItems
-                                   where inv.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
                                    let discount2 = (100 - oli.Discount2) / 100
@@ -240,7 +241,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
-                                   where pay.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (pay.Invoice.Status.Code.Trim().ToLower() == "invoiced" || pay.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    group pay by pay.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
@@ -249,7 +250,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
-                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       where (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
                                        group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
@@ -261,7 +262,7 @@ namespace GMGInventory.Application.Repositories
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
-                                where s.Invoice.Status.Code.ToLower() == "invoiced"
+                                where (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft")
                                 group s by s.Invoice.SalesOrder.Customer.Id into g
                                 select new
                                 {
@@ -395,7 +396,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CustomerVM>> GetAllCustomerAsync()
         {
             var customerInvoices = from inv in context.InvoiceLineItems
-                                   where inv.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
                                    let discount2 = (100 - oli.Discount2) / 100
@@ -407,7 +408,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerPayments = from pay in context.CustomerPaymentDetails
-                                   where pay.Invoice.Status.Code.ToLower() == "invoiced"
+                                   where (pay.Invoice.Status.Code.Trim().ToLower() == "invoiced" || pay.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    group pay by pay.Invoice.SalesOrder.Customer.Id into g
                                    select new
                                    {
@@ -416,7 +417,7 @@ namespace GMGInventory.Application.Repositories
                                    };
 
             var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
-                                       where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                                       where (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
                                        group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
                                        select new
                                        {
@@ -428,7 +429,7 @@ namespace GMGInventory.Application.Repositories
                                        };
 
             var customerSOACR = from s in context.SOACRLineItems
-                                where s.Invoice.Status.Code.ToLower() == "invoiced"
+                                where (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft")
                                 group s by s.Invoice.SalesOrder.Customer.Id into g
                                 select new
                                 {
@@ -1290,7 +1291,7 @@ namespace GMGInventory.Application.Repositories
                                            join sli in context.SOACRLineItems on inv.Id equals sli.InvoiceId
                                            join soa in context.SOACRs on sli.SOACRId equals soa.Id
                                            where cp.SOACRId == soa.Id
-                                           && ili.Invoice.Status.Code.ToLower() == "invoiced"
+                                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                                            select new
                                            {
                                                Amount = ili.Quantity * ili.UnitPrice
@@ -1393,7 +1394,7 @@ namespace GMGInventory.Application.Repositories
 
             return from inv in context.Invoices
                    where inv.SalesOrder.Customer.Id == Id
-                      && inv.Status.Code.ToLower() == "invoiced"
+                      && (inv.Status.Code.Trim().ToLower() == "invoiced" || inv.Status.Code.Trim().ToLower() == "draft")
                    select new CustomerVM
                    {
                        InvoiceNo = inv.InvoiceNumber,

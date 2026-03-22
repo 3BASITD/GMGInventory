@@ -143,8 +143,11 @@
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
-                @* <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button> *@
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
@@ -154,6 +157,10 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        
+        var date_today = new Date();
+        var date_month_ago = new Date();
+        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
 
         SetDateFilter();
         function SetDateFilter() {
@@ -177,289 +184,290 @@
         }
 
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetTypeOptions")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("type");
+        
+        // Load Select2 for Type
+        $("#filter-type").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
             },
-            success: function (data, status, xhr) {
-                if (!data.some(x => x.id === "" || x.id === null)) {
-                    data.unshift({ id: "", text: "" });
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
                 }
-                $("#filter-type").select2(
-                    $.extend(true, {}, select2FilterConfig, { 
-                        data: data 
-                    })
-                ).on("change", function () {
-                    loadPurposeOptions();
-                });
+                return $("<strong>" + repo.code + "</strong> " + (repo.text !== repo.code ? "<em class='fw-light'> - " + repo.text + "</em>" : ""));
             },
-            complete: function (xhr, status) {
-                loadPurposeOptions();
-                hideBatchLoader("type");
-                //loadedSelectOptions.TypeDoneLoading = true;
-            }
+            ajax: {
+                url: "@Url.Action("GetTypeOptions2")"
+            },
+            dropdownParent: $("#filterModal"),
+            minimumResultsForSearch: -1
         });
 
-        // Load request purpose data for select2
-        function loadPurposeOptions() {
-            if ($("#filter-purpose").attr("data-select2-id")) {
-                $("#filter-purpose").select2("destroy");
-                $("#filter-purpose").empty();
-            }
-            var typeText = $("#filter-type").select2("data")[0]?.text.toLowerCase() || "";
-            if (typeText != "maintenance & repair" && typeText != "") {
-                $(".filter-purpose-container").toggle(true);
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetPurposeOptions")",
-                    data: {
+        $("#filter-type").on("select2:select", function () {
+            $("#filter-purpose").val(null).trigger("change");
+        });
+
+        $("#filter-type").on("select2:unselecting", function (e) {
+            $("#filter-purpose").val(null).trigger("change");
+        });
+        
+        // Load Select2 for Purpose
+        $("#filter-purpose").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.code + "</strong> " + (repo.text !== repo.code ? "<em class='fw-light'> - " + repo.text + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetPurposeOptions2")",
+                data: function (params) {
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
                         TypeId: $("#filter-type").val()
-                    },
-                    beforeSend: function (xhr, error) {
-                        showBatchLoader("purpose");
-                    },
-                    success: function (data) {
-                        if (!data.some(x => x.id === "" || x.id === null)) {
-                            data.unshift({ id: "", text: "" });
-                        }
-                        $("#filter-purpose").select2(
-                            $.extend(true, {}, select2FilterConfig, {
-                                data: data
-                            })
-                        );
-                    },
-                    complete: function (xhr, status) {
-                        hideBatchLoader("purpose");
-                        //loadedSelectOptions.PurposeDoneLoading = true;
-                    }
-                });
-            } else {
-                $(".filter-purpose-container").toggle(false);
-            }
-        }
-
-        // Load region for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Region")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("region");
-            },
-            success: function (data, status, xhr) {
-                if (!data.some(x => x.id === "" || x.id === null)) {
-                    data.unshift({ id: "", text: "" });
+                    });
                 }
-                $("#filter-region").select2(
-                    $.extend(true, {}, select2FilterConfig, { 
-                        data: data 
-                    })
-                );
             },
-            complete: function (xhr, status) {
-                hideBatchLoader("region");
-                //loadedSelectOptions.RegionDoneLoading = true;
-            }
+            dropdownParent: $("#filterModal"),
+            minimumResultsForSearch: -1
+        });
+        
+        // Load Select2 for Region
+        $("#filter-region").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Region")"
+            },
+            dropdownParent: $('#filterModal'),
+            minimumResultsForSearch: -1
+        });
+        
+        // Load Select2 for Status
+        $("#filter-status").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return repo.text;
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "PurchaseStatus")"
+            },
+            dropdownParent: $('#filterModal'),
+            minimumResultsForSearch: -1
         });
 
-        // Load status for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "PurchaseStatus")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("status");
-            },
-            success: function (data, status, xhr) {
-                if (!data.some(x => x.id === "" || x.id === null)) {
-                    data.unshift({ id: "", text: "" });
-                }
-                $("#filter-status").select2(
-                    $.extend(true, {}, select2FilterConfig, {
-                        data: data 
-                    })
-                );
-            },
-            complete: function (xhr, status) {
-                hideBatchLoader("status");
-                //loadedSelectOptions.StatusDoneLoading = true;
-            }
-        });
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
 
         function ApplyFilter() {
-            // loadedSelectOptions.TypeId = $("#filter-type").val();
-            // loadedSelectOptions.PurposeId = $("#filter-purpose").val();
-            // loadedSelectOptions.RegionId = $("#filter-region").val();
-            // loadedSelectOptions.StatusId = $("#filter-status").val();
+            $("#filterModal").modal("hide");
             requestDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
-                //checkDefaultFilter();
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
             });
         };
 
         function ResetFilter() {
+            $("#filterModal").modal("hide");
             resetToDefaultDTFilter();
-
             requestDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
-                //checkDefaultFilter();
+                checkDefaultFilter();
             });
         }
-        
-        // var loadedSelectOptions = {
-        //     TypeId: "",
-        //     TypeDoneLoading: false,
-        //     PurposeId: "",
-        //     PurposeDoneLoading: false,
-        //     RegionId: "",
-        //     RegionDoneLoading: false,
-        //     StatusId: "",
-        //     StatusDoneLoading: false,
-        // };
 
-        // var defaultDTState = {
-        //     order: [[5, "desc"]],
-        //     page: 0,
-        //     length: 10,
-        //     search: { search: "" },
-        //     TypeId: null,
-        //     PurposeId: null,
-        //     Purpose: "",
-        //     RegionId: null,
-        //     FiledBy: "everyone",
-        //     DateFrom: DateForInput(new Date(new Date().setMonth(new Date().getMonth() - 1))),
-        //     DateTo: DateForInput(new Date()),
-        //     StatusId: null
-        // };
+        var defaultDTState = {
+            order: [[5, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            TypeId: "",
+            Type: "",
+            PurposeId: "",
+            Purpose: "",
+            RegionId: "",
+            Region: "",
+            DateFrom: DateForInput(date_month_ago),
+            DateTo: DateForInput(date_today),
+            FiledBy: "everyone",
+            StatusId: "",
+            Status: ""
+        };
 
-        // function checkDefaultFilter() {
-        //     var changed = JSON.stringify(requestDT.order()) != JSON.stringify(defaultDTState.order) ||
-        //                   requestDT.page.info().start != defaultDTState.page ||
-        //                   requestDT.page.len() != defaultDTState.length ||
-        //                   (requestDT.search() || "") != defaultDTState.search.search ||
-        //                   $('#filter-type').val() != defaultDTState.TypeId ||
-        //                   $('#filter-purpose').val() != defaultDTState.PurposeId ||
-        //                   $('#filter-region').val() != defaultDTState.RegionId ||
-        //                   $('#filter-filedby').val() != defaultDTState.FiledBy ||
-        //                   $("#filter-from").val() != defaultDTState.DateFrom ||
-        //                   $("#filter-to").val() != defaultDTState.DateTo ||
-        //                   $("#filter-status").val() != defaultDTState.StatusId;
+        function checkDTChanged() {
+            if(!requestDT) return false;
+            
+            return JSON.stringify(requestDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   requestDT.page.info().start != defaultDTState.page ||
+                   requestDT.page.len() != defaultDTState.length ||
+                   (requestDT.search() || "") != defaultDTState.search.search ||
+                   ($('#filter-type').val() ?? "") != defaultDTState.TypeId ||
+                   ($('#filter-purpose').val() ?? "") != defaultDTState.PurposeId ||
+                   ($('#filter-region').val() ?? "") != defaultDTState.RegionId ||
+                   ($("#filter-from").val() ?? "") != defaultDTState.DateFrom ||
+                   ($("#filter-to").val() ?? "") != defaultDTState.DateTo ||
+                   ($('#filter-filedby').val() ?? "") != defaultDTState.FiledBy ||
+                   ($("#filter-status").val() ?? "") != defaultDTState.StatusId;
+        }
 
-        //     $(".btn-filter").toggleClass('btn-filtered', changed);
-        //     $(".btnReset").toggle(changed);
-        // }
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
 
-        // function resetToDefaultDTFilter() {
-        //     $("#filter-type").val(defaultDTState.TypeId).trigger('change');
-        //     $("#filter-purpose").val(defaultDTState.PurposeId).trigger('change');
-        //     $("#filter-region").val(defaultDTState.RegionId).trigger('change');
-        //     $("#filter-filedby").val(defaultDTState.FiledBy);
-        //     $("#filter-from").val(defaultDTState.DateFrom);
-        //     $("#filter-to").val(defaultDTState.DateTo);
-        //     $("#filter-status").val(defaultDTState.StatusId).trigger('change');
+        function resetToDefaultDTFilter() {
+            $("#filter-type").val(defaultDTState.TypeId).trigger('change');
+            $("#filter-purpose").val(defaultDTState.PurposeId).trigger('change');
+            $("#filter-region").val(defaultDTState.RegionId).trigger('change');
+            $("#filter-from").val(defaultDTState.DateFrom);
+            $("#filter-to").val(defaultDTState.DateTo);
+            $("#filter-filedby").val(defaultDTState.FiledBy);
+            $("#filter-status").val(defaultDTState.StatusId).trigger('change');
+            
+            localStorage.removeItem(dt_storage);
 
-        //     console.log("resetToDefaultDTFilter 2 t:" + $("#filter-type").val() + " p:" + $("#filter-purpose").val() + " r:" + $("#filter-region").val() + " s:" + $("#filter-status").val());
+            if (requestDT) {
+                requestDT.state.clear();
+                requestDT.order(defaultDTState.order);
+                requestDT.page(defaultDTState.page);
+                requestDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
 
-        //     loadedSelectOptions.TypeId = defaultDTState.TypeId;
-        //     loadedSelectOptions.PurposeId = defaultDTState.PurposeId;
-        //     loadedSelectOptions.RegionId = defaultDTState.RegionId;
-        //     loadedSelectOptions.StatusId = defaultDTState.StatusId;
-
-        //     requestDT.state.clear();
-        //     requestDT.order(defaultDTState.order);
-        //     requestDT.page(defaultDTState.page);
-        //     requestDT.search(defaultDTState.search.search);
-        // }
-        
-        // function waitForSelect2Loaded() {
-        //     var tries = 0;
-
-        //     function check() { // huwag palitan ng loop, pang iwas problema sa async
-        //         if (loadedSelectOptions.TypeDoneLoading && $("#filter-type").val() != loadedSelectOptions.TypeId)
-        //         {// hiwalay para makapili si purpose
-        //             $("#filter-type").val(loadedSelectOptions.TypeId).trigger("change");
-        //             loadPurposeOptions();
-        //         }
-        //         if ((loadedSelectOptions.PurposeDoneLoading || loadedSelectOptions.TypeId == "") &&
-        //             loadedSelectOptions.RegionDoneLoading &&
-        //             loadedSelectOptions.StatusDoneLoading) {
-        //                 $("#filter-purpose").val(loadedSelectOptions.PurposeId).trigger("change");
-        //                 $("#filter-region").val(loadedSelectOptions.RegionId).trigger("change");
-        //                 $("#filter-status").val(loadedSelectOptions.StatusId).trigger("change");
-
-        //                 return;
-        //         }
-
-        //         if (tries++ < 50) {
-        //             setTimeout(check, 200);
-        //         } else {
-        //             toastr.warning("Filter select option loading timeout. Please try again later by reloading this page");
-        //         }
-        //     }
-
-        //     check();
-        // }
-
-        var requestDT = $('.table-request').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("requestdt");
-        }).DataTable({
-            // stateSave: true,
-            // stateSaveParams: function (settings, data) {
-            //     data.TypeId = $('#filter-type').val();
-            //     data.PurposeId = $('#filter-purpose').val();
-            //     data.Purpose = $('#filter-purpose option:selected').text();
-            //     data.RegionId = $('#filter-region').val();
-            //     data.FiledBy = $('#filter-filedby').val();
-            //     data.DateFrom = $("#filter-from").val();
-            //     data.DateTo = $("#filter-to").val();
-            //     data.StatusId = $("#filter-status").val();
-            // },
-            // stateLoadParams: function (settings, data) {
-            //     // $("#filter-type").val(data.TypeId).trigger('change');
-            //     // if(data.PurposeId) {
-            //     //     var purposeOption = new Option(data.Purpose, data.PurposeId, true, true);
-            //     //     $("#filter-purpose").append(purposeOption).trigger('change');
-            //     // } else {
-            //     //     $("#filter-purpose").val(defaultDTState.PurposeId).trigger('change');
-            //     // }
-            //     // $("#filter-region").val(data.RegionId).trigger('change');
-            //     loadedSelectOptions.TypeId = data.TypeId || "";
-            //     loadedSelectOptions.PurposeId = data.PurposeId || "";
-            //     loadedSelectOptions.RegionId = data.RegionId || "";
-            //     $("#filter-filedby").val(data.FiledBy).trigger('change');
-            //     $("#filter-from").val(data.DateFrom);
-            //     $("#filter-to").val(data.DateTo);
-            //     //$("#filter-status").val(data.StatusId).trigger('change');
-            //     loadedSelectOptions.StatusId = data.StatusId || "";
-
-            //     // waitForSelect2Loaded();
-            // },
+        var requestDT = $('.table-request').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                if (checkDTChanged()) {
+                    var now = new Date().getTime();
+                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
+                } else {
+                    localStorage.removeItem(dt_storage);
+                }
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.TypeId = $('#filter-type').val();
+                data.Type = $('#filter-type option:selected').text();
+                data.PurposeId = $('#filter-purpose').val();
+                data.Purpose = $('#filter-purpose option:selected').text();
+                data.RegionId = $('#filter-region').val();
+                data.Region = $('#filter-region option:selected').text();
+                data.FiledBy = $('#filter-filedby').val();
+                data.DateFrom = $("#filter-from").val();
+                data.DateTo = $("#filter-to").val();
+                data.StatusId = $("#filter-status").val();
+                data.Status = $('#filter-status option:selected').text();
+            },
+            stateLoadParams: function (settings, data) {
+                if (data.TypeId) {
+                    var typeOption = new Option(data.Type, data.TypeId, true, true);
+                    $(typeOption).data('data', {
+                        id: data.TypeId,
+                        text: data.Type
+                    });
+                    $("#filter-type").append(typeOption).trigger('change');
+                }
+                if (data.PurposeId) {
+                    var purposeOption = new Option(data.Purpose, data.PurposeId, true, true);
+                    $(purposeOption).data('data', {
+                        id: data.PurposeId,
+                        text: data.Purpose
+                    });
+                    $("#filter-purpose").append(purposeOption).trigger('change');
+                }
+                if (data.RegionId) {
+                    var regionOption = new Option(data.Region, data.RegionId, true, true);
+                    $(regionOption).data('data', {
+                        id: data.RegionId,
+                        text: data.Region
+                    });
+                    $("#filter-region").append(regionOption).trigger('change');
+                }
+                $("#filter-from").val(data.DateFrom);
+                $("#filter-to").val(data.DateTo);
+                $("#filter-filedby").val(data.FiledBy).trigger('change');
+                if (data.StatusId) {
+                    var statusOption = new Option(data.Status, data.StatusId, true, true);
+                    $(statusOption).data('data', {
+                        id: data.StatusId,
+                        text: data.Status
+                    });
+                    $("#filter-status").append(statusOption).trigger('change');
+                }
+            },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
                 data: function (data) {
-                    typeId = $('#filter-type').val();
-                    purposeId = $('#filter-purpose').val();
-                    purpose = $('#filter-purpose option:selected').text();
-                    regionId = $('#filter-region').val();
-                    // typeId = loadedSelectOptions.TypeId;
-                    // purposeId = loadedSelectOptions.PurposeId;
-                    // regionId = loadedSelectOptions.RegionId;
-                    filedBy = $('#filter-filedby').val();
-                    dateFrom = $("#filter-from").val();
-                    dateTo = $("#filter-to").val();
-                    statusId = $("#filter-status").val();
-                    // statusId = loadedSelectOptions.RegionId;
-
+                    var typeId = $('#filter-type').val();
                     if (typeId) data.TypeId = typeId;
+
+                    var purposeId = $('#filter-purpose').val();
                     if (purposeId) data.PurposeId = purposeId;
+                    
+                    var regionId = $('#filter-region').val();
                     if (regionId) data.RegionId = regionId;
-                    if (filedBy) data.FiledBy = filedBy;
-                    data.DateFrom = dateFrom;
-                    data.DateTo = dateTo;
+
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+
+                    var statusId = $("#filter-status").val();
                     if (statusId) data.StatusId = statusId;
+
+                    var filedBy = $('#filter-filedby').val();
+                    if (filedBy) data.FiledBy = filedBy;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -486,17 +494,12 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
-                        // if (data.status.toLowerCase() == "draft" && data.orderBy == $("#current-user-nickname").val()) {
-                        //     if (user_access.canDelete) {
-                        //         actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
-                        //     }
-                        // }
                         return actions + "</div>";
                     },
                     responsivePriority: 1
                 }
             ],
-            order: [[5, "desc"]],
+            order: defaultDTState.order,
             createdRow: function (row, data, dataIndex) {
                 if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('table-danger');
@@ -508,13 +511,11 @@
                     $(row).addClass('table-success');
                     $(row).find('td:eq(4)').addClass('text-success');
                 }
-                console.log(data.status.toLowerCase());
             }
         });
 
         requestDT.on("draw", function () {
-            hideBatchLoader("requestdt");
-            //checkDefaultFilter();
+            checkDefaultFilter();
         });
 
         if (user_access.canUploadDownload) {

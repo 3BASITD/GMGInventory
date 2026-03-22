@@ -878,6 +878,19 @@ namespace GMGInventory.Application.Repositories
             {
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 var inventory = await context.ItemInventories.Where(s => s.ItemId == itemId && s.WarehouseId == warehouseId).FirstOrDefaultAsync();
+
+
+                var countHistory = new PhysicalCountHistory
+                {
+                    ItemId = itemId,
+                    QuantityFrom = inventory == null ? 0 : inventory.Quantity,
+                    QuantityTo = quantity,
+                    Remarks = remarks,
+                    WarehouseId = warehouseId
+                };
+                context.PhysicalCountHistories.Add(countHistory);
+                await context.SaveChangesAsync(currentUserId);
+
                 if (inventory == null)
                 {
                     inventory = new ItemInventory
@@ -891,17 +904,6 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
-                    var countHistory = new PhysicalCountHistory
-                    {
-                        ItemId = itemId,
-                        QuantityFrom = inventory.Quantity,
-                        QuantityTo = quantity,
-                        Remarks = remarks,
-                        WarehouseId = warehouseId
-                    };
-                    context.PhysicalCountHistories.Add(countHistory);
-                    await context.SaveChangesAsync(currentUserId);
-
                     inventory.Quantity = quantity;
                     await context.SaveChangesAsync(currentUserId);
                 }
@@ -1265,7 +1267,8 @@ namespace GMGInventory.Application.Repositories
 
                           let quantityPacked = context.PackLineItems
                                                       .Where(s => s.Pack.SalesOrderId == sitem.SalesOrderId
-                                                               && s.ItemId == sitem.ItemId)
+                                                               && s.ItemId == sitem.ItemId
+                                                               && s.Pack.Status.Code.Trim().ToLower() == "posted")
                                                       .Sum(s => (int?)s.Quantity) ?? 0
                           let quantityReturned = context.SalesReturnLineItems
                                                       .Where(s => s.InvoiceLineItem.Invoice.SalesOrderId == sitem.Id
@@ -1291,8 +1294,8 @@ namespace GMGInventory.Application.Repositories
                               //UnservedQuantityD = sitem.Quantity - inventory > 0 ? sitem.Quantity - inventory : 0
                               //UnservedQuantityD = Math.Max(0, sitem.Quantity - inventory)
                               UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned) > 0
-                                                   ? sitem.Quantity - (quantityPacked - quantityReturned)
-                                                   : 0
+                                                ? sitem.Quantity - (quantityPacked - quantityReturned)
+                                                : 0
                           };
             return await salesVM.ToListAsync();
         }
@@ -2002,7 +2005,7 @@ namespace GMGInventory.Application.Repositories
                 if (unit == null) return $"Invalid Unit: {itemFile.Unit} not found";
 
                 var warehouse = await context.Warehouses
-                                             .Where(s => s.Code.ToLower() == itemFile.Warehouse.ToLower())
+                                             .Where(s => s.Code.Trim().ToLower() == itemFile.Warehouse.ToLower())
                                              .FirstOrDefaultAsync();
                 if (warehouse == null) return $"Invalid Warehouse: {itemFile.Warehouse} not found";
 
@@ -2017,7 +2020,7 @@ namespace GMGInventory.Application.Repositories
                 var modelNumber = SaveItemFromFileTruncate(itemFile.ModelNumber, 200, msg, "Model Number");
                 var size = SaveItemFromFileTruncate(itemFile.Size, 50, msg, "Size", false);
 
-                var item = await context.Items.Where(s => s.Code.ToLower() == code.ToLower()).FirstOrDefaultAsync();
+                var item = await context.Items.Where(s => s.Code.Trim().ToLower() == code.ToLower()).FirstOrDefaultAsync();
                 if (item != null)
                 {
                     item.OldCode = !string.IsNullOrWhiteSpace(oldCode) ? oldCode : item.OldCode;

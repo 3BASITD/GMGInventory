@@ -43,6 +43,30 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        {
+            var itemTypes = await context.ItemTypes
+                                     .Where(s => s.IsActive
+                                              && (string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower()))))
+                                     .Select(s => new JsonNameOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Code,
+                                         Name = s.Name
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var itemTypesFiltered = itemTypes.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = itemTypesFiltered,
+                total_count = itemTypes.Count
+            };
+        }
+
         public async Task<int?> GetIdAsync(string? Name)
         {
             var itemType = await context.ItemTypes.Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim()).FirstOrDefaultAsync();
@@ -328,7 +352,7 @@ namespace GMGInventory.Application.Repositories
                 var _name = typeVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
                 var name = _name.Length > 100 ? _name[..100] : _name;
 
-                var type = await context.ItemTypes.Where(s => s.Code.ToLower() == code.ToLower()).FirstOrDefaultAsync();
+                var type = await context.ItemTypes.Where(s => s.Code.Trim().ToLower() == code.ToLower()).FirstOrDefaultAsync();
                 if (type != null)
                 {
                     type.Name = name;

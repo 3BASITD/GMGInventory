@@ -68,8 +68,7 @@ namespace GMGInventory.Application.Repositories
                                 PartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
                                 Quantity = receive.Quantity,
                                 Unit = receive.OrderItem.RequestItem.Item.Unit.Name,
-                                UnitId = receive.OrderItem.RequestItem.Item.Unit.Id,
-                                Selected = SelectedId != null && receive.Id == SelectedId
+                                UnitId = receive.OrderItem.RequestItem.Item.Unit.Id
                             };
             return await receiveVM.Where(s => s.UnorderedQuantity > 0).ToListAsync();
         }
@@ -115,9 +114,13 @@ namespace GMGInventory.Application.Repositories
                                Id = retrn.Id,
                                DocumentNumber = retrn.DocumentNumber,
                                Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Code,
+                               SupplierId = retrn.PurchaseReceive.PurchaseOrder.Supplier.Id,
                                RRNumber = retrn.PurchaseReceive.DocumentNumber,
+                               RRId = retrn.PurchaseReceive.Id,
                                PONumber = retrn.PurchaseReceive.PurchaseOrder.DocumentNumber,
+                               POId = retrn.PurchaseReceive.PurchaseOrder.Id,
                                Warehouse = retrn.Warehouse.Code,
+                               WarehouseId = retrn.Warehouse.Id,
                                DRNumber = retrn.PurchaseReceive.DeliveryReceiptNumber,
                                SINumber = retrn.PurchaseReceive.SalesInvoiceNumber,
                                Status = retrn.Status.Code,
@@ -197,7 +200,7 @@ namespace GMGInventory.Application.Repositories
             var preturns = from preturn in context.PurchaseReturnNews
                            where (preturn.BarcotechRequestDate == null
                            || preturn.BarcotechRequestDate > dtYesterday)
-                           && preturn.Status.Code.ToLower() == "approved"
+                           && preturn.Status.Code.Trim().ToLower() == "approved"
                            select new APIPurchaseReturn
                            {
                                Id = preturn.Id,
@@ -243,8 +246,11 @@ namespace GMGInventory.Application.Repositories
                               Id = retrn.Id,
                               DocumentNumber = retrn.DocumentNumber,
                               RRNumber = retrn.PurchaseReceive.DocumentNumber,
+                              RRId = retrn.PurchaseReceive.Id,
                               PONumber = retrn.PurchaseReceive.PurchaseOrder.DocumentNumber,
+                              POId = retrn.PurchaseReceive.PurchaseOrder.Id,
                               Supplier = retrn.PurchaseReceive.PurchaseOrder.Supplier.Name,
+                              SupplierId = retrn.PurchaseReceive.PurchaseOrder.Supplier.Id,
                               CurrencyId = retrn.PurchaseReceive.PurchaseOrder.Currency.Id,
                               Currency = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,
                               CurrencyCode = retrn.PurchaseReceive.PurchaseOrder.Currency.Name,

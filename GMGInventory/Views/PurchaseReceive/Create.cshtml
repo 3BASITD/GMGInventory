@@ -9,6 +9,7 @@
         ViewData["Title"] = "New Purchase Receive";
     }
     var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
+    var userAccessSpecial = (ViewsAccessVM)ViewData["UserAccessSpecial"]!;
 }
 
 @section Breadcrumb {
@@ -193,6 +194,7 @@
 @section Scripts {
     <script>
         var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+        var user_accessSpecial = @Html.Raw(Json.Serialize(userAccessSpecial));
         $("#date-received").val(DateForInput(new Date()));
 
         if ($("#resubmitPRId").length) {
@@ -270,7 +272,8 @@
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                         }
                     },
                     name: "ItemCode",
@@ -409,24 +412,30 @@
             $("#receive-poNumber").select2({
                 placeholder: "<empty>",
                 ajax: {
-                    url: "@Url.Action("GetPurchaseOrderOptions2")",
-                    data: function (params) {
-                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
-                        return Object.assign(base, {
-                        SelectedId:  selectedOrder
-                        });
-                    }
+                    url: "@Url.Action("GetPurchaseOrderOptions2")"
                 },
                 templateResult: function (repo) {
                     if (repo.loading) {
                         return repo.text;
                     }
+
+                    var subinfo = [];
+                    subinfo.push("Order count: " + repo.totalQuantity);
+                    if(!repo.disabled) 
+                        subinfo.push("Pending count: " + repo.totalIncompleteQuantity);
+                    if(repo.alreadyOn)
+                        subinfo.push("Received on: " + repo.alreadyOn);
+                    if(repo.disabled) {
+                        if(repo.text.toLowerCase().includes("draft") || repo.text.toLowerCase().includes("submitted")) 
+                            subinfo.push("<small class='text-info'>Advance Filing requires Purchase Receiving (Special) - Add access</small>");
+                        else
+                            subinfo.push("<small class='text-info'>Receive completed</small>");
+                    }
+
                     return $(
                         "<strong>" + repo.text + "</strong><br />" +
                         "<small>" +
-                        "Order count: " + repo.totalQuantity + "<br />" +
-                        (!repo.disabled ? "Pending count: " + repo.totalIncompleteQuantity + "<br />" : "") +
-                        (repo.alreadyOn ? "Received on: " + repo.alreadyOn : "") +
+                        subinfo.join("<br />") +
                         "</small>"
                     );
                 }

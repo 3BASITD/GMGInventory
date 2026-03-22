@@ -246,7 +246,8 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
                 },
@@ -539,11 +540,9 @@
                 var oldQty = parseInt(rowdata.quantity) || 0;
 
                 var delta = newQty - oldQty;
-                console.log("Delta:"+delta);
                 // Update the row’s stored quantity so that next input compares correctly
                 rowdata.quantity = newQty;
 
-                console.log(rowdata);
 
                 orderDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
                     var row_data = this.data();

@@ -204,6 +204,9 @@
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
@@ -270,7 +273,7 @@
             allowClear: true,
             placeholder: {
                 id: "",
-                text: "All"
+                text: "ALL"
             },
             templateResult: function (repo) {
                 if (repo.loading) {
@@ -298,7 +301,7 @@
             allowClear: true,
             placeholder: {
                 id: "",
-                text: "All"
+                text: "ALL"
             },
             templateResult: function (repo) {
                 if (repo.loading) {
@@ -369,22 +372,37 @@
         $("#filter2-customer").on("select2:unselecting", function (e) {
             $("#filter2-customer-name").val("");
         });
+        
+        var dt_storage1 = "BAS_DT" + window.location.pathname.replace(/\//g, "_") + "_1";
+        var dt_storage2 = "BAS_DT" + window.location.pathname.replace(/\//g, "_") + "_2";
+        var dt_duration = 3600000; // 1 hour
 
         function ApplyFilter() {
+            $("#filterModal").modal("hide");
             salesDT1.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage1);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
                 salesDT2.ajax.reload(() => {
-                    $("#filterModal").modal("hide");
+                    var saved = localStorage.getItem(dt_storage2);
+                    if (saved) {
+                        var parsed = JSON.parse(saved);
+                        var expiry = parsed.timestamp + dt_duration;
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                    }
                     checkDefaultFilter();
                 });
             });
         }
 
         function ResetFilter() {
+            $("#filterModal").modal("hide");
             resetToDefaultDTFilter();
-
             salesDT1.ajax.reload(() => {
                 salesDT2.ajax.reload(() => {
-                    $("#filterModal").modal("hide");
                     checkDefaultFilter();
                 });
             });
@@ -424,12 +442,18 @@
                 $(`#filter${prefix}-to`).val() !== defaults.DateTo
             );
         }
-        function checkDefaultFilter() {
-                var changed = hasTableChanged(salesDT1, defaultDTState.table1, 1) ||
-                              hasTableChanged(salesDT2, defaultDTState.table2, 2);
+        
 
-            $(".btn-filter").toggleClass('btn-filtered', changed);
-            $(".btnReset").toggle(changed);
+        function checkDTChanged() {
+            if(!salesDT1 && !salesDT2) return false;
+            
+            return hasTableChanged(salesDT1, defaultDTState.table1, 1) ||
+                   hasTableChanged(salesDT2, defaultDTState.table2, 2);
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
         }
 
         function setDefaultDTFilter(dt, defaults, prefix) {
@@ -439,11 +463,18 @@
             $(`#filter${prefix}-customer-name`).val(defaults.Customer);
             $(`#filter${prefix}-from`).val(defaults.DateFrom);
             $(`#filter${prefix}-to`).val(defaults.DateTo);
+            
+            localStorage.removeItem(dt_storage1);
+            localStorage.removeItem(dt_storage2);
 
-            dt.state.clear();
-            dt.order(defaults.order);
-            dt.page(defaults.page);
-            dt.search(defaults.search.search);
+            if (dt) {
+                dt.state.clear();
+                dt.order(defaults.order);
+                dt.page(defaults.page);
+                dt.search(defaults.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
         function resetToDefaultDTFilter() {
@@ -453,9 +484,44 @@
 
         // Load List 1 on DataTable
         var salesDT1 = $('.table-sales1').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("sales1");
+            //showBatchLoader("sales1");
         }).DataTable({
             stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                if (checkDTChanged()) {
+                    var now = new Date().getTime();
+                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                    localStorage.setItem(dt_storage1, JSON.stringify(dtState));
+                } else {
+                    localStorage.removeItem(dt_storage1);
+                }
+            },
+            stateLoadCallback: function(settings) {
+                const saved1 = localStorage.getItem(dt_storage1);
+                const saved2 = localStorage.getItem(dt_storage2);
+                if (saved1 || saved2) {
+                    var age1 = dt_duration, age2 = dt_duration;
+                    var expiry1 = 0, expiry2 = 0;
+                    if (saved1) {
+                        var parsed = JSON.parse(saved1);
+                        var age1 = new Date().getTime() - parsed.timestamp;
+                        var expiry1 = parsed.timestamp + dt_duration;
+                    }
+                    if (saved2) {
+                        var parsed = JSON.parse(saved2);
+                        var age2 = new Date().getTime() - parsed.timestamp;
+                        var expiry2 = parsed.timestamp + dt_duration;
+                    }
+
+                    if (age1 < dt_duration || age2 < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry1 == 0 ? expiry2 : expiry1)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
             stateSaveParams: function (settings, data) {
                 data.BrandId = $('#filter1-brand').val();
                 data.BrandCode = $('#filter1-brand option:selected').text();
@@ -501,9 +567,15 @@
                     data.DateTo = $("#filter1-to").val();
                     if (brandId) data.Brand = brandId;
                     if (customerId) data.Customer = customerId;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -526,7 +598,7 @@
 
         // Load functions upon DataTable load
         salesDT1.on("draw", function () {
-            hideBatchLoader("sales1");
+            //hideBatchLoader("sales1");
             checkDefaultFilter();
 
             //$(".table-sales1 thead th").removeClass("text-end");
@@ -534,9 +606,45 @@
 
         // Load List 2 on DataTable
         var salesDT2 = $('.table-sales2').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("sales2");
+            //showBatchLoader("sales2");
         }).DataTable({
             stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                if (checkDTChanged()) {
+                    var now = new Date().getTime();
+                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                    localStorage.setItem(dt_storage2, JSON.stringify(dtState));
+                } else {
+                    localStorage.removeItem(dt_storage2);
+                }
+            },
+            stateLoadCallback: function(settings) {
+                const saved1 = localStorage.getItem(dt_storage1);
+                const saved2 = localStorage.getItem(dt_storage2);
+                if (saved1 || saved2) {
+                    var duration = 3600000; // 1 hour
+                    var age1 = duration, age2 = duration;
+                    var expiry1 = 0, expiry2 = 0;
+                    if (saved1) {
+                        var parsed = JSON.parse(saved1);
+                        var age1 = new Date().getTime() - parsed.timestamp;
+                        var expiry1 = parsed.timestamp + duration;
+                    }
+                    if (saved2) {
+                        var parsed = JSON.parse(saved2);
+                        var age2 = new Date().getTime() - parsed.timestamp;
+                        var expiry2 = parsed.timestamp + duration;
+                    }
+
+                    if (age1 < duration || age2 < duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry1 == 0 ? expiry2 : expiry1)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
             stateSaveParams: function (settings, data) {
                 data.BrandId = $('#filter2-brand').val();
                 data.BrandCode = $('#filter2-brand option:selected').text();
@@ -582,9 +690,15 @@
                     data.DateTo = $("#filter2-to").val();
                     if (brandId) data.Brand = brandId;
                     if (customerId) data.Customer = customerId;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -607,7 +721,7 @@
 
         // Load functions upon DataTable load
         salesDT2.on("draw", function () {
-            hideBatchLoader("sales2");
+            //hideBatchLoader("sales2");
             checkDefaultFilter();
 
             //$(".table-sales1 thead th").removeClass("text-end");

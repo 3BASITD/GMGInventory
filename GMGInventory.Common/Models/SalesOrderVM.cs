@@ -311,16 +311,23 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Served Quantity")]
         public string ServedQuantity => string.Format(SystemFormat.StringIntegerComma, ServedQuantityD);
-        public int ServedQuantityD { get; set; }
+        public int ServedQuantityD => PackedQuantityD - ReturnedQuantityD;
 
         [Display(Name = "Unserved Quantity")]
         public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
         //public int UnservedQuantityD => QuantityD - ServedQuantityD;
-        public int UnservedQuantityD => Math.Max(0, QuantityD - InventoryCountD);
+        //public int UnservedQuantityD => Math.Max(0, QuantityD - InventoryCountD);
+        public int UnservedQuantityD => QuantityD - (PackedQuantityD - ReturnedQuantityD) > 0
+                                      ? QuantityD - (PackedQuantityD - ReturnedQuantityD)
+                                      : 0;
 
         [Display(Name = "Packed Quantity")]
         public string PackedQuantity => string.Format(SystemFormat.StringIntegerComma, PackedQuantityD);
         public int PackedQuantityD { get; set; }
+
+        [Display(Name = "Returned Quantity")]
+        public string ReturnedQuantity => string.Format(SystemFormat.StringIntegerComma, ReturnedQuantityD);
+        public int ReturnedQuantityD { get; set; }
 
         [Display(Name = "Invoiced Quantity")]
         public string InvoicedQuantity => string.Format(SystemFormat.StringIntegerComma, InvoicedQuantityD);

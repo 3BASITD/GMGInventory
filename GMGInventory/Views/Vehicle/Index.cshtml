@@ -194,11 +194,18 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         var vehicleDT = $('.table-vehicles').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetVehiclesDT")",
-                type: "POST"
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -212,13 +219,13 @@
                 { data: "vehicleType", name: "VehicleType" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.dateRegistered || '<em class="text-muted">n/a</em>';
+                        return data.dateRegistered || '<em class="text-muted">N/A</em>';
                     },
                     name: "DateRegistered"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.dateExpiration || '<em class="text-muted">n/a</em>';
+                        return data.dateExpiration || '<em class="text-muted">N/A</em>';
                     },
                     name: "DateExpiration"
                 },
@@ -250,19 +257,19 @@
         });
 
         vehicleDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $('.btn-details').click(function (e) {
                 var data = vehicleDT.row($(this).parents('tr')).data();
 
                 $(".details-number").html(data.fleetPlateNumber);
                 $(".details-type").html(data.vehicleType);
-                $(".details-registered").html(data.dateRegistered || '<em class="text-muted">n/a</em>');
-                $(".details-expiration").html(data.dateExpiration || '<em class="text-muted">n/a</em>');
+                $(".details-registered").html(data.dateRegistered || '<em class="text-muted">N/A</em>');
+                $(".details-expiration").html(data.dateExpiration || '<em class="text-muted">N/A</em>');
                 $(".details-created-by").html(data.userCreated);
                 $(".details-created-date").html(data.dateCreated);
-                $(".details-modified-by").html(data.userModified || '<em class="text-muted">n/a</em>');
-                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">n/a</em>');
+                $(".details-modified-by").html(data.userModified || '<em class="text-muted">N/A</em>');
+                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">N/A</em>');
 
                 $("#detailsModal").modal("show");
             });

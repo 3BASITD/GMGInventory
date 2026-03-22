@@ -54,6 +54,29 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
+        public async Task<Select2Model<JsonCodeOptionsModel>> GetTypeOptions2(string search, int page)
+        {
+            var types = await context.PurchaseRequestTypes
+                                     .Where(s => string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower())))
+                                     .Select(s => new JsonCodeOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Name,
+                                         Code = s.Code
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var typesFiltered = types.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonCodeOptionsModel>
+            {
+                //incomplete_results = false,
+                items = typesFiltered,
+                total_count = types.Count
+            };
+        }
+
         public async Task<IList<JsonCodeOptionsModel>> GetPurposeOptions(int TypeId, int? SelectedId)
         {
             return await context.PurchaseRequestPurposes
@@ -67,6 +90,30 @@ namespace GMGInventory.Application.Repositories
                                 })
                                 .OrderBy(s => s.Id)
                                 .ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonCodeOptionsModel>> GetPurposeOptions2(string search, int page, int? TypeId)
+        {
+            var purposes = await context.PurchaseRequestPurposes
+                                        .Where(s => (TypeId == null || s.TypeId == TypeId)
+                                                 && (string.IsNullOrWhiteSpace(search)
+                                                 || (s.Code.ToLower().Contains(search.ToLower()))
+                                                 || (s.Name.ToLower().Contains(search.ToLower()))))
+                                        .Select(s => new JsonCodeOptionsModel
+                                        {
+                                            Id = s.Id.ToString(),
+                                            Text = s.Name,
+                                            Code = s.Code
+                                        })
+                                        .OrderBy(s => s.Text)
+                                        .ToListAsync();
+            var purposesFiltered = purposes.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonCodeOptionsModel>
+            {
+                //incomplete_results = false,
+                items = purposesFiltered,
+                total_count = purposes.Count
+            };
         }
 
         public async Task<IList<PurchaseRequestVM>> GetListAsync(PurchaseRequestFilter filter)
@@ -234,11 +281,10 @@ namespace GMGInventory.Application.Repositories
                             {
                                 Id = request.Id,
                                 PurchaseRequestId = request.PurchaseRequestId,
-
                                 LineNumber = request.LineNumber,
                                 SalesOrderId = request.SalesOrderId,
                                 SalesOrderNumber = request.SalesOrder.SalesOrderNumber,
-                                PONumber = string.Join(", ", po.Select(s => "<a href='/PurchaseOrder/Details/" + s.Id + "' class='text-info' target='_blank'>" + s.DocNum + "</a>")),
+                                PONumber = string.Join(", ", po.Select(s => "<a href='/PurchaseOrder/Details/" + s.Id + "' class='link-info' target='_blank'>" + s.DocNum + "</a>")),
                                 CustomerId = request.SalesOrder.Customer.Id,
                                 Customer = request.SalesOrder.Customer.Name,
                                 ItemId = request.ItemId,
@@ -312,8 +358,14 @@ namespace GMGInventory.Application.Repositories
                                                        .Sum(s => (int?)s.Quantity) ?? 0
                                 let packedQuantity = context.PackLineItems
                                                             .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
-                                                                     && s.ItemId == order.ItemId)
+                                                                     && s.ItemId == order.ItemId
+                                                                     && s.Pack.Status.Code.Trim().ToLower() == "posted")
                                                             .Sum(s => (int?)s.Quantity) ?? 0
+                                let returnedQuantity = context.SalesReturnLineItems
+                                                              .Where(s => s.InvoiceLineItem != null
+                                                                       && s.InvoiceLineItem.Invoice.SalesOrderId == order.SalesOrderId
+                                                                       && s.ItemId == order.ItemId)
+                                                              .Sum(s => (int?)s.Quantity) ?? 0
                                 where order.SalesOrderId == SalesOrderId
                                 orderby order.LineNumber ascending
                                 select new ItemFromSalesOrderVM
@@ -326,7 +378,8 @@ namespace GMGInventory.Application.Repositories
                                     PartNumber = order.Item.PartNumber,
                                     InventoryCountD = inventory,
                                     OrderedQuantityD = order.Quantity,
-                                    RemainingQuantityD = order.Quantity - packedQuantity,
+                                    PackQuantityD = packedQuantity,
+                                    ReturnedQuantityD = returnedQuantity,
                                     Unit = order.Item.Unit.Code,
                                     UnitId = order.Item.Unit.Id
                                 }).ToListAsync();
@@ -450,6 +503,13 @@ namespace GMGInventory.Application.Repositories
                             await context.SaveChangesAsync(currentUserId);
                         }
                     }
+
+                    Items = Items.OrderBy(x => x.LineNumber)
+                                 .Select((item, index) =>
+                                 {
+                                     item.LineNumber = index + 1;
+                                     return item;
+                                 }).ToList();
 
                     foreach (var rename in Items)
                     {
@@ -665,12 +725,53 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
+        public async Task<ResponseModel> CancelAsync(int requestId)
+        {
+            try
+            {
+                var existingRequest = await context.PurchaseRequests
+                                                   .Include(s => s.Status)
+                                                   .Include(s => s.PurchaseRequestLineItems).ThenInclude(s => s.PurchaseOrderLineItems)
+                                                   .Where(s => s.Id == requestId)
+                                                   .FirstOrDefaultAsync();
+
+                if (existingRequest == null)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Request. Record can not be found" };
+                }
+                else if (existingRequest.Status.Name.ToLower() != "submitted")
+                {
+                    return new ResponseModel { Status = "Error", Message = "Only submitted can be cancelled" };
+                }
+                else if (existingRequest.PurchaseRequestLineItems.Sum(s => s.PurchaseOrderLineItems.Count) > 0)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Record already used in Purchase Order. Cancel cannot proceed" };
+                }
+                else
+                {
+                    var draftStatus = await context.PurchaseStatuses.Where(s => s.Name.Trim().ToLower() == "draft").Select(s => s.Id).FirstAsync();
+
+                    existingRequest.StatusId = draftStatus;
+
+                    context.PurchaseRequests.Update(existingRequest);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    return new ResponseModel { Status = "Success", Message = "Purchase Request successfully cancelled" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
         public async Task<ResponseModel> DeleteAsync(int requestId)
         {
             try
             {
                 var existingRequest = await context.PurchaseRequests
                                                    .Include(s => s.Status)
+                                                   .Include(s => s.PurchaseRequestLineItems).ThenInclude(s => s.PurchaseOrderLineItems)
                                                    .Where(s => s.Id == requestId)
                                                    .FirstOrDefaultAsync();
 
@@ -681,6 +782,10 @@ namespace GMGInventory.Application.Repositories
                 else if (existingRequest.Status.Name.ToLower() != "draft")
                 {
                     return new ResponseModel { Status = "Error", Message = "Only draft can be deleted" };
+                }
+                else if (existingRequest.PurchaseRequestLineItems.Sum(s => s.PurchaseOrderLineItems.Count) > 0)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Record already used in Purchase Order. Delete cannot proceed" };
                 }
                 else
                 {

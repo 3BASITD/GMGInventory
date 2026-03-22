@@ -158,7 +158,7 @@
 
         // Load List on DataTable
         var shippingDT = $('.table-shipping').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -169,7 +169,14 @@
                         var customerId = $("#filter-customer").val();
                        if (customerId) data.Customer = customerId;
                 },
-                type: "POST"
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -202,7 +209,7 @@
 
         // Load functions upon DataTable load
         shippingDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
     </script>
 }

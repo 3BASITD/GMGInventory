@@ -172,7 +172,7 @@
 
         // Load List on DataTable
         var stockDT = $('.table-stock').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetStockCardDT")",
@@ -183,9 +183,15 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     if (itemId) data.Item = itemId;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -213,7 +219,7 @@
 
         // Load functions upon DataTable load
         stockDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-stock thead th").removeClass("text-end");
         });

@@ -25,6 +25,9 @@
                         @Html.DisplayNameFor(model => model.SRNumber)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.BIRInvoiceNumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.SONumber)
                     </th>
                     <th>
@@ -51,11 +54,18 @@
 
         // Load List on DataTable
         var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -68,25 +78,35 @@
                 { data: "srNumber", name: "SRNumber" },
                 {
                     data: function (data, type, dataToSet) {
-                        return !data.soNumber ? '<span class="text-muted">N/A</span>' : data.soNumber;
+                        return !data.birInvoiceNumber ? '<span class="text-muted">N/A</span>' : data.birInvoiceNumber;
                     },
-                    name: "SONumber" },
+                    name: "BIRInvoiceNumber"
+                },
                 {
                     data: function (data, type, dataToSet) {
-                        return !data.customerCode ? '<span class="text-muted">N/A</span>' : data.customerCode;
+                        return !data.soNumber ? '<span class="text-muted">N/A</span>' : data.soNumber;
                     },
-                    name: "CustomerCode" },
+                    name: "SONumber" 
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return !data.customerCode ? '<span class="text-muted">N/A</span>' : `<a href="/Customer/Details/${data.customerId}" class="link-info" target="_blank">${data.customerCode}</a>`;
+                    },
+                    name: "CustomerCode" 
+                },
                 { 
                     data: function (data, type, dataToSet) {
                         return !data.customerName ? '<span class="text-muted">N/A</span>' : data.customerName;
                     },
-                    name: "CustomerName" },
+                    name: "CustomerName"
+                },
                 { data: "returnDate", name: "ReturnDate" },
                 {
                     data: function (data, type, dataToSet) {
                         return !data.remarks ? '<span class="text-muted">N/A</span>' : data.remarks;
                     },
-                    name: "Remarks" },
+                    name: "Remarks"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -97,12 +117,12 @@
                     responsivePriority: 1
                 }
             ],
-            order: [[4, "desc"]]
+            order: [[5, "desc"]]
         });
 
         // Load functions upon DataTable load
         returnDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
     </script>
     }

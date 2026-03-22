@@ -157,7 +157,7 @@
 
         // Load List on DataTable
         var memoDT = $('.table-memo').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetDebitMemoDT")",
@@ -168,9 +168,15 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     if (customerId) data.Customer = customerId;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -195,7 +201,7 @@
 
         // Load functions upon DataTable load
         memoDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-memo thead th").removeClass("text-end");
             if ($("#filter-customer").val() == "") {

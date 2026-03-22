@@ -12,6 +12,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Name")]
         public string Customer { get; set; }
+        public int CustomerId { get; set; }
 
         [Display(Name = "Type")]
         public string Type { get; set; }

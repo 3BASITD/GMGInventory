@@ -19,5 +19,7 @@ namespace GMGInventory.Application.Contracts
         Task<bool> IsInvoiceInUse(int? invoiceId);
         Task<int> SaveAsync(InvoiceFormVM form);
         Task<ResponseModel<int>> UpdateAsync(InvoiceFormVM form);
+        Task<ResponseModel> CancelAsync(int? Id);
+        Task<ResponseModel> DeleteAsync(int? Id);
     }
 }

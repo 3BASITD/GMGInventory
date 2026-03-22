@@ -802,18 +802,23 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Sales Return Listing");
-            dt.Columns.AddRange(new DataColumn[14] {
-                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Brand")),
-                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemType")),
-                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemCode")),
-                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemName")),
-                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Unit")),
+            dt.Columns.AddRange(new DataColumn[19] {
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("SRNumber")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("ReturnDate")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ReturnReason")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("SONumber")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("OrderDate")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("Customer")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("Agent")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("SINumber")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("ControlNumber")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("DeliveryDate")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("PickupDate")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemCode")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemName")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Brand")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("ItemType")),
+                new DataColumn(chelper.DisplayName<SalesReturnRVM>("Unit")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("QuantityReturned")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("PriceReturned")),
                 new DataColumn(chelper.DisplayName<SalesReturnRVM>("Amount"))
@@ -821,17 +826,22 @@ namespace GMGInventory.Controllers
             var sales = await reportSalesRepository.GetSalesReturn(filter);
             foreach (var sale in sales)
             {
-                dt.Rows.Add(sale.Brand,
-                            sale.ItemType,
-                            sale.ItemCode,
-                            sale.ItemName,
-                            sale.Unit,
-                            sale.SRNumber,
+                dt.Rows.Add(sale.SRNumber,
                             sale.ReturnDate,
+                            sale.ReturnReason,
+                            sale.SONumber,
+                            sale.OrderDate,
                             sale.Customer,
                             sale.Agent,
                             sale.SINumber,
                             sale.ControlNumber,
+                            sale.DeliveryDate,
+                            sale.PickupDate,
+                            sale.ItemCode,
+                            sale.ItemName,
+                            sale.Brand,
+                            sale.ItemType,
+                            sale.Unit,
                             sale.QuantityReturned,
                             sale.PriceReturned,
                             sale.Amount);

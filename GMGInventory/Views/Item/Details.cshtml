@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Item Details";
+    ViewData["TitleDetails"] = $"[{Model.Code}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -184,8 +185,8 @@
                         <ul class="nav nav-tabs nav-fill nav-item" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" id="nav-warehouse-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-warehouse"
-                                   aria-controls="nav-warehouse" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-warehouse"
+                                       aria-controls="nav-warehouse" aria-selected="true">
                                     @*<br />*@Warehouse Details
                                 </a>
                             </li>
@@ -193,30 +194,30 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" id="nav-purchase-tab" role="tab"
-                                       data-bs-toggle="tab" data-bs-target="#nav-purchase"
-                                       aria-controls="nav-purchase" aria-selected="true">
+                                           data-bs-toggle="tab" data-bs-target="#nav-purchase"
+                                           aria-controls="nav-purchase" aria-selected="true">
                                         Cost@*<br />*@ History
                                     </a>
                                 </li>
                             }
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-sales-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-sales"
-                                   aria-controls="nav-sales" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-sales"
+                                       aria-controls="nav-sales" aria-selected="true">
                                     Sales Order@*<br />*@ Details
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-count-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-count"
-                                   aria-controls="nav-count" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-count"
+                                       aria-controls="nav-count" aria-selected="true">
                                     Physical Count@*<br />*@ Adjustment
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-conversion-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-conversion"
-                                   aria-controls="nav-conversion" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-conversion"
+                                       aria-controls="nav-conversion" aria-selected="true">
                                     @*<br />*@Conversion Details
                                 </a>
                             </li>
@@ -224,30 +225,30 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" id="nav-price-tab" role="tab"
-                                       data-bs-toggle="tab" data-bs-target="#nav-price"
-                                       aria-controls="nav-price" aria-selected="true">
+                                           data-bs-toggle="tab" data-bs-target="#nav-price"
+                                           aria-controls="nav-price" aria-selected="true">
                                         @*<br />*@Price History
                                     </a>
                                 </li>
                             }
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-transfer-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-transfer"
-                                   aria-controls="nav-transfer" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-transfer"
+                                       aria-controls="nav-transfer" aria-selected="true">
                                     Warehouse Transfer@*<br />*@ History
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-return-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-return"
-                                   aria-controls="nav-return" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-return"
+                                       aria-controls="nav-return" aria-selected="true">
                                     Sales Return@*<br />*@ History
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="nav-promo-tab" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-promo"
-                                   aria-controls="nav-promo" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-promo"
+                                       aria-controls="nav-promo" aria-selected="true">
                                     Promo Price
                                 </a>
                             </li>
@@ -310,7 +311,7 @@
                                 </table>
                             </div>
                             <div class="tab-pane fade" id="nav-count" role="tabpanel" aria-labelledby="nav-count-tab">
-                                <a href="@Url.Action("DownloadCounts", new {Id = Model.Id})" class="btn btn-secondary btn-sm float-right ml-2">
+                                <a href="@Url.Action("DownloadCounts", new { Id = Model.Id })" class="btn btn-secondary btn-sm float-right ml-2">
                                     <span class="fas fa-download"></span> Download
                                 </a>
                                 <table class="table table-head-fixed table-striped table-hover table-count">
@@ -770,7 +771,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="save-promo-name" class="control-label mb-0 d-block">Name</label>
-                                <input type="text" name="Name" id="save-promo-name" class="form-control" style="width: 100%"/>
+                                <input type="text" name="Name" id="save-promo-name" class="form-control" style="width: 100%" />
                                 
                             </div>
                         </div>
@@ -1039,14 +1040,21 @@
 
         // Item Location
         var locationDT = $('.table-location').on('preXhr.dt', function (e, settings, data) {
-              showBatchLoader("location");
+              //showBatchLoader("location");
         }).DataTable({
             ajax: {
-                 url: "@Url.Action("GetLocationListJson")",
+                url: "@Url.Action("GetLocationListJson")",
                 type: "POST",
                 data: function (data) {
                         data.Id = @Model?.Id;
-                 },
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: false,
@@ -1070,7 +1078,7 @@
             ],
             order: [[0, "asc"]]
              }).on("draw.dt", function () {
-                    hideBatchLoader("location");
+                    //hideBatchLoader("location");
 
             if (user_access.canAdd) {
              // Actions upon Display Create Modal
@@ -1165,7 +1173,7 @@
 
         //Conversion Details
         var conversionDT = $('.table-conversion').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetConversionListJson")",
@@ -1173,6 +1181,13 @@
                 data: function (data) {
                     data.Id = @Model?.Id;
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: false,
@@ -1442,20 +1457,27 @@
                 }
             }
 
-            hideLoader();
+            //hideLoader();
         });
 
 
         // Warehouse Details
         var warehouseDT = $('.table-warehouse').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("warehouse");
+            //showBatchLoader("warehouse");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehousesJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1483,7 +1505,7 @@
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
 
-            hideBatchLoader("warehouse");
+            //hideBatchLoader("warehouse");
 
             if (user_access.canEdit) {
                 // Actions upon Display Edit Quantity Modal
@@ -1549,14 +1571,21 @@
         if (user_access.canView) {
             // Purchase Order Details
             var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {
-                showBatchLoader("purchase");
+                //showBatchLoader("purchase");
             }).DataTable({
                 ajax: {
                     url: "@Url.Action("GetPurchasesJson")",
                     type: "POST",
                     data: function (data) {
                         data.Id = @Model?.Id;
+                    },
+                    beforeSend: function (jqXHR, settings) {
+                        settings.isDataTableRequest = true;
                     }
+                },
+                processing: true,
+                language: {
+                    processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                 },
                 serverSide: true,
                 filter: true,
@@ -1580,21 +1609,28 @@
                 ],
                 order: [[9, "desc"]]
             }).on("draw.dt", function () {
-                hideBatchLoader("purchase");
+                //hideBatchLoader("purchase");
             });
         }
 
 
         // Sales Order Details
         var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("sales");
+            //showBatchLoader("sales");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetSalesJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1618,20 +1654,27 @@
             ],
             order: [[9, "desc"]]
         }).on("draw.dt", function () {
-            hideBatchLoader("sales");
+            //hideBatchLoader("sales");
         });
 
 
         // Physical Count Adjustment
         var countDT = $('.table-count').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("count");
+            //showBatchLoader("count");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCountsJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1651,20 +1694,27 @@
             ],
             order: [[4, "desc"]]
         }).on("draw.dt", function () {
-            hideBatchLoader("count");
+            //hideBatchLoader("count");
         });
 
         if (user_access.canView) {
             // Price History
             var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
-                showBatchLoader("price");
+                //showBatchLoader("price");
             }).DataTable({
                 ajax: {
                     url: "@Url.Action("GetPricesJson")",
                     type: "POST",
                     data: function (data) {
                         data.Id = @Model?.Id;
+                    },
+                    beforeSend: function (jqXHR, settings) {
+                        settings.isDataTableRequest = true;
                     }
+                },
+                processing: true,
+                language: {
+                    processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                 },
                 serverSide: true,
                 filter: true,
@@ -1681,21 +1731,28 @@
                 ],
                 order: [[3, "desc"]]
             }).on("draw.dt", function () {
-                hideBatchLoader("price");
+                //hideBatchLoader("price");
             });
         }
 
 
         // Warehouse Transfer History
         var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("transfer");
+            //showBatchLoader("transfer");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetTransfersJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1715,20 +1772,27 @@
             ],
             order: [[4, "desc"]]
         }).on("draw.dt", function () {
-            hideBatchLoader("transfer");
+            //hideBatchLoader("transfer");
         });
 
 
         // Sales Return Details
         var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("return");
+            //showBatchLoader("return");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReturnsJson")",
-               type: "POST",
+                type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1748,7 +1812,7 @@
             ],
             order: [[5, "desc"]]
         }).on("draw.dt", function () {
-            hideBatchLoader("return");
+            //hideBatchLoader("return");
         });
 
         const convertTime12to24 = (time12h) => {
@@ -1769,14 +1833,21 @@
 
         // Promo Price
         var promoDT = $('.table-promo').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("promo");
+            //showBatchLoader("promo");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPromoJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1821,7 +1892,7 @@
             ],
             order: [[2, "asc"]]
         }).on("draw.dt", function () {
-            hideBatchLoader("promo");
+            //hideBatchLoader("promo");
 
             if (user_access.canDelete) {
                 $('.btn-remove-promo').off("click").on("click", function () {
@@ -1889,7 +1960,6 @@
                 });
 
                 $('.btn-update-promo').off("click").on("click", function () {
-                        console.log("show promo");
                         var row_data = promoDT.row($(this).parents('tr')).data();
                         
                         $("#save-promo-id").val(row_data.id);
@@ -1979,7 +2049,7 @@
           const day = String(today.getDate()).padStart(2, '0');
 
 
-          return `${year}-${month}-${day}`; 
+          return `${year}-${month}-${day}`;
         }
 
         

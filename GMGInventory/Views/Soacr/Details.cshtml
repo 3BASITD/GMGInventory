@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "SOA/CR Details";
+    ViewData["TitleDetails"] = $"[{Model.Id}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 @section Breadcrumb {
@@ -597,7 +598,7 @@
         var soacr_data = @Json.Serialize(Model);
 
         var soaDT = $('.table-soa').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetSOACRItemsJson", "Soacr")",
@@ -605,6 +606,13 @@
                 data: function (data) {
                     data.Id = soacr_data.id;
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -671,7 +679,7 @@
         });
 
         soaDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             //$('.table-soa thead th').removeClass("text-end");
 
@@ -991,7 +999,7 @@
         });
 
         var tbrHistoryDT = $('.table-tbr-history').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetInvoiceTBRHistory")",
@@ -999,6 +1007,13 @@
                     data.soaLineItemId = $("#tbr-history-for").data("id");
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1021,7 +1036,7 @@
 
         // Load functions upon DataTable load
         tbrHistoryDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         if (user_access.canUploadDownload) {
@@ -1075,9 +1090,7 @@
             return invoice_selected;
         }
 
-        var checkTable = $('.table-check').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
-        }).DataTable({
+        var checkTable = $('.table-check').DataTable({
             data: [],
             filter: true,
             responsive: true,
@@ -1110,7 +1123,6 @@
         });
 
         checkTable.on("draw", function () {
-            hideLoader();
             if (user_access.canEdit) {
                 $(".btn-remove-check").on("click", function () {
                     checkTable.row($(this).parents('tr')).remove().draw();
@@ -1216,7 +1228,7 @@
         }
 
         var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCustomerInvoiceToAddDT")",
@@ -1224,6 +1236,13 @@
                     data.Id = soacr_data.customerId;
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1250,7 +1269,7 @@
 
         // Load functions upon DataTable load
         invoiceDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".chkclassaddinvoiceall").on("change", function () {
                 invoiceDT.rows().every(function (rowIdx, tableLoop, rowLoop) {

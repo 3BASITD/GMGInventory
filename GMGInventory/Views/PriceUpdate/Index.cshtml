@@ -195,7 +195,7 @@
                     allowClear: true,
                     placeholder: {
                         id: "",
-                        text: "All"
+                        text: "ALL"
                     },
                     dropdownParent: $('#filterModal')
                 });
@@ -213,7 +213,7 @@
                     allowClear: true,
                     placeholder: {
                         id: "",
-                        text: "All"
+                        text: "ALL"
                     },
                     dropdownParent: $('#filterModal')
                 });
@@ -231,7 +231,7 @@
                     allowClear: true,
                     placeholder: {
                         id: "",
-                        text: "All"
+                        text: "ALL"
                     },
                     dropdownParent: $('#filterModal')
                 });
@@ -239,7 +239,7 @@
         });
 
         var dataTable = $('.table-update').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -253,8 +253,14 @@
                     if (itemTypeId) data.ItemTypeId = itemTypeId;
                     if (brandId) data.BrandId = brandId;
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
             },
-            //processing: true,
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -287,7 +293,7 @@
         });
 
         dataTable.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-update thead th").removeClass("text-end");
 

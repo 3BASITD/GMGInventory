@@ -187,6 +187,9 @@
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btnReset"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
@@ -328,18 +331,20 @@
             });
         }
 
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
         $(".btnFilter").on("click", function () {
+            $("#filterModal").modal("hide");
             orderDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
                 checkDefaultFilter();
             });
         });
 
         $(".btnReset").on("click", function () {
+            $("#filterModal").modal("hide");
             resetToDefaultDTFilter();
-
             orderDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
                 checkDefaultFilter();
             });
         });
@@ -362,21 +367,25 @@
             Status: ""
         };
 
-        function checkDefaultFilter() {
-            var changed = JSON.stringify(orderDT.order()) != JSON.stringify(defaultDTState.order) ||
-                          orderDT.page.info().start != defaultDTState.page ||
-                          orderDT.page.len() != defaultDTState.length ||
-                          (orderDT.search() || "") != defaultDTState.search.search ||
-                          $("#filter-agent").val() != defaultDTState.AgentId ||
-                          $("#filter-customer").val() != defaultDTState.CustomerId ||
-                          $('#filter-region').val() != defaultDTState.RegionId ||
-                          $('#filter-filedby').val() != defaultDTState.FiledBy ||
-                          $('#filter-from').val() != defaultDTState.DateFrom ||
-                          $('#filter-to').val() != defaultDTState.DateTo ||
-                          $('#filter-status').val() != defaultDTState.Status;
+        function checkDTChanged() {
+            if(!orderDT) return false;
+            
+            return JSON.stringify(orderDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   orderDT.page.info().start != defaultDTState.page ||
+                   orderDT.page.len() != defaultDTState.length ||
+                   (orderDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-agent").val() != defaultDTState.AgentId ||
+                   $("#filter-customer").val() != defaultDTState.CustomerId ||
+                   $('#filter-region').val() != defaultDTState.RegionId ||
+                   $('#filter-filedby').val() != defaultDTState.FiledBy ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo ||
+                   $('#filter-status').val() != defaultDTState.Status;
+        }
 
-            $(".btn-filter").toggleClass('btn-filtered', changed);
-            $(".btnReset").toggle(changed);
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
         }
 
         function resetToDefaultDTFilter() {
@@ -389,17 +398,47 @@
             $('#filter-to').val(defaultDTState.DateTo);
             $('#filter-from').val(defaultDTState.DateFrom);
             $('#filter-status').val(defaultDTState.Status);
+            
+            localStorage.removeItem(dt_storage);
 
-            orderDT.state.clear();
-            orderDT.order(defaultDTState.order);
-            orderDT.page(defaultDTState.page);
-            orderDT.search(defaultDTState.search.search);
+            if (orderDT) {
+                orderDT.state.clear();
+                orderDT.order(defaultDTState.order);
+                orderDT.page(defaultDTState.page);
+                orderDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
         var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                if (checkDTChanged()) {
+                    var now = new Date().getTime();
+                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
+                } else {
+                    localStorage.removeItem(dt_storage);
+                }
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
             stateSaveParams: function (settings, data) {
                 data.AgentId = $('#filter-agent').val();
                 data.AgentCode = $('#filter-agent option:selected').text();
@@ -461,6 +500,13 @@
                     data.DateTo = $("#filter-to").val();
                     data.Status = $("#filter-status").val();
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -470,48 +516,53 @@
                 return: true,
             },
             columns: [
-                { data: "soNumber", name: "SONumber" },
+                { data: "soNumber", name: "SONumber", responsivePriority: 2 },
                 {
                     data: function (data, type, dataToSet) {
                         if(data.orderQueueNumber)
-                            return `<a href="/OrderQueue/Details/${data.orderQueueNumber}" class="text-info" target="_blank">${data.orderQueueNumber}</a>`;
+                            return `<a href="/OrderQueue/Details/${data.orderQueueNumber}" class="link-info" target="_blank">${data.orderQueueNumber}</a>`;
                         else
                             return '<span class="text-muted">N/A</span>';
                     },
-                    name: "PurchaseRequestDetail"
+                    name: "OrderQueueNumber",
+                    responsivePriority: 11
                 },
                 {
                     data: function (data, type, dataToSet) {
                         return data.purchaseRequestDetail || '<span class="text-muted">N/A</span>';
                     }, 
-                    name: "PurchaseRequestDetail"
+                    name: "PurchaseRequestDetail",
+                    responsivePriority: 12
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return `<a href="/Customer/Details/${data.customerId}" class="text-info" target="_blank">${data.customerCode}</a>`;
+                        return `<a href="/Customer/Details/${data.customerId}" class="link-info" target="_blank">${data.customerCode}</a>`;
                     },
-                    name: "CustomerCode" 
+                    name: "CustomerCode", 
+                    responsivePriority: 3
                 },
-                { data: "customerName", name: "CustomerName" },
-                { data: "priority", name: "Priority" },
+                { data: "customerName", name: "CustomerName", responsivePriority: 13 },
+                { data: "priority", name: "Priority", responsivePriority: 14 },
                 {
                     data: function (data, type, dataToSet) {
                         return data.customerAddress || '<span class="text-muted">N/A</span>';
                     }, 
-                    name: "CustomerAddress"
+                    name: "CustomerAddress",
+                    responsivePriority: 15
                 },
-                { data: "area", name: "Area" },
-                { data: "region", name: "Region" },
-                { data: "orderDate", name: "OrderDate" },
-                { data: "requiredDeliveryDate", name: "RequiredDeliveryDate" },
+                { data: "area", name: "Area", responsivePriority: 4 },
+                { data: "region", name: "Region", responsivePriority: 5 },
+                { data: "orderDate", name: "OrderDate", responsivePriority: 6 },
+                { data: "requiredDeliveryDate", name: "RequiredDeliveryDate", responsivePriority: 7 },
                 {
                     data: function (data, type, dataToSet) {
                         return data.forwarder || '<span class="text-muted">N/A</span>';
                     }, 
-                    name: "Forwarder"
+                    name: "Forwarder",
+                    responsivePriority: 8
                 },
-                { data: "totalAmount", name: "TotalAmount", className: "text-end" },
-                { data: "status", name: "Status" },
+                { data: "totalAmount", name: "TotalAmount", className: "text-end", responsivePriority: 9 },
+                { data: "status", name: "Status", responsivePriority: 10 },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -534,7 +585,7 @@
         });
 
         orderDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             LoadFilterSelect2();
 

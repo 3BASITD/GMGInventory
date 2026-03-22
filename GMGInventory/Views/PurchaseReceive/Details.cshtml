@@ -1,8 +1,10 @@
 ﻿@model PurchaseReceiveDetailsVM
 @{
     ViewData["Title"] = "Purchase Receiving Details";
+    ViewData["TitleDetails"] = $"[{Model.DocumentNumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
     var userAccessBasic = (ViewsAccessVM)ViewData["UserAccessBasic"]!;
+    var userAccessSpecial = (ViewsAccessVM)ViewData["UserAccessSpecial"]!;
     var hashMicroUserAccess = (ViewsAccessVM)ViewData["HashMicroUserAccess"]!;
 
     var status = Model.Status.ToLowerInvariant();
@@ -12,13 +14,17 @@
     bool isSubmitted = status == "submitted";
     bool isApproved = status == "approved";
     bool isDisapproved = status == "disapproved";
+    bool isReturned = Model.IsReturned;
+    bool isAdvanced = Model.POStatus.Trim().ToLower() == "draft" || Model.POStatus.Trim().ToLower() == "submitted";
 
     bool canHashMicroSync = hashMicroUserAccess.CanUploadDownload && (isDraft || isSubmitted || isApproved);
+    bool canEditAdvance = userAccessSpecial.CanEdit;
     bool canAdd = userAccess.CanAdd;
     bool canPrint = userAccess.CanPrint;
+    bool canCancel = userAccess.CanEdit && isSubmitted && !isHashMicroMoved;
     bool canDelete = userAccess.CanDelete && isDraft && !isHashMicroMoved;
-    bool canEdit = userAccess.CanEdit && isDraft;
-    bool canApproveDisapprove = userAccess.CanApproveDisapprove && isSubmitted;
+    bool canEdit = userAccess.CanEdit && ((isAdvanced && canEditAdvance) || !isAdvanced) && isDraft;
+    bool canApproveDisapprove = userAccess.CanApproveDisapprove && isSubmitted && !isAdvanced;
 
     bool canRecreate = isDisapproved &&
                        !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
@@ -81,6 +87,21 @@
                     <span class="fas fa-print mr-0"></span>
                 </button>
             }
+            @if (canCancel)
+            {
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-cancel">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Cancel&#10;@(isHashMicroMoved ? "Record already copied to HashMicro. Cancel cannot proceed" : isSubmitted ? "Edit access is required" : "Only submitted receiving can be deleted")"
+                        data-microtip-position="bottom" role="tooltip">
+                    <span class="fas fa-times mr-0"></span>
+                </button>
+            }
             @if (canDelete)
             {
                 <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-delete">
@@ -109,14 +130,14 @@
             {
                 <button type="button"
                         class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Save as Draft&#10;@(isDraft ? "Edit access is required" : "Only draft receiving can be saved as draft")"
+                        data-microtip-title="Save as Draft&#10;@(!((isAdvanced && canEditAdvance) || !isAdvanced) ? "Filed in Advance: Purchase Receiving (Special) - Edit access is required" : isDraft ? "Edit access is required" : "Only draft receiving can be saved as draft")"
                         data-microtip-position="bottom"
                         role="tooltip">
                     <span class="fas fa-save mr-0"></span>
                 </button>
                 <button type="button"
                         class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Submit&#10;@(isDraft ? "Edit access is required" : "Only draft receiving can be submitted")"
+                        data-microtip-title="Submit&#10;@(!((isAdvanced && canEditAdvance) || !isAdvanced) ? "Filed in Advance: Purchase Receiving (Special) - Edit access is required" : isDraft ? "Edit access is required" : "Only draft receiving can be submitted")"
                         data-microtip-position="bottom"
                         role="tooltip">
                     <span class="fas fa-paper-plane mr-0"></span>
@@ -135,14 +156,14 @@
             {
                 <button type="button"
                         class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Disapprove&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted receiving can be disapproved")"
+                        data-microtip-title="Disapprove&#10;@(isAdvanced ? "Filed in Advance: Approve the Purchase Order first before Approving / Disapproving this Purchase Receive." : !isSubmitted ? "Only submitted receiving can be disapproved" : "Approve / Disapprove access is required")"
                         data-microtip-position="bottom"
                         role="tooltip">
                     <span class="fas fa-times mr-0"></span>
                 </button>
                 <button type="button"
                         class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Approve&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted receiving can be approved")"
+                        data-microtip-title="Approve&#10;@(isAdvanced ? "Filed in Advance: Approve the Purchase Order first before Approving / Disapproving this Purchase Receive." : !isSubmitted ? "Only submitted receiving can be disapproved" : "Approve / Disapprove access is required")"
                         data-microtip-position="bottom"
                         role="tooltip">
                     <span class="fas fa-check mr-0"></span>
@@ -218,7 +239,7 @@
                         @Html.DisplayNameFor(model => model.PONumber)
                     </span>
                     <b class="d-block" id="receive-poNumber">
-                        @Model.PONumber
+                        <a href="@Url.Action("Details", "PurchaseOrder", new { Id = Model.POId })" class="link-info" target="_blank">@Model.PONumber @(isAdvanced? Html.Raw($"({Model.POStatus})") : "") @(isAdvanced && isDraft && !canEditAdvance ? Html.Raw("(<span data-microtip-title='Filed in Advance: Purchase Receiving (Special) - Edit access is required.' data-microtip-position='bottom' role='tooltip'><span class='fas fa-exclamation-triangle'></span></span>") : isAdvanced && isSubmitted ? Html.Raw("<span data-microtip-title='Filed in Advance: Approve the Purchase Order first before approving this Purchase Receive.' data-microtip-position='bottom' role='tooltip'><span class='fas fa-exclamation-triangle'></span></span>") : "")</a>
                     </b>
                 </p>
             </div>
@@ -230,6 +251,20 @@
                     </span>
                     <b class="d-block">
                         @Model.ReceiveDate
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.Supplier)
+                    </span>
+                    <b class="d-block">
+                        @Html.ActionLink(Model.Supplier,
+                                        "Details",
+                                        "Supplier",
+                                        new { @Id = Model.SupplierId },
+                                                new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -259,7 +294,11 @@
                         @Html.DisplayNameFor(model => model.Warehouse)
                     </span>
                     <b class="d-block">
-                        @Model.Warehouse
+                        @Html.ActionLink(Model.Warehouse,
+                                        "Details",
+                                        "Warehouse",
+                                        new { @Id = Model.WarehouseId },
+                                                new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -435,11 +474,12 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var user_accessBasic = @Html.Raw(Json.Serialize(userAccessBasic));
+        var user_accessSpecial = @Html.Raw(Json.Serialize(userAccessSpecial));
         var hashmicro_user_access = @Html.Raw(Json.Serialize(hashMicroUserAccess));
         var ro_data = @Json.Serialize(Model);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
@@ -448,6 +488,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -466,11 +513,18 @@
                     className: "form-cell"
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
-                { data: "itemCode", name: "ItemCode", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
+                    },
+                    name: "ItemCode",
+                    className: "form-cell"
+                },
                 { data: "itemDescription", name: "ItemDescription", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        if (ro_data.status.toLowerCase() == "draft" && data.toReceive == true) {
+                        var isAdvance = ro_data.poStatus.trim().toLowerCase() == "draft" || ro_data.poStatus.trim().toLowerCase() == "submitted";
+                        if (ro_data.status.toLowerCase() == "draft" && data.toReceive == true && (isAdvance == false || (isAdvance == true && user_accessSpecial.canEdit == true))) {
                             if (data.quantityD > data.toReceiveQuantityD) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.quantityD + '" class="form-control form-control-sm quantity is-invalid" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Can not exceed ' + data.toReceiveQuantity + ' receiving quantity.</label>';
                             } else if (data.quantityD == 0) {
@@ -516,7 +570,7 @@
         });
 
         itemDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
@@ -686,6 +740,33 @@
                                 Id: ro_data.id,
                                 reason: confirm
                             },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        if (user_access.canEdit) {
+            $(".btn-details-cancel").on("click", function () {
+                swal({
+                    title: "Cancel Purchase Receiving",
+                    text: "Continue to cancel this purchase receiving? This will change the status Submitted to Draft.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        $.ajax({
+                            url: "@Url.Action("CancelJson")",
+                            type: "POST",
+                            data: { Id: ro_data.id },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
                                     window.location.reload();

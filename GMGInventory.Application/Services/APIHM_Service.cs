@@ -144,7 +144,7 @@ namespace GMGInventory.Application.Services
             if (invoice == null)
                 return new ResponseModel<string> { Status = "Error", Message = "Invalid Sales Invoice", NewRow = "Invoice Id: " + Id };
 
-            if (invoice.Status.Code.ToLower() == "cancelled")
+            if (invoice.Status.Code.Trim().ToLower() == "cancelled")
                 return new ResponseModel<string> { Status = "Error", Message = "Cannot move cancelled invoice", NewRow = "Invoice Number: " + invoice.InvoiceNumber };
 
             if (invoice.HashMicroMoveId != null || invoice.HashMicroMoveName != null)
@@ -158,7 +158,7 @@ namespace GMGInventory.Application.Services
                 invoice_date = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
                 invoice_date_due = (invoice.DueDate == null ? invoice.InvoiceDate : invoice.DueDate.Value).ToString("yyyy-MM-dd"),
                 currency_code = "PHP",
-                post = invoice.Status.Code.ToLower() == "invoiced",
+                post = invoice.Status.Code.Trim().ToLower() == "invoiced",
                 origin = "S/" + invoice.InvoiceNumber + "/" + invoice.ControlNumber,
                 invoice_line_ids = from ili in invoice.InvoiceLineItems
                                    join sli in context.SalesOrderLineItems on new { ili.ItemId, ili.Invoice.Pack.SalesOrderId }
@@ -225,7 +225,7 @@ namespace GMGInventory.Application.Services
 
             var responses = new List<ResponseModel<string>>();
             var invoices = await context.Invoices
-                                        .Where(s => s.Status.Code.ToLower() == "invoiced"
+                                        .Where(s => s.Status.Code.Trim().ToLower() == "invoiced"
                                                  && DateFrom <= s.InvoiceDate.Date
                                                  && s.InvoiceDate.Date <= DateTo)
                                         .Include(s => s.Status)
@@ -242,7 +242,7 @@ namespace GMGInventory.Application.Services
                     invoice_date = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
                     invoice_date_due = (invoice.DueDate == null ? invoice.InvoiceDate : invoice.DueDate.Value).ToString("yyyy-MM-dd"),
                     currency_code = "PHP",
-                    post = invoice.Status.Code.ToLower() == "invoiced",
+                    post = invoice.Status.Code.Trim().ToLower() == "invoiced",
                     origin = "M/" + invoice.InvoiceNumber + "/" + invoice.ControlNumber,
                     invoice_line_ids = from ili in invoice.InvoiceLineItems
                                        join sli in context.SalesOrderLineItems on new { ili.ItemId, ili.Invoice.Pack.SalesOrderId }
@@ -319,10 +319,10 @@ namespace GMGInventory.Application.Services
             if (preceiving == null)
                 return new ResponseModel<string> { Status = "Error", Message = "Invalid Purchase Receiving", NewRow = "PO Id: " + Id };
 
-            if (preceiving.Status.Code.ToLower() == "disapproved")
+            if (preceiving.Status.Code.Trim().ToLower() == "disapproved")
                 return new ResponseModel<string> { Status = "Error", Message = "Cannot move disapproved purchase receiving", NewRow = "Document Number: " + preceiving.DocumentNumber };
 
-            if (preceiving.Status.Code.ToLower() == "resubmitted")
+            if (preceiving.Status.Code.Trim().ToLower() == "resubmitted")
                 return new ResponseModel<string> { Status = "Error", Message = "Cannot move resubmitted purchase receiving", NewRow = "Document Number: " + preceiving.DocumentNumber };
 
             if (preceiving.HashMicroMoveId != null || preceiving.HashMicroMoveName != null)
@@ -336,7 +336,7 @@ namespace GMGInventory.Application.Services
                 invoice_date = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
                 invoice_date_due = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
                 currency_code = preceiving.PurchaseOrder.Currency.Name,
-                post = preceiving.Status.Code.ToLower() == "approved",
+                post = preceiving.Status.Code.Trim().ToLower() == "approved",
                 origin = "S/" + preceiving.PurchaseOrder.DocumentNumber,
                 type = "?",
                 invoice_line_ids = from prli in preceiving.PurchaseReceivingLineItems
@@ -409,7 +409,7 @@ namespace GMGInventory.Application.Services
             var responses = new List<ResponseModel<string>>();
 
             var preceivings = await context.PurchaseReceivings
-                                          .Where(s => s.Status.Code.ToLower() == "approved"
+                                          .Where(s => s.Status.Code.Trim().ToLower() == "approved"
                                                    && DateFrom <= s.ReceiveDate.Date
                                                    && s.ReceiveDate.Date <= DateTo)
                                           .Include(s => s.Status)
@@ -426,7 +426,7 @@ namespace GMGInventory.Application.Services
                     invoice_date = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
                     invoice_date_due = preceiving.ReceiveDate.ToString("yyyy-MM-dd"),
                     currency_code = preceiving.PurchaseOrder.Currency.Name,
-                    post = preceiving.Status.Code.ToLower() == "approved",
+                    post = preceiving.Status.Code.Trim().ToLower() == "approved",
                     origin = "S/" + preceiving.PurchaseOrder.DocumentNumber,
                     type = "?",
                     invoice_line_ids = from prli in preceiving.PurchaseReceivingLineItems

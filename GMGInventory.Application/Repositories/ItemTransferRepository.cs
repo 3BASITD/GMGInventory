@@ -1,7 +1,9 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -353,15 +355,31 @@ namespace GMGInventory.Application.Repositories
                 var sourceItem = await context.ItemInventories
                                                .Where(s => s.WarehouseId == formVM.Source && s.ItemId == item.Id)
                                                .FirstAsync();
+                var sourceQuantity = sourceItem.Quantity;
+
                 sourceItem.Quantity -= item.Quantity;
                 context.ItemInventories.Update(sourceItem);
+                await context.SaveChangesAsync(currentUserId);
+
+                var countHistorySource = new PhysicalCountHistory
+                {
+                    ItemId = item.Id,
+                    QuantityFrom = sourceQuantity,
+                    QuantityTo = sourceItem.Quantity,
+                    Remarks = "Warehouse Transfer",
+                    WarehouseId = formVM.Source
+                };
+                context.PhysicalCountHistories.Add(countHistorySource);
                 await context.SaveChangesAsync(currentUserId);
 
                 var destinationItem = await context.ItemInventories
                                                    .Where(s => s.WarehouseId == formVM.Destination && s.ItemId == item.Id)
                                                    .FirstOrDefaultAsync();
+
+                var destinationQuantity = 0;
                 if (destinationItem != null)
                 {
+                    destinationQuantity = destinationItem.Quantity;
                     destinationItem.Quantity += item.Quantity;
                     context.ItemInventories.Update(destinationItem);
                 }
@@ -375,6 +393,17 @@ namespace GMGInventory.Application.Repositories
                     };
                     await context.ItemInventories.AddAsync(destinationItem);
                 }
+                await context.SaveChangesAsync(currentUserId);
+
+                var countHistoryDestination = new PhysicalCountHistory
+                {
+                    ItemId = item.Id,
+                    QuantityFrom = destinationQuantity,
+                    QuantityTo = destinationItem.Quantity,
+                    Remarks = "Warehouse Transfer",
+                    WarehouseId = formVM.Destination
+                };
+                context.PhysicalCountHistories.Add(countHistoryDestination);
                 await context.SaveChangesAsync(currentUserId);
                 #endregion
 

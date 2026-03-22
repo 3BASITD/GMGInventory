@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Sales Invoice Details";
+    ViewData["TitleDetails"] = $"[{Model.InvoiceNumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
     var hashMicroUserAccess = (ViewsAccessVM)ViewData["HashMicroUserAccess"]!;
 }
@@ -21,8 +22,8 @@
                     {
                         @if (Model.HashMicroMoveId != null)
                         {
-                            <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="ViewHashMicro()" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
-                                <span class="fas fa-cloud"></span>
+                            <button type="button" class="btn btn-light text-dark btn-sm float-right ml-2" onclick="ViewHashMicro()" data-microtip-title="Move to HashMicro&#10;Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-cloud mr-0"></span>
                             </button>
                         }
                         else
@@ -31,45 +32,6 @@
                                 <span class="fas fa-upload"></span> Move to HashMicro
                             </button>
                         }
-                    }
-                    @if (userAccess.CanDelete)
-                    {
-                        @if (Model.HashMicroMoveId == null)
-                        {
-                            <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="cancel">
-                                <span class="fas fa-times"></span> Cancel
-                            </button>
-                            @if (Model.Status.ToLower() == "draft")
-                            {
-                                <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
-                                    <span class="fas fa-trash"></span> Delete
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Can only Delete Draft" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-trash"></span> Delete
-                                </button>
-                            }
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Cannot Cancel. Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
-                                <span class="fas fa-times"></span> Cancel
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Cannot Delete. Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
-                                <span class="fas fa-trash"></span> Delete
-                            </button>
-                        }
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-times"></span> Cancel
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-trash"></span> Delete
-                        </button>
                     }
                     @if (userAccess.CanPrint)
                     {
@@ -94,8 +56,47 @@
                     }
                     else
                     {
-                        <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
-                            <span class="fas fa-print"></span> Print
+                        <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Prit&#10;Print access is required." data-microtip-position="bottom-left" role="tooltip">
+                            <span class="fas fa-print mr-0"></span>
+                        </button>
+                    }
+                    @if (userAccess.CanDelete)
+                    {
+                        @if (Model.HashMicroMoveId == null)
+                        {
+                            <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="cancel">
+                                <span class="fas fa-times"></span> Cancel
+                            </button>
+                            @if (Model.Status.ToLower() == "draft")
+                            {
+                                <button type="submit" class="btn btn-danger btn-sm float-right ml-2" value="delete">
+                                    <span class="fas fa-trash"></span> Delete
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete&#10;Can only Delete Draft" data-microtip-position="bottom-left" role="tooltip">
+                                    <span class="fas fa-trash mr-0"></span>
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Cancel&#10;Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-times mr-0"></span>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete&#10;Already on HashMicro" data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-trash mr-0"></span>
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Cancel&#10;Delete access is required." data-microtip-position="bottom-left" role="tooltip">
+                            <span class="fas fa-times mr-0"></span>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete&#10;Delete access is required." data-microtip-position="bottom-left" role="tooltip">
+                            <span class="fas fa-trash mr-0"></span>
                         </button>
                     }
                     @if (Model.Status.ToLower() == "invoiced")
@@ -108,8 +109,8 @@
                         }
                         else
                         {
-                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                                <span class="fas fa-save"></span> Update
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Update&#10;Edit access is required." data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-save mr-0"></span>
                             </button>
                         }
                     }
@@ -126,11 +127,11 @@
                         }
                         else
                         {
-                            <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                                <span class="fas fa-save"></span> Save as Draft
+                            <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Save as Draft&#10;Edit access is required." data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-save mr-0"></span>
                             </button>
-                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                                <span class="fas fa-paper-plane"></span> Post
+                            <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Post&#10;Edit access is required." data-microtip-position="bottom-left" role="tooltip">
+                                <span class="fas fa-paper-plane mr-0"></span>
                             </button>
                         }
                     }
@@ -159,7 +160,11 @@
                             @Html.DisplayNameFor(model => model.PackNumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model.PackNumber
+                            @Html.ActionLink(Model.PackNumber.ToString(),
+                                            "Details",
+                                            "Pack",
+                                            new { @Id = Model.PackNumber },
+                                            new { @class = "link-info", target = "_blank" })
                         </b>
                     </p>
                 </div>
@@ -269,7 +274,11 @@
                             @Html.DisplayNameFor(model => model.CustomerCode)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model.CustomerCode
+                            @Html.ActionLink(Model.CustomerCode,
+                                            "Details",
+                                            "Customer",
+                                            new { @Id = Model.CustomerId },
+                                            new { @class = "link-info", target = "_blank" })
                         </b>
                     </p>
                 </div>
@@ -319,7 +328,11 @@
                             @Html.DisplayNameFor(model => model.SONumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model.SONumber
+                            @Html.ActionLink(Model.SONumber,
+                                            "Details",
+                                            "Agent",
+                                            new { @Id = Model.SalesOrderId },
+                                            new { @class = "link-info", target = "_blank" })
                         </b>
                     </p>
                 </div>
@@ -358,7 +371,11 @@
                                 @Html.DisplayNameFor(model => model.Agent)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model.Agent
+                                @Html.ActionLink(Model.Agent,
+                                                "Details",
+                                                "Agent",
+                                                new { @Id = Model.AgentId },
+                                                new { @class = "link-info", target = "_blank" })
                             </b>
                         }
                     </p>
@@ -620,7 +637,8 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
                 },
@@ -684,7 +702,7 @@
         });
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
@@ -693,6 +711,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -713,7 +738,8 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode",
                     className: "form-cell"
@@ -745,7 +771,7 @@
         });
 
         itemDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             itemDT.column(0).visible($("#invoice-status").val().toLowerCase() == "draft");
 

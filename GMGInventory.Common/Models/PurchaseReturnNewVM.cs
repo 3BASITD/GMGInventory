@@ -20,12 +20,15 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "PO Number")]
         public string PONumber { get; set; }
+        public int POId { get; set; }
 
         [Display(Name = "RR Number")]
         public string RRNumber { get; set; }
+        public int RRId { get; set; }
 
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
+        public int SupplierId { get; set; }
 
         [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }

@@ -3,8 +3,10 @@ using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.IO.Packaging;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -155,13 +157,13 @@ namespace GMGInventory.Sync
                 var success = new List<string>();
                 try
                 {
-                    var purchaseOrder = await context.PurchaseOrderNews.Where(s => s.DocumentNumber.ToLower() == "wala pa").FirstOrDefaultAsync();
-                    if (purchaseOrder == null) errors.Add($"Invalid Purchase Order: \"\" not found");
+                    var purchaseOrder = await context.PurchaseOrderNews.Where(s => s.DocumentNumber.ToLower() == api_receiving.receiving_code).FirstOrDefaultAsync();
+                    if (purchaseOrder == null) errors.Add($"Invalid Purchase Order: {api_receiving.receiving_code} not found");
 
-                    var warehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_receiving.wh_code.ToLower()).FirstOrDefaultAsync();
+                    var warehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == api_receiving.wh_code.ToLower()).FirstOrDefaultAsync();
                     if (warehouse == null) errors.Add($"Invalid Warehouse: {api_receiving.wh_code} not found");
 
-                    var item = await context.Items.Where(s => s.Code.ToLower() == api_receiving.item_code.ToLower()).FirstOrDefaultAsync();
+                    var item = await context.Items.Where(s => s.Code.Trim().ToLower() == api_receiving.item_code.ToLower()).FirstOrDefaultAsync();
                     if (item == null) errors.Add($"Invalid Item: {api_receiving.item_code} not found");
 
                     var orderItem = await context.PurchaseOrderNewLineItems
@@ -206,9 +208,7 @@ namespace GMGInventory.Sync
                                 ReceiveDate = receivedDate,
                                 Remarks = api_receiving.remarks,
                                 StatusId = status.Id,
-
-                                //PurchaseOrderId = purchaseOrder!.Id, // error pa to kasi null, antay pa sa sagot ng gmg
-
+                                PurchaseOrderId = purchaseOrder!.Id,
                                 WarehouseId = warehouse!.Id
                             };
                             await context.PurchaseReceivings.AddAsync(receive);
@@ -326,140 +326,100 @@ namespace GMGInventory.Sync
 
                 try
                 {
-                    var agent = await context.Agents.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
-                    if (agent == null) errors.Add($"Invalid Agent: \"\" not found");
+                    var salesOrder = await context.SalesOrders.Where(s => s.SalesOrderNumber.Trim().ToLower() == api_outbound.outbound_code).FirstOrDefaultAsync();
+                    if (salesOrder == null) errors.Add($"Invalid Sales Order: {api_outbound.outbound_code} not found");
 
-                    var customer = await context.Customers.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
-                    if (customer == null) errors.Add($"Invalid Customer: \"\" not found");
+                    var warehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == api_outbound.wh_code).FirstOrDefaultAsync();
+                    if (warehouse == null) errors.Add($"Invalid Warehouse: {api_outbound.wh_code} not found");
 
-                    var item = await context.Items.Where(s => s.Code.ToLower() == api_outbound.item_code.ToLower()).FirstOrDefaultAsync();
+                    var item = await context.Items.Where(s => s.Code.Trim().ToLower() == api_outbound.item_code.ToLower()).FirstOrDefaultAsync();
                     if (item == null) errors.Add($"Invalid Item: {api_outbound.item_code} not found");
 
+                    var packType = await context.PackTypes.Where(s => s.Code.Trim().ToLower() == "wala pa").FirstOrDefaultAsync();
+                    if (packType == null) errors.Add($"Invalid Pack Type: \"\" not found");
+
                     var quantity = 0;
-                    if (int.TryParse(api_outbound.qty_requested, out var q))
+                    if (int.TryParse(api_outbound.qty_scan, out var q))
                         quantity = q;
                     if (quantity <= 0)
-                        errors.Add($"Invalid Quantity: {api_outbound.qty_requested}");
+                        errors.Add($"Invalid Quantity: {api_outbound.qty_scan}");
+
+                    var boxNumber = 1;
+                    //if (int.TryParse(api_outbound.qty_scan, out var q))
+                    //    quantity = q;
+                    //if (quantity <= 0)
+                    //    errors.Add($"Invalid Quantity: {api_outbound.qty_scan}");
 
                     if (errors.Count() == 0)
                     {
-                        var order = await context.SalesOrders
-                                                 .Where(s => s.BarcotechOutboundCode == api_outbound.outbound_code)
-                                                 .FirstOrDefaultAsync();
+                        var pack = await context.Packs
+                                                .Where(s => s.BarcotechOutboundCode == api_outbound.outbound_code)
+                                                .FirstOrDefaultAsync();
 
-                        var orderDate = DateTime.MinValue;
+                        var packDate = DateTime.MinValue;
                         if (DateTime.TryParse(api_outbound.dispatch_date, out var d))
-                            orderDate = d;
+                            packDate = d;
 
-                        if (order == null)
+                        if (pack == null)
                         {
-                            var status = await context.PurchaseStatuses
+                            var status = await context.Statuses
                                                       .Where(s => s.Name.ToLower() == "submitted")
                                                       .FirstAsync();
 
                             var salesHelper = new SalesHelper();
                             var soNumber = await salesHelper.GetNewOrder(context);
 
-                            order = new SalesOrder
+                            pack = new Pack
                             {
-                                SalesOrderNumber = soNumber,
-                                AgentId = agent!.Id,
-                                CustomerId = customer!.Id,
-                                SalesOrderDate = orderDate,
-                                RequiredDeliveryDate = orderDate,
-                                OverallDiscount = 0,
-                                WithLP = true,
-                                WithREYCONonDefective = true,
-                                WithREYCOJITLPDeliveryId = 1,
-                                Remarks = api_outbound.remarks,
+                                SalesOrderId = salesOrder!.Id,
                                 StatusId = status.Id,
+                                PackDate = packDate,
+                                WarehouseId = warehouse!.Id,
+                                Remarks = api_outbound.remarks,
                                 BarcotechOutboundCode = api_outbound.outbound_code
                             };
-                            await context.SalesOrders.AddAsync(order);
+                            await context.Packs.AddAsync(pack);
                             await context.SaveChangesAsync(userId);
 
-                            success.Add($"Added Order: <a href='SalesOrder/Details/{order.Id}'>{order.SalesOrderNumber}</a>");
+                            success.Add($"Added Order: <a href='Pack/Details/{pack.Id}'>{pack.Id}</a>");
                         }
                         else
                         {
-                            order.AgentId = agent!.Id;
-                            order.CustomerId = customer!.Id;
-                            order.SalesOrderDate = orderDate;
-                            order.RequiredDeliveryDate = orderDate;
-                            order.Remarks = api_outbound.remarks;
-                            context.SalesOrders.Update(order);
+                            pack.SalesOrderId = salesOrder!.Id;
+                            pack.PackDate = packDate;
+                            pack.WarehouseId = warehouse!.Id;
+                            pack.Remarks = api_outbound.remarks;
+                            context.Packs.Update(pack);
                             await context.SaveChangesAsync(userId);
 
-                            success.Add($"Updated Order: <a href='SalesOrder/Details/{order.Id}'>{order.SalesOrderNumber}</a>");
+                            success.Add($"Updated Order: <a href='Pack/Details/{pack.Id}'>{pack.Id}</a>");
                         }
 
-                        var orderItem = await context.SalesOrderLineItems
-                                                     .Where(s => s.BarcotechOutboundId == api_outbound.id)
-                                                     .FirstOrDefaultAsync();
+                        var packItem = await context.PackLineItems
+                                                    .Where(s => s.BarcotechOutboundId == api_outbound.id)
+                                                    .FirstOrDefaultAsync();
 
-                        var orderLastLine = await context.SalesOrderLineItems
-                                                         .Where(s => s.SalesOrderId == order.Id)
-                                                         .OrderByDescending(s => s.LineNumber)
-                                                         .Select(s => s.LineNumber)
-                                                         .FirstOrDefaultAsync();
-
-                        var sellingPrice = await context.ItemPrices
-                                                        .Where(s => s.ItemId == item!.Id)
-                                                        .FirstOrDefaultAsync();
-
-                        var discount1 = await context.CustomerBrandDiscount
-                                                     .Where(s => s.CustomerId == customer!.Id
-                                                              && s.BrandId == item!.BrandId
-                                                              && s.IsActive == true)
-                                                     .FirstOrDefaultAsync();
-
-                        var itemPromo = await context.ItemPromo
-                                                     .Where(s => s.ItemId == item!.Id
-                                                              && s.EffectiveDate <= orderDate
-                                                              && orderDate <= s.ExpirationDate)
-                                                     .FirstOrDefaultAsync();
-                        if (orderItem == null)
+                        if (packItem == null)
                         {
-                            orderItem = new SalesOrderLineItem
+                            packItem = new PackLineItem
                             {
-                                SalesOrderId = order.Id,
+                                PackId = pack.Id,
                                 ItemId = item!.Id,
-                                LineNumber = orderLastLine + 1,
                                 Quantity = quantity,
-                                SellingPrice = itemPromo != null ? itemPromo.PromoPrice
-                                             : sellingPrice == null ? 0
-                                             : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
-                                             : sellingPrice.RetailSellingPrice,
-                                Discount1 = discount1 == null ? 0
-                                          : discount1.Discount,
-                                Discount2 = 0,
-                                Discount3 = 0,
-                                Discount4 = 0,
-                                Discount5 = 0,
-                                CustomerBrandDiscountId = discount1 == null ? null
-                                                        : discount1.Id,
-                                ItemPromoId = itemPromo == null ? null
-                                            : itemPromo.Id,
+                                BoxNumber = boxNumber,
+                                PackTypeId = packType!.Id,
                                 BarcotechOutboundId = api_outbound.id
                             };
-                            await context.SalesOrderLineItems.AddAsync(orderItem);
+                            await context.PackLineItems.AddAsync(packItem);
                             await context.SaveChangesAsync(userId);
                         }
                         else
                         {
-                            orderItem.ItemId = item!.Id;
-                            orderItem.Quantity = quantity;
-                            orderItem.SellingPrice = itemPromo != null ? itemPromo.PromoPrice
-                                             : sellingPrice == null ? 0
-                                             : sellingPrice.NetSellingPrice > sellingPrice.RetailSellingPrice ? sellingPrice.NetSellingPrice
-                                             : sellingPrice.RetailSellingPrice;
-                            orderItem.Discount1 = discount1 == null ? 0
-                                                : discount1.Discount;
-                            orderItem.CustomerBrandDiscountId = discount1 == null ? null
-                                                              : discount1.Id;
-                            orderItem.ItemPromoId = itemPromo == null ? null
-                                                  : itemPromo.Id;
-                            context.SalesOrderLineItems.Update(orderItem);
+                            packItem.ItemId = item!.Id;
+                            packItem.Quantity = quantity;
+                            packItem.BoxNumber = boxNumber;
+                            packItem.PackTypeId = packType!.Id;
+                            context.PackLineItems.Update(packItem);
                             await context.SaveChangesAsync(userId);
                         }
                     }
@@ -541,11 +501,10 @@ namespace GMGInventory.Sync
 
                     var salesOrder = await context.SalesOrders.Where(s => s.SalesOrderNumber.ToLower() == "wala pa").FirstOrDefaultAsync();
                     if (salesOrder == null) errors.Add($"Invalid Sales Order: \"\" not found"); // tatanggalin
-
-                    var customer = await context.Customers.Where(s => s.Code.ToLower() == "wala pa").FirstOrDefaultAsync();
+                    var customer = await context.Customers.Where(s => s.Code.Trim().ToLower() == "wala pa").FirstOrDefaultAsync();
                     if (customer == null) errors.Add($"Invalid Customer: \"\" not found");
 
-                    var item = await context.Items.Where(s => s.Code.ToLower() == api_return.item_code.ToLower()).FirstOrDefaultAsync();
+                    var item = await context.Items.Where(s => s.Code.Trim().ToLower() == api_return.item_code.ToLower()).FirstOrDefaultAsync();
                     if (item == null) errors.Add($"Invalid Item: {api_return.item_code} not found");
 
                     var quantity = 0;
@@ -734,19 +693,19 @@ namespace GMGInventory.Sync
 
                 try
                 {
-                    var swarehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
+                    var swarehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
                     if (swarehouse == null) errors.Add($"Invalid Source Warehouse: {api_transfer.from_wh_code} not found");
 
-                    var dwarehouse = await context.Warehouses.Where(s => s.Code.ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
+                    var dwarehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == api_transfer.from_wh_code.ToLower()).FirstOrDefaultAsync();
                     if (dwarehouse == null) errors.Add($"Invalid Destination Warehouse: {api_transfer.from_wh_code} not found");
 
-                    var item = await context.Items.Where(s => s.Code.ToLower() == api_transfer.item_code.ToLower()).FirstOrDefaultAsync();
+                    var item = await context.Items.Where(s => s.Code.Trim().ToLower() == api_transfer.item_code.ToLower()).FirstOrDefaultAsync();
                     if (item == null) errors.Add($"Invalid Item: {api_transfer.item_code} not found");
 
                     var shorten_location_code = string.Concat(api_transfer.bin_location_code.Where(c => c != ' ' && c != '-').Take(10));
 
                     var location = await context.LocationCodes
-                                                .Where(s => s.Code.ToLower() == shorten_location_code.ToLower()
+                                                .Where(s => s.Code.Trim().ToLower() == shorten_location_code.ToLower()
                                                          || s.Name.ToLower() == api_transfer.bin_location_code.ToLower())
                                                 .FirstOrDefaultAsync();
                     if (location == null)

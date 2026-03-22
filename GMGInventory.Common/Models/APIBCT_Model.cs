@@ -30,19 +30,27 @@ namespace GMGInventory.Common.Models
 
     public class APIBCT_Outbound
     {
-        public string id { get; set; }
+        //public string id { get; set; }
         public string outbound_code { get; set; }
+        public string packing_number { get; set; }
+        public string packaging_type { get; set; }
+        public string carton_id { get; set; }
+        public string carton_number { get; set; }
+        public string packed_by { get; set; }
         public string item_code { get; set; }
-        public string barcode { get; set; }
+        public string item_name { get; set; }
+        public string description { get; set; }
         public string serial_no { get; set; }
         public string qty_scan { get; set; }
-        public string qty_requested { get; set; }
         public string dispatch_date { get; set; }
-        public string dispatched_by { get; set; }
+        public string is_done { get; set; }
+        //public string barcode { get; set; }
+        //public string qty_requested { get; set; }
+        //public string dispatched_by { get; set; }
         public string wh_code { get; set; }
-        public string bin_location_code { get; set; }
-        public string batch_number { get; set; }
-        public string expiration_date { get; set; }
+        //public string bin_location_code { get; set; }
+        //public string batch_number { get; set; }
+        //public string expiration_date { get; set; }
         public string remarks { get; set; }
     }
 

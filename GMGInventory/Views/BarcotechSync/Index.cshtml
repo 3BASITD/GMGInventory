@@ -35,11 +35,18 @@
     <script>
         // Load List on DataTable
         var dtLogs = $('.table-logs').on('preXhr.dt', function(e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -65,13 +72,13 @@
                         //         var module = data.moduleName.toLowerCase();
                                 
                         //         if(module == "receiving")
-                        //             return `<a href='/PurchaseReceive/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
+                        //             return `<a href='/PurchaseReceive/Details/${id}' class='link-info' target='_blank'>${name}</a>`;
                         //         if(module == "outbound")
-                        //             return `<a href='/SalesOrder/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
+                        //             return `<a href='/SalesOrder/Details/${id}' class='link-info' target='_blank'>${name}</a>`;
                         //         if(module == "return")
-                        //             return `<a href='/SalesReturn/Details/${id}' class='text-info' target='_blank'>${name}</a>`;
+                        //             return `<a href='/SalesReturn/Details/${id}' class='link-info' target='_blank'>${name}</a>`;
                         //         if(module == "transfer")
-                        //             return `<a href='/Transfer/Details/${id}' class='text-info' target='_blank'>View</a>`;
+                        //             return `<a href='/Transfer/Details/${id}' class='link-info' target='_blank'>View</a>`;
                         //     }
                         //     return data.remarks;
                         // }
@@ -94,7 +101,7 @@
         });
 
         dtLogs.on("draw", function() {
-            hideLoader();
+            //hideLoader();
         });
     </script>
 }

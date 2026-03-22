@@ -99,7 +99,7 @@
 
         // Load List on DataTable
         var registerDT = $('.table-register').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCheckRegisterSummaryDT")",
@@ -107,9 +107,15 @@
                 data: function (data) {
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -134,7 +140,7 @@
 
         // Load functions upon DataTable load
         registerDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-register thead th").removeClass("text-end");
         });

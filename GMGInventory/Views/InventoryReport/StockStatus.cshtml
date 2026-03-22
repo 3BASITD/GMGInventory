@@ -173,7 +173,7 @@
                     allowClear: true,
                     placeholder: {
                         id: "",
-                        text: "All"
+                        text: "ALL"
                     },
                     dropdownParent: $('#filterModal')
                 });
@@ -191,7 +191,7 @@
                     allowClear: true,
                     placeholder: {
                         id: "",
-                        text: "All"
+                        text: "ALL"
                     },
                     minimumResultsForSearch: -1,
                     templateResult: function (repo) {
@@ -207,7 +207,7 @@
 
         // Load List on DataTable
         var stockDT = $('.table-stock').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetStockStatusDT")",
@@ -220,9 +220,15 @@
                     if (brandId) data.Brand = brandId;
                     if (itemId) data.Item = itemId;
                     if (warehouseId) data.Warehouse = warehouseId;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -253,7 +259,7 @@
 
         // Load functions upon DataTable load
         stockDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-stock thead th").removeClass("text-end");
         });

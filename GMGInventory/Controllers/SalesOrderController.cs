@@ -68,7 +68,6 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
-
             ViewData["UserAccessSpecial"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrderSpecial)).Convert();
 
             var order = await salesOrderRepository.GetDetailsAsync(Id);
@@ -145,8 +144,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
-
-            ViewData["UserAccess2"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrderSpecial)).Convert();
+            ViewData["UserAccessSpecial"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrderSpecial)).Convert();
 
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (Id != null && (order == null || order.DisapprovedBy == null || order.DisapprovedDateD == null))

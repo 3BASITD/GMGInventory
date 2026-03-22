@@ -110,14 +110,21 @@
         });
 
         var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCustomerInvoiceToAddDT")",
                 type: "POST",
                 data: function (data) {
                     data.Id = $("#filter-customer").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -148,7 +155,7 @@
         });
         
         invoiceDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
             dtCheckboxes();
         });
 

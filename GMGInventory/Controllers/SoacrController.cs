@@ -421,7 +421,8 @@ namespace GMGInventory.Controllers
             var tableHeader = section.AddTable();
             tableHeader.Borders.Bottom.Width = 0.75;
 
-            var columnWidth = new double[] { 3, 3, 2.5, 3, 3, 3 };
+            //var columnWidth = new double[] { 3, 3, 2.5, 3, 3, 3, 3 };
+            var columnWidth = new double[] { 2.5, 2.5, 1.5, 2.5, 2.5, 2.5, 2.5 };
 
             foreach (var w in columnWidth)
             {
@@ -429,7 +430,7 @@ namespace GMGInventory.Controllers
             }
 
             var header = tableHeader.AddRow();
-            var columnHeader = new string[] { "Invoice Date", "Invoice No.", "Trans Cod", "Open Amount", "Freight Cost", "Total" };
+            var columnHeader = new string[] { "Invoice Date", "Invoice No.", "Trans Cod", "Open Amount", "TBR", "Freight Cost", "Total" };
             for (var chctr = 0; chctr < columnHeader.Length; chctr++)
             {
                 var chcell = header.Cells[chctr].AddParagraph(columnHeader[chctr]);
@@ -469,8 +470,9 @@ namespace GMGInventory.Controllers
                 row.Cells[1].AddParagraph(item.ControlNumber).Format = cellFormatCenter.Clone();
                 row.Cells[2].AddParagraph(item.InvoiceType).Format = cellFormatCenter.Clone();
                 row.Cells[3].AddParagraph(item.InvoiceAmount).Format = cellFormatRight.Clone();
-                row.Cells[4].AddParagraph(item.FreightCharge).Format = cellFormatRight.Clone();
-                row.Cells[5].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
+                row.Cells[4].AddParagraph(item.TBR).Format = cellFormatRight.Clone();
+                row.Cells[5].AddParagraph(item.FreightCharge).Format = cellFormatRight.Clone();
+                row.Cells[6].AddParagraph(item.Balance).Format = cellFormatRight.Clone();
             }
 
             var cellFormatLeftBold = new ParagraphFormat
@@ -491,8 +493,9 @@ namespace GMGInventory.Controllers
             //footerRow.Cells[1].AddParagraph("# of Invoice(s): " + details.Contents.Count).Format = cellFormatRightBold.Clone();
             footerRow.Cells[2].AddParagraph("Total:").Format = cellFormatRightBold.Clone();
             footerRow.Cells[3].AddParagraph(details.TotalInvoiceAmount).Format = cellFormatRightBold.Clone();
-            footerRow.Cells[4].AddParagraph(details.TotalFreightCost).Format = cellFormatRightBold.Clone();
-            footerRow.Cells[5].AddParagraph(details.TotalBalance).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[4].AddParagraph(details.TotalTBR).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[5].AddParagraph(details.TotalFreightCost).Format = cellFormatRightBold.Clone();
+            footerRow.Cells[6].AddParagraph(details.TotalBalance).Format = cellFormatRightBold.Clone();
 
             //var footer = section.Footers.Primary.AddParagraph();
             //footer.AddText("This is the footer of the table");

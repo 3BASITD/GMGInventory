@@ -13,9 +13,11 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
+        public int SalesOrderId { get; set; }
 
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
+        public int InvoiceId { get; set; }
 
         [Display(Name = "Control Number")]
         public string ControlNumber { get; set; }
@@ -25,18 +27,20 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
+        public int ItemId { get; set; }
 
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
         [Display(Name = "Part Number")]
-        public string PartNumber { get; set; }
+        public string? PartNumber { get; set; }
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }
 
         [Display(Name = "Quantity")]
-        public int Quantity { get; set; }
+        public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
+        public int QuantityD { get; set; }
 
         [Display(Name = "Selling Price")]
         public string SellingPrice => string.Format(SystemFormat.StringDecimalComma, SellingPriceD);
@@ -52,7 +56,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Extended Price")]
         public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
-        public decimal ExtendedPriceD => Math.Round(Quantity * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
+        public decimal ExtendedPriceD => Math.Round(QuantityD * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
 
 
 

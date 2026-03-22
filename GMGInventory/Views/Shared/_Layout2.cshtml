@@ -8,6 +8,8 @@
     var activeUser = UserManager.FindByNameAsync(User.Identity.Name).Result;
     ViewData["IsNavIconPlain"] = activeUser.IsNavIconPlain;
     var newIcon = activeUser.IsNavIconPlain == false;
+    var title = ViewData["Title"];
+    var titleDetails = ViewData["TitleDetails"];
 }
 
 <!DOCTYPE html>
@@ -15,7 +17,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GMGInventory | @ViewData["Title"]</title>
+    <title>@(titleDetails == null ? "" : $"{titleDetails} ")@title | 3BAS Tigers Inc</title>
     <link rel="icon" href="~/images/box.ico" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -45,8 +47,9 @@
         <nav class="main-header navbar navbar-expand-lg @(activeUser.IsDarkMode ? "navbar-dark" : "navbar-white navbar-light") to-stick nav-sticked">
             <div class="container-fluid">
                 <a asp-controller="Home" asp-action="Index" class="navbar-brand brand-link">
-                    <img src="~/images/BAS-02.png" alt="BAS" class="brand-image img-circle bg-white" style="margin-top:-3px;">
-                    <span class="brand-text font-weight-light">INVENTORY SYSTEM</span>
+                    <img src="~/images/3BAS.png" alt="BAS" class="brand-image" style="margin-top:-3px;margin-right:0.8rem" />
+                    @* <img src="~/images/3BAS.png" alt="BAS" class="brand-image img-circle bg-white" style="margin-top:-3px;" /> *@
+                    <span class="brand-text font-weight-light">3BAS TIGER INC</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>

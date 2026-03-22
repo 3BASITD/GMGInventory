@@ -7,6 +7,7 @@ namespace GMGInventory.Application.Contracts
     public interface IItemTypeRepository : IGenericRepository<ItemType>
     {
         Task<IList<JsonOptionsModel>> GetOptions(int? CategoryId, int? IncludeId);
+        Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page);
         Task<int?> GetIdAsync(string? Name);
         Task<IList<ItemTypeViewVM>> GetListAsync();
         Task<ForDataTables<ItemTypeViewVM>> GetListDTAsync(DataTablesRequestForm form);

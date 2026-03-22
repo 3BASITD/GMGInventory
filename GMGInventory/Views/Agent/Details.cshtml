@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Agent Details";
+    ViewData["TitleDetails"] = $"[{Model.Code}]";
 }
 
 @section Breadcrumb {
@@ -203,14 +204,21 @@
 
         //Customer Details
         var customersDT = $('.table-customers').on('preXhr.dt', function (e, settings, data) {
-            ShowLoader("customers");
+            //ShowLoader("customers");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetDetailsJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -253,7 +261,7 @@
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
 
-            HideLoader("customers");
+            //HideLoader("customers");
 
         });
 

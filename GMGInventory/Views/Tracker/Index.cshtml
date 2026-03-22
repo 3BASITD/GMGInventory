@@ -452,7 +452,7 @@
         };
 
         var taskDT = $('.table-tasks').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             stateSave: true,
             stateSaveParams: function (settings, data) {
@@ -478,7 +478,14 @@
                 data: function (data) {
                     data.Status = $("#filter-status").val();
                     data.Priority = $("#filter-priority").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -570,7 +577,7 @@
         });
 
         taskDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         $('#filterModal').on('show.bs.modal', function () {

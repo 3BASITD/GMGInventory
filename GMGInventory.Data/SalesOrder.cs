@@ -77,8 +77,6 @@ namespace GMGInventory.Data
         public int? ResubmitId { get; set; }
         public virtual SalesOrder Resubmit { get; set; }
 
-        public string? BarcotechOutboundCode { get; set; }
-
         public DateTime? BarcotechRequestDate { get; set; }
 
         public ICollection<SalesOrder> SalesOrderResubmits { get; set; }

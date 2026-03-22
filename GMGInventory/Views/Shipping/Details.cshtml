@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Shipping Details";
+    ViewData["TitleDetails"] = $"[{Model.SONumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -155,7 +156,7 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
@@ -164,6 +165,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -178,7 +186,8 @@
                 { data: "packTypeName", name: "PackTypeName", visible: false },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
                 },
@@ -211,7 +220,7 @@
         });
 
         itemDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         $(".btn-details-print").on("click", function () {

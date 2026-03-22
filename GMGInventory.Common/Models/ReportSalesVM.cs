@@ -452,8 +452,23 @@ namespace GMGInventory.Common.Models
         public string SRNumber { get; set; }
 
         [Display(Name = "Return Date")]
-        public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDate);
+        public FormattedDate ReturnDate => new FormattedDate(ReturnDateD);
         public DateTime ReturnDateD { get; set; }
+
+        [Display(Name = "Order Date")]
+        public FormattedDate? OrderDate => OrderDateD == null ? null : new FormattedDate(OrderDateD.Value);
+        public DateTime? OrderDateD { get; set; }
+
+        [Display(Name = "Delivery Date")]
+        public FormattedDate? DeliveryDate => DeliveryDateD == null ? null : new FormattedDate(DeliveryDateD.Value);
+        public DateTime? DeliveryDateD { get; set; }
+
+        [Display(Name = "Pickup Date")]
+        public FormattedDate? PickupDate => PickupDateD == null ? null : new FormattedDate(PickupDateD.Value);
+        public DateTime? PickupDateD { get; set; }
+
+        [Display(Name = "Reason of Return")]
+        public string ReturnReason { get; set; }
 
         [Display(Name = "Customer")]
         public string Customer { get; set; }
@@ -461,8 +476,11 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Agent")]
         public string Agent { get; set; }
 
-        [Display(Name = "Sale Invoice Number")]
-        public string SINumber { get; set; }
+        [Display(Name = "Sales Invoice Number")]
+        public string? SINumber { get; set; }
+
+        [Display(Name = "Sales Order Number")]
+        public string? SONumber { get; set; }
 
         [Display(Name = "Control Number")]
         public string ControlNumber { get; set; }

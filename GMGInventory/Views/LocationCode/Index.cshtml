@@ -186,7 +186,7 @@
 
         // Load List on DataTable
         var dataTable = $('.table-locationCode').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -194,6 +194,13 @@
                 data: function (data) {
 
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -247,7 +254,7 @@
 
         // Load functions upon DataTable load
         dataTable.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             if (user_access.canDelete) {
                 $('.deleteBtn').click(function (e) {

@@ -30,6 +30,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer")]
         public string Customer { get; set; }
+        public int CustomerId { get; set; }
 
         [Display(Name = "Customer Priority")]
         public string Priority => SystemFormat.CustomerPriority(PriorityD);
@@ -37,6 +38,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
+        public int SalesOrderId { get; set; }
 
         [Display(Name = "Total Amount")]
         public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
@@ -88,6 +90,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
+        public int CustomerId { get; set; }
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
@@ -103,9 +106,11 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Agent")]
         public string Agent { get; set; }
+        public int AgentId { get; set; }
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
+        public int SalesOrderId { get; set; }
 
         [Display(Name = "Purchase Order Number")]
         public string? PONumber { get; set; }

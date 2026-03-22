@@ -49,7 +49,7 @@ namespace GMGInventory.Application.Repositories
                                              PackageCount = s.Select(l => l.BoxNumber).Distinct().Count()
                                          }).ToList()
                            let forwarder = so.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == so.Id).FirstOrDefault()!.Forwarder
-                           where (sts.Code.ToLower() == "invoiced" || sts.Code.ToLower() == "draft")
+                           where (sts.Code.Trim().ToLower() == "invoiced" || sts.Code.Trim().ToLower() == "draft")
                            && filter.DateFrom <= invs.SalesOrder.SalesOrderDate.Date
                            && invs.SalesOrder.SalesOrderDate.Date <= filter.DateTo
                            && (filter.Customer == null || filter.Customer == so.CustomerId)

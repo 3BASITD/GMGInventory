@@ -209,11 +209,18 @@
 
         // Load List on DataTable
         var soacrDT = $('.table-soacr').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -222,21 +229,35 @@
             search: {
                 return: true,
             },
-            stateSave: true,
             columns: [
                 { data: "id", name: "Id" },
-                { data: "customer", name: "Customer" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/Customer/Details/${data.customerId}" class="link-info" target="_blank">${data.customer}</a>`;
+                    },
+                    name: "Customer"
+                },
                 { data: "type", name: "Type" },
-                { data: "soaFrom", name: "SOAFrom" },
-                { data: "soaTo", name: "SOATo" },
-                { data: "totalAmount", name: "TotalAmount", className: "text-end" },
-                { data: "tbr", name: "TBR", className: "text-end" },
-                { data: "credit", name: "Credit", className: "text-end" },
-                { data: "debit", name: "Debit", className: "text-end" },
-                { data: "paidAmount", name: "PaidAmount", className: "text-end" },
-                { data: "freightCharge", name: "FreightCharge", className: "text-end" },
-                { data: "balance", name: "Balance", className: "text-end" },
-                { data: "overPayment", name: "OverPayment", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.soaFrom || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "SOAFrom"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.soaTo || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "SOATo"
+                },
+                { data: "totalAmount", name: "TotalAmount", className: "text-end", orderable: false },
+                { data: "tbr", name: "TBR", className: "text-end", orderable: false },
+                { data: "credit", name: "Credit", className: "text-end", orderable: false },
+                { data: "debit", name: "Debit", className: "text-end", orderable: false },
+                { data: "paidAmount", name: "PaidAmount", className: "text-end", orderable: false },
+                { data: "freightCharge", name: "FreightCharge", className: "text-end", orderable: false },
+                { data: "balance", name: "Balance", className: "text-end", orderable: false },
+                { data: "overPayment", name: "OverPayment", className: "text-end", orderable: false },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -252,7 +273,7 @@
 
         // Load functions upon DataTable load
         soacrDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             //$(".printBtn").on("click", function () {
             //    $.LoadingOverlay("show", {

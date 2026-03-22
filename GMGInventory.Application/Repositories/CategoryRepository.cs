@@ -42,6 +42,30 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        {
+            var categories = await context.Categories
+                                     .Where(s => s.IsActive
+                                              && (string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower()))))
+                                     .Select(s => new JsonNameOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Code,
+                                         Name = s.Name
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var categoriesFiltered = categories.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = categoriesFiltered,
+                total_count = categories.Count
+            };
+        }
+
         public async Task<int?> GetIdAsync(string? Name)
         {
             var _name = (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim();
@@ -353,7 +377,7 @@ namespace GMGInventory.Application.Repositories
                 var _name = categoryVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
                 var name = _name.Length > 100 ? _name[..100] : _name;
 
-                var category = await context.Categories.Where(s => s.Code.ToLower() == code.ToLower()).FirstOrDefaultAsync();
+                var category = await context.Categories.Where(s => s.Code.Trim().ToLower() == code.ToLower()).FirstOrDefaultAsync();
                 if (category != null)
                 {
                     category.Name = name;

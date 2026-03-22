@@ -178,5 +178,27 @@ namespace GMGInventory.Controllers
             responseModel.NewRow = packId;
             return Json(responseModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await packRepository.CancelAsync(Id);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PackingListing, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await packRepository.DeleteAsync(Id);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
     }
 }

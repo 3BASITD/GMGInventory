@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Purchase Order Details";
+    ViewData["TitleDetails"] = $"[{Model.DocumentNumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 
     var status = Model.Status.ToLowerInvariant();
@@ -10,12 +11,13 @@
     bool isDraft = status == "draft";
     bool isSubmitted = status == "submitted";
     bool isDisapproved = status == "disapproved";
-
     bool isNonAutomotive = type == "non-automotive";
     bool isAutomotive = type == "automotive";
+    bool isReceived = Model.IsReceived;
 
     bool canAdd = userAccess.CanAdd;
     bool canPrint = userAccess.CanPrint;
+    bool canCancel = userAccess.CanEdit && isSubmitted;
     bool canDelete = userAccess.CanDelete && isDraft;
     bool canEdit = userAccess.CanEdit && isDraft;
     bool canApproveDisapprove = userAccess.CanApproveDisapprove && isSubmitted;
@@ -54,6 +56,21 @@
                         data-microtip-position="bottom-left"
                         role="tooltip">
                     <span class="fas fa-print mr-0"></span>
+                </button>
+            }
+            @if (canCancel)
+            {
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-cancel">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Cancel&#10;@(isSubmitted ? "Edit access is required" : "Only submitted order can be cancelled")"
+                        data-microtip-position="bottom" role="tooltip">
+                    <span class="fas fa-times mr-0"></span>
                 </button>
             }
             @if (canDelete)
@@ -212,7 +229,11 @@
                         @Html.DisplayNameFor(model => model.Supplier)
                     </span>
                     <b class="d-block">
-                        @Model.Supplier
+                        @Html.ActionLink(Model.Supplier,
+                                        "Details",
+                                        "Supplier",
+                                        new { @Id = Model.SupplierId },
+                                                new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -454,10 +475,13 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header bg-light">
-                        <span class="card-title">Purchase Request Item(s)</span>
+                        <span class="card-title">Purchase Order Item(s)</span>
                         <div class="card-tools">
                             @if (isDraft && canAdd)
                             {
+                                <button type="button" class="btn btn-secondary btn-sm float-right prBtn ml-2" data-bs-toggle="modal" data-bs-target="#prModal">
+                                    <span class="fas fa-plus"></span> Add PR Item(s)
+                                </button>
                                 <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
                                     <span class="fas fa-plus"></span> Add Item
                                 </button>
@@ -593,6 +617,62 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Order Item Modal -->
+    <div class="modal fade" id="prModal" role="dialog" aria-labelledby="prModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Purchase Order Item (from Purchase Request)</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <div class="form-group">
+                                <label for="addpr-pr-number" class="form-label mb-0">Purchase Request Ref#</label>
+                                <select id="addpr-pr-number" name="PRNumber" style="width: 100%;">
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-head-fixed table-striped table-hover table-pr">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input class="prchkclassrequestall" type="checkbox" onclick="PRRowSelectAll()" />
+                                        </th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Part Number</th>
+                                        <th>Request Quantity</th>
+                                        <th>Remaining Quantity</th>
+                                        <th>Order Quantity</th>
+                                        <th>Unit</th>
+                                        <th>Unit Cost</th>
+                                        <th>Total Amount</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-add-pr" onclick="AddPRItem()">
+                        <span class="fas fa-plus"></span> Add
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -812,7 +892,7 @@
         var po_data = @Json.Serialize(Model);
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemListJson")",
@@ -821,6 +901,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -840,13 +927,21 @@
                     className: "form-cell"
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
-                { data: "purchaseRequestNumber", name: "PurchaseRequestNumber", className: "form-cell" },
+                { 
+                    data: "purchaseRequestNumber",
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/PurchaseRequest/Details/${data.purchaseRequestId}" class="link-info" target="_blank">${data.purchaseRequestNumber}</a>`;
+                    },
+                    name: "PurchaseRequestNumber", 
+                    className: "form-cell" 
+                },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                         }
                     },
                     name: "ItemCode",
@@ -922,7 +1017,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        if (po_data.status.toLowerCase() == "approved") {
+                        if (po_data.status.toLowerCase() == "approved" || po_data.status.toLowerCase() == "approved (completed)") {
                             if(!user_access.canEdit || data.quantityUpdateCount > 2) {
                                 actions += '<button type="button" class="btn btn-warning btn-xs btn-history-quantity" data-microtip-title="Update Quantity History" data-microtip-position="left" role="tooltip"><span class="fas fa-history"></span></button>';
                             } else {
@@ -950,7 +1045,7 @@
         });
 
         itemDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-item thead th").removeClass("form-cell");
             $(".table-item thead th").removeClass("text-end");
@@ -1103,30 +1198,30 @@
         });
 
         if (user_access.canAdd) {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetPurchaseRequestOptions")",
-                data: {
-                    RequestTypeId: po_data.requestTypeId,
-                    RequestPurposeId: po_data.requestPurposeId
+            $("#add-pr-number").select2({
+                minimumInputLength: -1,
+                allowClear: true,
+                placeholder: "<empty>",
+                language: {
+                    noResults: function () {
+                        return "No available request found";
+                    }
                 },
-                success: function (data, status, xhr) {
-                    $("#add-pr-number").select2({
-                        ajax: null, //already fetched outside
-                        data: data,
-                        minimumInputLength: -1,
-                        placeholder: "<empty>",
-                        language: {
-                            noResults: function () {
-                                return "No request found";
-                            }
-                        },
-                        dropdownParent: $("#addModal")
-                    }).on("select2:select", function () {
-                        loadAllItemsOptions();
-                    });
-                }
+                ajax: {
+                    url: "@Url.Action("GetPurchaseRequestOptions")",
+                    data: function (params) {
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
+                            RequestTypeId: po_data.requestTypeId,
+                            RequestPurposeId: po_data.requestPurposeId,
+                            RegionId: po_data.regionId
+                        });
+                    }
+                },
+                dropdownParent: $("#addModal")
             });
+
+            $("#add-pr-number").on("select2:select", loadAllItemsOptions);
 
             loadAllItemsOptions();
             function loadAllItemsOptions() {
@@ -1221,6 +1316,191 @@
                     $(".add-quantity-warning").text("");
                 }
             });
+
+
+            // Load pr for select2
+            $("#addpr-pr-number").select2({
+                minimumInputLength: -1,
+                allowClear: true,
+                placeholder: "<empty>",
+                language: {
+                    noResults: function () {
+                        return "No available request found";
+                    }
+                },
+                ajax: {
+                    url: "@Url.Action("GetPurchaseRequestOptions")",
+                    data: function (params) {
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
+                            RequestTypeId: po_data.requestTypeId,
+                            RequestPurposeId: po_data.requestPurposeId,
+                            RegionId: po_data.regionId
+                        });
+                    }
+                },
+                dropdownParent: $("#prModal")
+            });
+
+            $("#addpr-pr-number").on("select2:select", function() {
+                $(".prchkclassrequestall, .prchkclassrequest").prop("checked", false);
+                prDT.ajax.reload();
+            });
+
+            var prDT = $('.table-pr').DataTable({
+                ajax: {
+                    url: '@Url.Action("GetPurchaseRequestItems")',
+                    data: function () {
+                        return {
+                            PurchaseRequestId: $("#addpr-pr-number").val()
+                        };
+                    },
+                    dataSrc: function (json) {
+                        return JSON.parse(JSON.stringify(json));
+                    },
+                    type: "POST",
+                },
+                serverSide: false,
+                filter: true,
+                responsive: true,
+                autoWidth: false,
+                searching: false,
+                paging: false,
+                info: false,
+                search: {
+                    return: true,
+                },
+                columns: [
+                    {
+                        orderable: false,
+                        data: function (data, type, dataToSet) {
+                            return data.remainingQuantityD == 0 ? '' : '<input class="prchkclassrequest" type="checkbox" ' + ( data.toOrder == true ? 'checked="checked" ' : '') + 'name="requestitemchk_' + data.id + '" onchange="PRRowSelect(this)" />';
+                        }
+                    },
+                    { data: "itemCode", name: "ItemCode" },
+                    { data: "itemName", name: "ItemName" },
+                    { data: "partNumber", name: "PartNumber" },
+                    { data: "requestQuantity", name: "RequestQuantity", className: "text-end" },
+                    { data: "remainingQuantity", name: "RemainingQuantityD", className: "text-end" },
+                    {
+                        data: function (data, type, dataToSet) {
+                            if (data.toOrder == true) {
+                                if (data.orderQuantityD > data.remainingQuantityD) {
+                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm poquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Order higher than remaining quantity</label>';
+                                } else if (data.orderQuantityD == 0) {
+                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm poquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot order an item with 0 quantity</label>';
+                                } else if (isNaN(data.orderQuantityD) || String(data.orderQuantityD).trim() == "" || data.orderQuantityD < 0) {
+                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm poquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Invalid quantity</label>';
+                                } else {
+                                    return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm poquantity" style="width: 100%;" />';
+                                }
+                            } else {
+                                return '-';
+                            }
+                        },
+                        name: "OrderQuantity",
+                        className: "form-cell text-end"
+                    },
+                    { data: "unit", name: "Unit" },
+                    {
+                        data: function (data, type, dataToSet) {
+                            if (data.toOrder == true) {
+                                if (isNaN(data.unitCostD) || String(data.unitCostD).trim() == "" || data.unitCostD < 0) {
+                                    return '<input type="number" min="0" max="1999999" step="0.01" value="' + data.unitCostD + '" class="form-control form-control-sm pocost" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Invalid cost</label>';
+                                } else {
+                                    return '<input type="number" min="0" max="1999999" step="0.01" value="' + data.unitCostD + '" class="form-control form-control-sm pocost" style="width: 100%;" />';
+                                }
+                            } else {
+                                return '-';
+                            }
+                        },
+                        name: "UnitCost",
+                        className: "form-cell text-end"
+                    },
+                    { data: "totalAmount", name: "TotalAmount", className: "text-end" }
+                ],
+                order: [[1, "asc"]],
+                drawCallback: function () {
+                    let api = this.api();
+
+                    api.rows().every(function () {
+                        let data = this.data();
+                        let row = this.node();
+
+                        if (data.toOrder === false) {
+                            $(row).find("td").addClass("text-muted");
+                        } else {
+                            $(row).find("td").removeClass("text-muted");
+                        }
+                    });
+                }
+            });
+
+            prDT.on("draw", function () {
+                $(".table-pr thead th").removeClass("text-end");
+
+                $(".poquantity, .pocost").off("blur").on("blur", function () {
+                    var tr = $(this).closest('tr');
+                    var row = prDT.row(tr);
+                    var rowData = row.data();
+
+                    var columnClass = $(this).hasClass("poquantity") ? "poquantity" : "pocost";
+
+                    var quantityValue = parseFloat($(row.node()).find(".poquantity").val()) || 0;
+                    var costValue = parseFloat($(row.node()).find(".pocost").val()) || 0;
+
+                    rowData.orderQuantityD = quantityValue;
+                    rowData.unitCostD = costValue;
+                    rowData.totalAmountD = quantityValue * costValue;
+                    rowData.totalAmount = FormatStringDecimal(quantityValue * costValue);
+
+                    row.data(rowData).draw(false);
+                });
+            });
+
+            function PRRowSelectAll() {
+                var isChecked = $(".prchkclassrequestall").prop("checked");
+                prDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    $(this.node()).find(".prchkclassrequest").prop("checked", isChecked);
+
+                    var data = this.data();
+
+                    if (data.remainingQuantityD > 0) {
+                        data.toOrder = isChecked;
+                        data.orderQuantityD = data.remainingQuantityD;
+                        this.data(data).draw(false);
+                    }
+                });
+            }
+
+            function PRRowSelect(elem) {
+                var tr = $(elem).closest('tr');
+                var row = prDT.row(tr);
+                var rowData = row.data();
+
+                rowData.toOrder = $(elem).prop("checked");
+                rowData.orderQuantityD = $(elem).prop("checked") ? rowData.remainingQuantityD : 0;
+
+                row.data(rowData).draw(false);
+
+                var rows_checked = 0;
+                prDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if ($(this.node()).find(".prchkclassrequest").prop("checked")) {
+                        rows_checked++;
+                    }
+                });
+
+                if (rows_checked == prDT.rows().count()) {
+                    $(".prchkclassrequestall").prop("checked", true);
+                    $(".prchkclassrequestall").prop("indeterminate", false);
+                } else if (rows_checked == 0) {
+                    $(".prchkclassrequestall").prop("checked", false);
+                    $(".prchkclassrequestall").prop("indeterminate", false);
+                } else {
+                    $(".prchkclassrequestall").prop("checked", false);
+                    $(".prchkclassrequestall").prop("indeterminate", true);
+                }
+            }
 
             $.ajax({
                 type: "POST",
@@ -1339,6 +1619,71 @@
                     toastr.success("Added " + $("#add-name").select2("data")[0].text + " on Purchase Order Item(s)", "Success");
                     clearItemForm();
                 }
+            }
+
+            function AddPRItem() {
+                var rowsToAdd = prDT.rows().data().toArray().filter(function(row) {
+                    return row.toOrder == true;
+                });
+
+                var duplicateRows = [];
+                var zeroRows = [];
+                var invalidQuantityRows = [];
+                var invalidCostRows = [];
+                var successRows = [];
+                rowsToAdd.forEach(function (row) {
+                    var prRow = {
+                        purchaseOrderId: 0,
+                        lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
+                        purchaseRequestId: $("#addpr-pr-number").select2("data")[0].id,
+                        purchaseRequestNumber: $("#addpr-pr-number").select2("data")[0].text,
+                        requestItemId: row.id,
+                        itemId: row.itemId,
+                        itemCode: row.itemCode,
+                        itemPartNumber: row.partNumber,
+                        itemDescription: row.itemName,
+                        quantity: FormatStringInteger(row.orderQuantityD),
+                        quantityD: row.orderQuantityD,
+                        unorderedQuantity: FormatStringInteger(row.remainingQuantityD),
+                        unorderedQuantityD: row.remainingQuantityD,
+                        unitId: row.unitId,
+                        unitCode: row.unit,
+                        unitCost: FormatStringDecimal(row.unitCostD),
+                        unitCostD: row.unitCostD,
+                        totalAmount: FormatStringDecimal(row.totalAmountD),
+                        totalAmountD: row.totalAmountD
+                    };
+
+                    var exists = itemDT.rows().data().toArray().some(function(r) {
+                        return r.requestItemId == prRow.requestItemId;
+                    });
+
+                    if (exists){
+                        duplicateRows.push(prRow.itemDescription + " of " + prRow.purchaseRequestNumber);
+                    } else if (prRow.quantityD == 0) {
+                        zeroRows.push(prRow.itemDescription);
+                    } else if (isNaN(prRow.quantityD) || String(prRow.quantityD).trim() == "" || prRow.quantityD < 0) {
+                        invalidQuantityRows.push(prRow.itemDescription);
+                    } else if (isNaN(prRow.unitCostD) || String(prRow.unitCostD).trim() == "" || prRow.unitCostD < 0) {
+                        invalidCostRows.push(prRow.itemDescription);
+                    } else {
+                        itemDT.row.add(prRow);
+                        successRows.push(prRow.itemDescription);
+                    }
+                });
+
+                if (duplicateRows.length)
+                    toastr.warning("<ul><li>" + duplicateRows.join("</li><li>") + "</li></ul>", "DUPLICATE: The following item(s) are already added");
+                if (zeroRows.length)
+                    toastr.error("<ul><li>" + zeroRows.join("</li><li>") + "</li></ul>", "ERROR: The following item(s) have 0 quantity");
+                if (invalidQuantityRows.length)
+                    toastr.error("<ul><li>" + invalidQuantityRows.join("</li><li>") + "</li></ul>", "ERROR: The following item(s) have invalid quantity");
+                if (invalidCostRows.length)
+                    toastr.error("<ul><li>" + invalidCostRows.join("</li><li>") + "</li></ul>", "ERROR: The following item(s) have invalid cost");
+                if (successRows.length)
+                    toastr.success("<ul><li>" + successRows.join("</li><li>") + "</li></ul>", "SUCCESS: The following item(s) have successfully added on Purchase Request Item(s)");
+
+                itemDT.draw();
             }
 
             $(".btn-details-save").on("click", function () {
@@ -1589,6 +1934,31 @@
             }
 
             $(".btn-quantity-history").on("click", HistoryQuantity);
+
+            $(".btn-details-cancel").on("click", function () {
+                swal({
+                    title: "Cancel Purchase Order",
+                    text: "Continue to cancel this purchase order? This will change the status Submitted to Draft.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        $.ajax({
+                            url: "@Url.Action("CancelJson")",
+                            type: "POST",
+                            data: { Id: po_data.id },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
         }
 
         if (user_access.canApproveDisapprove) {

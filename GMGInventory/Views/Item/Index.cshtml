@@ -450,6 +450,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="px-3 pb-2 text-muted small modal-note">
+                    Your filter, sort, and search will be saved for 1 hour
+                </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary"><span class="fas fa-save mr-2"></span>Save</button>
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="Close"><span class="fas fa-times mr-2"></span>Cancel</button>
@@ -576,9 +579,18 @@
             }
         }
 
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
         function ApplyFilter() {
+            $("#filterModal").modal("hide");
             itemDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
                 checkDefaultFilter();
             });
         }
@@ -586,10 +598,9 @@
         var isTable = true;
 
         function ResetFilter() {
+            $("#filterModal").modal("hide");
             resetToDefaultDTFilter();
-
             itemDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
                 checkDefaultFilter();
             });
         }
@@ -606,19 +617,23 @@
             ActiveStatusId: ""
         };
 
-        function checkDefaultFilter() {
-            var changed = JSON.stringify(itemDT.order()) != JSON.stringify(defaultDTState.order) ||
-                          itemDT.page.info().start != defaultDTState.page ||
-                          itemDT.page.len() != defaultDTState.length ||
-                          (itemDT.search() || "") != defaultDTState.search.search ||
-                          $("#CategoryId").val() != defaultDTState.CategoryId ||
-                          $("#ItemTypeId").val() != defaultDTState.ItemTypeId ||
-                          $('#BrandId').val() != defaultDTState.BrandId ||
-                          $('#WarehouseId').val() != defaultDTState.WarehouseId ||
-                          $('#ActiveStatusId').val() != defaultDTState.ActiveStatusId;
+        function checkDTChanged() {
+            if(!itemDT) return false;
+            
+            return JSON.stringify(itemDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   itemDT.page.info().start != defaultDTState.page ||
+                   itemDT.page.len() != defaultDTState.length ||
+                   (itemDT.search() || "") != defaultDTState.search.search ||
+                   $("#CategoryId").val() != defaultDTState.CategoryId ||
+                   $("#ItemTypeId").val() != defaultDTState.ItemTypeId ||
+                   $('#BrandId').val() != defaultDTState.BrandId ||
+                   $('#WarehouseId').val() != defaultDTState.WarehouseId ||
+                   $('#ActiveStatusId').val() != defaultDTState.ActiveStatusId;
+        }
 
-            $(".btn-filter").toggleClass('btn-filtered', changed);
-            $(".btnReset").toggle(changed);
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
         }
 
         function resetToDefaultDTFilter() {
@@ -627,17 +642,47 @@
             $("#BrandId").val(defaultDTState.BrandId).trigger('change');
             $("#WarehouseId").val(defaultDTState.WarehouseId).trigger('change');
             $("#ActiveStatusId").val(defaultDTState.ActiveStatusId).trigger('change');
+            
+            localStorage.removeItem(dt_storage);
 
-            itemDT.state.clear();
-            itemDT.order(defaultDTState.order);
-            itemDT.page(defaultDTState.page);
-            itemDT.search(defaultDTState.search.search);
+            if (itemDT) {
+                itemDT.state.clear();
+                itemDT.order(defaultDTState.order);
+                itemDT.page(defaultDTState.page);
+                itemDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({ 
             stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                if (checkDTChanged()) {
+                    var now = new Date().getTime();
+                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
+                } else {
+                    localStorage.removeItem(dt_storage);
+                }
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
             stateSaveParams: function (settings, data) {
                 data.CategoryId = $('#CategoryId').val();
                 data.ItemTypeId = $('#ItemTypeId').val();
@@ -670,7 +715,14 @@
                     if (warehouseId) data.WarehouseId = warehouseId;
                     if (activeStatusId) data.ActiveStatusId = activeStatusId;
                     data.IsTable = isTable;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -839,7 +891,7 @@
                 $('#toggleView').html('<span class="fas fa-table"></span> List View');
             }
 
-            hideLoader();
+            //hideLoader();
             LoadSelect2();
             checkDefaultFilter();
 

@@ -33,7 +33,10 @@
                         @Html.DisplayNameFor(model => model.PackNumber)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Customer)
+                        @Html.DisplayNameFor(model => model.CustomerCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerName)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Priority)
@@ -134,7 +137,7 @@
 
         // Load List on DataTable
         var packDT = $('.table-pack').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -144,6 +147,13 @@
                     data.StatusCode = $("#filter-status").val();
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -153,9 +163,20 @@
                 return: true,
             },
             columns: [
-                { data: "soNumber", name: "SONumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.soNumber + "</a>";
+                    },
+                    name: "SONumber"
+                },
                 { data: "packNumber", name: "PackNumber" },
-                { data: "customer", name: "Customer" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerCode + "</a>";
+                    },
+                    name: "CustomerCode"
+                },
+                { data: "customerName", name: "CustomerName" },
                 { data: "priority", name: "Priority" },
                 { data: "packedBy", name: "PackedBy" },
                 { data: "packedDate", name: "PackedDate" },
@@ -178,7 +199,7 @@
 
         // Load functions upon DataTable load
         packDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
     </script>
 }

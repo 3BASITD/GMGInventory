@@ -322,7 +322,7 @@
 
                     // Warehouse Details
                     var warehouseDT = $('.modal-table-warehouse').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-warehouse");
+                        //showBatchLoader("modal-warehouse");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -330,7 +330,14 @@
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
+                            },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
                             }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: true,
@@ -346,12 +353,12 @@
                         ],
                         order: [[0, "asc"]]
                     }).on("draw.dt", function () {
-                        hideBatchLoader("modal-warehouse");
+                        //hideBatchLoader("modal-warehouse");
                     });
 
                     // Purchase Order Details
                     var purchaseDT = $('.modal-table-purchase').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-purchase");
+                        //showBatchLoader("modal-purchase");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -359,7 +366,14 @@
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
+                            },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
                             }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: true,
@@ -383,13 +397,13 @@
                         ],
                         order: [[9, "desc"]]
                     }).on("draw.dt", function () {
-                        hideBatchLoader("modal-purchase");
+                        //hideBatchLoader("modal-purchase");
                     });
 
 
                     // Sales Order Details
                     var salesDT = $('.modal-table-sales').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-sales");
+                        //showBatchLoader("modal-sales");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -397,7 +411,14 @@
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
+                            },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
                             }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: true,
@@ -421,13 +442,13 @@
                         ],
                         order: [[9, "desc"]]
                     }).on("draw.dt", function () {
-                        hideBatchLoader("modal-sales");
+                        //hideBatchLoader("modal-sales");
                     });
 
 
                     // Physical Count Adjustment
                     var countDT = $('.modal-table-count').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-count");
+                        //showBatchLoader("modal-count");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -435,7 +456,14 @@
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
+                            },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
                             }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: true,
@@ -455,12 +483,12 @@
                         ],
                         order: [[4, "desc"]]
                     }).on("draw.dt", function () {
-                        hideBatchLoader("modal-count");
+                        //hideBatchLoader("modal-count");
                     });
 
                     //Conversion Details
                     var conversionDT = $('.modal-table-conversion').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-conversion");
+                        //showBatchLoader("modal-conversion");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -469,6 +497,13 @@
                             data: function (data) {
                                 data.Id = id;
                             },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
+                            }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: false,
@@ -503,12 +538,12 @@
                             }
                         }
 
-                        hideBatchLoader("modal-conversion");
+                        //hideBatchLoader("modal-conversion");
                     });
 
                     // Price History
                     var priceDT = $('.modal-table-price').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-price");
+                        //showBatchLoader("modal-price");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -516,7 +551,14 @@
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
+                            },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
                             }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: true,
@@ -533,7 +575,7 @@
                         ],
                         order: [[3, "desc"]]
                     }).on("draw.dt", function () {
-                        hideBatchLoader("modal-price");
+                        //hideBatchLoader("modal-price");
 
 
                     });
@@ -541,7 +583,7 @@
 
                     // Warehouse Transfer History
                     var transferDT = $('.modal-table-transfer').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-transfer");
+                        //showBatchLoader("modal-transfer");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -549,7 +591,14 @@
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
+                            },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
                             }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: true,
@@ -569,13 +618,13 @@
                         ],
                         order: [[4, "desc"]]
                     }).on("draw.dt", function () {
-                        hideBatchLoader("modal-transfer");
+                        //hideBatchLoader("modal-transfer");
                     });
 
 
                     // Sales Return Details
                     var returnDT = $('.modal-table-return').on('preXhr.dt', function (e, settings, data) {
-                        showBatchLoader("modal-return");
+                        //showBatchLoader("modal-return");
                     }).DataTable({
                         destroy: true,
                         ajax: {
@@ -583,7 +632,14 @@
                             type: "POST",
                             data: function (data) {
                                 data.Id = id;
+                            },
+                            beforeSend: function (jqXHR, settings) {
+                                settings.isDataTableRequest = true;
                             }
+                        },
+                        processing: true,
+                        language: {
+                            processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                         },
                         serverSide: true,
                         filter: true,
@@ -603,7 +659,7 @@
                         ],
                         order: [[5, "desc"]]
                     }).on("draw.dt", function () {
-                        hideBatchLoader("modal-return");
+                        //hideBatchLoader("modal-return");
                     });
 
                     hideLoader();

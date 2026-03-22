@@ -24,25 +24,19 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Brand)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ItemType)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ItemCode)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ItemName)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Unit)
-                    </th>
-                    <th>
                         @Html.DisplayNameFor(model => model.SRNumber)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.ReturnDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReturnReason)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SONumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderDate)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Customer)
@@ -57,6 +51,27 @@
                         @Html.DisplayNameFor(model => model.ControlNumber)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.DeliveryDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PickupDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemType)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Unit)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.QuantityReturned)
                     </th>
                     <th>
@@ -69,7 +84,22 @@
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="11" class="text-end">Total</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th class="text-end">Total</th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -136,6 +166,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
@@ -242,18 +275,26 @@
             $("#filter-item-name").val("");
         });
 
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
         function ApplyFilter() {
+            $("#filterModal").modal("hide");
             salesDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
                 checkDefaultFilter();
             });
         }
 
         function ResetFilter() {
+            $("#filterModal").modal("hide");
             resetToDefaultDTFilter();
-
             salesDT.ajax.reload(() => {
-                $("#filterModal").modal("hide");
                 checkDefaultFilter();
             });
         }
@@ -273,18 +314,22 @@
             DateTo: DateForInput(date_today),
         };
 
-        function checkDefaultFilter() {
-            var changed = JSON.stringify(salesDT.order()) != JSON.stringify(defaultDTState.order) ||
-                          salesDT.page.info().start != defaultDTState.page ||
-                          salesDT.page.len() != defaultDTState.length ||
-                          (salesDT.search() || "") != defaultDTState.search.search ||
-                          $("#filter-customer").val() != defaultDTState.CustomerId ||
-                          $("#filter-item").val() != defaultDTState.ItemId ||
-                          $('#filter-from').val() != defaultDTState.DateFrom ||
-                          $('#filter-to').val() != defaultDTState.DateTo;
+        function checkDTChanged() {
+            if(!salesDT) return false;
+            
+            return JSON.stringify(salesDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   salesDT.page.info().start != defaultDTState.page ||
+                   salesDT.page.len() != defaultDTState.length ||
+                   (salesDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-customer").val() != defaultDTState.CustomerId ||
+                   $("#filter-item").val() != defaultDTState.ItemId ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
 
-            $(".btn-filter").toggleClass('btn-filtered', changed);
-            $(".btnReset").toggle(changed);
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
         }
 
         function resetToDefaultDTFilter() {
@@ -294,18 +339,48 @@
             $("#filter-item-name").val(defaultDTState.Item);
             $('#filter-from').val(defaultDTState.DateFrom);
             $('#filter-to').val(defaultDTState.DateTo);
+            
+            localStorage.removeItem(dt_storage);
 
-            salesDT.state.clear();
-            salesDT.order(defaultDTState.order);
-            salesDT.page(defaultDTState.page);
-            salesDT.search(defaultDTState.search.search);
+            if (salesDT) {
+                salesDT.state.clear();
+                salesDT.order(defaultDTState.order);
+                salesDT.page(defaultDTState.page);
+                salesDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
         // Load List on DataTable
         var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                if (checkDTChanged()) {
+                    var now = new Date().getTime();
+                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
+                } else {
+                    localStorage.removeItem(dt_storage);
+                }
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
             stateSaveParams: function (settings, data) {
                 data.CustomerId = $('#filter-customer').val();
                 data.CustomerCode = $('#filter-customer option:selected').text();
@@ -359,9 +434,15 @@
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -370,49 +451,81 @@
                 return: true,
             },
             columns: [
-                { data: "brand", name: "Brand" },
-                { data: "itemType", name: "ItemType" },
-                { data: "itemCode", name: "ItemCode" },
-                { data: "itemName", name: "ItemName" },
-                { data: "unit", name: "Unit" },
-                { data: "srNumber", name: "SRNumber" },
-                { data: "returnDate", name: "ReturnDate" },
+                { data: "srNumber", name: "SRNumber", responsivePriority: 1 },
+                { data: "returnDate.format1", name: "ReturnDate", responsivePriority: 2 },
+                { data: "returnReason", name: "ReturnReason", responsivePriority: 3 },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.soNumber || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "SONumber",
+                    responsivePriority: 4
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.orderDate ? data.orderDate.format1 : "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "OrderDate", 
+                    responsivePriority: 5
+                },
                 {
                     data: function (data, type, dataToSet) {
                         return data.customer || "<span class='text-muted'>N/A</span>";
                     },
-                    name: "Customer"
+                    name: "Customer",
+                    responsivePriority: 6
                 },
                 {
                     data: function (data, type, dataToSet) {
                         return data.agent || "<span class='text-muted'>N/A</span>";
                     },
-                    name: "Agent"
+                    name: "Agent",
+                    responsivePriority: 7
                 },
                 {
                     data: function (data, type, dataToSet) {
                         return data.siNumber || "<span class='text-muted'>N/A</span>";
                     },
-                    name: "SINumber"
+                    name: "SINumber",
+                    responsivePriority: 8
                 },
                 { data: "controlNumber", name: "ControlNumber" },
-                { data: "quantityReturned", name: "QuantityReturned", className: "text-end" },
-                { data: "priceReturned", name: "PriceReturned", className: "text-end" },
-                { data: "amount", name: "Amount", className: "text-end" }
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.deliveryDate ? data.deliveryDate.format1 : "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "DeliveryDate",
+                    responsivePriority: 9
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.pickupDate ? data.pickupDate.format1 : "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "PickupDate", 
+                    responsivePriority: 10
+                },
+                { data: "itemCode", name: "ItemCode", responsivePriority: 11 },
+                { data: "itemName", name: "ItemName" },
+                { data: "brand", name: "Brand" },
+                { data: "itemType", name: "ItemType" },
+                { data: "unit", name: "Unit", responsivePriority: 12 },
+                { data: "quantityReturned", name: "QuantityReturned", className: "text-end", responsivePriority: 13 },
+                { data: "priceReturned", name: "PriceReturned", className: "text-end", responsivePriority: 14 },
+                { data: "amount", name: "Amount", className: "text-end", responsivePriority: 15 }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();
                 var api = this.api(), data;
 
-                $(api.column(11).footer()).html(FormatStringInteger(json.totalQuantity));
-                $(api.column(12).footer()).html(FormatStringDecimal(json.totalAmount));
-                $(api.column(13).footer()).html(FormatStringDecimal(json.totalAmount2));
+                $(api.column(16).footer()).html(FormatStringInteger(json.totalQuantity));
+                $(api.column(17).footer()).html(FormatStringDecimal(json.totalAmount));
+                $(api.column(18).footer()).html(FormatStringDecimal(json.totalAmount2));
             }
         });
 
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
             checkDefaultFilter();
 
             $(".table-sales thead th").removeClass("text-end");

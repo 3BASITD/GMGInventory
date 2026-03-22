@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Receptacle Details";
+    ViewData["TitleDetails"] = $"[{Model.PackNumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -146,7 +147,7 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
@@ -155,6 +156,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -169,7 +177,8 @@
                 { data: "packTypeName", name: "PackTypeName", visible: false },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
                 },
@@ -210,7 +219,7 @@
         });
 
         itemDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-item thead th").removeClass("text-end");
 
@@ -238,12 +247,19 @@
 
         // Load List on DataTable
         var historyDT = $('.table-history').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReceptaclePrintHistoriesDTJson")",
                 data: { packId: @Model.Id },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -274,7 +290,7 @@
 
         // Load functions upon DataTable load
         historyDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         $(".btn-history").on("click", function () {

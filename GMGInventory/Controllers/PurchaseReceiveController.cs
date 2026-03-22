@@ -26,7 +26,8 @@ namespace GMGInventory.Controllers
         }
         public async Task<IActionResult> GetPurchaseOrderOptions2(string search, int page)
         {
-            return Json(await receiveRepository.GetPurchaseOrderOptions2(search, page));
+            var PurchaseReceivingSpecial = await GetAccessAsync(PageNames.PurchaseReceivingSpecial);
+            return Json(await receiveRepository.GetPurchaseOrderOptions2(search, page, PurchaseReceivingSpecial.CanAdd == false));
         }
 
         public async Task<IActionResult> Index()
@@ -61,6 +62,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
             ViewData["UserAccessBasic"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingBasic)).Convert();
+            ViewData["UserAccessSpecial"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingSpecial)).Convert();
             ViewData["HashMicroUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.HashMicroBill)).Convert();
 
             var receive = await receiveRepository.GetDetails(Id);
@@ -152,6 +154,7 @@ namespace GMGInventory.Controllers
             TempData["PurchaseReceivingId"] = Id;
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceiving)).Convert();
             ViewData["UserAccessBasic"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingBasic)).Convert();
+            ViewData["UserAccessSpecial"] = new ViewsAccessData(await GetAccessAsync(PageNames.PurchaseReceivingSpecial)).Convert();
 
             return View();
         }
@@ -184,6 +187,16 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var response = await receiveRepository.DisapproveAsync(Id, reason);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
+
+        public async Task<IActionResult> CancelJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseReceiving, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await receiveRepository.CancelAsync(Id);
             if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
             return Json(response);
         }

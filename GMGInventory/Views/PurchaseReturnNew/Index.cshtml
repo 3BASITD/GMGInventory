@@ -218,7 +218,7 @@
         });
 
         var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
@@ -228,7 +228,14 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.StatusId = $("#filter-status").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true, 
@@ -239,10 +246,30 @@
             },
             columns: [
                 { data: "documentNumber", name: "DocumentNumber" },
-                { data: "poNumber", name: "PONumber" },
-                { data: "rrNumber", name: "RRNumber" },
-                { data: "supplier", name: "Supplier" },
-                { data: "warehouse", name: "Warehouse" },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/PurchaseOrder/Details/" + data.poId + "' class='link-info' target='_blank'>" + data.poNumber + "</a>";
+                    },
+                    name: "PONumber" 
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/PurchaseReceive/Details/" + data.rrId + "' class='link-info' target='_blank'>" + data.rrNumber + "</a>";
+                    },
+                    name: "RRNumber" 
+                },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Supplier/Details/" + data.supplierId + "' class='link-info' target='_blank'>" + data.supplier + "</a>";
+                    },
+                    name: "Supplier"
+                },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.warehouse + "</a>";
+                    },
+                    name: "Warehouse" 
+                },
                 { data: "drNumber", name: "DRNumber" },
                 { data: "siNumber", name: "SINumber" },
                 { data: "status", name: "Status" },
@@ -284,7 +311,7 @@
         });
 
         returnDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         if (user_access.canUploadDownload) {

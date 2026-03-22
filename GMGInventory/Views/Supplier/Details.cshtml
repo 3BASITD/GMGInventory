@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Supplier Details";
+    ViewData["TitleDetails"] = $"[{Model.Code}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -265,7 +266,14 @@
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -280,7 +288,8 @@
                         if (data.item == null) {
                             return "";
                         } else {
-                            return data.item + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            //return data.item + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.item + "</a>";
                         }
                     },
                     name: "Item",

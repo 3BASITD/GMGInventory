@@ -223,7 +223,7 @@
 
         // Load List on DataTable
         var purchaseReturnDT = $('.table-purchaseReturn').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPurchaseReturnDT")",
@@ -245,9 +245,15 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.Status = $("#filter-status").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -283,7 +289,7 @@
 
         // Load functions upon DataTable load
         purchaseReturnDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-purchaseReturn thead th").removeClass("text-end");
         });

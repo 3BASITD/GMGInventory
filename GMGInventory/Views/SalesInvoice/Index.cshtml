@@ -206,7 +206,7 @@
 
         // Load List on DataTable
         var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -216,6 +216,13 @@
                     data.StatusCode = $("#filter-status").val();
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -229,10 +236,26 @@
                 { data: "invoiceNumber", name: "InvoiceNumber" },
                 { data: "birInvoiceNumber", name: "BIRInvoiceNumber" },
                 { data: "invoiceType", name: "InvoiceType" },
-                { data: "packNumber", name: "PackNumber" },
-                { data: "customer", name: "Customer" },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Pack/Details/" + data.packNumber + "' class='link-info' target='_blank'>" + data.packNumber + "</a>";
+                    },
+                    name: "PackNumber"
+                },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customer + "</a>";
+                    },
+                    name: "Customer"
+                },
                 { data: "priority", name: "Priority" },
-                { data: "soNumber", name: "SONumber" },
+                {
+                    data: "soNumber",
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.soNumber + "</a>";
+                    },
+                    name: "SONumber"
+                },
                 { data: "totalAmount", name: "TotalAmount", class: "text-end" },
                 { data: "status", name: "Status" },
                 {
@@ -258,7 +281,7 @@
         // Load functions upon DataTable load
         invoiceDT.on("draw", function () {
             $(".table-invoice th").removeClass("text-end");
-            hideLoader();
+            //hideLoader();
         });
 
         if (hashmicro_user_access.canUploadDownload) {

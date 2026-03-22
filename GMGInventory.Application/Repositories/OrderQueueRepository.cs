@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Data.Migrations;
@@ -37,7 +38,7 @@ namespace GMGInventory.Application.Repositories
             if (DateFrom > DateTo) (DateFrom, DateTo) = (DateTo, DateFrom);
 
             var orders = from order in app_context.Orders
-                         where order.OrderNo!.ToLower().StartsWith("draft-") == false
+                         where !EF.Functions.Like(order.OrderNo, "draft-%")
                          && DateFrom <= order.CreatedDate
                          && order.CreatedDate <= DateTo
                          group order by order.OrderNo into gorder
@@ -55,26 +56,35 @@ namespace GMGInventory.Application.Repositories
 
             var ordersList = await orders.ToListAsync();
 
+            var salesSources = await (
+                from source in context.SalesOrderSources
+                select new
+                {
+                    source.SourceOrderNumber,
+                    source.Status,
+                    ItemCount = source.SalesOrderLineItems.Count()
+                }
+            ).ToListAsync();
+
+            var sourceLookup = salesSources.GroupBy(x => x.SourceOrderNumber)
+                                           .ToDictionary(g => g.Key, g => g.First());
+
             for (int i = ordersList.Count - 1; i >= 0; i--)
             {
                 var order = ordersList[i];
+                if (sourceLookup.TryGetValue(order.OrderNumber, out var status))
+                {
+                    order.AddedCount = status.ItemCount;
 
-                var status = from source in context.SalesOrderSources
-                             join userc in userManager.Users on source.UserCreated equals userc.Id
-                             where source.SourceOrderNumber == order.OrderNumber
-                             select new
-                             {
-                                 source.Status,
-                                 ItemCount = source.SalesOrderLineItems.Count()
-                             };
-
-                order.AddedCount = status.Any() ? status.First().ItemCount : 0;
-
-                order.Status = status.Any() == false
-                             ? "Pending"
-                             : (status.First().Status == null || status.First().Status.ToLower().Contains("added"))
-                             ? (order.ItemCount == order.AddedCount ? "Fully Added" : "Partial Added")
-                             : status.First().Status;
+                    order.Status = status.Status == null || status.Status.ToLower().Contains("added")
+                                 ? (order.ItemCount == order.AddedCount ? "Fully Added" : "Partial Added")
+                                 : status.Status;
+                }
+                else
+                {
+                    order.AddedCount = 0;
+                    order.Status = "Pending";
+                }
             }
 
             return ordersList.Where(s => Status == null

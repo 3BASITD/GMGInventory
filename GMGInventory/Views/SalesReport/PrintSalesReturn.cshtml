@@ -13,6 +13,11 @@
     <title>GMGInventory | @title</title>
     <link rel="icon" href="~/images/box.ico" />
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+    <style>
+            body * {
+                opacity: 1;
+            }
+    </style>
 </head>
 <body>
     <h3>@title</h3>
@@ -29,29 +34,23 @@
         <strong>Date To</strong>
         <span>@Model.DateTo</span>
     </p>
-    <table class="table-items">
+    <table class="table-items f-10">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Brand)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().ItemType)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().ItemCode)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().ItemName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().Unit)
-                </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().SRNumber)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().ReturnDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ReturnReason)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().SONumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().OrderDate)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().Customer)
@@ -64,6 +63,27 @@
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().ControlNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().DeliveryDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().PickupDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ItemType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().Unit)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().QuantityReturned)
@@ -80,17 +100,22 @@
             @foreach (var item in Model.Contents)
             {
                 <tr>
-                    <td><nobr>@item.Brand</nobr></td>
-                    <td>@item.ItemType</td>
+                    <td><nobr>@item.SRNumber</nobr></td>
+                    <td><nobr>@item.ReturnDate.Format4</nobr></td>
+                    <td>@item.ReturnReason</td>
+                    <td><nobr>@(item.SONumber ?? "N/A")</nobr></td>
+                    <td><nobr>@(item.OrderDate == null ? "N/A" : item.OrderDate.Format4)</nobr></td>
+                    <td>@(item.Customer ?? "N/A")</td>
+                    <td><nobr>@(item.Agent ?? "N/A")</nobr></td>
+                    <td><nobr>@(item.SINumber ?? "N/A")</nobr></td>
+                    <td><nobr>@item.ControlNumber</nobr></td>
+                    <td><nobr>@(item.DeliveryDate == null ? "N/A" : item.DeliveryDate.Format4)</nobr></td>
+                    <td><nobr>@(item.PickupDate == null ? "N/A" : item.PickupDate.Format4)</nobr></td>
                     <td>@item.ItemCode</td>
                     <td>@item.ItemName</td>
+                    <td><nobr>@item.Brand</nobr></td>
+                    <td>@item.ItemType</td>
                     <td><nobr>@item.Unit</nobr></td>
-                    <td><nobr>@item.SRNumber</nobr></td>
-                    <td><nobr>@item.ReturnDate</nobr></td>
-                    <td>@item.Customer</td>
-                    <td><nobr>@item.Agent</nobr></td>
-                    <td><nobr>@item.SINumber</nobr></td>
-                    <td><nobr>@item.ControlNumber</nobr></td>
                     <td class="right-text"><nobr>@item.QuantityReturned</nobr></td>
                     <td class="right-text"><nobr>@item.PriceReturned</nobr></td>
                     <td class="right-text"><nobr>@item.Amount</nobr></td>
@@ -99,7 +124,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="11" class="right-text">Total</th>
+                <th colspan="16" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalQuantityReturned</nobr></th>
                 <th class="right-text"><nobr>@Model.TotalPriceReturned</nobr></th>
                 <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>

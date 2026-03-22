@@ -471,7 +471,7 @@
 
         // Load List on DataTable
         var dataTable = $('.table-supplier').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -481,6 +481,13 @@
 
                     //if (regionId) data.RegionId = regionId;
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -545,7 +552,7 @@
 
 
         dataTable.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             if (user_access.canDelete) {
                 $('.deleteBtn').click(function (e) {
@@ -589,7 +596,7 @@
                 // Actions upon Display Edit Modal
                 $(".editBtn").click(function (e) {
                     var data = dataTable.row($(this).parents('tr')).data();
-                    console.log(data);
+
                     $("#edit-id").val(data.id);
                     $("#edit-code").val(data.code);
                     $("#edit-name").val(data.name);

@@ -69,6 +69,9 @@
                         @Html.DisplayNameFor(model => model.Status)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.ReceivedStatus)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.OrderDate)
                     </th>
                     <th>
@@ -291,7 +294,7 @@
         });
 
         var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("orderdt");
+            //showBatchLoader("orderdt");
         }).DataTable({
         //         stateSave: true,
         //         stateSaveParams: function (settings, data) {
@@ -316,7 +319,14 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.StatusId = $("#filter-status").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -328,10 +338,16 @@
             columns: [
                 { data: "documentNumber", name: "DocumentNumber" },
                 { data: "type", name: "Type" },
-                { data: "supplier", name: "Supplier" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/Supplier/Details/${data.supplierId}" class="link-info" target="_blank">${data.supplier}</a>`;
+                    }, 
+                    name: "Supplier"
+                },
                 { data: "term", name: "Term" },
                 { data: "deliveryMode", name: "DeliveryMode" },
                 { data: "status", name: "Status" },
+                { data: "receivedStatus", name: "ReceivedStatus" },
                 { data: "orderDate", name: "OrderDate" },
                 {
                     data: function (data, type, dataToSet) {
@@ -354,7 +370,7 @@
                     responsivePriority: 1
                 }
             ],
-            order: [[6, "desc"]],
+            order: [[7, "desc"]],
             createdRow: function (row, data, dataIndex) {
                 if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('table-danger');
@@ -362,7 +378,7 @@
                 } else if (data.status.toLowerCase() == 'disapproved') {
                     $(row).addClass('table-danger');
                     $(row).find('td:eq(5)').addClass('text-danger');
-                } else if (data.status.toLowerCase() == 'approved') {
+                } else if (data.status.toLowerCase() == 'approved' || data.status.toLowerCase() == 'approved (completed)') {
                     $(row).addClass('table-success');
                     $(row).find('td:eq(5)').addClass('text-success');
                 }
@@ -370,7 +386,7 @@
         });
 
         orderDT.on("draw", function () {
-            hideBatchLoader("orderdt");
+            //hideBatchLoader("orderdt");
         });
 
         if (user_access.canUploadDownload) {

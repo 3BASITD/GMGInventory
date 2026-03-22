@@ -161,11 +161,18 @@
         });
 
         var serviceLevelAgreementDT = $('.table-sla').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetServiceLevelAgreementsDT")",
-                type: "POST"
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -204,7 +211,7 @@
         });
 
         serviceLevelAgreementDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $('.btn-details').click(function (e) {
                 var data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
@@ -213,8 +220,8 @@
                 $(".details-availability").html(data.priorAvailability);
                 $(".details-created-by").html(data.userCreated);
                 $(".details-created-date").html(data.dateCreated);
-                $(".details-modified-by").html(data.userModified || '<em class="text-muted">n/a</em>');
-                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">n/a</em>');
+                $(".details-modified-by").html(data.userModified || '<em class="text-muted">N/A</em>');
+                $(".details-modified-date").html(data.dateModified || '<em class="text-muted">N/A</em>');
 
                 $("#detailsModal").modal("show");
             });

@@ -163,7 +163,7 @@
         });
 
         var itemDT = $('.table-replenish').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson", "ReplenishInventory")",
@@ -174,6 +174,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -201,7 +208,7 @@
 
         itemDT.on("draw", function () {
             $(".table-replenish th").removeClass("form-cell");
-            hideLoader();
+            //hideLoader();
         });
 
         var returnDT = $('.table-return-items').DataTable({
@@ -308,7 +315,7 @@
                     $('.table-return-history tbody').empty();
                 }
                 historyDT = $('.table-return-history').on('preXhr.dt', function (e, settings, data) {
-                    showLoader();
+                    //showLoader();
                 }).DataTable({
                     ajax: {
                         url: "@Url.Action("GetListJson", "PurchaseReturn")",
@@ -319,6 +326,13 @@
                             return JSON.parse(JSON.stringify(json));
                         },
                         type: "POST",
+                        beforeSend: function (jqXHR, settings) {
+                            settings.isDataTableRequest = true;
+                        }
+                    },
+                    processing: true,
+                    language: {
+                        processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                     },
                     filter: true,
                     responsive: true,
@@ -338,7 +352,7 @@
                 });
 
                 historyDT.on("draw", function () {
-                    hideLoader();
+                    //hideLoader();
                 });
             }
         });

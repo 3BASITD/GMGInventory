@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Sales Order Details";
+    ViewData["TitleDetails"] = $"[{Model.SONumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
     var userAccessSpecial = (ViewsAccessVM)ViewData["UserAccessSpecial"]!;
 
@@ -18,12 +19,10 @@
     bool canDelete = userAccess.CanDelete && isDraft;
     bool canEdit = userAccess.CanEdit && isDraft;
 
-    bool canPack = isApproved &&
-                   !string.IsNullOrWhiteSpace(Model.ApprovedBy) &&
+    bool canPack = !string.IsNullOrWhiteSpace(Model.ApprovedBy) &&
                    Model.ApprovedDate != null;
 
-    bool canRecreate = isDisapproved &&
-                       !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
+    bool canRecreate = !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
                        Model.DisapprovedDate != null &&
                        Model.ResubmitId == null &&
                        canAdd;
@@ -61,6 +60,26 @@
                     </button>
                 }
 
+                @if (canRecreate)
+                {
+                    <a href="@Url.Action("Create")/@Model.Id"
+                           class="btn btn-primary btn-sm float-right ml-2">
+                        <span class="fas fa-edit"></span> Update to Resubmit
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Order already been resubmitted"
+                                                                                                                                            : canAdd ? "Only disapproved orders can be resubmitted"
+                                                                                                                                            : "Add access is required")"
+                            data-microtip-position="bottom"
+                            role="tooltip">
+                        <span class="fas fa-edit mr-0"></span>
+                    </button>
+                }
+
                 @if (canApproveDisapprove)
                 {
                     <button type="button"
@@ -84,7 +103,7 @@
                     </button>
 
                     <button type="button"
-                            class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                            class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
                             data-microtip-title="Disapprove&#10;@(isSubmitted ? "Approve / Disapprove access is required" : "Only submitted orders can be disapproved")"
                             data-microtip-position="bottom"
                             role="tooltip">
@@ -95,7 +114,7 @@
                 @if (canDelete)
                 {
                     <button type="button"
-                            class="btn btn-danger btn-sm float-right ml-2" 
+                            class="btn btn-danger btn-sm float-right ml-2"
                             onclick="DeleteDraft()">
                         <span class="fas fa-trash"></span> Delete
                     </button>
@@ -140,7 +159,6 @@
                 @if (canPack)
                 {
                     <a href="@Url.Action("Create", "Pack")/@Model.Id?page=SalesOrder"
-                       target="_blank" 
                        class="btn btn-primary btn-sm float-right ml-2">
                         <span class="fas fa-box-open"></span> Start Packing
                     </a>
@@ -148,40 +166,11 @@
                 else
                 {
                     <button type="button"
-                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" 
+                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
                             data-microtip-title="Start Packing&#10;Only approved order can be packed"
-                            data-microtip-position="bottom" 
+                            data-microtip-position="bottom"
                             role="tooltip">
                         <span class="fas fa-box-open mr-0"></span>
-                    </button>
-                }
-
-                @if (canRecreate)
-                {
-                    <a href="@Url.Action("Create")/@Model.Id"
-                       class="btn btn-primary btn-sm float-right ml-2">
-                        <span class="fas fa-edit"></span> Update to Resubmit
-                    </a>
-                }
-                else
-                {
-                    <button type="button"
-                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null 
-                                                                        ? "Order already been resubmitted"
-                                                                        : "Only disapproved orders can be resubmitted")"
-                            data-microtip-position="bottom"
-                            role="tooltip">
-                        <span class="fas fa-edit mr-0"></span>
-                    </button>
-                    <button type="button"
-                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
-                            data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Order already been resubmitted"
-                                                                         : canAdd ? "Only disapproved orders can be resubmitted"
-                                                                         : "Add access is required")"
-                            data-microtip-position="bottom"
-                            role="tooltip">
-                        <span class="fas fa-edit mr-0"></span>
                     </button>
                 }
 
@@ -194,31 +183,31 @@
             @if ((!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null) || Model.ResubmitFromId != null)
             {
                 <div class="row">
-                @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null)
-                {
-                    <div class="col-12">
-                        <div class="alert alert-danger text-sm" role="alert">
-                            <strong>Disapproved:</strong>
-                            @(string.IsNullOrWhiteSpace(Model.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null)
+                    {
+                        <div class="col-12">
+                            <div class="alert alert-danger text-sm" role="alert">
+                                <strong>Disapproved:</strong>
+                                @(string.IsNullOrWhiteSpace(Model.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                            </div>
                         </div>
-                    </div>
-                }
-                @if (Model.ResubmitId != null || Model.ResubmitFromId != null)
-                {
-                    <div class="col-12">
-                        <div class="alert alert-info text-sm" role="alert">
-                        <strong>Resubmit Details:</strong>
-                        @if (Model.ResubmitId != null)
-                        {
-                            <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "SalesOrder", new { Id = Model.ResubmitId })" class="alert-link">here</a>.</div>
-                        }
-                        @if (Model.ResubmitFromId != null)
-                        {
-                            <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "SalesOrder", new { Id = Model.ResubmitFromId })" class="alert-link">here</a>.</div>
-                        }
+                    }
+                    @if (Model.ResubmitId != null || Model.ResubmitFromId != null)
+                    {
+                        <div class="col-12">
+                            <div class="alert alert-info text-sm" role="alert">
+                                <strong>Resubmit Details:</strong>
+                                @if (Model.ResubmitId != null)
+                                {
+                                    <div>This has been resubmitted. You can view the new one <a href="@Url.Action("Details", "SalesOrder", new { Id = Model.ResubmitId })" class="alert-link">here</a>.</div>
+                                }
+                                @if (Model.ResubmitFromId != null)
+                                {
+                                    <div>This is a resubmission. You can view the previous one <a href="@Url.Action("Details", "SalesOrder", new { Id = Model.ResubmitFromId })" class="alert-link">here</a>.</div>
+                                }
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
                 </div>
             }
             <div class="row">
@@ -253,7 +242,7 @@
                                 @Html.DisplayNameFor(model => model.Forwarder)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model.Forwarder
+                                @(string.IsNullOrWhiteSpace(Model.Forwarder) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Forwarder)
                             </b>
                         }
                     </p>
@@ -271,7 +260,11 @@
                                 @Html.DisplayNameFor(model => model.AgentCode)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model.AgentCode
+                                @Html.ActionLink(Model.AgentCode,
+                                                "Details",
+                                                "Agent",
+                                                new { @Id = Model.AgentId },
+                                                        new { @class = "link-info", target = "_blank" })
                             </b>
                         }
                     </p>
@@ -297,7 +290,11 @@
                                 @Html.DisplayNameFor(model => model.CustomerCode)
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model.CustomerCode
+                                @Html.ActionLink(Model.CustomerCode,
+                                                "Details",
+                                                "Customer",
+                                                new { @Id = Model.CustomerId },
+                                                        new { @class = "link-info", target = "_blank" })
                             </b>
                         }
                     </p>
@@ -504,16 +501,21 @@
                             </b>
                         }
                     </p>
-                    @if(!string.IsNullOrWhiteSpace(Model.AppOrderSource)) {
+                    @if (!string.IsNullOrWhiteSpace(Model.AppOrderSource))
+                    {
                         <p class="text-sm">
                             <span class="text-muted">
                                 @Html.DisplayNameFor(model => model.AppOrderSource)
                             </span>
                             <b class="d-block form-gayahin">
-                                <a href="/OrderQueue/Details/@Model.AppOrderSource" class="text-info" target="_blank">@Model.AppOrderSource</a>
+                                @Html.ActionLink(Model.AppOrderSource,
+                                                "Details",
+                                                "OrderQueue",
+                                                new { @Id = Model.AppOrderSource },
+                                                        new { @class = "link-info", target = "_blank" })
                             </b>
                         </p>
-                    }
+                     }
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
                     <p class="text-sm">
@@ -750,7 +752,7 @@
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-discount1" class="form-label mb-0">
-                                        Discount 1 <span class="discount1-info text-info" data-microtip-title="Customer auto-brand discount. Sales Order (Special) access is required to change discount 1" data-microtip-position="right" role="tooltip">
+                                        Discount 1 <span class="discount1-info text-info d-none" data-microtip-title="Customer auto-brand discount. Sales Order (Special) Edit access is required to allow updating of discount 1" data-microtip-position="right" role="tooltip">
                                             <span class="fas fa-info-circle"></span>
                                         </span>
                                     </label>
@@ -1429,7 +1431,7 @@
         }
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
@@ -1438,6 +1440,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -1471,7 +1480,8 @@
                 { data: "unit", name: "Unit", className: "form-cell" },
                 {
                     data: function (data, type, dataToSet) {
-                        return '<nobr>' + data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span></nobr>';
+                        //return '<nobr>' + data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span></nobr>';
+                        return "<nobr><a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a></nobr>";
                     },
                     name: "ItemCode",
                     className: "form-cell"
@@ -1538,8 +1548,29 @@
                     className: "form-cell text-end"
                 },
                 { data: "grossPrice", name: "GrossPrice", className: "form-cell text-end grossprice" },
-                { data: "servedQuantity", name: "ServedQuantity", className: "form-cell text-end servedquantity" },
-                { data: "unservedQuantity", name: "UnservedQuantity", className: "form-cell text-end unservedquantity" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                            return data.servedQuantity;
+                        } else {
+                            return '<span data-microtip-title="Packed Qty [' + data.packedQuantity + '] - Returned Qty [' + data.returnedQuantity + ']" data-microtip-position="bottom-left" role="tooltip">' + data.servedQuantity + '</span>';
+                        }
+                    },
+                    name: "ServedQuantity",
+                    className: "form-cell text-end servedquantity"
+                },
+                {
+                    data: "unservedQuantity",
+                    data: function (data, type, dataToSet) {
+                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                            return data.unservedQuantity;
+                        } else {
+                            return '<span data-microtip-title="Order Qty [' + data.quantity + '] - (Packed Qty [' + data.packedQuantity + '] - Returned Qty [' + data.returnedQuantity + '])" data-microtip-position="bottom-left" role="tooltip">' + data.unservedQuantity + '</span>';
+                        }
+                    },
+                    name: "UnservedQuantity",
+                    className: "form-cell text-end unservedquantity"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -1585,7 +1616,7 @@
                 itemDT.column(12).visible(false);
             }
 
-            hideLoader();
+            //hideLoader();
 
             $(".btn-remove-item").on("click", function () {
                 itemDT.row($(this).parents('tr')).remove().draw();

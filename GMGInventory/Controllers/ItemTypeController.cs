@@ -19,6 +19,11 @@ namespace GMGInventory.Controllers
             return Json(await itemTypeRepository.GetOptions(CategoryId, IncludeId));
         }
 
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await itemTypeRepository.GetOptions2(search, page));
+        }
+
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.ItemTypes, AccessTypes.View);

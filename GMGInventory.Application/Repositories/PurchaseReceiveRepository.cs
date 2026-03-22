@@ -41,9 +41,13 @@ namespace GMGInventory.Application.Repositories
                                  Id = receive.Id,
                                  DocumentNumber = receive.DocumentNumber,
                                  Supplier = receive.PurchaseOrder.Supplier.Code,
+                                 SupplierId = receive.PurchaseOrder.Supplier.Id,
                                  Term = receive.PurchaseOrder.Term.Name,
                                  PONumber = receive.PurchaseOrder.DocumentNumber,
-                                 Warehouse = receive.Warehouse.Code,
+                                 POId = receive.PurchaseOrder.Id,
+                                 POStatus = receive.PurchaseOrder.Status.Code,
+                                 Warehouse = receive.Warehouse.Name,
+                                 WarehouseId = receive.Warehouse.Id,
                                  Status = receive.Status.Code,
                                  ReceiveDateD = receive.ReceiveDate,
                                  Remarks = receive.Remarks,
@@ -108,12 +112,12 @@ namespace GMGInventory.Application.Repositories
                 }
             }
             var totalReceivingRecord = await context.PurchaseReceivings
-                                                    .Where(s => s.Status.Code.ToLower() == "approved"
+                                                    .Where(s => s.Status.Code.Trim().ToLower() == "approved"
                                                              && filter.DateFrom <= s.ReceiveDate.Date
                                                              && s.ReceiveDate.Date <= filter.DateTo)
                                                     .CountAsync();
             var totalReceivingNotMovedRecord = await context.PurchaseReceivings
-                                                            .Where(s => s.Status.Code.ToLower() == "approved"
+                                                            .Where(s => s.Status.Code.Trim().ToLower() == "approved"
                                                                      && filter.DateFrom <= s.ReceiveDate.Date
                                                                      && s.ReceiveDate.Date <= filter.DateTo
                                                                      && s.HashMicroMoveById == null)
@@ -154,6 +158,7 @@ namespace GMGInventory.Application.Repositories
                               DocumentNumber = receive.DocumentNumber,
                               PONumber = receive.PurchaseOrder.DocumentNumber,
                               POId = receive.PurchaseOrder.Id,
+                              POStatus = receive.PurchaseOrder.Status.Code,
                               POWarehouse = receive.PurchaseOrder.DeliveryAddress.Code,
                               POWarehouseId = receive.PurchaseOrder.DeliveryAddress.Id,
                               Supplier = receive.PurchaseOrder.Supplier.Name,
@@ -167,7 +172,7 @@ namespace GMGInventory.Application.Repositories
                               Discount3D = receive.PurchaseOrder.Discount3,
                               IsVATIncluded = receive.PurchaseOrder.IsVATIncluded ? "Yes" : "No",
                               PurchaseOrderType = receive.PurchaseOrder.Type.Name,
-                              Warehouse = receive.Warehouse.Code,
+                              Warehouse = receive.Warehouse.Name,
                               WarehouseId = receive.Warehouse.Id,
                               IsSameWarehouse = receive.PurchaseOrder.DeliveryAddressId == receive.WarehouseId,
                               Status = receive.Status.Code,
@@ -181,6 +186,7 @@ namespace GMGInventory.Application.Repositories
                               DisapprovedReason = receive.DisapprovedReason,
                               ResubmitId = receive.ResubmitId,
                               ResubmitFromId = resubmitfrom == null ? null : resubmitfrom.Id,
+                              IsReturned = receive.PurchaseReturns.Count() > 0,
                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = receive.DateCreated,
                               UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
@@ -501,19 +507,20 @@ namespace GMGInventory.Application.Repositories
             return await incompleteOrders.ToListAsync();
         }
 
-        public async Task<Select2Model<JsonPurchaseOptionModel>> GetPurchaseOrderOptions2(string search, int page)
+        public async Task<Select2Model<JsonPurchaseOptionModel>> GetPurchaseOrderOptions2(string search, int page, bool ActiveOnly)
         {
             var orders =
                 from poli in context.PurchaseOrderNewLineItems
-                where poli.PurchaseOrder.Status.Name.ToLower() == "approved"
-                   && (string.IsNullOrWhiteSpace(search) || poli.PurchaseOrder.DocumentNumber.Contains(search))
-                group poli by new { poli.PurchaseOrder.Id, poli.PurchaseOrder.DocumentNumber } into g
+                where string.IsNullOrWhiteSpace(search) || poli.PurchaseOrder.DocumentNumber.Contains(search)
+                group poli by new { poli.PurchaseOrder.Id, poli.PurchaseOrder.DocumentNumber, Status = poli.PurchaseOrder.Status.Name } into g
                 orderby g.Key.Id ascending
                 select new
                 {
                     g.Key.Id,
-                    g.Key.DocumentNumber,
-                    TotalQuantity = g.Sum(s => s.Quantity)
+                    DocumentNumber = g.Key.DocumentNumber + (g.Key.Status.ToLower() == "approved" ? "" : (" (" + g.Key.Status + ")")),
+                    TotalQuantity = g.Sum(s => s.Quantity),
+                    ActiveOnlyEnabler = (ActiveOnly == true && g.Key.Status.ToLower() == "approved")
+                                     || (ActiveOnly == false && g.Key.Status.ToLower() != "disapproved")
                 };
 
             var filteredOrders = await orders
@@ -546,7 +553,7 @@ namespace GMGInventory.Application.Repositories
                     Text = s.DocumentNumber,
                     TotalQuantity = s.TotalQuantity,
                     TotalIncompleteQuantity = s.TotalQuantity - recq + retq,
-                    Disabled = (s.TotalQuantity - recq + retq) <= 0,
+                    Disabled = (s.TotalQuantity - recq + retq) <= 0 || s.ActiveOnlyEnabler == false,
                     AlreadyOn = alreadyOn
                 };
             }).ToList();
@@ -689,12 +696,61 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
+        public async Task<ResponseModel> CancelAsync(int receivingId)
+        {
+            try
+            {
+                var existingReceiving = await context.PurchaseReceivings
+                                                     .Include(s => s.Status)
+                                                     .Include(s => s.PurchaseReturns)
+                                                     .Where(s => s.Id == receivingId)
+                                                     .FirstOrDefaultAsync();
+
+                if (existingReceiving == null)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Receiving. Record can not be found" };
+                }
+                else if (existingReceiving.Status.Name.ToLower() != "submitted")
+                {
+                    return new ResponseModel { Status = "Error", Message = "Only submitted can be cancelled." };
+                }
+                else if (existingReceiving.HashMicroMoveId != null)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Record already copied to HashMicro. Cancel cannot proceed" };
+                }
+                else if (existingReceiving.PurchaseReturns.Count > 0)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Record already used in Purchase Return. Cancel cannot proceed" };
+                }
+                else
+                {
+                    var draftStatus = await context.PurchaseStatuses.Where(s => s.Name.Trim().ToLower() == "draft").Select(s => s.Id).FirstAsync();
+
+                    existingReceiving.StatusId = draftStatus;
+
+                    context.PurchaseReceivings.Update(existingReceiving);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    return new ResponseModel { Status = "Success", Message = "Purchase Receiving successfully cancelled" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel
+                {
+                    Status = "Error",
+                    Message = SystemFormat.GetInnermostExceptionMessage(ex)
+                };
+            }
+        }
+
         public async Task<ResponseModel> DeleteAsync(int receivingId)
         {
             try
             {
                 var existingReceiving = await context.PurchaseReceivings
                                                      .Include(s => s.Status)
+                                                     .Include(s => s.PurchaseReturns)
                                                      .Where(s => s.Id == receivingId)
                                                      .FirstOrDefaultAsync();
 
@@ -709,6 +765,10 @@ namespace GMGInventory.Application.Repositories
                 else if (existingReceiving.HashMicroMoveId != null)
                 {
                     return new ResponseModel { Status = "Error", Message = "Record already copied to HashMicro. Delete cannot proceed" };
+                }
+                else if (existingReceiving.PurchaseReturns.Count > 0)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Record already used in Purchase Return. Delete cannot proceed" };
                 }
                 else
                 {

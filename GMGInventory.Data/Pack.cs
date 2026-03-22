@@ -37,6 +37,7 @@ namespace GMGInventory.Data
         public int? WarehouseId { get; set; }
         public Warehouse Warehouse { get; set; }
 
+        public string? BarcotechOutboundCode { get; set; }
         public DateTime? BarcotechRequestDate { get; set; }
 
         public ICollection<Invoice> Invoices { get; set; }

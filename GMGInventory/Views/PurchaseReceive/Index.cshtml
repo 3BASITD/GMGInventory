@@ -328,7 +328,7 @@
         });
 
         var receiveDT = $('.table-receive').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
@@ -339,7 +339,14 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.StatusId = $("#filter-status").val();
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -350,10 +357,25 @@
             },
             columns: [
                 { data: "documentNumber", name: "DocumentNumber" },
-                { data: "supplier", name: "Supplier" },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Supplier/Details/" + data.supplierId + "' class='link-info' target='_blank'>" + data.supplier + "</a>";
+                    },
+                    name: "Supplier"
+                },
                 { data: "term", name: "Term" },
-                { data: "poNumber", name: "PONumber" },
-                { data: "warehouse", name: "Warehouse" },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/PurchaseOrder/Details/" + data.poId + "' class='link-info' target='_blank'>" + data.poNumber + (data.poStatus.trim().toLowerCase() == "draft" || data.poStatus.trim().toLowerCase() == "submitted" ? ` (${data.poStatus})` : "") + "</a>";
+                    },
+                    name: "PONumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.warehouse + "</a>";
+                    },
+                    name: "Warehouse"
+                },
                 { data: "status", name: "Status" },
                 { data: "receiveDate", name: "ReceiveDate" },
                 {
@@ -400,7 +422,7 @@
         });
 
         receiveDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         if (user_access.canUploadDownload) {

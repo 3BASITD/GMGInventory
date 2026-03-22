@@ -57,11 +57,18 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         var replenishDT = $('.table-replenish').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -98,7 +105,7 @@
         });
 
         replenishDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
             if (user_access.canDelete) {
                 $('.deleteBtn').click(function (e) {
                     swal({

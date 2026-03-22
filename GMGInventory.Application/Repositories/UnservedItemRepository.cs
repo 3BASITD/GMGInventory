@@ -31,7 +31,8 @@ namespace GMGInventory.Application.Repositories
                                       select (int?)ii.Quantity).Sum() ?? 0
                              let packedQuantity = context.PackLineItems
                                                          .Where(s => s.Pack.SalesOrderId == l.SalesOrderId
-                                                                  && s.ItemId == l.ItemId)
+                                                                  && s.ItemId == l.ItemId
+                                                                  && s.Pack.Status.Code.Trim().ToLower() == "posted")
                                                          .Sum(s => (int?)s.Quantity) ?? 0
                              let returnedQuantity = context.SalesReturnLineItems
                                                            .Where(s => s.InvoiceLineItem != null

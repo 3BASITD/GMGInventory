@@ -33,9 +33,9 @@ namespace GMGInventory.Controllers
             return Json(await orderRepository.GetDeliveryModeOptions(SelectedId));
         }
 
-        public async Task<IActionResult> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? RegionId, int? SelectedId)
+        public async Task<IActionResult> GetPurchaseRequestOptions(string search, int page, int RequestTypeId, int? RequestPurposeId, int? RegionId)
         {
-            return Json(await orderRepository.GetPurchaseRequestOptions(RequestTypeId, RequestPurposeId, RegionId, SelectedId));
+            return Json(await orderRepository.GetPurchaseRequestOptions(search, page, RequestTypeId, RequestPurposeId, RegionId));
         }
 
         public async Task<IActionResult> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
@@ -66,6 +66,15 @@ namespace GMGInventory.Controllers
 
             var form = new DataTablesRequestForm(Request.Form);
             return Json(await orderRepository.GetListDTAsync(form, filter));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetPurchaseRequestItems(int PurchaseRequestId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await orderRepository.GetPurchaseRequestItems(PurchaseRequestId));
         }
 
         public async Task<IActionResult> Details(int Id)
@@ -232,6 +241,17 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> CancelJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await orderRepository.CancelAsync(Id);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> DeleteJson(int Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseOrder, AccessTypes.Delete);
@@ -255,6 +275,7 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("Term")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("DeliveryMode")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("Status")),
+                new DataColumn(chelper.DisplayName<PurchaseOrderVM>("ReceivedStatus")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("OrderDate")),
                 new DataColumn(chelper.DisplayName<PurchaseOrderVM>("Remarks"))
             ]);
@@ -267,6 +288,7 @@ namespace GMGInventory.Controllers
                             order.Term,
                             order.DeliveryMode,
                             order.Status,
+                            order.ReceivedStatus,
                             order.OrderDate,
                             order.Remarks);
             }

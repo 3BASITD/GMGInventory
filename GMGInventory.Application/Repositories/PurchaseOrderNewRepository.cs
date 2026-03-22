@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -80,55 +81,34 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetPurchaseRequestOptions(int RequestTypeId, int? RequestPurposeId, int? RegionId, int? SelectedId)
+        public async Task<Select2Model<JsonOptionsModel>> GetPurchaseRequestOptions(string search, int page, int RequestTypeId, int? RequestPurposeId, int? RegionId)
         {
-            //var requests = from prli in context.PurchaseRequestLineItems
-            //               let poli = prli.PurchaseOrderLineItems
-            //                              .Where(a => a.PurchaseOrder.Status.Name.ToLower() == "approved")
-            //                              .Select(a => (int?)a.Quantity)
-            //                              .Sum() ?? 0
-            //               where poli != prli.Quantity
-            //               && (RegionId == null || prli.SalesOrder.SalesOrderLineItems.First().SalesOrder.Customer.Area.Region.Id == RegionId)
-            //               select prli.PurchaseRequestId;
-
-
-            //return await context.PurchaseRequests
-            //                    .Include(s => s.Status)
-            //                    .Where(s => s.TypeId == RequestTypeId
-            //                             && (RequestPurposeId == null || s.PurposeId == RequestPurposeId)
-            //                             && s.Status.Name.ToLower() == "approved"
-            //                             && requests.Contains(s.Id))
-            //                    .Select(s => new JsonOptionsModel
-            //                    {
-            //                        Id = s.Id.ToString(),
-            //                        Text = s.DocumentNumber,
-            //                        Selected = SelectedId != null && s.Id == SelectedId
-            //                    })
-            //                    .OrderBy(s => s.Text)
-            //                    .ToListAsync();
             var query = from pr in context.PurchaseRequests.AsNoTracking()
                         where pr.TypeId == RequestTypeId
                            && (RequestPurposeId == null || pr.PurposeId == RequestPurposeId)
-                           && pr.Status.Name == "Approved"
+                           && pr.Status.Name.ToLower() == "approved"
                            && pr.PurchaseRequestLineItems.Any(prli =>
                                 prli.Quantity !=
                                 prli.PurchaseOrderLineItems
-                                    .Where(poli => poli.PurchaseOrder.Status.Name == "Approved")
+                                    .Where(poli => poli.PurchaseOrder.Status.Name.ToLower() == "approved")
                                     .Sum(poli => ((int?)poli.Quantity) ?? 0)
                                               && (RegionId == null ||
                                                   prli.SalesOrder
                                                       .SalesOrderLineItems
                                                       .Any(sol => sol.SalesOrder.Customer.Area.Region.Id == RegionId))
                            )
+                        orderby pr.DocumentNumber ascending
                         select new JsonOptionsModel
                         {
                             Id = pr.Id.ToString(),
-                            Text = pr.DocumentNumber,
-                            Selected = SelectedId != null && pr.Id == SelectedId
+                            Text = pr.DocumentNumber
                         };
-
-            return await query.OrderBy(x => x.Text).ToListAsync();
-
+            var queryFiltered = await query.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = queryFiltered,
+                total_count = query.Count()
+            };
         }
 
         public async Task<IList<JsonPurchaseItemOptionsModel>> GetPurchaseRequestItemOptions(int RequestId, int? SelectedId)
@@ -136,11 +116,11 @@ namespace GMGInventory.Application.Repositories
             var requests = from prli in context.PurchaseRequestLineItems
                            let ponli = context.PurchaseOrderNewLineItems
                                               .Where(a => a.RequestItemId == prli.Id
-                                                       && a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                                       /*&& a.PurchaseOrder.Status.Name.ToLower() == "approved"*/)
                                               .ToList()
                            let prevorder = context.PurchaseOrderNewLineItems
                                                   .Where(a => a.RequestItem.ItemId == prli.ItemId
-                                                           && a.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                                           /*&& a.PurchaseOrder.Status.Name.ToLower() == "approved"*/)
                                                   .OrderByDescending(a => a.DateCreated)
                                                   .Select(a => new
                                                   {
@@ -161,7 +141,6 @@ namespace GMGInventory.Application.Repositories
                                Unit = prli.Item == null ? prli.Unit.Name : prli.Item.Unit.Name,
                                UnitId = prli.Item == null ? prli.Unit.Id : prli.Item.Unit.Id,
                                Served = ponli.Select(a => (int?)a.Quantity).Sum() ?? 0,
-                               Selected = SelectedId != null && prli.Id == SelectedId,
                                OrderedOn = ponli.Count() > 0 ? string.Join(", ", ponli.Select(s => s.PurchaseOrder.DocumentNumber)) : "",
                                Disabled = (ponli.Select(a => (int?)a.Quantity).Sum() ?? 0) >= prli.Quantity,
                                PreviousCurrency = prevorder == null ? null : prevorder.Currency,
@@ -171,6 +150,53 @@ namespace GMGInventory.Application.Repositories
             return await requests.ToListAsync();
         }
 
+
+        public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page, int? regionId)
+        {
+            var orders = from order in context.SalesOrders
+                             //let oli = from soli in order.SalesOrderLineItems
+                             //          let ii = context.ItemInventories
+                             //                .Where(s => s.ItemId == soli.ItemId
+                             //                         && s.Warehouse.IsMain == true)
+                             //                .Sum(s => (int?)s.Quantity) ?? 0
+                             //          select new
+                             //          {
+                             //              soli.Quantity,
+                             //              Stock = ii
+                             //          }
+                         where order.Status.Code.ToLower() != "submitted"
+                         && order.Status.Code.ToLower() != "disapproved"
+                         && order.Status.Code.ToLower() != "draft"
+                         && (string.IsNullOrWhiteSpace(search)
+                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         && (regionId == null || order.Customer.Area.Region.Id == regionId)
+                         //&& oli.Any(s => s.Quantity > s.Stock)
+                         orderby order.SalesOrderNumber ascending
+                         select new JsonSalesOrderOptionsModel
+                         {
+                             Id = order.Id.ToString(),
+                             Text = order.SalesOrderNumber,
+                             CustomerCode = order.Customer.Code,
+                             CustomerName = order.Customer.Name,
+                             CustomerAddress = order.Customer
+                                                    .ShippingAddresses
+                                                    .Where(s => s.IsDefault == true)
+                                                    .Select(s => s.Address)
+                                                    .FirstOrDefault(),
+                             SalesOrderDateD = order.SalesOrderDate,
+                             PurchaseOrder = order.PurchaseOrder,
+                             ForwarderName = order.SalesOrderDeliveryMonitorings
+                                                  .Select(s => s.Forwarder.Name)
+                                                  .FirstOrDefault(),
+                             RegionId = order.Customer.Area.RegionId
+                         };
+            var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonSalesOrderOptionsModel>
+            {
+                items = ordersFiltered,
+                total_count = orders.Count()
+            };
+        }
 
         public async Task<string> GetNewDocumentNumber(int? TypeId)
         {
@@ -185,7 +211,27 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<PurchaseOrderNewVM>> GetListAsync(PurchaseOrderFilter filter)
         {
+            var orderedQty = from poli in context.PurchaseOrderNewLineItems
+                             group poli by poli.PurchaseOrderId into g
+                             select new
+                             {
+                                 PurchaseOrderId = g.Key,
+                                 Total = g.Sum(s => (int?)s.Quantity) ?? 0
+                             };
+            var receivedQty = from prli in context.PurchaseReceivingLineItems
+                              group prli by prli.PurchaseReceiving.PurchaseOrderId into g
+                              select new
+                              {
+                                  PurchaseOrderId = g.Key,
+                                  Total = g.Sum(s => (int?)s.Quantity) ?? 0
+                              };
             var orderVM = from order in context.PurchaseOrderNews
+                              //join olq in orderedQty on order.Id equals olq.PurchaseOrderId into olqg
+                              //from olq in olqg.DefaultIfEmpty()
+                              //join rlq in receivedQty on order.Id equals rlq.PurchaseOrderId into rlqg
+                              //from rlq in rlqg.DefaultIfEmpty()
+                          let olq = orderedQty.Where(s => s.PurchaseOrderId == order.Id).Sum(s => s.Total)
+                          let rlq = receivedQty.Where(s => s.PurchaseOrderId == order.Id).Sum(s => s.Total)
                           where (filter.TypeId == null || order.TypeId == filter.TypeId)
                           && (filter.ModeId == null || order.DeliveryModeId == filter.ModeId)
                           && (filter.SupplierId == null || order.Supplier.Id == filter.SupplierId)
@@ -197,11 +243,15 @@ namespace GMGInventory.Application.Repositories
                               Id = order.Id,
                               DocumentNumber = order.DocumentNumber,
                               Type = order.Type.Code,
+                              SupplierId = order.Supplier.Id,
                               Supplier = order.Supplier.Code,
                               SupplierName = order.Supplier.Name,
                               Term = order.Term.Name,
                               DeliveryMode = order.DeliveryMode.Code,
                               Status = order.Status.Code,
+                              ReceivedStatus = olq - rlq == 0 ? "COMPLETED"
+                                             : rlq == 0 ? "NOTHING YET"
+                                             : olq - rlq + " REMAINING",
                               OrderDateD = order.OrderDate,
                               Remarks = order.Remarks
                           };
@@ -227,6 +277,7 @@ namespace GMGInventory.Application.Repositories
                     s.Term,
                     s.DeliveryMode,
                     s.Status,
+                    s.ReceivedStatus,
                     s.OrderDate,
                     s.Remarks
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
@@ -271,6 +322,31 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        public async Task<IList<ItemFromPurchaseRequestVM>> GetPurchaseRequestItems(int PurchaseRequestId)
+        {
+            var itemVM = await (from request in context.PurchaseRequestLineItems
+                                let orderQuantity = context.PurchaseOrderNewLineItems
+                                                            .Where(s => s.RequestItemId == request.Id)
+                                                            .Sum(s => (int?)s.Quantity) ?? 0
+                                where request.PurchaseRequestId == PurchaseRequestId
+                                select new ItemFromPurchaseRequestVM
+                                {
+                                    Id = request.Id,
+                                    ItemId = request.Item.Id,
+                                    ItemCode = request.Item.Code,
+                                    ItemName = request.Item.Name,
+                                    PartNumber = request.Item.PartNumber,
+                                    RemainingQuantityD = Math.Max(0, request.Quantity - orderQuantity),
+                                    RequestId = request.PurchaseRequest.Id,
+                                    RequestQuantityD = request.Quantity,
+                                    Unit = request.Item.Unit.Code,
+                                    UnitId = request.Item.Unit.Id,
+                                    UnitCostD = 0
+                                }).ToListAsync();
+
+            return itemVM;
+        }
+
         public async Task<IList<APIPurchaseOrder>> GetListAPI()
         {
             DateTime dtNow = DateTime.Now;
@@ -278,7 +354,7 @@ namespace GMGInventory.Application.Repositories
             var orders = from order in context.PurchaseOrderNews
                          where (order.BarcotechRequestDate == null
                          || order.BarcotechRequestDate > dtYesterday)
-                         && order.Status.Code.ToLower() == "approved"
+                         && order.Status.Code.Trim().ToLower() == "approved"
                          select new APIPurchaseOrder
                          {
                              Id = order.Id,
@@ -314,6 +390,12 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
         {
+            var orderedQty = context.PurchaseOrderNewLineItems
+                                    .Where(s => s.PurchaseOrderId == orderId)
+                                    .Sum(s => (int?)s.Quantity) ?? 0;
+            var receivedQty = context.PurchaseReceivingLineItems
+                                     .Where(s => s.PurchaseReceiving.PurchaseOrderId == orderId)
+                                     .Sum(s => (int?)s.Quantity) ?? 0;
             var details = from order in context.PurchaseOrderNews
                           let resubmitfrom = context.PurchaseOrderNews
                                                     .Where(s => s.ResubmitId == order.Id)
@@ -354,7 +436,10 @@ namespace GMGInventory.Application.Repositories
                               DeliveryName = order.DeliveryAddress.Name,
                               DeliveryContactPerson = order.DeliveryAddress.ContactPerson + "",
                               DeliveryContactNumber = order.DeliveryAddress.ContactNumber + "",
-                              Status = order.Status.Code,
+                              Status = order.Status.Code + (order.Status.Code.ToLower() != "approved" ? "" : (
+                                                orderedQty - receivedQty == 0 ? " (Fully Received)"
+                                              : receivedQty == 0 ? " (Not yet Received)"
+                                              : " (Partially Received, " + (orderedQty - receivedQty) + "  Remaining)")),
                               OrderDateD = order.OrderDate,
                               Discount1D = order.Discount1,
                               Discount2D = order.Discount2,
@@ -377,6 +462,7 @@ namespace GMGInventory.Application.Repositories
                                                    .OrderByDescending(s => s.ReceiveDate)
                                                    .Select(s => (DateTime?)s.ReceiveDate)
                                                    .FirstOrDefault(),
+                              IsReceived = order.PurchaseReceivings.Count() > 0,
                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = order.DateCreated,
                               UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
@@ -607,6 +693,14 @@ namespace GMGInventory.Application.Repositories
                             await context.SaveChangesAsync(currentUserId);
                         }
                     }
+
+                    Items = Items.OrderBy(x => x.LineNumber)
+                                 .Select((item, index) =>
+                                 {
+                                     item.LineNumber = index + 1;
+                                     return item;
+                                 }).ToList();
+
                     foreach (var rename in Items)
                     {
                         var i = context.PurchaseRequestLineItems.Where(s => s.Id == rename.RequestItemId).FirstOrDefault();
@@ -930,21 +1024,66 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
+        public async Task<ResponseModel> CancelAsync(int orderId)
+        {
+            try
+            {
+                var existingOrder = await context.PurchaseOrderNews
+                                                 .Include(s => s.Status)
+                                                 .Include(s => s.PurchaseReceivings)
+                                                 .FirstOrDefaultAsync(pr => pr.Id == orderId);
+
+                if (existingOrder == null)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Order. Record can not be found" };
+                }
+                else if (existingOrder.Status.Name.ToLower() != "submitted")
+                {
+                    return new ResponseModel { Status = "Error", Message = "Only submitted can be cancelled" };
+                }
+                else if (existingOrder.PurchaseReceivings.Count > 0)
+                {
+                    var usedIn = existingOrder.PurchaseReceivings.Select(s => s.DocumentNumber);
+                    return new ResponseModel { Status = "Error", Message = "Record already used in Purchase Receiving. Cancel cannot proceed<ul><li>" + string.Join("</li><li>",usedIn) + "</li>" };
+                }
+                else
+                {
+                    var draftStatus = await context.PurchaseStatuses.Where(s => s.Name.Trim().ToLower() == "draft").Select(s => s.Id).FirstAsync();
+
+                    existingOrder.StatusId = draftStatus;
+
+                    context.PurchaseOrderNews.Update(existingOrder);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    return new ResponseModel { Status = "Success", Message = "Purchase Order successfully cancelled" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
         public async Task<ResponseModel> DeleteAsync(int orderId)
         {
             try
             {
                 var existingOrder = await context.PurchaseOrderNews
                                                  .Include(s => s.Status)
+                                                 .Include(s => s.PurchaseReceivings)
                                                  .FirstOrDefaultAsync(pr => pr.Id == orderId);
 
                 if (existingOrder == null)
                 {
-                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Receiving. Record can not be found" };
+                    return new ResponseModel { Status = "Error", Message = "Invalid Purchase Order. Record can not be found" };
                 }
                 else if (existingOrder.Status.Name.ToLower() != "draft")
                 {
                     return new ResponseModel { Status = "Error", Message = "Only draft can be deleted" };
+                }
+                else if (existingOrder.PurchaseReceivings.Count > 0)
+                {
+                    return new ResponseModel { Status = "Error", Message = "Record already used in Purchase Receiving. Cancel cannot proceed" };
                 }
                 else
                 {

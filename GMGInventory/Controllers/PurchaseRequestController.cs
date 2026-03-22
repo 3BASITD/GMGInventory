@@ -20,9 +20,19 @@ namespace GMGInventory.Controllers
             return Json(await requestRepository.GetTypeOptions(SelectedId));
         }
 
+        public async Task<IActionResult> GetTypeOptions2(string search, int page)
+        {
+            return Json(await requestRepository.GetTypeOptions2(search, page));
+        }
+
         public async Task<IActionResult> GetPurposeOptions(int TypeId, int? SelectedId)
         {
             return Json(await requestRepository.GetPurposeOptions(TypeId, SelectedId));
+        }
+
+        public async Task<IActionResult> GetPurposeOptions2(string search, int page, int? TypeId)
+        {
+            return Json(await requestRepository.GetPurposeOptions2(search, page, TypeId));
         }
 
         public async Task<IActionResult> Index()
@@ -186,6 +196,16 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var response = await requestRepository.DisapproveAsync(Id, reason);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+            return Json(response);
+        }
+
+        public async Task<IActionResult> CancelJson(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.PurchaseRequest, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await requestRepository.CancelAsync(Id);
             if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
             return Json(response);
         }

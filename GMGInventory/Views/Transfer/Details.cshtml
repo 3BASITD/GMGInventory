@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Transfer Details";
+    ViewData["TitleDetails"] = $"[{Model.Id}]";
 }
 
 @section Breadcrumb {
@@ -39,7 +40,7 @@
                                          "Details", 
                                          "Warehouse", 
                                          new { @Id = Model.SourceId }, 
-                                         new { @class = "text-info", target = "_blank" })
+                                                new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -53,7 +54,7 @@
                                          "Details",
                                          "Warehouse",
                                          new { @Id = Model.DestinationId }, 
-                                         new { @class = "text-info", target = "_blank" })
+                                                new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -157,12 +158,19 @@
 @section Scripts {
     <script>
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemTransferJson")",
                 data: { transferId: @Model?.Id },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -174,7 +182,7 @@
             columns: [
                 {
                     data: function (data, type, dataToSet) {
-                        return `<a href="/Item/Details/${data.itemId}" class="text-info" target="_blank">${data.code}</a>`;
+                        return `<a href="/Item/Details/${data.itemId}" class="link-info" target="_blank">${data.code}</a>`;
                     },
                     name: "Code"
                 },
@@ -192,7 +200,7 @@
         });
 
         itemDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
     </script>
 }

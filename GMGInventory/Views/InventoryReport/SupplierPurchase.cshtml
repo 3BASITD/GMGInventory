@@ -213,7 +213,7 @@
                     allowClear: true,
                     placeholder: {
                         id: "",
-                        text: "All"
+                        text: "ALL"
                     },
                     dropdownParent: $('#filterModal')
                 });
@@ -239,7 +239,7 @@
 
         // Load List on DataTable
         var purchaseDT = $('.table-purchase').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetSupplierPurchaseDT")",
@@ -254,9 +254,15 @@
                     if (brandId) data.Brand = brandId;
                     if (itemId) data.Item = itemId;
                     if (supplierId) data.Supplier = supplierId;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -288,7 +294,7 @@
 
         // Load functions upon DataTable load
         purchaseDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".table-purchase thead th").removeClass("text-end");
         });

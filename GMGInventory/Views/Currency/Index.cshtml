@@ -37,11 +37,18 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         var currencyDT = $('.table-currencies').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetCurrenciesDT")",
-                type: "POST"
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -57,7 +64,7 @@
         });
 
         currencyDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         if (user_access.canUploadDownload) {

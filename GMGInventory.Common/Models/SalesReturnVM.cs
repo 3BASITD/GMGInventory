@@ -33,6 +33,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
 
+        [Display(Name = "BIR Invoice Number")]
+        public string? BIRInvoiceNumber { get; set; }
+
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }
 

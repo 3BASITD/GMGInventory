@@ -13,7 +13,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Item")] Item,
         [PageNamesString("Price List")] PriceList,
         [PageNamesString("Price Update")] PriceUpdate,
-        [PageNamesString("Purchase Return")] PurchaseReturn,
+        [PageNamesString("Purchase Return")] PurchaseReturn, // 10
         [PageNamesString("Replenish Inventory")] ReplenishInventory,
         [PageNamesString("Warehouse")] Warehouse,
         [PageNamesString("Warehouse Transfer")] WarehouseTransfer,
@@ -23,7 +23,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Purchase Receiving")] PurchaseReceiving,
         [PageNamesString("Purchase Return (New)")] PurchaseReturnNew,
         [PageNamesString("Customer")] Customer,
-        [PageNamesString("Payment")] Payment,
+        [PageNamesString("Payment")] Payment, // 20
         [PageNamesString("SOA / Counter Receipt")] SOACR,
         [PageNamesString("Check / Cheque")] Cheque,
         [PageNamesString("Agents")] Agents,
@@ -33,7 +33,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Categories")] Categories,
         [PageNamesString("Forwarders")] Forwarders,
         [PageNamesString("Item Types")] ItemTypes,
-        [PageNamesString("Location Codes")] LocationCodes,
+        [PageNamesString("Location Codes")] LocationCodes, // 30
         [PageNamesString("Reasons of Return")] ReasonsOfReturn,
         [PageNamesString("Regions")] Regions,
         [PageNamesString("Suppliers")] Suppliers,
@@ -43,7 +43,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Agent Sales per Item")] AgentSalesPerItemReport,
         [PageNamesString("Brand Sales Report")] BrandSalesReport,
         [PageNamesString("Best Selling Items")] BestSellingItemsReport,
-        [PageNamesString("Commision Report")] CommissionReport,
+        [PageNamesString("Commision Report")] CommissionReport, // 40
         [PageNamesString("Customer Sales Ranking Report")] CustomerSalesRankingReport,
         [PageNamesString("Customer Sales Report")] CustomerSalesReport,
         [PageNamesString("Daily Sales Report")] DailySalesReport,
@@ -53,7 +53,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Sales Return Listing Report")] SalesReturnListingReport,
         [PageNamesString("Unserved Item Report")] UnservedItemReport,
         [PageNamesString("Below Maintaining Items")] BelowMaintainingItemsReport,
-        [PageNamesString("Receiving Listing")] ReceivingListingReport,
+        [PageNamesString("Receiving Listing")] ReceivingListingReport, // 50
         [PageNamesString("Receiving Listing by Supplier")] ReceivingListingBySupplierReport,
         [PageNamesString("Receiving Summary")] ReceivingSummaryReport,
         [PageNamesString("Stock Card")] StockCardReport,
@@ -63,7 +63,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Debit Memo Listing Report")] DebitMemoListingReport,
         [PageNamesString("Purchase Order Report")] PurchaseOrderReport,
         [PageNamesString("Purchase Return Report")] PurchaseReturnReport,
-        [PageNamesString("Purchase Receiving Report")] PurchaseReceivingReport,
+        [PageNamesString("Purchase Receiving Report")] PurchaseReceivingReport, // 60
         [PageNamesString("Purchase Receiving Basic")] PurchaseReceivingBasic,
         [PageNamesString("Item Basic")] ItemBasic,
         [PageNamesString("Receptacle")] Receptacle,
@@ -73,7 +73,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Tracker Issue")] TrackerIssue,
         [PageNamesString("HashMicro (Invoice)")] HashMicroInvoice,
         [PageNamesString("HashMicro (Bill)")] HashMicroBill,
-        [PageNamesString("Driver")] Driver,
+        [PageNamesString("Driver")] Driver, // 70
         [PageNamesString("Vehicle")] Vehicle,
         [PageNamesString("Currency")] Currency,
         [PageNamesString("Service Level Agreement")] ServiceLevelAgreement,
@@ -83,7 +83,8 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Purchase Request (Non-Automotive)")] PurchaseRequestNonAutomotive,
         [PageNamesString("Warehouse Transfer Report")] WarehouseTransferReport,
         [PageNamesString("Daily Outbound Report")] DailyOutboundReport,
-        [PageNamesString("Barcotech Sync Status")] BarcotechSync
+        [PageNamesString("Barcotech Sync Status")] BarcotechSync, // 80
+        [PageNamesString("Purchase Receiving (Special)")] PurchaseReceivingSpecial
     }
 
     public static class PageNameExtensions

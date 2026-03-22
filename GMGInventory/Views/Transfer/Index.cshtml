@@ -224,7 +224,7 @@
         });
 
         var dataTable = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehouseTransferJson")",
@@ -233,6 +233,13 @@
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -245,13 +252,13 @@
                 { data: "id", name: "Id" },
                 {
                     data: function (data, type, dataToSet) {
-                        return `<a href="/Warehouse/Details/${data.sourceId}" class="text-info" target="_blank">${data.source}</a>`;
+                        return `<a href="/Warehouse/Details/${data.sourceId}" class="link-info" target="_blank">${data.source}</a>`;
                     },
                     name: "Source"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return `<a href="/Warehouse/Details/${data.destinationId}" class="text-info" target="_blank">${data.destination}</a>`;
+                        return `<a href="/Warehouse/Details/${data.destinationId}" class="link-info" target="_blank">${data.destination}</a>`;
                     },
                     name: "Destination"
                 },
@@ -278,7 +285,7 @@
         });
 
         dataTable.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             // Actions upon Display Update Modal
             $('.btn-update').click(function (e) {

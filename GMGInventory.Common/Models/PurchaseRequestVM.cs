@@ -164,9 +164,17 @@ namespace GMGInventory.Common.Models
         public string OrderedQuantity => string.Format(SystemFormat.StringIntegerComma, OrderedQuantityD);
         public int OrderedQuantityD { get; set; }
 
+        [Display(Name = "Pack Quantity")]
+        public string PackQuantity => string.Format(SystemFormat.StringIntegerComma, PackQuantityD);
+        public int PackQuantityD { get; set; }
+
+        [Display(Name = "Returned Quantity")]
+        public string ReturnedQuantity => string.Format(SystemFormat.StringIntegerComma, ReturnedQuantityD);
+        public int ReturnedQuantityD { get; set; }
+
         [Display(Name = "Unserved Quantity")]
         public string RemainingQuantity => string.Format(SystemFormat.StringIntegerComma, RemainingQuantityD);
-        public int RemainingQuantityD { get; set; }
+        public int RemainingQuantityD => OrderedQuantityD - (PackQuantityD - ReturnedQuantityD); // unserved quantity
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }

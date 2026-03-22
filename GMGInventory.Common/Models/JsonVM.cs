@@ -201,7 +201,6 @@ namespace GMGInventory.Common.Models
         public decimal UnitCost { get; set; }
         public int Served { get; set; }
         public int UnorderedQuantity => Math.Max(0, Quantity - Served);
-        public bool Selected { get; set; } = false;
         public string? OrderedOn { get; set; }
         public bool Disabled { get; set; }
         public string? PreviousCost => PreviousCurrency == null || PreviousCurrencyRateD == null || PreviousCostD == null

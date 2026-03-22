@@ -343,6 +343,41 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-default">
+            <div class="card-header">
+                <span class="card-title">
+                    @if (isNewIcon)
+                    {
+                        <span class="emoji">⛃</span>
+                    }
+                    Browser's Local Storage
+                </span>
+                <div class="card-tools">
+                    <button class="btn btn-danger btn-sm float-right btn-filter btn-clear-local-storage">
+                        <span class="fas fa-times"></span> Clear All
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-head-fixed table-striped table-hover table-local-storage">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Source</th>
+                            <th>Content</th>
+                            <th>Expiration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
         var iconWithAccess = "<i class=\"fas fa-check text-success\"></i>";
@@ -350,16 +385,22 @@
         var iconNoAccess = "<i class=\"text-muted\">-</i>";
 
         var accessDT = $('.table-access').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetUserAccessesDT", "Access")",
                 type: "POST",
                 data: function (data) {
                     data.userId = "@(activeUser?.Id ?? "")";
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
             },
             processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+            },
             serverSide: true,
             filter: true,
             responsive: true,
@@ -443,7 +484,7 @@
         });
 
         accessDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
         $('.table-logs').DataTable({
@@ -456,6 +497,80 @@
 
         $("#navIconCheckbox").on("change", function (e) {
             $("#navIconForm").submit();
+        });
+
+        storageDT = $('.table-local-storage').DataTable({
+            data: [],
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            columns: [
+                { data: "name", className: "form-cell" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<a href="' + window.location.origin + '' + data.path + '" class="link-info" target="_blank">' + data.path + '</a>';
+                    },
+                    className: "form-cell" 
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<pre>" + data.content + "</pre>";
+                    },
+                    className: "form-cell" 
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.expiration || "<span class='fw-normal text-muted'>N/A</span>";
+                    },
+                    className: "form-cell"
+                }
+            ],
+            order: [[3, "asc"]]
+        });
+
+        // storageDT.on("draw", function () {
+        //     loadLocalStorageDT();
+        // });
+        loadLocalStorageDT()
+        function loadLocalStorageDT() {
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('BAS_DT')) {
+                    var local = JSON.parse(localStorage.getItem(key));
+                    var removeKeys = ["time", "start", "length", "order", "search", "columns", "childRows", "select"];
+
+                    var row = {
+                        name: key,
+                        path: local.pathname,
+                        content: JSON.stringify(Object.fromEntries(
+                                     Object.entries(local.data).filter(([k, v]) => 
+                                        !removeKeys.includes(k) &&
+                                        v != null &&
+                                        v != "" &&
+                                        v != undefined
+                                 )), null, 3),
+                        expiration: local.timestamp && local.duration ? (new Date(local.timestamp + local.duration)).toLocaleString() : null
+                    };
+                    storageDT.row.add(row).draw();
+                }
+            });
+        }
+
+        $(".btn-clear-local-storage").on("click", function () {
+            swal({
+                title: "Clean Local Storage",
+                text: "Are you sure you want to clear saved settings for tables that have state saving enabled?",
+                icon: "info",
+                buttons: true
+            }).then((confirm) => {
+                if (confirm) {
+                    storageDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                        var row_data = this.data();
+                        localStorage.removeItem(row_data.name);
+                        this.remove();
+                    });
+                    storageDT.draw(false);
+                }
+            });
         });
     </script>
 }

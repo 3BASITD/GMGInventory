@@ -1,8 +1,20 @@
 ﻿@model PackDetailsVM
 
 @{
-    ViewData["Title"] = "Package Details";
+    ViewData["Title"] = "Pack Details";
+    ViewData["TitleDetails"] = $"[{Model.Id}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+
+    var status = Model.Status.ToLowerInvariant();
+
+    bool isDraft = status == "draft";
+    bool isPosted = status == "posted";
+
+    bool canAdd = userAccess.CanAdd;
+    bool canPrint = userAccess.CanPrint;
+    bool canCancel = userAccess.CanEdit && isPosted;
+    bool canDelete = userAccess.CanDelete && isDraft;
+    bool canEdit = userAccess.CanEdit && isDraft;
 }
 
 @section Breadcrumb {
@@ -13,7 +25,23 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (userAccess.CanPrint)
+            @if (isPosted)
+            {
+                <a href="@Url.Action("Create", "SalesInvoice")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
+                    <span class="fas fa-file-invoice"></span> Start Invoice
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Start Invoice&#10;Not yet posted"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-file-invoice mr-0"></span>
+                </button>
+            }
+            @if (canPrint)
             {
                 <button type="button" class="btn btn-info btn-sm float-right ml-2 btn-details-print">
                     <span class="fas fa-print"></span> Print
@@ -21,47 +49,73 @@
             }
             else
             {
-                <button type="button" class="btn btn-info btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Print access is required." data-microtip-position="bottom-left" role="tooltip">
-                    <span class="fas fa-print"></span> Print
+                <button type="button"
+                        class="btn btn-info btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Print&#10;Print access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-print mr-0"></span>
                 </button>
             }
-
-            @if (Model.Status.ToLower() == "draft")
+            @if (canCancel)
             {
-                @if (userAccess.CanDelete)
-                {
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeletePack()">
-                        <span class="fas fa-trash"></span> Delete
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Delete access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-trash"></span> Delete
-                    </button>
-                }
-                @if (userAccess.CanEdit)
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2" onclick="SavePack('save')">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
-                        <span class="fas fa-paper-plane"></span> Post
-                    </button>
-                } else
-                {
-                    <button type="button" class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-save"></span> Save as Draft
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Edit access is required." data-microtip-position="bottom-left" role="tooltip">
-                        <span class="fas fa-paper-plane"></span> Post
-                    </button>
-                }
-            } else if (Model.Status.ToLower() == "posted")
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-cancel">
+                    <span class="fas fa-times"></span> Cancel
+                </button>
+            }
+            else
             {
-                <a href="@Url.Action("Create", "SalesInvoice")/@Model.Id" class="btn btn-primary btn-sm float-right ml-2">
-                    <span class="fas fa-file-invoice"></span> Start Invoice
-                </a>
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Cancel&#10;@(isPosted ? "Edit access is required" : "Only posted pack can be cancelled")"
+                        data-microtip-position="bottom" role="tooltip">
+                    <span class="fas fa-times mr-0"></span>
+                </button>
+            }
+            @if (canDelete)
+            {
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 btn-details-delete">
+                    <span class="fas fa-trash"></span> Delete
+                </button>
+                
+                @* <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="DeletePack()">
+                    <span class="fas fa-trash"></span> Delete
+                </button> *@
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Delete&#10;@(isDraft ? "Delete access is required" : "Only draft pack can be deleted")"
+                        data-microtip-position="bottom" role="tooltip">
+                    <span class="fas fa-trash mr-0"></span>
+                </button>
+            }
+            @if (canEdit)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2" onclick="SavePack('save')">
+                    <span class="fas fa-save"></span> Save as Draft
+                </button>
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2" onclick="SavePack('post')">
+                    <span class="fas fa-paper-plane"></span> Post
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Save as Draft&#10;Edit access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-save mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Post&#10;Edit access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-paper-plane mr-0"></span>
+                </button>
             }
             <a class="btn btn-light btn-sm float-right" asp-action="Index">
                 <span class="fas fa-arrow-left"></span> Back to List
@@ -84,7 +138,11 @@
                         @Html.DisplayNameFor(model => model.CustomerCode)
                     </span>
                     <b class="d-block">
-                        @Model.CustomerCode
+                        @Html.ActionLink(Model.CustomerCode,
+                                        "Details",
+                                        "Customer",
+                                        new { @Id = Model.CustomerrId },
+                                        new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
                 <p class="text-sm">
@@ -118,7 +176,11 @@
                         @Html.DisplayNameFor(model => model.SONumber)
                     </span>
                     <b class="d-block">
-                        @Model.SONumber
+                        @Html.ActionLink(Model.SONumber,
+                                        "Details",
+                                        "SalesOrder",
+                                        new { @Id = Model.SalesOrderId },
+                                        new { @class = "link-info", target = "_blank" })
                     </b>
                 </p>
                 <p class="text-sm">
@@ -134,7 +196,7 @@
                         @Html.DisplayNameFor(model => model.Forwarder)
                     </span>
                     <b class="d-block">
-                        @Model.Forwarder
+                        @(string.IsNullOrWhiteSpace(Model.Forwarder) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Forwarder)
                     </b>
                 </p>
                 <p class="text-sm">
@@ -341,7 +403,8 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
                 },
@@ -509,7 +572,7 @@
         });
 
         var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
@@ -518,6 +581,13 @@
                     return JSON.parse(JSON.stringify(json));
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -542,7 +612,8 @@
                 { data: "packTypeName", name: "PackTypeName", visible: false },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
                 },
@@ -592,7 +663,7 @@
         });
 
         itemDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             $(".btn-remove-item").off("click").on("click", function () {
                 var rowdata = itemDT.row($(this).parents('tr')).data();
@@ -826,20 +897,6 @@
             return item_to_pack;
         }
 
-        function DeletePack() {
-            swal({
-                title: "Delete Pack",
-                text: "Are you sure you want to delete this record?",
-                icon: "error",
-                buttons: true,
-                dangerMode: true
-            }).then((confirm) => {
-                if (confirm) {
-                    SavePack("delete");
-                }
-            });
-        }
-
         function SavePack(savingAs) {
             var itemsToPack = GetItemsToPack();
             if (itemsToPack.length == 0) {
@@ -874,21 +931,77 @@
                 });
             }
         }
-
-        $(".btn-details-print").on("click", function () {
-            $.LoadingOverlay("show", {
-                image: "",
-                fontawesome: "fas fa-print"
-            });
-            setTimeout(function () {
-                let win = window.open('@Url.Action("PrintDetails")/' + pack_data.id, '');
-                var wintimer = setInterval(function () {
-                    if (win.closed) {
-                        clearInterval(wintimer);
-                        hideLoader();
+        
+        if (user_access.canEdit) {
+            $(".btn-details-cancel").on("click", function () {
+                swal({
+                    title: "Cancel Pack",
+                    text: "Continue to cancel this pack? This will change the status Posted to Draft.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        $.ajax({
+                            url: "@Url.Action("CancelJson")",
+                            type: "POST",
+                            data: { Id: pack_data.id },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
                     }
-                }, 100);
-            }, 500);
-        });
+                });
+            });
+        }
+
+        if (user_access.canDelete) {
+            $(".btn-details-delete").on("click", function () {
+                swal({
+                    title: "Delete Pack",
+                    text: "Continue to delete this pack?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm != null) {
+                        $.ajax({
+                            url: "@Url.Action("DeleteJson")",
+                            type: "POST",
+                            data: { Id: pack_data.id },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Success") {
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.message, data.status);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+        
+        if (user_access.canPrint) {
+            $(".btn-details-print").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("PrintDetails")/' + pack_data.id, '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+        }
     </script>
 }

@@ -164,6 +164,24 @@ namespace GMGInventory.Controllers
             return Json(responseModel);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CancelJson(int? Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await invoiceRepository.CancelAsync(Id));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteJson(int? Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await invoiceRepository.DeleteAsync(Id));
+        }
+
         public async Task<IActionResult> MoveToHashMicro(int? Id)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.HashMicroInvoice, AccessTypes.UploadDownload);

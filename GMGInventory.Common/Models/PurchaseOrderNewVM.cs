@@ -58,6 +58,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Status")]
         public string Status { get; set; }
 
+        [Display(Name = "Received Status")]
+        public string ReceivedStatus { get; set; }
+
         [Display(Name = "Date Ordered")]
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDate);
         public string OrderDate3 => OrderDateD.ToString(SystemFormat.StringDate3);
@@ -118,6 +121,8 @@ namespace GMGInventory.Common.Models
         public string DateReceived => DateReceivedD == null ? "" : DateReceivedD.Value.ToString("MMMM dd, yyyy");
         public string TimeReceived => DateReceivedD == null ? "" : DateReceivedD.Value.ToString("hh:mm tt");
         public DateTime? DateReceivedD { get; set; }
+
+        public bool IsReceived { get; set; }
 
         [Display(Name = "Created By")]
         public string UserCreated { get; set; }
@@ -213,5 +218,46 @@ namespace GMGInventory.Common.Models
 
         public int CostUpdateCount { get; set; }
         public int QuantityUpdateCount { get; set; }
+    }
+
+    public class ItemFromPurchaseRequestVM
+    {
+        public int Id { get; set; }
+
+        public int ItemId { get; set; }
+
+        [Display(Name = "Item Code")]
+        public string ItemCode { get; set; }
+
+        [Display(Name = "Item Name")]
+        public string ItemName { get; set; }
+
+        [Display(Name = "Part Number")]
+        public string? PartNumber { get; set; }
+
+        [Display(Name = "Remaining Quantity")]
+        public string RemainingQuantity => string.Format(SystemFormat.StringIntegerComma, RemainingQuantityD);
+        public int RemainingQuantityD { get; set; }
+        public int RequestId { get; set; }
+
+        [Display(Name = "Request Quantity")]
+        public string RequestQuantity => string.Format(SystemFormat.StringIntegerComma, RequestQuantityD);
+        public int RequestQuantityD { get; set; }
+
+        [Display(Name = "Unit")]
+        public string Unit { get; set; }
+        public int UnitId { get; set; }
+
+        [Display(Name = "Unit Cost")]
+        public string UnitCost => string.Format(SystemFormat.StringDecimalComma, UnitCostD);
+        public decimal UnitCostD { get; set; }
+
+        [Display(Name = "Total Amount")]
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD => RequestQuantityD * UnitCostD;
+
+        public bool ToOrder { get; set; } = false;
+
+        public int OrderQuantityD { get; set; } = 0;
     }
 }

@@ -9,12 +9,17 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
+        public int SalesOrderId { get; set; }
 
         [Display(Name = "Pack Number")]
         public string PackNumber { get; set; }
 
-        [Display(Name = "Customer")]
-        public string Customer { get; set; }
+        [Display(Name = "Customer Code")]
+        public string CustomerCode { get; set; }
+        public int CustomerId { get; set; }
+
+        [Display(Name = "Customer Name")]
+        public string CustomerName { get; set; }
 
         [Display(Name = "Packed By")]
         public string PackedBy { get; set; }
@@ -42,6 +47,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
+        public int CustomerrId { get; set; }
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }

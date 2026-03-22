@@ -7,6 +7,7 @@ namespace GMGInventory.Application.Contracts
     public interface ICategoryRepository : IGenericRepository<Category>
     {
         Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page);
         Task<int?> GetIdAsync(string? Name);
         Task<IList<GenericAuditVM>> GetAllGenericVMAsync();
         Task<GenericAuditVM?> GetGenericVMAsync(int? id);

@@ -52,7 +52,5 @@ namespace GMGInventory.Data
         [ForeignKey("ItemPromoId")]
         public int? ItemPromoId { get; set; }
         public ItemPromo ItemPromo { get; set; }
-
-        public string? BarcotechOutboundId { get; set; }
     }
 }

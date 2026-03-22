@@ -503,7 +503,6 @@
 
         $("#delivery-driver").on("select2:select",function (e){
             var data = e.params.data
-            console.log(data);
 
              $("#delivery-representative").val(data.text);
 
@@ -519,7 +518,7 @@
 
         // Load List on DataTable
         var deliveryDT = $('.table-delivery').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -536,6 +535,13 @@
                     data.DateTo = $("#filter-to").val();
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -648,7 +654,7 @@
 
         // Load functions upon DataTable load
         deliveryDT.on("draw", function () {
-            hideLoader();
+            //hideLoader();
 
             LoadFilterSelect2();
         });
@@ -657,7 +663,7 @@
             function ShowEdit(id){
                 var datas = deliveryDT.rows().data().toArray().filter(row => row.id === id);
                 var data = datas[0];
-                //console.log(data);
+
                 $("#delivery-sales-order-id").val(data.id);
                 $("#delivery-date").val(DateForInput(data.dateDeliverD));
                 $("#delivery-pickup-date").val(DateForInput(data.datePickupD));
@@ -748,7 +754,7 @@
                 $('.table-item').DataTable().destroy();
             }
             $('.table-item').on('preXhr.dt', function (e, settings, data) {
-                showLoader();
+                //showLoader();
             }).DataTable({
                 ajax: {
                     url: "@Url.Action("GetItemsJson", "SalesOrder")",
@@ -757,6 +763,13 @@
                         return JSON.parse(JSON.stringify(json));
                     },
                     type: "POST",
+                    beforeSend: function (jqXHR, settings) {
+                        settings.isDataTableRequest = true;
+                    }
+                },
+                processing: true,
+                language: {
+                    processing: "<div class='dt-loader'>Loading table, please wait...</div>"
                 },
                 filter: true,
                 responsive: true,
@@ -783,7 +796,7 @@
                     columnDTTotalDecimal(api, 9);
                 }
             }).on("draw", function () {
-                hideLoader();
+                //hideLoader();
 
                 $(".table-item thead th").removeClass("form-cell");
                 $(".table-item thead th").removeClass("text-end");

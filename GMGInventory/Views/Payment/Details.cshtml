@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Payment Details";
+    ViewData["TitleDetails"] = $"[{Model.SOANo}]";
 }
 
 @section Breadcrumb {
@@ -190,7 +191,7 @@
 @section Scripts {
     <script>
         var itemTableChecks = $('.table-payment-checks').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPaymentChecksJson", "Payment")",
@@ -198,6 +199,13 @@
                 data: function (data) {
                     data.Id = @Model?.Id;
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             responsive: true,
             autoWidth: false,
@@ -217,12 +225,12 @@
         });
 
         itemTableChecks.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
 
         var itemTableInvoice = $('.table-payment-invoice').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPaymentInvoicesJson", "Payment")",
@@ -230,6 +238,13 @@
                 data: function (data) {
                     data.Id = @Model?.Id;
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             responsive: true,
             autoWidth: false,
@@ -256,7 +271,7 @@
         });
 
         itemTableInvoice.on("draw", function () {
-            hideLoader();
+            //hideLoader();
         });
 
 

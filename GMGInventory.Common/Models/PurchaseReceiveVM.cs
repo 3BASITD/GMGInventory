@@ -22,6 +22,7 @@ namespace GMGInventory.Common.Models
         [Display(Name = "PO Number")]
         public string PONumber { get; set; }
         public int POId { get; set; }
+        public string POStatus { get; set; }
         public string POWarehouse { get; set; }
         public int POWarehouseId { get; set; }
 
@@ -67,6 +68,8 @@ namespace GMGInventory.Common.Models
         public DateTime ReceiveDateD { get; set; }
         public int? ResubmitId { get; set; }
         public int? ResubmitFromId { get; set; }
+
+        public bool IsReturned { get; set; }
 
         public string? DisapprovedReason { get; set; }
         public string? Remarks { get; set; }

@@ -356,7 +356,7 @@ namespace GMGInventory.Application.Repositories
                 var _name = brandVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
                 var name = _name.Length > 100 ? _name[..100] : _name;
 
-                var brand = await context.Brands.Where(s => s.Code.ToLower() == code.ToLower()).FirstOrDefaultAsync();
+                var brand = await context.Brands.Where(s => s.Code.Trim().ToLower() == code.ToLower()).FirstOrDefaultAsync();
                 if (brand != null)
                 {
                     brand.Name = name;

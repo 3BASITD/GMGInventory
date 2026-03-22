@@ -299,7 +299,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> 
 
 @if (TempData["PurchaseRequestId"] != null)
 {
@@ -388,7 +388,8 @@
                         if (data.itemId == null || data.itemCode == null) {
                             return "-";
                         } else {
-                            return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
+                            return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                         }
                     },
                     name: "ItemCode",
@@ -950,7 +951,13 @@
                 { data: "orderedQuantity", name: "OrderedQuantity", className: "text-end" },
                 { data: "unit", name: "Unit" },
                 { data: "inventoryCount", name: "InventoryCount", className: "text-end" },
-                { data: "remainingQuantity", name: "RemainingQuantity", className: "text-end" },
+                { 
+                    data: "remainingQuantity", data: function (data, type, dataToSet) {
+                        return '<span data-microtip-title="SO Quantity [' + data.orderedQuantity + '] - (Pack Quantity [' + data.packQuantity + '] + SR Quantity [' + data.returnedQuantity + '])" data-microtip-position="bottom-left" role="tooltip">' + data.remainingQuantity + '</span>'
+                    },
+                    name: "RemainingQuantity", 
+                    className: "text-end"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         if (data.toRequest == true) {
@@ -958,7 +965,7 @@
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Requesting higher than unserved quantity</label>';
                             } else if (data.requestQuantityD == 0) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot request an item with 0 quantity</label>';
-                            } else if (isNaN(data.requestQuantityD) || data.requestQuantityD < 0) {
+                            } else if (isNaN(data.requestQuantityD) || String(data.requestQuantityD).trim() == "" || data.requestQuantityD < 0) {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Invalid quantity</label>';
                             } else {
                                 return '<input type="number" min="0" max="1999999" step="1" value="' + data.requestQuantityD + '" class="form-control form-control-sm soquantity" style="width: 100%;" />';
@@ -1009,7 +1016,7 @@
 
                 var data = this.data();
                 data.toRequest = isChecked;
-                data.requestQuantityD = 0;
+                data.requestQuantityD = data.remainingQuantityD;
                 this.data(data).draw(false);
             });
         }
@@ -1020,7 +1027,7 @@
             var rowData = row.data();
 
             rowData.toRequest = $(elem).prop("checked");
-            rowData.requestQuantityD = 0;
+            rowData.requestQuantityD = $(elem).prop("checked") ? rowData.remainingQuantityD : 0;
 
             row.data(rowData).draw(false);
 

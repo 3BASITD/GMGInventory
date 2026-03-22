@@ -253,7 +253,7 @@
 
         // Load List on DataTable
         var dataTable = $('.table-forwarder').on('preXhr.dt', function (e, settings, data) {
-            showLoader();
+            //showLoader();
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson")",
@@ -263,6 +263,13 @@
 
                     //if (regionId) data.RegionId = regionId;
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -275,7 +282,7 @@
                 { data: "name", name: "Name" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.address || '<em class="text-muted">n/a</em>';
+                        return data.address || '<em class="text-muted">N/A</em>';
                     },
                     name: "Address"
                 },
@@ -283,13 +290,13 @@
                 { data: "dateCreated", name: "DateCreated" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.userModified || '<em class="text-muted">n/a</em>';
+                        return data.userModified || '<em class="text-muted">N/A</em>';
                     },
                     name: "UserModified"
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.dateModified || '<em class="text-muted">n/a</em>';
+                        return data.dateModified || '<em class="text-muted">N/A</em>';
                     },
                     name: "DateModified"
                 },
@@ -322,7 +329,7 @@
 
         // Load functions upon DataTable load
         dataTable.on("draw", function () {
-            hideLoader();
+            //hideLoader();
             if (user_access.canDelete) {
                 $('.deleteBtn').click(function (e) {
                     swal({
@@ -364,13 +371,13 @@
             $('.detailsBtn').click(function (e) {
                 var data = dataTable.row($(this).parents('tr')).data();
                 $(".modal-detail-name").html(data.name);
-                $(".modal-detail-address").html(data.address || '<em class="text-muted">n/a</em>');
-                $(".modal-detail-phone").html(data.phoneNumber || '<em class="text-muted">n/a</em>');
-                $(".modal-detail-fax").html(data.faxNumber || '<em class="text-muted">n/a</em>');
+                $(".modal-detail-address").html(data.address || '<em class="text-muted">N/A</em>');
+                $(".modal-detail-phone").html(data.phoneNumber || '<em class="text-muted">N/A</em>');
+                $(".modal-detail-fax").html(data.faxNumber || '<em class="text-muted">N/A</em>');
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
-                $(".modal-detail-usermodified").html(data.userModified || '<em class="text-muted">n/a</em>');
-                $(".modal-detail-datemodified").html(data.dateModified || '<em class="text-muted">n/a</em>');
+                $(".modal-detail-usermodified").html(data.userModified || '<em class="text-muted">N/A</em>');
+                $(".modal-detail-datemodified").html(data.dateModified || '<em class="text-muted">N/A</em>');
             });
 
             if (user_access.canEdit) {

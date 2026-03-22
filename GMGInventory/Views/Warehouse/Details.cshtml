@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Warehouse Details";
+    ViewData["TitleDetails"] = $"[{Model.Code}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -234,7 +235,7 @@
         });
 
         var itemDT = $('.table-warehouse-items').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("items");
+            //showBatchLoader("items");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetListJson", "Item")",
@@ -242,6 +243,13 @@
                 data: function (data) {
                     data.WarehouseId = warehouse_data.id
                 },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -260,11 +268,11 @@
         });
 
         itemDT.on("draw", function () {
-            hideBatchLoader("items");
+            //hideBatchLoader("items");
         });
 
         var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
-            showBatchLoader("transfer");
+            //showBatchLoader("transfer");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetWarehouseTransferJson", "Transfer")",
@@ -272,6 +280,13 @@
                     data.warehouseId = warehouse_data.id
                 },
                 type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -293,7 +308,7 @@
         });
 
         transferDT.on("draw", function () {
-            hideBatchLoader("transfer");
+            //hideBatchLoader("transfer");
         });
     </script>
 }

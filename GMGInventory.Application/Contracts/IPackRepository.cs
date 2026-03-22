@@ -18,6 +18,8 @@ namespace GMGInventory.Application.Contracts
         string? CheckItem(PackFormVM form);
         Task<int> SaveAsync(PackFormVM form);
         Task<int> UpdateAsync(PackFormVM form);
+        Task<ResponseModel> CancelAsync(int Id);
+        Task<ResponseModel> DeleteAsync(int Id);
         Task<ResponseModelData<int>> AddAPI(PackFormAPIVM form);
     }
 }

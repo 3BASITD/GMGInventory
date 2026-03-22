@@ -202,7 +202,7 @@ else
                     @if (navPages.Contains(PageNames.OrderQueue.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "Shipping" ? "active" : "")"
+                            <a class="dropdown-item @(currentController == "OrderQueue" ? "active" : "")"
                                asp-area="" asp-controller="OrderQueue" asp-action="Index">
                                 @if (newIcon)
                                 {

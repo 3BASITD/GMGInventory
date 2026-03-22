@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Customer Details";
+    ViewData["TitleDetails"] = $"[{Model.Code}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
@@ -1033,14 +1034,21 @@
 
         //Shipping Details
         var shippingDT = $('.table-shipping').on('preXhr.dt', function (e, settings, data) {
-            ShowLoader("shipping");
+            //ShowLoader("shipping");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetShippingJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1090,7 +1098,7 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            HideLoader("shipping");
+            //HideLoader("shipping");
 
             if (user_access.canDelete) {
                 $('.btn-remove-shipping').off("click").on("click", function () {
@@ -1199,14 +1207,21 @@
 
         //Discount Details
         var discountDT = $('.table-discount').on('preXhr.dt', function (e, settings, data) {
-            ShowLoader("discount");
+            //ShowLoader("discount");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetDiscountJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: false,
@@ -1250,7 +1265,7 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            HideLoader("discount");
+            //HideLoader("discount");
 
             if (user_access.canDelete) {
                 $('.btn-remove-discount').off("click").on("click", function () {
@@ -1336,14 +1351,21 @@
 
         // Forwarder Details
         var forwarderDT = $('.table-forwarder').on('preXhr.dt', function (e, settings, data) {
-            ShowLoader("forwarder");
+            //ShowLoader("forwarder");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetForwarderJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1361,20 +1383,27 @@
             ],
             order: [[0, "asc"]]
         }).on("draw.dt", function () {
-            HideLoader("forwarder");
+            //HideLoader("forwarder");
 
         });
 
         // Payment Details
         var paymentsDT = $('.table-payments').on('preXhr.dt', function (e, settings, data) {
-            ShowLoader("payments");
+            //ShowLoader("payments");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetPaymentJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1402,21 +1431,28 @@
                 columnDTTotalDecimal(api, 4);
             }
         }).on("draw.dt", function () {
-            HideLoader("payments");
+            //HideLoader("payments");
 
         });
 
 
         //  Receivable Details
         var receivablesDT = $('.table-receivables').on('preXhr.dt', function (e, settings, data) {
-            ShowLoader("receivables");
+            //ShowLoader("receivables");
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetReceivableJson")",
                 type: "POST",
                 data: function (data) {
                     data.Id = @Model?.Id;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
                 }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1438,7 +1474,7 @@
                 columnDTTotalDecimal(api, 3);
             }
         }).on("draw.dt", function () {
-            HideLoader("receivables");
+            //HideLoader("receivables");
 
         });
 

@@ -1,10 +1,11 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Dynamic.Core;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -31,7 +32,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
                            && (filter.Item == null || ili.Item.Id == filter.Item)
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new AgentSalesPerItemRVM
                            {
                                Agent = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
@@ -140,7 +141,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new BrandSalesRVM
                            {
                                AgentCode = ili.Invoice.SalesOrder.Agent.Code,
@@ -249,7 +250,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new BestSellingItemRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -393,7 +394,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
                            && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new CommissionRVM
                            {
                                AgentId = ili.Invoice.SalesOrder.Agent.Id,
@@ -541,7 +542,7 @@ namespace GMGInventory.Application.Repositories
                            where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Region == null || (ili.Invoice.SalesOrder.Customer.Area != null && ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new CustomerSalesRankingRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -645,7 +646,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
                            && (filter.Customer == null || ili.Invoice.SalesOrder.Customer.Id == filter.Customer)
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new CustomerSalesRVM
                            {
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
@@ -999,7 +1000,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Agent == null || ili.Invoice.SalesOrder.Agent.Id == filter.Agent)
                            && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new SalesAgentAreaRVM
                            {
                                AgentId = ili.Invoice.SalesOrder.Agent.Id,
@@ -1118,7 +1119,7 @@ namespace GMGInventory.Application.Repositories
                            let discount2 = (100 - soli.Discount2) / 100
                            where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
-                           //&& ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                           && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new SalesReportBasisRVM
                            {
                                Code = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Code
@@ -1216,20 +1217,26 @@ namespace GMGInventory.Application.Repositories
                            && (filter.DateTo == null || sreturn.SalesReturn.ReturnDate.Date <= filter.DateTo)
                            && (filter.Customer == null || sreturn.SalesReturn.SalesOrder!.Customer.Id == filter.Customer)
                            && (filter.Item == null || sreturn.Item.Id == filter.Item || (filter.Item == 0 && sreturn.Item.Code.Trim().ToLower().Contains((filter.ItemKeyword + "").Trim().ToLower())))
-                           //&& sreturn.InvoiceLineItem!.Invoice.Status.Code.ToLower() == "invoiced"
+                           && (sreturn.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || sreturn.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
+                           let delivery = sreturn.SalesReturn.SalesOrder.SalesOrderDeliveryMonitorings.FirstOrDefault()
                            select new SalesReturnRVM
                            {
                                Agent = sreturn.InvoiceLineItem == null ? "" : sreturn.InvoiceLineItem.Invoice.SalesOrder.Agent.Code,
                                Brand = sreturn.Item.Brand.Name,
                                ControlNumber = sreturn.InvoiceLineItem == null ? "TBR" : sreturn.InvoiceLineItem.Invoice.ControlNumber,
                                Customer = sreturn.SalesReturn.SalesOrder!.Customer.Name,
+                               DeliveryDateD = delivery == null ? null : delivery.DateDeliver,
                                ItemCode = sreturn.Item.Code,
                                ItemName = sreturn.Item.Name,
                                ItemType = sreturn.Item.ItemType.Code,
+                               OrderDateD =  sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? null : sreturn.InvoiceLineItem.Invoice.SalesOrder.SalesOrderDate,
+                               PickupDateD = delivery == null ? null : delivery.DatePickup,
                                PriceReturnedD = sreturn.SellingPrice,
                                QuantityReturnedD = sreturn.Quantity,
-                               ReturnDateD = sreturn.SalesReturn.DateModified ?? sreturn.SalesReturn.DateCreated,
-                               SINumber = sreturn.InvoiceLineItem == null ? "" : sreturn.InvoiceLineItem.Invoice.InvoiceNumber,
+                               ReturnReason = sreturn.ReasonOfReturn.Name,
+                               ReturnDateD = sreturn.SalesReturn.ReturnDate,
+                               SINumber = sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? null : sreturn.InvoiceLineItem.Invoice.InvoiceNumber,
+                               SONumber = sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? null : sreturn.InvoiceLineItem.Invoice.SalesOrder.SalesOrderNumber,
                                SRNumber = sreturn.SalesReturn.SalesReturnNumber,
                                Unit = sreturn.Item.Unit.Code
                            };
@@ -1258,14 +1265,20 @@ namespace GMGInventory.Application.Repositories
                     s.Brand,
                     s.ControlNumber,
                     s.Customer,
+                    (s.DeliveryDate == null ? "" : s.DeliveryDate.ToString()),
                     s.ItemCode,
                     s.ItemName,
                     s.ItemType,
+                    (s.OrderDate == null ? "" : s.OrderDate.ToString()),
+                    (s.PickupDate == null ? "" : s.PickupDate.ToString()),
                     s.PriceReturned,
                     s.PriceReturnedD.ToString(),
                     s.QuantityReturned,
                     s.QuantityReturnedD.ToString(),
+                    s.ReturnReason,
+                    s.ReturnDate.ToString(),
                     s.SINumber,
+                    s.SONumber,
                     s.SRNumber,
                     s.Unit,
                 }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
@@ -1278,6 +1291,9 @@ namespace GMGInventory.Application.Repositories
                 bool isAsc = form.SortColumnDirection == "asc";
                 data = form.SortColumn switch
                 {
+                    "DeliveryDate" => isAsc ? data.OrderBy(s => s.DeliveryDateD) : data.OrderByDescending(s => s.DeliveryDateD),
+                    "OrderDate" => isAsc ? data.OrderBy(s => s.OrderDateD) : data.OrderByDescending(s => s.OrderDateD),
+                    "PickupDate" => isAsc ? data.OrderBy(s => s.PickupDateD) : data.OrderByDescending(s => s.PickupDateD),
                     "PriceReturned" => isAsc ? data.OrderBy(s => s.PriceReturnedD) : data.OrderByDescending(s => s.PriceReturnedD),
                     "QuantityReturned" => isAsc ? data.OrderBy(s => s.QuantityReturnedD) : data.OrderByDescending(s => s.QuantityReturnedD),
                     "ReturnDate" => isAsc ? data.OrderBy(s => s.ReturnDateD) : data.OrderByDescending(s => s.ReturnDateD),
@@ -1357,7 +1373,8 @@ namespace GMGInventory.Application.Repositories
                               ItemName = soline.Item.Name,
                               //PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
                               //PendingD = soline.Quantity - inventory > 0 ? soline.Quantity - inventory : 0,
-                              PendingD = Math.Max(0, soline.Quantity - inventory),
+                              //PendingD = Math.Max(0, soline.Quantity - inventory),
+                              PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
                               ReplenishDateD = soline.DateCreated
                           };
             var solineslist = await solines.ToListAsync();
