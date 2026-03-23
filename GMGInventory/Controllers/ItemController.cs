@@ -65,17 +65,17 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
 
-            ItemFilterVM itemFilterVM = new();
-            itemFilterVM.Categories = new(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
-            itemFilterVM.ItemTypes = new(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
-            itemFilterVM.Brands = new(await brandRepository.GetAllActiveBrandAsync(-1), "Id", "Name");
-            itemFilterVM.Warehouses = new(await warehouseRepository.GetAllActiveWarehouseAsync(-1), "Id", "Name");
-            itemFilterVM.ActiveStatus = new(new[]
-            {
-                new { Id = 1, Name = "Active" },
-                new { Id = 0, Name = "Inactive" }
-            }, "Id", "Name");
-            ViewData["ItemFilter"] = itemFilterVM;
+            //ItemFilterVM itemFilterVM = new();
+            //itemFilterVM.Categories = new(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
+            //itemFilterVM.ItemTypes = new(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
+            //itemFilterVM.Brands = new(await brandRepository.GetAllActiveBrandAsync(-1), "Id", "Name");
+            //itemFilterVM.Warehouses = new(await warehouseRepository.GetAllActiveWarehouseAsync(-1), "Id", "Name");
+            //itemFilterVM.ActiveStatus = new(new[]
+            //{
+            //    new { Id = 1, Name = "Active" },
+            //    new { Id = 0, Name = "Inactive" }
+            //}, "Id", "Name");
+            //ViewData["ItemFilter"] = itemFilterVM;
             return View();
         }
 

@@ -9,6 +9,7 @@ namespace GMGInventory.Application.Contracts
         Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page, int? regionId);
         Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderInvoicedOptions(string search, int page);
         Task<IList<JsonOptionsModel>> GetStatusOptions();
+        Task<Select2Model<JsonOptionsModel>> GetStatusOptions2(string search, int page);
         Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id);
         Task<SalesOrderPrintVM?> PrintDetailsAsync(int? Id);
         Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter);

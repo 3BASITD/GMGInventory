@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office2013.Word;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -421,11 +422,11 @@ namespace GMGInventory.Application.Repositories
                                               .Where(s => s.DateCreated.Date <= DateTime.Now)
                                               .OrderByDescending(s => s.DateCreated)
                                               .FirstOrDefault()
-                              where (filter.ActiveStatusId == null || (filter.ActiveStatusId == 1 && item.IsActive == true) || (filter.ActiveStatusId == 0 && item.IsActive == false))
-                                  && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
-                                  && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
-                                  && (filter.BrandId == null || filter.BrandId == item.BrandId)
-                                  && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
+                              where (filter.CategoryId == null || filter.CategoryId == item.Category.Id || (filter.CategoryId == 0 && (item.Category.Code + " " + item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
+                                 && (filter.BrandId == null || filter.BrandId == item.Brand.Id || (filter.BrandId == 0 && (item.Brand.Code + " " + item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
+                                 && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemType.Id || (filter.ItemTypeId == 0 && (item.ItemType.Code + " " + item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
+                                 && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
+                                 && (filter.StatusId == null || (filter.StatusId == 1 && item.IsActive == true) || (filter.StatusId == 0 && item.IsActive == false))
                               select new ItemCommonVM
                               {
                                   Id = item.Id,
@@ -436,11 +437,11 @@ namespace GMGInventory.Application.Repositories
                                   InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   BeginningCostD = item.BeginningCost,
-                                  Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  Category = item.Category.Code.Replace("\n", "").Replace("\r", "").Trim(),
                                   CategoryId = item.CategoryId,
-                                  ItemType = item.ItemType.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  ItemType = item.ItemType.Code.Replace("\n", "").Replace("\r", "").Trim(),
                                   ItemTypeId = item.ItemTypeId,
-                                  Brand = item.Brand.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  Brand = item.Brand.Code.Replace("\n", "").Replace("\r", "").Trim(),
                                   BrandId = item.BrandId,
                                   Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
                                   Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
@@ -458,10 +459,13 @@ namespace GMGInventory.Application.Repositories
             else
             {
                 var itemsVM = from item in context.Items
-                              where (filter.ActiveStatusId == null || (filter.ActiveStatusId == 1 && item.IsActive == true) || (filter.ActiveStatusId == 0 && item.IsActive == false))
-                                  && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
-                                  && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
-                                  && (filter.BrandId == null || filter.BrandId == item.BrandId)
+                              join inventory in context.ItemInventories on item.Id equals inventory.ItemId into gin
+                              from inventory in gin.DefaultIfEmpty()
+                              where (filter.CategoryId == null || filter.CategoryId == item.Category.Id || (filter.CategoryId == 0 && (item.Category.Code + " " + item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
+                                 && (filter.BrandId == null || filter.BrandId == item.Brand.Id || (filter.BrandId == 0 && (item.Brand.Code + " " + item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
+                                 && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemType.Id || (filter.ItemTypeId == 0 && (item.ItemType.Code + " " + item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
+                                 && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
+                                 && (filter.StatusId == null || (filter.StatusId == 1 && item.IsActive == true) || (filter.StatusId == 0 && item.IsActive == false))
                               select new ItemCommonVM
                               {
                                   Id = item.Id,
@@ -481,6 +485,8 @@ namespace GMGInventory.Application.Repositories
                                   Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
                                   Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
                                   UnitId = item.UnitId,
+                                  Warehouse = inventory == null ? null : inventory.Warehouse.Name,
+                                  WarehouseId = inventory == null ? null : inventory.WarehouseId,
                                   IsActive = item.IsActive,
                                   Image = item.Image
                               };
@@ -518,39 +524,19 @@ namespace GMGInventory.Application.Repositories
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
 
-
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn == "Quantity" || form.SortColumn == "RetailPrice" || form.SortColumn == "NetPrice")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    if (form.SortColumnDirection == "asc")
-                    {
-                        switch (form.SortColumn)
-                        {
-                            case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                            case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
-                            case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
-                            default: break;
-                        }
-                    }
-                    else if (form.SortColumnDirection == "desc")
-                    {
-                        switch (form.SortColumn)
-                        {
-                            case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                            case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
-                            case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
-                            default: break;
-                        }
-                    }
-                }
-                else
-                {
-                    data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
-                }
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "RetailPrice" => isAsc ? data.OrderBy(s => s.RetailPriceD) : data.OrderByDescending(s => s.RetailPriceD),
+                    "NetPrice" => isAsc ? data.OrderBy(s => s.NetPriceD) : data.OrderByDescending(s => s.NetPriceD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();

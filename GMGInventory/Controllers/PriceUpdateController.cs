@@ -113,7 +113,7 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<ItemPriceVM>("NetPrice"))
             });
 
-            filter.ActiveStatusId = 1; // active only
+            filter.StatusId = 1; // active only
             var prices = await itemPriceRepository.GetAllItemPriceAsync(filter);
             foreach (var price in prices)
             {

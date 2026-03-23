@@ -32,14 +32,15 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
         {
             var agents = await context.Agents
-                                      .Where(s => string.IsNullOrWhiteSpace(search)
+                                      .Where(s => s.IsActive 
+                                               && (string.IsNullOrWhiteSpace(search)
                                                || s.Code.ToLower().Contains(search.ToLower())
-                                               || ((s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName).ToLower().Contains(search.ToLower())))
+                                               || ((s.FirstName + " " + s.LastName).ToLower().Contains(search.ToLower()))))
                                       .Select(s => new JsonNameOptionsModel
                                       {
                                           Id = s.Id.ToString(),
                                           Text = s.Code,
-                                          Name = s.FirstName + (s.MiddleName == null ? "" : " " + s.MiddleName) + " " + s.LastName,
+                                          Name = s.FirstName + " " + s.LastName,
                                       })
                                       .OrderBy(s => s.Text)
                                       .ToListAsync();

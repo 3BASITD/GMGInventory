@@ -40,6 +40,30 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        {
+            var warehouses = await context.Warehouses
+                                          .Where(s => s.IsActive
+                                                   && (string.IsNullOrWhiteSpace(search)
+                                                   || (s.Code.ToLower().Contains(search.ToLower()))
+                                                   || (s.Name.ToLower().Contains(search.ToLower()))))
+                                          .Select(s => new JsonNameOptionsModel
+                                          {
+                                              Id = s.Id.ToString(),
+                                              Text = s.Code,
+                                              Name = s.Name
+                                          })
+                                          .OrderBy(s => s.Text)
+                                          .ToListAsync();
+            var warehousesFiltered = warehouses.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = warehousesFiltered,
+                total_count = warehouses.Count
+            };
+        }
+
         public async Task<WarehouseVM?> GetWarehouse(int Id)
         {
             var warehouse = from whouse in context.Warehouses

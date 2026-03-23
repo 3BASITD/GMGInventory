@@ -182,6 +182,24 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetStatusOptions2(string search, int page)
+        {
+            var status = context.SalesOrders
+                                .Select(s => new JsonOptionsModel
+                                {
+                                    Id = s.Status.Id.ToString(),
+                                    Text = s.Status.Name
+                                })
+                                .Distinct()
+                                .OrderBy(s => s.Id);
+            var statusFiltered = await status.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = statusFiltered,
+                total_count = status.Count()
+            };
+        }
+
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
             var customerInvoices = from inv in context.InvoiceLineItems

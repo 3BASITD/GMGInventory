@@ -9,26 +9,21 @@ namespace GMGInventory.Common.Models
     {
         [Display(Name = "Category")]
         public int? CategoryId { get; set; }
-        public SelectList? Categories { get; set; }
         public string? CategoryKeyword { get; set; }
 
         [Display(Name = "Item Type")]
         public int? ItemTypeId { get; set; }
-        public SelectList? ItemTypes { get; set; }
         public string? ItemTypeKeyword { get; set; }
 
         [Display(Name = "Brand")]
         public int? BrandId { get; set; }
-        public SelectList? Brands { get; set; }
         public string? BrandKeyword { get; set; }
 
         [Display(Name = "Warehouse")]
         public int? WarehouseId { get; set; }
-        public SelectList? Warehouses { get; set; }
 
         [Display(Name = "Status")]
-        public int? ActiveStatusId { get; set; }
-        public SelectList? ActiveStatus { get; set; }
+        public int? StatusId { get; set; }
 
         public int? ItemId { get; set; }
         public string? ItemKeyword { get; set; }

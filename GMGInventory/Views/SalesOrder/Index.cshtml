@@ -227,109 +227,101 @@
 
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
-        var loadfilterloaded = false;
-        function LoadFilterSelect2() {
-            if (loadfilterloaded) return;
-            loadfilterloaded = true;
-
-            // Load Select2 for Agent
-            $("#filter-agent").select2({
-                minimumInputLength: 1,
-                allowClear: true,
-                placeholder: '<All>',
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
-                    }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                },
-                ajax: {
-                    url: "@Url.Action("GetOptions2", "Agent")"
-                },
-                dropdownParent: $("#filterModal")
-            });
-
-            $("#filter-agent").on("select2:select", function () {
-                $("#filter-agent-name").val($(this).select2("data")[0].name);
-            });
-
-            $("#filter-agent").on("select2:unselecting", function (e) {
-                $("#filter-agent-name").val("");
-            });
-
-            // Load Select2 for Customer
-            $("#filter-customer").select2({
-                minimumInputLength: 1,
-                allowClear: true,
-                placeholder: '<All>',
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
-                    }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                },
-                ajax: {
-                    url: "@Url.Action("GetOptions", "Customer")"
-                },
-                dropdownParent: $("#filterModal")
-            });
-
-            $("#filter-customer").on("select2:select", function () {
-                $("#filter-customer-name").val($(this).select2("data")[0].name);
-            });
-
-            $("#filter-customer").on("select2:unselecting", function (e) {
-                $("#filter-customer-name").val("");
-            });
-
-            // Load region data for select2
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Region")",
-                success: function (data, status, xhr) {
-                    $("#filter-region").select2({
-                        ajax: null, //already fetched outside
-                        allowClear: true,
-                        placeholder: '<All>',
-                        data: data,
-                        minimumResultsForSearch: Infinity
-                    });
+        // Load Select2 for Agent
+        $("#filter-agent").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
                 }
-            });
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Agent")"
+            },
+            dropdownParent: $("#filterModal")
+        });
 
-            // Load forwarder data for select2 on edit
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Forwarder")",
-                success: function (data, status, xhr) {
-                    $("#delivery-forwarder").select2({
-                        ajax: null, //already fetched outside
-                        data: data,
-                        allowClear: true,
-                        placeholder: {
-                            id: "",
-                            text: "<All>"
-                        },
-                        dropdownParent: $("#editModal")
-                    });
-                }
-            });
+        $("#filter-agent").on("select2:select", function () {
+            $("#filter-agent-name").val($(this).select2("data")[0].name);
+        });
 
-            // Load status data for select2
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetStatusOptions")",
-                success: function (data, status, xhr) {
-                    $("#filter-status").select2({
-                        ajax: null, //already fetched outside
-                        allowClear: true,
-                        placeholder: '<All>',
-                        data: data,
-                        minimumResultsForSearch: Infinity
-                    });
+        $("#filter-agent").on("select2:unselecting", function (e) {
+            $("#filter-agent-name").val("");
+        });
+
+        // Load Select2 for Customer
+        $("#filter-customer").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
                 }
-            });
-        }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")"
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter-customer").on("select2:select", function () {
+            $("#filter-customer-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-customer").on("select2:unselecting", function (e) {
+            $("#filter-customer-name").val("");
+        });
+
+        // Load Select2 for Region
+        $("#filter-region").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Region")"
+            },
+            dropdownParent: $("#filterModal"),
+            minimumResultsForSearch: -1
+        });
+
+        $("#filter-region").on("select2:select", function () {
+            $("#filter-region-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-region").on("select2:unselecting", function (e) {
+            $("#filter-region-name").val("");
+        });
+
+        // Load Select2 for Status
+        $("#filter-status").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            ajax: {
+                url: "@Url.Action("GetStatusOptions2")"
+            },
+            dropdownParent: $("#filterModal"),
+            minimumResultsForSearch: -1
+        });
 
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
         var dt_duration = 3600000; // 1 hour
@@ -361,9 +353,11 @@
             CustomerCode: "",
             CustomerName: "",
             RegionId: "",
+            Region: "",
             FiledBy: "everyone",
             DateFrom: DateForInput(date_year_ago),
             DateTo: DateForInput(date_today),
+            StatusId: "",
             Status: ""
         };
 
@@ -380,7 +374,7 @@
                    $('#filter-filedby').val() != defaultDTState.FiledBy ||
                    $('#filter-from').val() != defaultDTState.DateFrom ||
                    $('#filter-to').val() != defaultDTState.DateTo ||
-                   $('#filter-status').val() != defaultDTState.Status;
+                   $('#filter-status').val() != defaultDTState.StatusId;
         }
 
         function checkDefaultFilter() {
@@ -393,11 +387,11 @@
             $("#filter-agent-name").val(defaultDTState.AgentName);
             $("#filter-customer").val(defaultDTState.CustomerId).trigger('change');
             $("#filter-customer-name").val(defaultDTState.CustomerName);
-            $('#filter-region').val(defaultDTState.RegionId);
+            $('#filter-region').val(defaultDTState.RegionId).trigger('change');
             $('#filter-filedby').val(defaultDTState.FiledBy);
             $('#filter-to').val(defaultDTState.DateTo);
             $('#filter-from').val(defaultDTState.DateFrom);
-            $('#filter-status').val(defaultDTState.Status);
+            $('#filter-status').val(defaultDTState.StatusId).trigger('change');
             
             localStorage.removeItem(dt_storage);
 
@@ -411,9 +405,7 @@
             $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
-        var orderDT = $('.table-order').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var orderDT = $('.table-order').DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
                 if (checkDTChanged()) {
@@ -447,10 +439,12 @@
                 data.CustomerCode = $('#filter-customer option:selected').text();
                 data.CustomerName = $('#filter-customer-name').val();
                 data.RegionId = $('#filter-region').val();
+                data.Region = $('#filter-region option:selected').text();
                 data.FiledBy = $('#filter-filedby').val();
                 data.DateFrom = $("#filter-from").val();
                 data.DateTo = $("#filter-to").val();
-                data.Status = $("#filter-status").val();
+                data.StatusId = $("#filter-status").val();
+                data.Status = $('#filter-status option:selected').text();
             },
             stateLoadParams: function (settings, data) {
                 if(data.AgentId) {
@@ -473,32 +467,46 @@
                     $("#filter-customer").append(customerOption).trigger('change');
                     $("#filter-customer-name").val(data.CustomerName);
                 }
-                $('#filter-region').val(data.RegionId);
+                if(data.RegionId) {
+                    var regionOption = new Option(data.Region, data.RegionId, true, true);
+                    $(regionOption).data('data', {
+                        id: data.RegionId,
+                        text: data.Region
+                    });
+                    $("#filter-region").append(regionOption).trigger('change');
+                }
                 if(data.FiledBy != "me") data.FiledBy = "everyone";
                 $('#filter-filedby').val(data.FiledBy);
                 $('#filter-from').val(data.DateFrom);
                 $('#filter-to').val(data.DateTo);
-                $('#filter-status').val(data.Status);
+                if(data.StatusId) {
+                    var statusOption = new Option(data.Status, data.StatusId, true, true);
+                    $(statusOption).data('data', {
+                        id: data.StatusId,
+                        text: data.Status
+                    });
+                    $("#filter-status").append(statusOption).trigger('change');
+                }
             },
-            // initComplete: function () {
-            //     checkDefaultFilter();
-            // },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
                 data: function (data) {
                     var agentId = $("#filter-agent").val();
-                    var customerId = $("#filter-customer").val();
-                    var regionId = $("#filter-region").val();
-
                     if (agentId) data.AgentId = agentId;
+
+                    var customerId = $("#filter-customer").val();
                     if (customerId) data.CustomerId = customerId;
+
+                    var regionId = $("#filter-region").val();
                     if (regionId) data.RegionId = regionId;
 
                     data.FiledBy = $("#filter-filedby").val();
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    data.Status = $("#filter-status").val();
+
+                    var statusId = $("#filter-status").val();
+                    if (statusId) data.Status = statusId;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -530,7 +538,7 @@
                 {
                     data: function (data, type, dataToSet) {
                         return data.purchaseRequestDetail || '<span class="text-muted">N/A</span>';
-                    }, 
+                    },
                     name: "PurchaseRequestDetail",
                     responsivePriority: 12
                 },
@@ -538,7 +546,7 @@
                     data: function (data, type, dataToSet) {
                         return `<a href="/Customer/Details/${data.customerId}" class="link-info" target="_blank">${data.customerCode}</a>`;
                     },
-                    name: "CustomerCode", 
+                    name: "CustomerCode",
                     responsivePriority: 3
                 },
                 { data: "customerName", name: "CustomerName", responsivePriority: 13 },
@@ -546,7 +554,7 @@
                 {
                     data: function (data, type, dataToSet) {
                         return data.customerAddress || '<span class="text-muted">N/A</span>';
-                    }, 
+                    },
                     name: "CustomerAddress",
                     responsivePriority: 15
                 },
@@ -557,7 +565,7 @@
                 {
                     data: function (data, type, dataToSet) {
                         return data.forwarder || '<span class="text-muted">N/A</span>';
-                    }, 
+                    },
                     name: "Forwarder",
                     responsivePriority: 8
                 },
@@ -568,9 +576,9 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '"  data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
-                        if (data.status.toLowerCase() == "draft" && user_access.canDelete) {
-                            actions += '<button type="button" data-id="' + data.id + '" class="btn btn-danger btn-xs" onclick="DeleteDraft(this)" data-microtip-title="Delete Sales Order" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
-                        }
+                        // if (data.status.toLowerCase() == "draft" && user_access.canDelete) {
+                        //     actions += '<button type="button" data-id="' + data.id + '" class="btn btn-danger btn-xs" onclick="DeleteDraft(this)" data-microtip-title="Delete Sales Order" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
+                        // }
                         if  (user_access.canAdd &&  data.isAllPacked != true && data.status.toLowerCase() != "draft" && data.status.toLowerCase() != "submitted" && data.status.toLowerCase() != "disapproved") {
                             //actions += '<button data-id="' + data.id + '" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-box-open"></span></button>';
                             actions += '<a href="@Url.Action("Create", "Pack")/' + data.id + '?page=SalesOrder" class="btn btn-primary btn-xs packBtn" type="button" data-microtip-title="Start Packing" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-box-open"></span></a>';
@@ -580,15 +588,10 @@
                     responsivePriority: 1
                 }
             ],
-            //order: [[5, "desc"], [6, "desc"]]
-            order: [[0, "asc"]]
+            order: defaultDTState.order
         });
 
         orderDT.on("draw", function () {
-            //hideLoader();
-
-            LoadFilterSelect2();
-
             checkDefaultFilter();
         });
 

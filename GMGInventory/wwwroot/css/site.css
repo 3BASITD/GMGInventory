@@ -537,7 +537,7 @@ table.dataTable tbody tr.child .dtr-data {
     flex: 1;
 }
 
-.dataTables_processing {
+.dataTables_processing:not([style*="display: none"]):not([style*="display:none"]) {
     position: absolute;
     top: 0 !important;
     left: 0 !important;
@@ -548,21 +548,33 @@ table.dataTable tbody tr.child .dtr-data {
     background: rgba(255,255,255,0.8) !important;
     color: #333;
     font-size: 1.2em;
-    display: flex;
+    display: flex !important;
     justify-content: center;
     align-items: center;
     z-index: 10;
     pointer-events: none;
     box-shadow: none;
+    animation: beat-dt-loader 2s infinite ease-in-out;
 }
 
-.dark-mode .dataTables_processing {
+.dark-mode .dataTables_processing:not([style*="display: none"]):not([style*="display:none"]) {
     background-color: rgba(33,37,41,0.8) !important;
     color: #FFF;
 }
 
+@keyframes beat-dt-loader {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.85;
+    }
+}
+
 .dataTables_processing .dt-loader {
     background-color: white;
+    margin-top: 10px;
 }
 
 .dark-mode .dataTables_processing .dt-loader {

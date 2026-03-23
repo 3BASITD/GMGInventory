@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -14,6 +15,11 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetOptions(int? IncludeId)
         {
             return Json(await warehouseRepository.GetOptions(IncludeId));
+        }
+
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await warehouseRepository.GetOptions2(search, page));
         }
 
         public async Task<IActionResult> Index()

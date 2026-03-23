@@ -11,7 +11,10 @@
         <div class="card-tools">
             <button type="button" id="toggleView" class="btn btn-primary btn-sm float-right ml-2"><span class="fas fa-border-all"></span> Card View</button>
 
-            @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"])
+            @* @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"]) *@
+            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
 
             @if (userAccess.CanAdd)
             {
@@ -75,6 +78,75 @@
             </thead>
         </table>
         @* <div id="cardContainer" class="dt-card-view d-none"></div> *@
+    </div>
+</div>
+
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter-category" class="form-label mb-0">Category</label>
+                            <select id="filter-category" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter-item-type" class="form-label mb-0">Item Type</label>
+                            <select id="filter-item-type" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter-warehouse" class="form-label mb-0">Warehouse</label>
+                            <select id="filter-warehouse" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="filter-status" class="form-label mb-0">Status</label>
+                            <select id="filter-status" class="form-select form-select-sm">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -466,117 +538,130 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        var loadselect2loaded = false;
-        function LoadSelect2() {
-            if (loadselect2loaded) return;
-            loadselect2loaded = true;
+        // Load Select2 for Category
+        $("#filter-category").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Category")"
+            },
+            dropdownParent: $('#filterModal')
+        });
 
-            $('.select2filter').select2({
-                ajax: null, //already fetched outside
-                allowClear: true,
-                placeholder: {
-                    id: "",
-                    text: "<empty>"
+        // Load Select2 for Item Type
+        $("#filter-item-type").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "ItemType")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        // Load Select2 for Brand
+        $("#filter-brand").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        // Load Select2 for Warehouse
+        $("#filter-warehouse").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Warehouse")"
+            },
+            dropdownParent: $('#filterModal'),
+            minimumResultsForSearch: -1
+        });
+
+        function loadSelect2(selector, modal, url) {
+            $(selector).select2({
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    if (repo.name) {
+                        return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                    }
+                    return repo.text;
                 },
-                width: 'resolve',
-                dropdownParent: $("#filterModal")
+                ajax: {
+                    url: url
+                },
+                dropdownParent: $(modal)
             });
+        }
 
-            if (user_access.canAdd || user_access.canEdit) {
-                // Load Select2 Unit
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetUnitOptions", "Item")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                            $("#create-unit").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                dropdownParent: $("#createModal")
-                            });
-                        }
+        if (user_access.canAdd) {
+            loadSelect2("#create-unit", "#createModal", "@Url.Action("GetOptions2", "Unit")");
+            loadSelect2("#create-brand", "#createModal", "@Url.Action("GetOptions2", "Brand")");
+            loadSelect2("#create-item-type", "#createModal", "@Url.Action("GetOptions2", "ItemType")");
+            loadSelect2("#create-category", "#createModal", "@Url.Action("GetOptions2", "Category")");
+            loadSelect2("#create-warehouse", "#createModal", "@Url.Action("GetOptions2", "Warehouse")");
+        }
 
-                        if (user_access.canEdit) {
-                            $("#edit-unit").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                dropdownParent: $("#editModal")
-                            });
-                        }
-                    }
-                });
-
-                // Load Select2 Category
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Category")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                            $("#create-category").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                dropdownParent: $("#createModal")
-                            });
-                        }
-
-                        if (user_access.canEdit) {
-                            $("#edit-category").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                dropdownParent: $("#editModal")
-                            });
-                        }
-                    }
-                });
-
-                // Load Select2 Item Type
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "ItemType")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                            $("#create-item-type").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                //theme: "bootstrap-5",
-                                dropdownParent: $("#createModal")
-                            });
-                        }
-
-                        if (user_access.canEdit) {
-                            $("#edit-item-type").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                //theme: "bootstrap-5",
-                                dropdownParent: $("#editModal")
-                            });
-                        }
-                    }
-                });
-
-                // Load Select2 Brand
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetOptions", "Brand")",
-                    success: function (data, status, xhr) {
-                        if (user_access.canAdd) {
-                            $("#create-brand").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                dropdownParent: $("#createModal")
-                            });
-                        }
-
-                        if (user_access.canEdit) {
-                            $("#edit-brand").select2({
-                                ajax: null, //already fetched outside
-                                data: data,
-                                dropdownParent: $("#editModal")
-                            });
-                        }
-                    }
-                });
-            }
+        if (user_access.canEdit) {
+            loadSelect2("#edit-unit", "#editModal", "@Url.Action("GetOptions2", "Unit")");
+            loadSelect2("#edit-brand", "#editModal", "@Url.Action("GetOptions2", "Brand")");
+            loadSelect2("#edit-item-type", "#editModal", "@Url.Action("GetOptions2", "ItemType")");
+            loadSelect2("#edit-category", "#editModal", "@Url.Action("GetOptions2", "Category")");
+            loadSelect2("#edit-warehouse", "#editModal", "@Url.Action("GetOptions2", "Warehouse")");
         }
 
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
@@ -595,7 +680,9 @@
             });
         }
 
-        var isTable = true;
+        if (!localStorage.hasOwnProperty("BASItemDTIsTable")) {
+            localStorage.setItem("BASItemDTIsTable", false);
+        }
 
         function ResetFilter() {
             $("#filterModal").modal("hide");
@@ -611,10 +698,14 @@
             length: 10,
             search: { search: "" },
             CategoryId: "",
+            Category: "",
             ItemTypeId: "",
+            ItemType: "",
             BrandId: "",
+            Brand: "",
             WarehouseId: "",
-            ActiveStatusId: ""
+            Warehouse: "",
+            StatusId: 1
         };
 
         function checkDTChanged() {
@@ -624,11 +715,11 @@
                    itemDT.page.info().start != defaultDTState.page ||
                    itemDT.page.len() != defaultDTState.length ||
                    (itemDT.search() || "") != defaultDTState.search.search ||
-                   $("#CategoryId").val() != defaultDTState.CategoryId ||
-                   $("#ItemTypeId").val() != defaultDTState.ItemTypeId ||
-                   $('#BrandId').val() != defaultDTState.BrandId ||
-                   $('#WarehouseId').val() != defaultDTState.WarehouseId ||
-                   $('#ActiveStatusId').val() != defaultDTState.ActiveStatusId;
+                   $("#filter-category").val() != defaultDTState.CategoryId ||
+                   $("#filter-item-type").val() != defaultDTState.ItemTypeId ||
+                   $('#filter-brand').val() != defaultDTState.BrandId ||
+                   $('#filter-warehouse').val() != defaultDTState.WarehouseId ||
+                   $('#filter-status').val() != defaultDTState.StatusId;
         }
 
         function checkDefaultFilter() {
@@ -637,11 +728,11 @@
         }
 
         function resetToDefaultDTFilter() {
-            $("#CategoryId").val(defaultDTState.CategoryId).trigger('change');
-            $("#ItemTypeId").val(defaultDTState.ItemTypeId).trigger('change');
-            $("#BrandId").val(defaultDTState.BrandId).trigger('change');
-            $("#WarehouseId").val(defaultDTState.WarehouseId).trigger('change');
-            $("#ActiveStatusId").val(defaultDTState.ActiveStatusId).trigger('change');
+            $("#filter-category").val(defaultDTState.CategoryId).trigger('change');
+            $("#filter-item-type").val(defaultDTState.ItemTypeId).trigger('change');
+            $("#filter-brand").val(defaultDTState.BrandId).trigger('change');
+            $("#filter-warehouse").val(defaultDTState.WarehouseId).trigger('change');
+            $("#filter-status").val(defaultDTState.StatusId);
             
             localStorage.removeItem(dt_storage);
 
@@ -655,9 +746,7 @@
             $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
-        var itemDT = $('.table-item').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({ 
+        var itemDT = $('.table-item').DataTable({ 
             stateSave: true,
             stateSaveCallback: function(settings, data) {
                 if (checkDTChanged()) {
@@ -684,37 +773,93 @@
                 return null;
             },
             stateSaveParams: function (settings, data) {
-                data.CategoryId = $('#CategoryId').val();
-                data.ItemTypeId = $('#ItemTypeId').val();
-                data.BrandId = $('#BrandId').val();
-                data.WarehouseId = $('#WarehouseId').val();
-                data.ActiveStatusId = $('#ActiveStatusId').val();
-                data.IsTable = isTable;
+                data.CustomerId = $('#filter-customer').val();
+                data.Category = $('#filter-category option:selected').text();
+                data.CategoryId = $('#filter-category').val();
+                data.ItemType = $('#filter-item-type option:selected').text();
+                data.ItemTypeId = $('#filter-item-type').val();
+                data.Brand = $('#filter-brand option:selected').text();
+                data.BrandId = $('#filter-brand').val();
+                data.Warehouse = $('#filter-warehouse option:selected').text();
+                data.WarehouseId = $('#filter-warehouse').val();
+                data.StatusId = $('#filter-status').val();
             },
             stateLoadParams: function (settings, data) {
-                $('#CategoryId').val(data.CategoryId || "").trigger('change');
-                $('#ItemTypeId').val(data.ItemTypeId || "").trigger('change');
-                $('#BrandId').val(data.BrandId || "").trigger('change');
-                $('#WarehouseId').val(data.WarehouseId || "").trigger('change');
-                $('#ActiveStatusId').val(data.ActiveStatusId || "").trigger('change');
-                isTable = data.IsTable;
+                if(data.CategoryId) {
+                    var categoryOption = new Option(data.Category, data.CategoryId, true, true);
+                    $(categoryOption).data('data', {
+                        id: data.CategoryId,
+                        text: data.Category
+                    });
+                    $("#filter-category").append(categoryOption).trigger('change');
+                }
+                if(data.ItemTypeId) {
+                    var itemTypeOption = new Option(data.ItemType, data.ItemTypeId, true, true);
+                    $(itemTypeOption).data('data', {
+                        id: data.ItemTypeId,
+                        text: data.ItemType
+                    });
+                    $("#filter-item-type").append(itemTypeOption).trigger('change');
+                }
+                if(data.BrandId) {
+                    var brandOption = new Option(data.Brand, data.BrandId, true, true);
+                    $(brandOption).data('data', {
+                        id: data.BrandId,
+                        text: data.Brand
+                    });
+                    $("#filter-brand").append(brandOption).trigger('change');
+                }
+                if(data.WarehouseId) {
+                    var warehouseOption = new Option(data.Warehouse, data.WarehouseId, true, true);
+                    $(warehouseOption).data('data', {
+                        id: data.WarehouseId,
+                        text: data.Warehouse
+                    });
+                    $("#filter-warehouse").append(warehouseOption).trigger('change');
+                }
+                $('#filter-status').val(data.StatusId);
             },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
                 data: function (data) {
-                    var categoryId = $("#CategoryId").val();
-                    var itemTypeId = $("#ItemTypeId").val();
-                    var brandId = $("#BrandId").val();
-                    var warehouseId = $("#WarehouseId").val();
-                    var activeStatusId = $("#ActiveStatusId").val();
+                    var categoryId = $("#filter-category").val();
+                    if (categoryId) {
+                        if ($("#filter-category").select2("data")[0].text != $("#filter-category").val()) {
+                            data.CategoryId = categoryId;
+                        } else {
+                            data.CategoryId = 0;
+                            data.CategoryKeyword = categoryId;
+                        }
+                    }
 
-                    if (categoryId) data.CategoryId = categoryId;
-                    if (itemTypeId) data.ItemTypeId = itemTypeId;
-                    if (brandId) data.BrandId = brandId;
-                    if (warehouseId) data.WarehouseId = warehouseId;
-                    if (activeStatusId) data.ActiveStatusId = activeStatusId;
-                    data.IsTable = isTable;
+                    var itemTypeId = $("#filter-item-type").val();
+                    if (itemTypeId) {
+                        if ($("#filter-item-type").select2("data")[0].text != $("#filter-item-type").val()) {
+                            data.ItemTypeId = itemTypeId;
+                        } else {
+                            data.ItemTypeId = 0;
+                            data.ItemTypeKeyword = itemTypeId;
+                        }
+                    }
+
+                    var brandId = $("#filter-brand").val();
+                    if (brandId) {
+                        if ($("#filter-brand").select2("data")[0].text != $("#filter-brand").val()) {
+                            data.BrandId = brandId;
+                        } else {
+                            data.BrandId = 0;
+                            data.BrandKeyword = brandId;
+                        }
+                    }
+
+                    var warehouseId = $("#filter-warehouse").val();
+                    if (warehouseId) {
+                        data.WarehouseId = warehouseId;
+                    }
+
+                    data.StatusId = $("#filter-status").val();
+                    data.IsTable = localStorage.getItem("BASItemDTIsTable") == "true";
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -759,7 +904,7 @@
                 {
                     data: function (data, type, dataToSet) {
                         if(data.warehouse) {
-                            return data.warehouse;
+                            return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.warehouse + "</a>";
                         } else {
                             return '<span class="text-danger" data-microtip-title="Erroneous price data, please contact IT" data-microtip-position="bottom" role="tooltip"><span class="fas fa-exclamation-triangle"></span></span>';
                         }
@@ -875,24 +1020,26 @@
         }
 
         $('#toggleView').on('click', function () {
-            isTable = !isTable;
+            if (localStorage.hasOwnProperty("BASItemDTIsTable")) {
+                localStorage.setItem("BASItemDTIsTable", localStorage.getItem("BASItemDTIsTable") != "true");
+            } else {
+                localStorage.setItem("BASItemDTIsTable", false);
+            }
             itemDT.ajax.reload();
         });
 
         itemDT.on("draw", function () {
-            if (isTable) {
-                $('.table-item').show();            // show table again
-                cardContainer.addClass('d-none'); // hide cards
+            if (localStorage.getItem("BASItemDTIsTable") == "true") {
+                $('.table-item').show();
+                cardContainer.addClass('d-none');
                 $('#toggleView').html('<span class="fas fa-border-all"></span> Card View');
             } else {
                 renderCards();
-                $('.table-item').hide();            // hide only the table
-                cardContainer.removeClass('d-none'); // show cards in same spot
+                $('.table-item').hide();
+                cardContainer.removeClass('d-none');
                 $('#toggleView').html('<span class="fas fa-table"></span> List View');
             }
 
-            //hideLoader();
-            LoadSelect2();
             checkDefaultFilter();
 
             if (user_access.canDelete) {
@@ -946,9 +1093,12 @@
                     $("#edit-interchange-number").val(data.interchangeNumber);
                     $("#edit-model-number").val(data.modelNumber);
                     $("#edit-size").val(data.size);
-                    $("#edit-category").val(data.categoryId).trigger("change");
-                    $("#edit-item-type").val(data.itemTypeId).trigger("change");
-                    $("#edit-brand").val(data.brandId).trigger("change");
+                    var brandOption = new Option(data.brand, data.brandId, true, true);
+                    $("#edit-brand").append(brandOption).trigger("change");
+                    var categoryOption = new Option(data.category, data.categoryId, true, true);
+                    $("#edit-category").append(categoryOption).trigger("change");
+                    var itemTypeOption = new Option(data.itemType, data.itemTypeId, true, true);
+                    $("#edit-item-type").append(itemTypeOption).trigger("change");
                     $("#edit-beginning-cost").val(data.beginningCostD);
                 });
 
@@ -1326,11 +1476,11 @@
 
             $(".downloadBtn").click(function (e) {
                 var urlQuery = [];
-                if ($("#CategoryId").val()) { urlQuery.push("CategoryId=" + $("#CategoryId").val()); }
-                if ($("#ItemTypeId").val()) { urlQuery.push("ItemTypeId=" + $("#ItemTypeId").val()); }
-                if ($("#BrandId").val()) { urlQuery.push("BrandId=" + $("#BrandId").val()); }
-                if ($("#WarehouseId").val()) { urlQuery.push("WarehouseId=" + $("#WarehouseId").val()); }
-                if ($("#ActiveStatusId").val()) { urlQuery.push("ActiveStatusId=" + $("#ActiveStatusId").val()); }
+                if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
+                if ($("#filter-item-type").val()) { urlQuery.push("ItemTypeId=" + $("#filter-item-type").val()); }
+                if ($("#filter-brand").val()) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }
+                if ($("#filter-warehouse").val()) { urlQuery.push("WarehouseId=" + $("#filter-warehouse").val()); }
+                if ($("#filter-status").val()) { urlQuery.push("StatusId=" + $("#filter-status").val()); }
                 window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
             });
 

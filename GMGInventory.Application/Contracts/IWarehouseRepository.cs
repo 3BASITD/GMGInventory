@@ -6,6 +6,7 @@ namespace GMGInventory.Application.Contracts
     public interface IWarehouseRepository
     {
         Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId);
+        Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page);
         Task<WarehouseVM?> GetWarehouse(int Id);
         Task<ForDataTables<WarehouseVM>> GetWarehousesDT(DataTablesRequestForm form);
         Task<IList<APIGeneric>> GetListAPI();

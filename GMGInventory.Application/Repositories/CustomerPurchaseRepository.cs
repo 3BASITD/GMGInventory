@@ -19,7 +19,7 @@ namespace GMGInventory.Application.Repositories
         {
             var salesOrder = from ili in context.InvoiceLineItems
                              join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId} equals new { soli.SalesOrderId, soli.ItemId }
-                             where (filter.CategoryId == null || filter.CategoryId == ili.Item.Category.Id || (filter.CategoryId == 0 && (ili.Item.Category.Code + " " + ili.Item.Category.Name).ToLower().Contains((filter.CustomerKeyword + "").ToLower())))
+                             where (filter.CategoryId == null || filter.CategoryId == ili.Item.Category.Id || (filter.CategoryId == 0 && (ili.Item.Category.Code + " " + ili.Item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
                                 && (filter.BrandId == null || filter.BrandId == ili.Item.Brand.Id || (filter.BrandId == 0 && (ili.Item.Brand.Code + " " + ili.Item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
                                 && (filter.ItemTypeId == null || filter.ItemTypeId == ili.Item.ItemType.Id || (filter.ItemTypeId == 0 && (ili.Item.ItemType.Code + " " + ili.Item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
                                 && (filter.CustomerId == null || filter.CustomerId == ili.Invoice.SalesOrder.Customer.Id || (filter.CustomerId == 0 && (ili.Invoice.SalesOrder.Customer.Code + " " + ili.Invoice.SalesOrder.Customer.Name).ToLower().Contains((filter.CustomerKeyword + "").ToLower())))

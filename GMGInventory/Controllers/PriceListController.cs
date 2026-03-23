@@ -13,10 +13,7 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class PriceListController(IAccessRepository accessRepository
-                             , IItemPriceRepository itemPriceRepository
-                             , ICategoryRepository categoryRepository
-                             , IItemTypeRepository itemTypeRepository
-                             , IBrandRepository brandRepository) : BaseController(accessRepository)
+                                   , IItemPriceRepository itemPriceRepository) : BaseController(accessRepository)
     {
         private readonly ControllerHelper chelper = new();
 
@@ -27,11 +24,6 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.PriceList)).Convert();
 
-            ItemFilterVM itemFilterVM = new ItemFilterVM();
-            itemFilterVM.Categories = new SelectList(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
-            itemFilterVM.ItemTypes = new SelectList(await itemTypeRepository.GetAllActiveItemTypeAsync(-1), "Id", "Name");
-            itemFilterVM.Brands = new SelectList(await brandRepository.GetAllActiveBrandAsync(-1), "Id", "Name");
-            ViewData["ItemFilter"] = itemFilterVM;
             return View();
         }
 

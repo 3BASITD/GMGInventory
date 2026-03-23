@@ -37,6 +37,28 @@ namespace GMGInventory.Application.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Select2Model<JsonOptionsModel>> GetOptions2(string search, int page)
+        {
+            var units = await context.Units
+                                     .Where(s => string.IsNullOrWhiteSpace(search)
+                                              || (s.Code.ToLower().Contains(search.ToLower()))
+                                              || (s.Name.ToLower().Contains(search.ToLower())))
+                                     .Select(s => new JsonOptionsModel
+                                     {
+                                         Id = s.Id.ToString(),
+                                         Text = s.Name
+                                     })
+                                     .OrderBy(s => s.Text)
+                                     .ToListAsync();
+            var unitsFiltered = units.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonOptionsModel>
+            {
+                //incomplete_results = false,
+                items = unitsFiltered,
+                total_count = units.Count
+            };
+        }
+
         public async Task<IList<APIGeneric>> GetListAPI()
         {
             var units = from unit in context.Units

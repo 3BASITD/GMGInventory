@@ -113,7 +113,7 @@ namespace GMGInventory.Application.Repositories
                             let quantityReturned = context.SalesReturnLineItems
                                                           .Where(s => s.ItemId == item.Id)
                                                           .Sum(s => (int?)s.Quantity) ?? 0
-                            where (filter.ActiveStatusId == null || (filter.ActiveStatusId == 1 && item.IsActive == true) || (filter.ActiveStatusId == 0 && item.IsActive == false))
+                            where (filter.StatusId == null || (filter.StatusId == 1 && item.IsActive == true) || (filter.StatusId == 0 && item.IsActive == false))
                                 && (filter.BrandId == null || filter.BrandId == item.BrandId || (filter.BrandId == 0 && item.Brand.Code.ToLower().Contains((filter.BrandKeyword + "").ToLower())))
                                 && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId || (filter.ItemTypeId == 0 && item.ItemType.Code.ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
                                 && (filter.ItemId == null || filter.ItemId == 0 || filter.ItemId == item.Id)
@@ -243,7 +243,7 @@ namespace GMGInventory.Application.Repositories
             var pricesVM = await (from item in context.Items
                                   join price in context.ItemPrices on item.Id equals price.ItemId
                                   join user in userManager.Users on price.UserCreated equals user.Id
-                                  where ((filter.ActiveStatusId == null || (filter.ActiveStatusId == 1 && item.IsActive == true) || (filter.ActiveStatusId == 0 && item.IsActive == false))
+                                  where ((filter.StatusId == null || (filter.StatusId == 1 && item.IsActive == true) || (filter.StatusId == 0 && item.IsActive == false))
                                       && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
                                       && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
                                       && (filter.BrandId == null || filter.BrandId == item.BrandId))
