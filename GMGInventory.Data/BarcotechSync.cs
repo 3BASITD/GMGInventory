@@ -11,6 +11,7 @@
         public string PrimaryKey { get; set; }
         public string SyncStatus { get; set; }
         public string? Remarks { get; set; }
+        public string? Trace { get; set; }
         public DateTime DatePerformed { get; set; }
     }
 }

@@ -1,14 +1,10 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
-using GMGInventory.Application.Services;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using System.Data;
 
 namespace GMGInventory.Controllers

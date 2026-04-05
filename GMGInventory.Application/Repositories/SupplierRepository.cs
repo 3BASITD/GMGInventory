@@ -255,15 +255,20 @@ namespace GMGInventory.Application.Repositories
             return suppliersViewVM;
         }
 
-        public async Task<IList<APIGeneric>> GetListAPI()
+        public async Task<IList<APISupplier>> GetListAPI()
         {
             var suppliers = from supplier in context.Suppliers
                             where supplier.IsActive == true
-                            select new APIGeneric
+                            select new APISupplier
                             {
                                 Id = supplier.Id,
                                 Code = supplier.Code,
-                                Name = supplier.Name
+                                Name = supplier.Name,
+                                Address1 = supplier.AddressLine1,
+                                Address2 = supplier.AddressLine2,
+                                OfficeTelNo = supplier.OfficeTelNo,
+                                ContactPerson = supplier.ContactPerson,
+                                Region = supplier.Region.Code
                             };
             return await suppliers.ToListAsync();
         }

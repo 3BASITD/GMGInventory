@@ -348,7 +348,7 @@ namespace GMGInventory.Application.Repositories
                 if (string.IsNullOrWhiteSpace(typeVM.Name)) return "Item Type Name is required";
 
                 var _code = typeVM.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim();
-                var code = _code.Length > 10 ? _code[..10] : _code;
+                var code = _code.Length > 20 ? _code[..20] : _code;
                 var _name = typeVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
                 var name = _name.Length > 100 ? _name[..100] : _name;
 

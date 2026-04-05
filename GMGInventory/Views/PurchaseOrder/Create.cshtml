@@ -859,7 +859,6 @@
             }
 
             $("#order-supplier").select2({
-                //minimumInputLength: 1,
                 placeholder: '<empty>',
                 templateResult: function (repo) {
                     if (repo.loading) {
@@ -966,6 +965,28 @@
                 noResults: function () {
                     return "No available request found";
                 }
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+
+                var subinfo = [];
+                subinfo.push("Request count: " + repo.totalQuantity);
+                if(!repo.disabled)
+                    subinfo.push("Pending count: " + repo.totalIncompleteQuantity);
+                if(repo.alreadyOn)
+                    subinfo.push("Order on: " + repo.alreadyOn);
+                if(repo.disabled) {
+                    subinfo.push("<small class='text-info'>Order completed</small>");
+                }
+
+                return $(
+                    "<strong>" + repo.text + "</strong><br />" +
+                    "<small>" +
+                    subinfo.join("<br />") +
+                    "</small>"
+                );
             },
             ajax: {
                 url: "@Url.Action("GetPurchaseRequestOptions")",
@@ -1124,6 +1145,28 @@
                 noResults: function () {
                     return "No available request found";
                 }
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+
+                var subinfo = [];
+                subinfo.push("Request count: " + repo.totalQuantity);
+                if(!repo.disabled)
+                    subinfo.push("Pending count: " + repo.totalIncompleteQuantity);
+                if(repo.alreadyOn)
+                    subinfo.push("Order on: " + repo.alreadyOn);
+                if(repo.disabled) {
+                    subinfo.push("<small class='text-info'>Order completed</small>");
+                }
+
+                return $(
+                    "<strong>" + repo.text + "</strong><br />" +
+                    "<small>" +
+                    subinfo.join("<br />") +
+                    "</small>"
+                );
             },
             ajax: {
                 url: "@Url.Action("GetPurchaseRequestOptions")",
@@ -1397,8 +1440,8 @@
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
-                if (data.purchaseRequestId == $("#add-name").select2("data")[0].text
-                 && data.itemDescription == $("#add-pr-number").select2("data")[0].id) {
+                if (data.purchaseRequestId == $("#add-pr-number").select2("data")[0].id
+                 && data.itemDescription == $("#add-name").select2("data")[0].text) {
                     rowIndexes.push(idx);
                 }
                 return false;

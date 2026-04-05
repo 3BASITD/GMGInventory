@@ -184,13 +184,9 @@
         }).DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved = localStorage.getItem(dt_storage);
@@ -231,7 +227,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -302,7 +298,7 @@
                     responsivePriority: 1
                 }
             ],
-            order: [[0, "desc"]]
+            order: defaultDTState.order
         });
 
         orderDT.on("draw", function () {

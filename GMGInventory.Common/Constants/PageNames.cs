@@ -84,7 +84,8 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Warehouse Transfer Report")] WarehouseTransferReport,
         [PageNamesString("Daily Outbound Report")] DailyOutboundReport,
         [PageNamesString("Barcotech Sync Status")] BarcotechSync, // 80
-        [PageNamesString("Purchase Receiving (Special)")] PurchaseReceivingSpecial
+        [PageNamesString("Purchase Receiving (Special)")] PurchaseReceivingSpecial,
+        [PageNamesString("Barcotech (Stock)")] BarcotechStock
     }
 
     public static class PageNameExtensions

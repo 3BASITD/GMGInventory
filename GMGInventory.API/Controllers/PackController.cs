@@ -9,9 +9,9 @@ namespace GMGInventory.API.Controllers
     public class PackController(IPackRepository packRepository) : ControllerBase
     {
         [HttpGet("List")]
-        public async Task<IList<APIPack>> GetList()
+        public async Task<IList<APIPack>> GetList(DateTime? date)
         {
-            return await packRepository.GetListAPI();
+            return await packRepository.GetListAPI(date);
         }
     }
 }

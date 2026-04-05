@@ -15,6 +15,16 @@
                     <span class="fas fa-upload"></span> Move All to HashMicro
                 </button>
             }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Move All to HashMicro&#10;Upload Hash Micro access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-upload mr-0"></span>
+                </button>
+            }
             <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
@@ -222,7 +232,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -328,7 +338,7 @@
                                 DateFrom: $("#filter-from").val(),
                                 DateTo: $("#filter-to").val()
                             },
-                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the transfer, which may result in some records being transferred while others are not.</small>",
+                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the process, so some records may be saved while others are not.</small>",
                             success: function (data, status, xhr) {
                                 var success_ctr = 0;
                                 $("table.table-moveall tbody").html("");

@@ -37,7 +37,7 @@ namespace GMGInventory.Application.Repositories
                            join userm in userManager.Users on ret.UserModified equals userm.Id into um
                            from userm in um.DefaultIfEmpty()
                            where ret.Id == Id
-                           && ret.SalesReturnLineItems.Any(s=> (s.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft"))
+                           //&& ret.SalesReturnLineItems.Any(s=> (s.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft"))
                            select new SalesReturnVM
                            {
                                BIRInvoiceNumber = string.Join(",", ret.SalesReturnLineItems.Select(s => s.InvoiceLineItem.Invoice.ControlNumber)),
@@ -128,29 +128,12 @@ namespace GMGInventory.Application.Repositories
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn == "ReturnDate")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    if (form.SortColumnDirection == "asc")
-                    {
-                        switch (form.SortColumn)
-                        {
-                            case "ReturnDate": data = data.OrderBy(s => s.ReturnDateD); break;
-                            default: break;
-                        }
-                    }
-                    else if (form.SortColumnDirection == "desc")
-                    {
-                        switch (form.SortColumn)
-                        {
-                            case "ReturnDate": data = data.OrderByDescending(s => s.ReturnDateD); break;
-                            default: break;
-                        }
-                    }
-                }
-                else
-                {
-                    data = data.OrderBy(form.SortColumn + " " + form.SortColumnDirection);
-                }
+                    "ReturnDate" => isAsc ? data.OrderBy(s => s.ReturnDateD) : data.OrderByDescending(s => s.ReturnDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize);
@@ -164,24 +147,34 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APISalesReturn>> GetListAPI()
+        public async Task<IList<APISalesReturn>> GetListAPI(DateTime? dt)
         {
             DateTime dtNow = DateTime.Now;
             DateTime dtYesterday = dtNow.AddDays(-1);
             var sreturns = from sreturn in context.SalesReturns
-                           where (sreturn.BarcotechRequestDate == null
-                           || sreturn.BarcotechRequestDate > dtYesterday)
+                           join userc in userManager.Users on sreturn.UserCreated equals userc.Id
+                           join userm in userManager.Users on sreturn.UserModified equals userm.Id into um
+                           from userm in um.DefaultIfEmpty()
+                           where ((dt != null && sreturn.ReturnDate.Date == dt.Value.Date)
+                           || (dt == null && (sreturn.BarcotechRequestDate == null
+                           || sreturn.BarcotechRequestDate > dtYesterday)))
                            select new APISalesReturn
                            {
                                Id = sreturn.Id,
                                SalesOrderId = sreturn.SalesOrderId,
+                               SalesOrderNumber = sreturn.SalesOrder == null ? null : sreturn.SalesOrder.SalesOrderNumber,
                                SalesReturnNumber = sreturn.SalesReturnNumber,
                                ReturnDate = sreturn.ReturnDate,
+                               UserCreated = userc.FirstName + " " + userc.LastName,
+                               DateCreated = sreturn.DateCreated,
+                               LastUserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                               LastDateModified = sreturn.DateModified,
                                LineItems = from item in sreturn.SalesReturnLineItems
                                            select new APISalesReturnLineItem
                                            {
                                                Id = item.Id,
                                                ItemId = item.ItemId,
+                                               ItemCode = item.Item.Code,
                                                Quantity = item.Quantity,
                                                ReasonOfReturnId = item.ReasonOfReturnId
                                            }

@@ -292,7 +292,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -316,8 +316,16 @@
                 },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
-                { data: "userModified", name: "UserModified" },
-                { data: "dateModified", name: "DateModified" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.userModified || "<span class='text-muted'>N/A</span>";
+                    }, name: "UserModified"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateModified || "<span class='text-muted'>N/A</span>";
+                    }, name: "DateModified"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -389,8 +397,8 @@
                 $(".modal-detail-region").html(data.regionName);
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
-                $(".modal-detail-usermodified").html(data.userModified);
-                $(".modal-detail-datemodified").html(data.dateModified);
+                $(".modal-detail-usermodified").html(data.userModified || "<span class='text-muted'>N/A</span>");
+                $(".modal-detail-datemodified").html(data.dateModified || "<span class='text-muted'>N/A</span>");
             });
 
 
@@ -408,11 +416,11 @@
             // Validation for Edit Modal
             var validateEdit = $("#editForm").validate({
                 rules: {
-                    code: { required: true, maxlength: 10 },
+                    code: { required: true, maxlength: 50 },
                     name: { required: true, maxlength: 100 }
                 },
                 messages: {
-                    code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                     name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
                 },
                 submitHandler: function (form, event) {
@@ -457,11 +465,11 @@
         // Validation for Create Modal
         var validateCreate = $("#createForm").validate({
             rules: {
-                code: { required: true, maxlength: 10 },
+                code: { required: true, maxlength: 50 },
                 name: { required: true, maxlength: 100 }
             },
             messages: {
-                code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                 name: { required: "Please enter Name.", maxlength: "Name must not exceed 100 characters." }
             },
             submitHandler: function (form, event) {

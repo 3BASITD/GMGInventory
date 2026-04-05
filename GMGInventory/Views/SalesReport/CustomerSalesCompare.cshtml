@@ -269,7 +269,6 @@
 
         // Load Select2 for Brand Filter 1
         $("#filter1-brand").select2({
-            //minimumInputLength: 1,
             allowClear: true,
             placeholder: {
                 id: "",
@@ -297,7 +296,6 @@
 
         // Load Select2 for Brand Filter 2
         $("#filter2-brand").select2({
-            //minimumInputLength: 1,
             allowClear: true,
             placeholder: {
                 id: "",
@@ -325,9 +323,8 @@
 
         // Load Select2 for Customer Filter 1
         $("#filter1-customer").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -350,9 +347,8 @@
 
         // Load Select2 for Customer Filter 2
         $("#filter2-customer").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -488,13 +484,9 @@
         }).DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage1, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage1);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage1, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved1 = localStorage.getItem(dt_storage1);
@@ -574,7 +566,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -593,7 +585,8 @@
                 var api = this.api(), data;
 
                 $(api.column(2).footer()).html(FormatStringDecimal(json.totalAmount));
-            }
+            },
+            order: defaultDTState.table1.order
         });
 
         // Load functions upon DataTable load
@@ -610,13 +603,9 @@
         }).DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage2, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage2);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage2, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved1 = localStorage.getItem(dt_storage1);
@@ -697,7 +686,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -716,7 +705,8 @@
                 var api = this.api(), data;
 
                 $(api.column(2).footer()).html(FormatStringDecimal(json.totalAmount));
-            }
+            },
+            order: defaultDTState.table2.order
         });
 
         // Load functions upon DataTable load

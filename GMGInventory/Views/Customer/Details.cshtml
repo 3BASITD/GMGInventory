@@ -1048,7 +1048,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1221,7 +1221,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: false,
@@ -1365,7 +1365,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1403,7 +1403,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1452,7 +1452,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1539,7 +1539,7 @@
         // Validation for Edit Modal
         var validateEdit = $("#editForm").validate({
             rules: {
-                Code: { required: true, maxlength: 10 },
+                Code: { required: true, maxlength: 50 },
                 Name: { required: true, maxlength: 100 },
                 Email: { maxlength: 50 },
                 CreditLimit: { required: true, range: [0, 9999999999.99] },
@@ -1552,7 +1552,7 @@
                 Remarks: { maxlength: 500 }
             },
             messages: {
-                Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                 Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
                 Email: { maxlength: "Email number must not exceed 50 characters." },
                 CreditLimit: { required: "Please enter credit limit.", range: "Credit Limit must be between 0-9999999999.99." },

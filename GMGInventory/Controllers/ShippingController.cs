@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.ExtendedProperties;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;

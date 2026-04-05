@@ -210,9 +210,8 @@
 
         // Load Select2 for Customer
         $("#filter-customer").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -236,9 +235,8 @@
         // Load Select2 for Item
         $("#filter-item").select2({
             tags: true,
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -358,13 +356,9 @@
         }).DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved = localStorage.getItem(dt_storage);
@@ -441,7 +435,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -520,7 +514,8 @@
                 $(api.column(16).footer()).html(FormatStringInteger(json.totalQuantity));
                 $(api.column(17).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(18).footer()).html(FormatStringDecimal(json.totalAmount2));
-            }
+            },
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load

@@ -252,7 +252,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -264,8 +264,18 @@
             columns: [
                 { data: "code", name: "Code" },
                 { data: "firstName", name: "FirstName" },
-                { data: "middleName", name: "MiddleName" },
-                { data: "lastName", name: "LastName" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.middleName || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "MiddleName"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.lastName || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "LastName"
+                },
                 { data: "area", name: "Area" },
                 {
                     data: function (data, type, dataToSet) {
@@ -279,8 +289,18 @@
                 },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
-                { data: "userModified", name: "UserModified" },
-                { data: "dateModified", name: "DateModified" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.userModified || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "UserModified"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateModified || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "DateModified"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -401,12 +421,12 @@
                 // Validation for Edit Modal
                 var validateEdit = $("#editForm").validate({
                     rules: {
-                        code: { required: true, maxlength: 10 },
+                        code: { required: true, maxlength: 50 },
                         firstName: { required: true, maxlength: 100 },
                         lastName: { required: true, maxlength: 100 }
                     },
                     messages: {
-                        code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                        code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                         firstName: { required: "Please enter First Name.", maxlength: "First Name must not exceed 100 characters." },
                         lastName: { required: "Please enter Last Name.", maxlength: "Last Name must not exceed 100 characters." }
                     },
@@ -493,12 +513,12 @@
             // Validation for Create Modal
             var validateCreate = $("#createForm").validate({
                 rules: {
-                    code: { required: true, maxlength: 10 },
+                    code: { required: true, maxlength: 50 },
                     firstName: { required: true, maxlength: 100 },
                     lastName: { required: true, maxlength: 100 }
                 },
                 messages: {
-                    code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                     firstName: { required: "Please enter First Name.", maxlength: "First Name must not exceed 100 characters." },
                     lastName: { required: "Please enter Last Name.", maxlength: "Last Name must not exceed 100 characters." }
                 },

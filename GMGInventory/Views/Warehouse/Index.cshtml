@@ -170,7 +170,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -363,14 +363,14 @@
             // Validation for Add Modal
             var validateAdd = $("#createForm").validate({
                 rules: {
-                    Code: { required: true, maxlength: 10 },
+                    Code: { required: true, maxlength: 50 },
                     Name: { required: true, maxlength: 100 },
                     Address: { maxlength: 250 },
                     Person: { maxlength: 100 },
                     Number: { maxlength: 50 }
                 },
                 messages: {
-                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                     Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
                     Address: { maxlength: "Address must not exceed 250 characters." },
                     Person: { maxlength: "Contact person must not exceed 100 characters." },
@@ -412,14 +412,14 @@
             // Validation for Add Modal
             var validateAdd = $("#editForm").validate({
                 rules: {
-                    Code: { required: true, maxlength: 10 },
+                    Code: { required: true, maxlength: 50 },
                     Name: { required: true, maxlength: 100 },
                     Address: { maxlength: 250 },
                     Person: { maxlength: 100 },
                     Number: { maxlength: 50 }
                 },
                 messages: {
-                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                     Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
                     Address: { maxlength: "Address must not exceed 250 characters." },
                     Person: { maxlength: "Contact person must not exceed 100 characters." },

@@ -366,13 +366,9 @@
         var requestDT = $('.table-request').DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 var saved = localStorage.getItem(dt_storage);
@@ -454,9 +450,7 @@
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-
-                    var statusId = $("#filter-status").val();
-                    if (statusId) data.StatusId = statusId;
+                    data.StatusId = $("#filter-status").val();
 
                     var filedBy = $('#filter-filedby').val();
                     if (filedBy) data.FiledBy = filedBy;
@@ -467,7 +461,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,

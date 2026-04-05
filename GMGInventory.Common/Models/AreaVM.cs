@@ -9,7 +9,7 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(10)]
+        [StringLength(50)]
         [Display(Name = "Code")]
         public string Code { get; set; }
 

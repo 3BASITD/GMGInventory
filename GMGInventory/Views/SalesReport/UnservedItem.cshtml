@@ -143,7 +143,6 @@
 
         // Load Select2 for Brand
         $("#filter-brand").select2({
-            //minimumInputLength: 1,
             allowClear: true,
             placeholder: {
                 id: "",
@@ -194,7 +193,7 @@
         }
 
         var defaultDTState = {
-            order: [[0, "asc"]],
+            order: [[4, "desc"]],
             page: 0,
             length: 10,
             search: { search: "" },
@@ -246,13 +245,9 @@
         }).DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved = localStorage.getItem(dt_storage);
@@ -306,7 +301,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -331,7 +326,7 @@
                 $(api.column(4).footer()).html(FormatStringInteger(json.totalQuantity));
                 $(api.column(5).footer()).html(FormatStringInteger(json.totalQuantity2));
             },
-            order: [[4, "desc"]]
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load

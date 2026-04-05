@@ -23,6 +23,15 @@ namespace GMGInventory.Common.Models
         public string? AreaCode { get; set; }
     }
 
+    public class APICustomer : APIGeneric
+    {
+        public string? Address { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? FaxNumber { get; set; }
+        public string? ContactPerson { get; set; }
+    }
+
     public class APIDriver
     {
         public int Id { get; set; }
@@ -57,10 +66,16 @@ namespace GMGInventory.Common.Models
     public class APISalesOrder
     {
         public int Id { get; set; }
-        public int AgentId { get; set; }
-        public int CustomerId { get; set; }
         public string SalesOrderNumber { get; set; }
+        public int AgentId { get; set; }
+        public string AgentCode { get; set; }
+        public int CustomerId { get; set; }
+        public string CustomerCode { get; set; }
         public DateTime OrderDate { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime DateCreated { get; set; }
+        public string? LastUserModified { get; set; }
+        public DateTime? LastDateModified { get; set; }
         public IEnumerable<APISalesOrderLineItem> LineItems { get; set; }
     }
 
@@ -68,6 +83,7 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public int LineNumber { get; set; }
+        public int ItemId { get; set; }
         public string ItemCode { get; set; }
         public int Quantity { get; set; }
     }
@@ -77,6 +93,10 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
         public string SalesOrderNumber { get; set; }
         public DateTime PackDate { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime DateCreated { get; set; }
+        public string? LastUserModified { get; set; }
+        public DateTime? LastDateModified { get; set; }
         public IEnumerable<APIPackLineItem> LineItems { get; set; }
     }
 
@@ -85,6 +105,7 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
         public string PackType { get; set; }
         public int BoxNumber { get; set; }
+        public int? ItemId { get; set; }
         public string? ItemCode { get; set; }
         public int Quantity { get; set; }
     }
@@ -93,8 +114,13 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public int? SalesOrderId { get; set; }
+        public string? SalesOrderNumber { get; set; }
         public string SalesReturnNumber { get; set; }
         public DateTime ReturnDate { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime DateCreated { get; set; }
+        public string? LastUserModified { get; set; }
+        public DateTime? LastDateModified { get; set; }
         public IEnumerable<APISalesReturnLineItem> LineItems { get; set; }
     }
 
@@ -102,6 +128,7 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public int ItemId { get; set; }
+        public string ItemCode { get; set; }
         public int Quantity { get; set; }
         public int ReasonOfReturnId { get; set; }
     }
@@ -110,10 +137,16 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public string DocumentNumber { get; set; }
+        public int? SupplierId { get; set; }
         public string? SupplierCode { get; set; }
+        public int? WarehouseId { get; set; }
         public string? WarehouseCode { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? DueDate { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime DateCreated { get; set; }
+        public string? LastUserModified { get; set; }
+        public DateTime? LastDateModified { get; set; }
         public IEnumerable<APIPurchaseLineItem> LineItems { get; set; }
     }
 
@@ -122,13 +155,27 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
         public string DocumentNumber { get; set; }
         public DateTime ReturnDate { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime DateCreated { get; set; }
+        public string? LastUserModified { get; set; }
+        public DateTime? LastDateModified { get; set; }
         public IEnumerable<APIPurchaseLineItem> LineItems { get; set; }
     }
 
     public class APIPurchaseLineItem
     {
         public int Id { get; set; }
+        public int ItemId { get; set; }
         public string ItemCode { get; set; }
         public int Quantity { get; set; }
+    }
+
+    public class APISupplier: APIGeneric
+    {
+        public string Address1 { get; set; }
+        public string? Address2 { get; set; }
+        public string? OfficeTelNo { get; set; }
+        public string? ContactPerson { get; set; }
+        public string Region { get; set; }
     }
 }

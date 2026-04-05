@@ -148,7 +148,6 @@
 
         // Load Select2 for Brand
         $("#filter-brand").select2({
-            //minimumInputLength: 1,
             allowClear: true,
             placeholder: {
                 id: "",
@@ -176,9 +175,8 @@
 
         // Load Select2 for Customer
         $("#filter-customer").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -282,13 +280,9 @@
         }).DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved = localStorage.getItem(dt_storage);
@@ -357,7 +351,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -377,7 +371,8 @@
                 var api = this.api(), data;
 
                 $(api.column(2).footer()).html(FormatStringDecimal(json.totalAmount));
-            }
+            },
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load

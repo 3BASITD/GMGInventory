@@ -4,6 +4,7 @@ using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -193,19 +194,27 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIPurchaseReturn>> GetListAPI()
+        public async Task<IList<APIPurchaseReturn>> GetListAPI(DateTime? dt)
         {
             DateTime dtNow = DateTime.Now;
             DateTime dtYesterday = dtNow.AddDays(-1);
             var preturns = from preturn in context.PurchaseReturnNews
-                           where (preturn.BarcotechRequestDate == null
-                           || preturn.BarcotechRequestDate > dtYesterday)
+                           join userc in userManager.Users on preturn.UserCreated equals userc.Id
+                           join userm in userManager.Users on preturn.UserModified equals userm.Id into um
+                           from userm in um.DefaultIfEmpty()
+                           where ((dt != null && preturn.ReturnDate.Date == dt.Value.Date)
+                           || (dt == null && (preturn.BarcotechRequestDate == null
+                           || preturn.BarcotechRequestDate > dtYesterday)))
                            && preturn.Status.Code.Trim().ToLower() == "approved"
                            select new APIPurchaseReturn
                            {
                                Id = preturn.Id,
                                DocumentNumber = preturn.DocumentNumber,
                                ReturnDate = preturn.ReturnDate,
+                               UserCreated = userc.FirstName + " " + userc.LastName,
+                               DateCreated = preturn.DateCreated,
+                               LastUserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                               LastDateModified = preturn.DateModified,
                                LineItems = from item in preturn.PurchasReturnLineItem
                                            select new APIPurchaseLineItem
                                            {

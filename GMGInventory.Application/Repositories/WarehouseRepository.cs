@@ -67,24 +67,25 @@ namespace GMGInventory.Application.Repositories
         public async Task<WarehouseVM?> GetWarehouse(int Id)
         {
             var warehouse = from whouse in context.Warehouses
-                             join userc in userManager.Users on whouse.UserCreated equals userc.Id
-                             join userm in userManager.Users on whouse.UserModified equals userm.Id into um
-                             from userm in um.DefaultIfEmpty()
-                             select new WarehouseVM
-                             {
-                                 Id = whouse.Id,
-                                 Code = whouse.Code,
-                                 Name = whouse.Name,
-                                 Address = whouse.Address,
-                                 ContactPerson = whouse.ContactPerson,
-                                 ContactNumber = whouse.ContactNumber,
-                                 IsMain = whouse.IsMain == true,
-                                 IsActive = whouse.IsActive,
-                                 UserCreated = userc.FirstName + " " + userc.LastName,
-                                 DateCreatedD = whouse.DateCreated,
-                                 UserModified = userm == null ? null : (userm.FirstName + " " + userm.LastName),
-                                 DateModifiedD = whouse.DateModified
-                             };
+                            join userc in userManager.Users on whouse.UserCreated equals userc.Id
+                            join userm in userManager.Users on whouse.UserModified equals userm.Id into um
+                            from userm in um.DefaultIfEmpty()
+                            where whouse.Id == Id
+                            select new WarehouseVM
+                            {
+                                Id = whouse.Id,
+                                Code = whouse.Code,
+                                Name = whouse.Name,
+                                Address = whouse.Address,
+                                ContactPerson = whouse.ContactPerson,
+                                ContactNumber = whouse.ContactNumber,
+                                IsMain = whouse.IsMain == true,
+                                IsActive = whouse.IsActive,
+                                UserCreated = userc.FirstName + " " + userc.LastName,
+                                DateCreatedD = whouse.DateCreated,
+                                UserModified = userm == null ? null : (userm.FirstName + " " + userm.LastName),
+                                DateModifiedD = whouse.DateModified
+                            };
             return await warehouse.FirstOrDefaultAsync();
         }
 
@@ -169,7 +170,7 @@ namespace GMGInventory.Application.Repositories
         {
             var response = new ResponseModel();
 
-            if (await context.Warehouses.AnyAsync(s=>s.Code == warehouse.Code))
+            if (await context.Warehouses.AnyAsync(s => s.Code == warehouse.Code))
             {
                 response.Status = "Error";
                 response.Message = "Code already in use";
@@ -252,7 +253,8 @@ namespace GMGInventory.Application.Repositories
 
                     response.Status = "Success";
                     response.Message = "Successfully deactivated warehouse";
-                } else
+                }
+                else
                 {
                     context.Warehouses.Remove(whouse);
                     await context.SaveChangesAsync(currentUser);
@@ -292,14 +294,15 @@ namespace GMGInventory.Application.Repositories
         {
             var response = new ResponseModel();
             var warehouse = await context.Warehouses.Where(s => s.Id == id).FirstOrDefaultAsync();
-            if(warehouse == null)
+            if (warehouse == null)
             {
                 response.Status = "Error";
                 response.Message = "Invalid warehouse";
-            } else
+            }
+            else
             {
-                var previous = await context.Warehouses.Where(s=>s.IsMain == true).FirstOrDefaultAsync();
-                if(previous != null)
+                var previous = await context.Warehouses.Where(s => s.IsMain == true).FirstOrDefaultAsync();
+                if (previous != null)
                 {
                     previous.IsMain = false;
                     context.Warehouses.Update(previous);

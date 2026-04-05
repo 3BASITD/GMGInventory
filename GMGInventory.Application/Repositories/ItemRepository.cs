@@ -1,24 +1,15 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Office2013.Word;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Dynamic.Core;
-using System.Reflection.Emit;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -42,30 +33,29 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetOptions(string search, int page)
         {
-            //var items = await context.Items.Include(s => s.Unit)
-            //                    .Where(s => string.IsNullOrWhiteSpace(search)
-            //                             || (s.Code.ToLower().Contains(search.ToLower())))
-            //                    .Select(s => new JsonItemOptionsModel
-            //                    {
-            //                        Id = s.Id.ToString(),
-            //                        Text = s.Code,
-            //                        Name = s.Name,
-            //                        Quantity = 0,
-            //                        Unit = s.Unit.Code
-            //                    })
-            //                    .ToListAsync();
-            var items = from item in context.Items
-                                            .Include(s => s.Unit)
-                        from price in context.ItemPrices
-                                             .Where(s => s.ItemId == item.Id
-                                                      && s.DateCreated <= DateTime.Now)
-                                             .OrderByDescending(s => s.DateCreated)
-                                             .Take(1)
-                                             .DefaultIfEmpty()
+            var latestPrices = context.ItemPrices
+                                      .Where(s => s.DateCreated <= DateTime.Now)
+                                      .GroupBy(s => s.ItemId)
+                                      .Select(s => new {
+                                          ItemId = s.Key,
+                                          LatestPrice = s.OrderByDescending(a => a.DateCreated).FirstOrDefault()
+                                      });
+            var inventoryStocks = context.ItemInventories
+                                         .Where(s => s.Warehouse.IsMain == true)
+                                         .GroupBy(s => s.ItemId)
+                                         .Select(s => new
+                                         {
+                                             ItemId = s.Key,
+                                             Quantity = s.Sum(a => (int?)a.Quantity) ?? 0
+                                         });
 
-                        let inventory = context.ItemInventories
-                                               .Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true)
-                                               .Sum(s => (int?)s.Quantity) ?? 0
+            var items = from item in context.Items
+                                            .AsNoTracking()
+                                            .Include(s => s.Unit)
+                        join price in latestPrices on item.Id equals price.ItemId into priceg
+                        from price in priceg.DefaultIfEmpty()
+                        join inventory in inventoryStocks on item.Id equals inventory.ItemId into inventoryg
+                        from inventory in inventoryg.DefaultIfEmpty()
                         where item.IsActive == true
                            && (string.IsNullOrWhiteSpace(search)
                            || item.Code.ToLower().Contains(search.ToLower())
@@ -76,14 +66,14 @@ namespace GMGInventory.Application.Repositories
                         select new JsonItemOptionsModel
                         {
                             Id = item.Id.ToString(),
-                            InventoryCount = inventory,
+                            InventoryCount = inventory == null ? 0 : inventory.Quantity,
                             Text = item.Code,
                             Name = item.Name,
                             OldCode = item.OldCode,
                             PartNumber = item.PartNumber + "",
-                            NetPriceD = price == null ? -999999 : price.NetSellingPrice,
+                            NetPriceD = price == null || price.LatestPrice == null ? -999999 : price.LatestPrice.NetSellingPrice,
                             QuantityD = 0,
-                            RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
+                            RetailPriceD = price == null || price.LatestPrice == null ? -999999 : price.LatestPrice.RetailSellingPrice,
                             UnitId = item.Unit == null ? -1 : item.Unit.Id,
                             Unit = item.Unit == null ? "" : item.Unit.Code,
                             BrandId = item.BrandId
@@ -415,7 +405,7 @@ namespace GMGInventory.Application.Repositories
             // Code, Name, PartNumber, InterchangeNumber, Warehouse, ModelNumber, Category, ItemType, Brand, Size, Unit, Quantity
             if (filter.IsTable != false)
             {
-                var itemsVM = from item in context.Items
+                var itemsVM = from item in context.Items.AsNoTracking()
                               join inventory in context.ItemInventories on item.Id equals inventory.ItemId into gin
                               from inventory in gin.DefaultIfEmpty()
                               let price = item.ItemPrices
@@ -458,13 +448,13 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
-                var itemsVM = from item in context.Items
-                              join inventory in context.ItemInventories on item.Id equals inventory.ItemId into gin
-                              from inventory in gin.DefaultIfEmpty()
+                var itemsVM = from item in context.Items.AsNoTracking()
+                              //join inventory in context.ItemInventories on item.Id equals inventory.ItemId into gin
+                              //from inventory in gin.DefaultIfEmpty()
                               where (filter.CategoryId == null || filter.CategoryId == item.Category.Id || (filter.CategoryId == 0 && (item.Category.Code + " " + item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
                                  && (filter.BrandId == null || filter.BrandId == item.Brand.Id || (filter.BrandId == 0 && (item.Brand.Code + " " + item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
                                  && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemType.Id || (filter.ItemTypeId == 0 && (item.ItemType.Code + " " + item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
-                                 && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
+                                 //&& (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
                                  && (filter.StatusId == null || (filter.StatusId == 1 && item.IsActive == true) || (filter.StatusId == 0 && item.IsActive == false))
                               select new ItemCommonVM
                               {
@@ -485,8 +475,8 @@ namespace GMGInventory.Application.Repositories
                                   Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
                                   Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
                                   UnitId = item.UnitId,
-                                  Warehouse = inventory == null ? null : inventory.Warehouse.Name,
-                                  WarehouseId = inventory == null ? null : inventory.WarehouseId,
+                                  //Warehouse = inventory == null ? null : inventory.Warehouse.Name,
+                                  //WarehouseId = inventory == null ? null : inventory.WarehouseId,
                                   IsActive = item.IsActive,
                                   Image = item.Image
                               };
@@ -1067,6 +1057,7 @@ namespace GMGInventory.Application.Repositories
                                   Id = inv.Id,
                                   Name = inv.Warehouse.Name,
                                   QuantityD = inv.Quantity,
+                                  WarehouseId = inv.Warehouse.Id
                               };
             return await inventoryVM.ToListAsync();
         }
@@ -1081,35 +1072,24 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToString().Contains(form.SearchValue)
-                                    || x.Name.ToString().Contains(form.SearchValue)
-                                    || x.QuantityD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Code,
+                    s.Name,
+                    s.QuantityD.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        default: break;
-                    }
-                }
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -1133,39 +1113,18 @@ namespace GMGInventory.Application.Repositories
                                   ConversionFactorD = poli.PurchaseOrder.CurrencyRate,
                                   Currency = poli.PurchaseOrder.Currency.Name,
                                   PurchaseNumber = poli.PurchaseOrder.DocumentNumber,
+                                  PurchaseId = poli.PurchaseOrder.Id,
                                   QuantityD = poli.Quantity,
                                   ReplenishBy = user.FirstName + " " + user.LastName,
                                   ReplenishDateD = poli.PurchaseOrder.DateCreated,
                                   Status = poli.PurchaseOrder.Status.Code,
                                   Supplier = poli.PurchaseOrder.Supplier.Code,
+                                  SupplierId = poli.PurchaseOrder.Supplier.Id,
                                   UnitCostD = poli.UnitCost * (100 - poli.PurchaseOrder.Discount1) / 100 * (100 - poli.PurchaseOrder.Discount2) / 100,
-                                  Warehouse = poli.PurchaseOrder.DeliveryAddress.Code
+                                  Warehouse = poli.PurchaseOrder.DeliveryAddress.Code,
+                                  WarehouseId = poli.PurchaseOrder.DeliveryAddress.Id
                               };
             return await purchasesVM.ToListAsync();
-
-            //var purchasesVM = from purchase in context.PurchaseOrders
-            //                                          .Include(s => s.Currency)
-            //                                          .Include(s => s.Destination)
-            //                                          .Include(s => s.Status)
-            //                                          .Include(s => s.Supplier)
-            //                  join purchaseItem in context.PurchaseOrderLineItems on purchase.Id equals purchaseItem.PurchaseOrderId
-            //                  join user in userManager.Users on purchase.UserCreated equals user.Id
-            //                  where purchaseItem.Item.Id == id
-            //                  select new ItemDetailPurchaseVM
-            //                  {
-            //                      ConversionFactorD = purchase.CurrencyRate,
-            //                      Currency = purchase.Currency.Code,
-            //                      PurchaseNumber = purchase.PONumber,
-            //                      QuantityD = purchaseItem.Quantity,
-            //                      ReplenishBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-            //                      ReplenishDateD = purchase.DateCreated,
-            //                      Status = purchase.Status.Code,
-            //                      Supplier = purchase.Supplier.Code,
-            //                      UnitCostD = 0, // tinanggal na sa db
-            //                      UnitPriceD = purchaseItem.UnitPrice,
-            //                      Warehouse = purchase.Destination.Code
-            //                  };
-            //return await purchasesVM.ToListAsync();
         }
 
         public async Task<ForDataTables<ItemDetailPurchaseVM>> GetItemPurchaseDTAsync(DataTablesRequestForm form, int id)
@@ -1178,62 +1137,37 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.ConversionFactorD.ToString().Contains(form.SearchValue)
-                                    || x.ConvertedTotalCostD.ToString().Contains(form.SearchValue)
-                                    || x.Currency.ToString().Contains(form.SearchValue)
-                                    || x.PurchaseNumber.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.ReplenishBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ReplenishDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Status.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Supplier.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TotalCostD.ToString().Contains(form.SearchValue.ToLower())
-                                    || x.UnitCostD.ToString().Contains(form.SearchValue)
-                                    || x.Warehouse.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.ConversionFactorD.ToString(),
+                    s.ConvertedTotalCostD.ToString(),
+                    s.PurchaseNumber,
+                    s.QuantityD.ToString(),
+                    s.ReplenishBy,
+                    s.ReplenishDate,
+                    s.Status,
+                    s.Supplier,
+                    s.TotalCostD.ToString(),
+                    s.UnitCostD.ToString(),
+                    s.Warehouse
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "ConversionFactor": data = data.OrderBy(s => s.ConversionFactorD); break;
-                        case "ConvertedTotalCost": data = data.OrderBy(s => s.ConvertedTotalCost); break;
-                        case "Currency": data = data.OrderBy(s => s.Currency); break;
-                        case "PurchaseNumber": data = data.OrderBy(s => s.PurchaseNumber); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        case "ReplenishBy": data = data.OrderBy(s => s.ReplenishBy); break;
-                        case "ReplenishDate": data = data.OrderBy(s => s.ReplenishDateD); break;
-                        case "Status": data = data.OrderBy(s => s.Status); break;
-                        case "Supplier": data = data.OrderBy(s => s.Supplier); break;
-                        case "TotalCost": data = data.OrderBy(s => s.TotalCostD); break;
-                        case "UnitCost": data = data.OrderBy(s => s.UnitCostD); break;
-                        case "Warehouse": data = data.OrderBy(s => s.Warehouse); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "ConversionFactor": data = data.OrderByDescending(s => s.ConversionFactorD); break;
-                        case "ConvertedTotalCost": data = data.OrderByDescending(s => s.ConvertedTotalCostD); break;
-                        case "Currency": data = data.OrderByDescending(s => s.Currency); break;
-                        case "PurchaseNumber": data = data.OrderByDescending(s => s.PurchaseNumber); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        case "ReplenishBy": data = data.OrderByDescending(s => s.ReplenishBy); break;
-                        case "ReplenishDate": data = data.OrderByDescending(s => s.ReplenishDateD); break;
-                        case "Status": data = data.OrderByDescending(s => s.Status); break;
-                        case "Supplier": data = data.OrderByDescending(s => s.Supplier); break;
-                        case "TotalCost": data = data.OrderByDescending(s => s.TotalCostD); break;
-                        case "UnitCost": data = data.OrderByDescending(s => s.UnitCostD); break;
-                        case "Warehouse": data = data.OrderByDescending(s => s.Warehouse); break;
-                        default: break;
-                    }
-                }
+                    "ConversionFactor" => isAsc ? data.OrderBy(s => s.ConversionFactorD) : data.OrderByDescending(s => s.ConversionFactorD),
+                    "ConvertedTotalCost" => isAsc ? data.OrderBy(s => s.ConvertedTotalCostD) : data.OrderByDescending(s => s.ConvertedTotalCostD),
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "ReplenishDate" => isAsc ? data.OrderBy(s => s.ReplenishDateD) : data.OrderByDescending(s => s.ReplenishDateD),
+                    "TotalCost" => isAsc ? data.OrderBy(s => s.TotalCostD) : data.OrderByDescending(s => s.TotalCostD),
+                    "UnitCost" => isAsc ? data.OrderBy(s => s.UnitCostD) : data.OrderByDescending(s => s.UnitCostD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -1277,8 +1211,6 @@ namespace GMGInventory.Application.Repositories
                               QuantityD = sitem.Quantity,
                               SalesNumber = sitem.SalesOrder.SalesOrderNumber,
                               UnitPriceD = sitem.SellingPrice,
-                              //UnservedQuantityD = sitem.Quantity - inventory > 0 ? sitem.Quantity - inventory : 0
-                              //UnservedQuantityD = Math.Max(0, sitem.Quantity - inventory)
                               UnservedQuantityD = sitem.Quantity - (quantityPacked - quantityReturned) > 0
                                                 ? sitem.Quantity - (quantityPacked - quantityReturned)
                                                 : 0
@@ -1296,56 +1228,37 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Agent.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Customer.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Discount1D.ToString().Contains(form.SearchValue)
-                                    || x.Discount2D.ToString().Contains(form.SearchValue)
-                                    || x.OrderBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.OrderDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.PackedQuantityD.ToString().Contains(form.SearchValue)
-                                    || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.UnitPriceD.ToString().Contains(form.SearchValue)
-                                    || x.UnservedQuantityD.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Agent,
+                    s.Customer,
+                    s.Discount1D.ToString(),
+                    s.Discount2D.ToString(),
+                    s.OrderBy,
+                    s.OrderDate,
+                    s.PackedQuantityD.ToString(),
+                    s.QuantityD.ToString(),
+                    s.UnitPriceD.ToString(),
+                    s.UnservedQuantityD.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderBy(s => s.Agent); break;
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "Discount1": data = data.OrderBy(s => s.Discount1D); break;
-                        case "Discount2": data = data.OrderBy(s => s.Discount2D); break;
-                        case "OrderBy": data = data.OrderBy(s => s.OrderBy); break;
-                        case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
-                        case "PackedQuantity": data = data.OrderBy(s => s.PackedQuantityD); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        case "UnitPrice": data = data.OrderBy(s => s.UnitPriceD); break;
-                        case "UnservedQuantity": data = data.OrderBy(s => s.UnservedQuantityD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Agent": data = data.OrderByDescending(s => s.Agent); break;
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "Discount1": data = data.OrderByDescending(s => s.Discount1D); break;
-                        case "Discount2": data = data.OrderByDescending(s => s.Discount2D); break;
-                        case "OrderBy": data = data.OrderByDescending(s => s.OrderBy); break;
-                        case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
-                        case "PackedQuantity": data = data.OrderByDescending(s => s.PackedQuantityD); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        case "UnitPrice": data = data.OrderByDescending(s => s.UnitPriceD); break;
-                        case "UnservedQuantity": data = data.OrderByDescending(s => s.UnservedQuantityD); break;
-                        default: break;
-                    }
-                }
+                    "Discount1" => isAsc ? data.OrderBy(s => s.Discount1D) : data.OrderByDescending(s => s.Discount1D),
+                    "Discount2" => isAsc ? data.OrderBy(s => s.Discount2D) : data.OrderByDescending(s => s.Discount2D),
+                    "OrderDate" => isAsc ? data.OrderBy(s => s.OrderDateD) : data.OrderByDescending(s => s.OrderDateD),
+                    "PackedQuantity" => isAsc ? data.OrderBy(s => s.PackedQuantityD) : data.OrderByDescending(s => s.PackedQuantityD),
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "UnitPrice" => isAsc ? data.OrderBy(s => s.UnitPriceD) : data.OrderByDescending(s => s.UnitPriceD),
+                    "UnservedQuantity" => isAsc ? data.OrderBy(s => s.UnservedQuantityD) : data.OrderByDescending(s => s.UnservedQuantityD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -1371,7 +1284,8 @@ namespace GMGInventory.Application.Repositories
                                 QuantityFromD = count.QuantityFrom,
                                 QuantityToD = count.QuantityTo,
                                 Remarks = count.Remarks + "",
-                                Warehouse = count.Warehouse.Code
+                                Warehouse = count.Warehouse.Code,
+                                WarehouseId = count.Warehouse.Id
                             };
             return await counstsVM.ToListAsync();
         }
@@ -1386,47 +1300,31 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.AdjustmentBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.AdjustmentDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityAdjustedD.ToString().Contains(form.SearchValue)
-                                    || x.QuantityFromD.ToString().Contains(form.SearchValue)
-                                    || x.QuantityToD.ToString().Contains(form.SearchValue)
-                                    || x.Remarks.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Warehouse.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.AdjustmentBy,
+                    s.AdjustmentDate,
+                    s.QuantityAdjustedD.ToString(),
+                    s.QuantityFromD.ToString(),
+                    s.QuantityToD.ToString(),
+                    s.Remarks,
+                    s.Warehouse
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "AdjustmentBy": data = data.OrderBy(s => s.AdjustmentBy); break;
-                        case "AdjustmentDate": data = data.OrderBy(s => s.AdjustmentDateD); break;
-                        case "QuantityAdjusted": data = data.OrderBy(s => s.QuantityAdjustedD); break;
-                        case "QuantityFrom": data = data.OrderBy(s => s.QuantityFromD); break;
-                        case "QuantityTo": data = data.OrderBy(s => s.QuantityToD); break;
-                        case "Remarks": data = data.OrderBy(s => s.Remarks); break;
-                        case "Warehouse": data = data.OrderBy(s => s.Warehouse); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "AdjustmentBy": data = data.OrderByDescending(s => s.AdjustmentBy); break;
-                        case "AdjustmentDate": data = data.OrderByDescending(s => s.AdjustmentDateD); break;
-                        case "QuantityAdjusted": data = data.OrderByDescending(s => s.QuantityAdjustedD); break;
-                        case "QuantityFrom": data = data.OrderByDescending(s => s.QuantityFromD); break;
-                        case "QuantityTo": data = data.OrderByDescending(s => s.QuantityToD); break;
-                        case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
-                        case "Warehouse": data = data.OrderByDescending(s => s.Warehouse); break;
-                        default: break;
-                    }
-                }
+                    "AdjustmentDate" => isAsc ? data.OrderBy(s => s.AdjustmentDateD) : data.OrderByDescending(s => s.AdjustmentDateD),
+                    "QuantityAdjusted" => isAsc ? data.OrderBy(s => s.QuantityAdjustedD) : data.OrderByDescending(s => s.QuantityAdjustedD),
+                    "QuantityFrom" => isAsc ? data.OrderBy(s => s.QuantityFromD) : data.OrderByDescending(s => s.QuantityFromD),
+                    "QuantityTo" => isAsc ? data.OrderBy(s => s.QuantityToD) : data.OrderByDescending(s => s.QuantityToD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -1464,129 +1362,31 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.NetPriceD.ToString().Contains(form.SearchValue)
-                                    || x.RetailPriceD.ToString().Contains(form.SearchValue)
-                                    || x.UpdateBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UpdateDate.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.NetPriceD.ToString(),
+                    s.RetailPriceD.ToString(),
+                    s.UpdateBy,
+                    s.UpdateDate
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "NetPrice": data = data.OrderBy(s => s.NetPriceD); break;
-                        case "RetailPrice": data = data.OrderBy(s => s.RetailPriceD); break;
-                        case "UpdateBy": data = data.OrderBy(s => s.UpdateBy); break;
-                        case "UpdateDate": data = data.OrderBy(s => s.UpdateDateD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "NetPrice": data = data.OrderByDescending(s => s.NetPriceD); break;
-                        case "RetailPrice": data = data.OrderByDescending(s => s.RetailPriceD); break;
-                        case "UpdateBy": data = data.OrderByDescending(s => s.UpdateBy); break;
-                        case "UpdateDate": data = data.OrderByDescending(s => s.UpdateDateD); break;
-                        default: break;
-                    }
-                }
+                    "NetPrice" => isAsc ? data.OrderBy(s => s.NetPriceD) : data.OrderByDescending(s => s.NetPriceD),
+                    "RetailPrice" => isAsc ? data.OrderBy(s => s.RetailPriceD) : data.OrderByDescending(s => s.RetailPriceD),
+                    "UpdateDate" => isAsc ? data.OrderBy(s => s.UpdateDateD) : data.OrderByDescending(s => s.UpdateDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<ItemDetailPriceVM>
-            {
-                Draw = form.Draw,
-                RecordsTotal = totalRecord,
-                RecordsFiltered = filterRecord,
-                Data = pageList
-            };
-        }
-
-        private async Task<IList<ItemPromoVM>> GetItemPromoAsync(int id)
-        {
-            var promoVM = from promo in context.ItemPromo
-                          join user in userManager.Users on promo.UserCreated equals user.Id
-                          where promo.ItemId == id
-                          select new ItemPromoVM
-                          {
-                              Id = promo.Id,
-                              PromoPriceD = promo.PromoPrice,
-                              ItemId = promo.ItemId,
-                              Name = promo.Name,
-                              EffectiveDateD = promo.EffectiveDate,
-                              ExpirationDateD = promo.ExpirationDate,
-                              UpdateBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
-                              UpdateDateD = promo.DateCreated,
-                              IsActive = promo.IsActive
-                          };
-            return await promoVM.ToListAsync();
-        }
-
-        public async Task<bool> CheckItemPromoDuration(int? selfId, int itemId, DateTime start, DateTime end)
-        {
-            return await context.ItemPromo.AnyAsync(s => s.Id != selfId &&
-                                                         s.ItemId == itemId &&
-                                                         s.IsActive && 
-                                                         s.EffectiveDate <= end &&
-                                                         s.ExpirationDate >= start);
-
-        }
-
-
-        public async Task<ForDataTables<ItemPromoVM>> GetItemPromoDTAsync(DataTablesRequestForm form, int id)
-        {
-            int totalRecord = 0;
-            int filterRecord = 0;
-            var data = (await GetItemPromoAsync(id)).AsQueryable();
-            //get total count of data in table
-            totalRecord = data.Count();
-            // search data when search value found
-            if (!string.IsNullOrWhiteSpace(form.SearchValue))
-            {
-                data = data.Where(x => x.PromoPriceD.ToString().Contains(form.SearchValue)
-                                    || x.Name.ToString().Contains(form.SearchValue)
-
-                                    || x.EffectiveDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ExpirationDate.ToLower().Contains(form.SearchValue.ToLower()));
-
-            }
-            // get total count of records after search
-            filterRecord = data.Count();
-            //sort data
-            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
-            {
-                if (form.SortColumnDirection == "asc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Price": data = data.OrderBy(s => s.PromoPriceD); break;
-                        case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "EffectiveDate": data = data.OrderBy(s => s.EffectiveDateD); break;
-                        case "ExpirationDate": data = data.OrderBy(s => s.ExpirationDateD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Price": data = data.OrderByDescending(s => s.PromoPriceD); break;
-                        case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "EffectiveDate": data = data.OrderByDescending(s => s.EffectiveDateD); break;
-                        case "ExpirationDate": data = data.OrderByDescending(s => s.ExpirationDateD); break;
-                        default: break;
-                    }
-                }
-            }
-            //pagination
-            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
-            return new ForDataTables<ItemPromoVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,
@@ -1623,47 +1423,29 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Destination.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.Remarks.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Source.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TransferBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TransferDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.TransferNumber.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Destination,
+                    s.QuantityD.ToString(),
+                    s.Remarks,
+                    s.Source,
+                    s.TransferBy,
+                    s.TransferDate,
+                    s.TransferNumber.ToString()
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Destination": data = data.OrderBy(s => s.Destination); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        case "Remarks": data = data.OrderBy(s => s.Remarks); break;
-                        case "Source": data = data.OrderBy(s => s.Source); break;
-                        case "TransferBy": data = data.OrderBy(s => s.TransferBy); break;
-                        case "TransferDate": data = data.OrderBy(s => s.TransferDateD); break;
-                        case "TransferNumber": data = data.OrderBy(s => s.TransferNumber); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Destination": data = data.OrderByDescending(s => s.Destination); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        case "Remarks": data = data.OrderByDescending(s => s.Remarks); break;
-                        case "Source": data = data.OrderByDescending(s => s.Source); break;
-                        case "TransferBy": data = data.OrderByDescending(s => s.TransferBy); break;
-                        case "TransferDate": data = data.OrderByDescending(s => s.TransferDateD); break;
-                        case "TransferNumber": data = data.OrderByDescending(s => s.TransferNumber); break;
-                        default: break;
-                    }
-                }
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "TransferDate" => isAsc ? data.OrderBy(s => s.TransferDateD) : data.OrderByDescending(s => s.TransferDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -1683,12 +1465,13 @@ namespace GMGInventory.Application.Repositories
                             where ritem.Item.Id == id
                             select new ItemDetailReturnVM
                             {
-                                Customer = ritem.SalesReturn.SalesOrder.Customer.Code,
+                                Customer = ritem.SalesReturn.SalesOrder == null ? null : ritem.SalesReturn.SalesOrder.Customer.Code,
                                 ItemCode = ritem.Item.Code,
                                 ItemName = ritem.Item.Name,
                                 QuantityD = ritem.Quantity,
                                 ReturnBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                                 ReturnDateD = ritem.SalesReturn.DateCreated,
+                                ReturnId = ritem.SalesReturn.Id,
                                 ReturnNumber = ritem.SalesReturn.SalesReturnNumber
                             };
 
@@ -1705,51 +1488,106 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Customer.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemCode.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ItemName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.QuantityD.ToString().Contains(form.SearchValue)
-                                    || x.ReturnBy.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ReturnDate.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.ReturnNumber.ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Customer,
+                    s.ItemCode,
+                    s.ItemName,
+                    s.QuantityD.ToString(),
+                    s.ReturnBy,
+                    s.ReturnDate,
+                    s.ReturnNumber
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Customer": data = data.OrderBy(s => s.Customer); break;
-                        case "ItemCode": data = data.OrderBy(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderBy(s => s.ItemName); break;
-                        case "Quantity": data = data.OrderBy(s => s.QuantityD); break;
-                        case "ReturnBy": data = data.OrderBy(s => s.ReturnBy); break;
-                        case "ReturnDate": data = data.OrderBy(s => s.ReturnDateD); break;
-                        case "ReturnNumber": data = data.OrderBy(s => s.ReturnNumber); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Customer": data = data.OrderByDescending(s => s.Customer); break;
-                        case "ItemCode": data = data.OrderByDescending(s => s.ItemCode); break;
-                        case "ItemName": data = data.OrderByDescending(s => s.ItemName); break;
-                        case "Quantity": data = data.OrderByDescending(s => s.QuantityD); break;
-                        case "ReturnBy": data = data.OrderByDescending(s => s.ReturnBy); break;
-                        case "ReturnDate": data = data.OrderByDescending(s => s.ReturnDateD); break;
-                        case "ReturnNumber": data = data.OrderBy(s => s.ReturnNumber); break;
-                        default: break;
-                    }
-                }
+                    "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "ReturnDate" => isAsc ? data.OrderBy(s => s.ReturnDateD) : data.OrderByDescending(s => s.ReturnDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
             return new ForDataTables<ItemDetailReturnVM>
+            {
+                Draw = form.Draw,
+                RecordsTotal = totalRecord,
+                RecordsFiltered = filterRecord,
+                Data = pageList
+            };
+        }
+
+        private async Task<IList<ItemPromoVM>> GetItemPromoAsync(int id)
+        {
+            var promoVM = from promo in context.ItemPromo
+                          join user in userManager.Users on promo.UserCreated equals user.Id
+                          where promo.ItemId == id
+                          select new ItemPromoVM
+                          {
+                              Id = promo.Id,
+                              PromoPriceD = promo.PromoPrice,
+                              ItemId = promo.ItemId,
+                              Name = promo.Name,
+                              EffectiveDateD = promo.EffectiveDate,
+                              ExpirationDateD = promo.ExpirationDate,
+                              UpdateBy = SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
+                              UpdateDateD = promo.DateCreated,
+                              IsActive = promo.IsActive
+                          };
+            return await promoVM.ToListAsync();
+        }
+
+        public async Task<bool> CheckItemPromoDuration(int? selfId, int itemId, DateTime start, DateTime end)
+        {
+            return await context.ItemPromo.AnyAsync(s => s.Id != selfId &&
+                                                         s.ItemId == itemId &&
+                                                         s.IsActive &&
+                                                         s.EffectiveDate <= end &&
+                                                         s.ExpirationDate >= start);
+
+        }
+
+        public async Task<ForDataTables<ItemPromoVM>> GetItemPromoDTAsync(DataTablesRequestForm form, int id)
+        {
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var data = (await GetItemPromoAsync(id)).AsQueryable();
+            //get total count of data in table
+            totalRecord = data.Count();
+            // search data when search value found
+            if (!string.IsNullOrWhiteSpace(form.SearchValue))
+            {
+                data = data.Where(s => new[]
+                {
+                    s.PromoPriceD.ToString(),
+                    s.Name,
+                    s.EffectiveDate,
+                    s.ExpirationDate
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
+            }
+            // get total count of records after search
+            filterRecord = data.Count();
+            //sort data
+            if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
+            {
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
+                {
+                    "Price" => isAsc ? data.OrderBy(s => s.PromoPriceD) : data.OrderByDescending(s => s.PromoPriceD),
+                    "EffectiveDate" => isAsc ? data.OrderBy(s => s.EffectiveDateD) : data.OrderByDescending(s => s.EffectiveDateD),
+                    "ExpirationDate" => isAsc ? data.OrderBy(s => s.ExpirationDateD) : data.OrderByDescending(s => s.ExpirationDateD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
+            }
+            //pagination
+            var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
+            return new ForDataTables<ItemPromoVM>
             {
                 Draw = form.Draw,
                 RecordsTotal = totalRecord,

@@ -146,7 +146,6 @@
 
         // Load Select2 for Agent
         $("#filter-agent").select2({
-            minimumInputLength: 1,
             allowClear: true,
             placeholder: '<empty>',
             templateResult: function (repo) {
@@ -171,7 +170,6 @@
 
         // Load Select2 for Customer
         $("#filter-customer").select2({
-            minimumInputLength: 1,
             allowClear: true,
             placeholder: '<empty>',
             templateResult: function (repo) {
@@ -222,7 +220,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,

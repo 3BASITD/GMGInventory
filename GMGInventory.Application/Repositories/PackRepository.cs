@@ -217,25 +217,34 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIPack>> GetListAPI()
+        public async Task<IList<APIPack>> GetListAPI(DateTime? dt)
         {
             DateTime dtNow = DateTime.Now;
             DateTime dtYesterday = dtNow.AddDays(-1);
             var packs = from pack in context.Packs
-                        where (pack.BarcotechRequestDate == null
-                        || pack.BarcotechRequestDate > dtYesterday)
-                        && pack.Status.Code.Trim().ToLower() == "posted"
+                        join userc in userManager.Users on pack.UserCreated equals userc.Id
+                        join userm in userManager.Users on pack.UserModified equals userm.Id into um
+                        from userm in um.DefaultIfEmpty()
+                        where ((dt != null && pack.PackDate.Date == dt.Value.Date)
+                        || (dt == null && (pack.BarcotechRequestDate == null
+                        || pack.BarcotechRequestDate > dtYesterday)))
+                     && pack.Status.Code.Trim().ToLower() == "posted"
                         select new APIPack
                         {
                             Id = pack.Id,
                             SalesOrderNumber = pack.SalesOrder.SalesOrderNumber,
                             PackDate = pack.DateCreated,
+                            UserCreated = userc.FirstName + " " + userc.LastName,
+                            DateCreated = pack.DateCreated,
+                            LastUserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                            LastDateModified = pack.DateModified,
                             LineItems = from item in pack.PackLineItems
                                         select new APIPackLineItem
                                         {
                                             Id = item.Id,
                                             PackType = item.PackType.Code,
                                             BoxNumber = item.BoxNumber,
+                                            ItemId = item.Item.Id,
                                             ItemCode = item.Item.Code,
                                             Quantity = item.Quantity
                                         }

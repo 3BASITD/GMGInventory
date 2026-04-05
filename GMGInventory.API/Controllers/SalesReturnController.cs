@@ -9,9 +9,9 @@ namespace GMGInventory.API.Controllers
     public class SalesReturnController(ISalesReturnRepository salesReturnRepository) : ControllerBase
     {
         [HttpGet("List")]
-        public async Task<IList<APISalesReturn>> GetList()
+        public async Task<IList<APISalesReturn>> GetList(DateTime? date)
         {
-            return await salesReturnRepository.GetListAPI();
+            return await salesReturnRepository.GetListAPI(date);
         }
     }
 }

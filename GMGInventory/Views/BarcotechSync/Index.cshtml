@@ -5,6 +5,11 @@
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
     </div>
     <div class="card-body">
         <table class="table table-head-fixed table-striped table-hover table-logs">
@@ -31,14 +36,183 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label mb-0">Status</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        <input type="checkbox" id="filter-include-success" />
+                        <label for="filter-include-success" class="fw-normal ml-1">Success</label>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <input type="checkbox" id="filter-include-fail" />
+                        <label for="filter-include-fail" class="fw-normal ml-1">Fail</label>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <input type="checkbox" id="filter-include-exception" />
+                        <label for="filter-include-exception" class="fw-normal ml-1">Exception</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-module" class="form-label mb-0">Module</label>
+                            <select id="filter-module" class="form-select form-select-sm">
+                                <option value="">ALL</option>
+                                <option value="Receiving">Receiving</option>
+                                <option value="Outbound">Outbound</option>
+                                <option value="Return">Return</option>
+                                <option value="Transfer">Transfer</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            dtLogs.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            dtLogs.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[4, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            IncludeSuccess: true,
+            IncludeFail: true,
+            IncludeException: false,
+            Module: ""
+        };
+
+        function checkDTChanged() {
+            if(!dtLogs) return false;
+            
+            return JSON.stringify(dtLogs.order()) != JSON.stringify(defaultDTState.order) ||
+                   dtLogs.page.info().start != defaultDTState.page ||
+                   dtLogs.page.len() != defaultDTState.length ||
+                   (dtLogs.search() || "") != defaultDTState.search.search ||
+                   $("#filter-include-success").prop("checked") != defaultDTState.IncludeSuccess ||
+                   $("#filter-include-fail").prop("checked") != defaultDTState.IncludeFail ||
+                   $("#filter-include-exception").prop("checked") != defaultDTState.IncludeException ||
+                   $("#filter-module").val() != defaultDTState.Module;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-include-success').prop("checked", defaultDTState.IncludeSuccess);
+            $('#filter-include-fail').prop("checked", defaultDTState.IncludeFail);
+            $('#filter-include-exception').prop("checked", defaultDTState.IncludeException);
+            $('#filter-module').val(defaultDTState.Module);
+            
+            localStorage.removeItem(dt_storage);
+
+            if (dtLogs) {
+                dtLogs.state.clear();
+                dtLogs.order(defaultDTState.order);
+                dtLogs.page(defaultDTState.page);
+                dtLogs.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
         // Load List on DataTable
-        var dtLogs = $('.table-logs').on('preXhr.dt', function(e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var dtLogs = $('.table-logs').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                //if (checkDTChanged()) {
+                    var now = new Date().getTime();
+                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
+                // } else {
+                //     localStorage.removeItem(dt_storage);
+                // }
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.IncludeSuccess = $('#filter-include-success').prop("checked");
+                data.IncludeFail = $('#filter-include-fail').prop("checked");
+                data.IncludeException = $('#filter-include-exception').prop("checked");
+                data.Module = $('#filter-module').val();
+            },
+            stateLoadParams: function (settings, data) {
+                $('#filter-include-success').prop("checked", data.IncludeSuccess);
+                $('#filter-include-fail').prop("checked", data.IncludeFail);
+                $('#filter-include-exception').prop("checked", data.IncludeException);
+                $('#filter-module').val(data.Module);
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
+                data: function (data) {
+                    data.IncludeSuccess = $('#filter-include-success').prop("checked");
+                    data.IncludeFail = $('#filter-include-fail').prop("checked");
+                    data.IncludeException = $('#filter-include-exception').prop("checked");
+                    data.Module = $('#filter-module').val();
+                },
                 type: "POST",
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -46,7 +220,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -88,7 +262,7 @@
                 },
                 { data: "datePerformed", name: "DatePerformed" }
             ],
-            order: [[4, "desc"]],
+            order: defaultDTState.order,
             createdRow: function (row, data, dataIndex) {
                 if (data.syncStatus.toLowerCase() == 'exception') {
                     $(row).addClass('table-warning');
@@ -101,7 +275,7 @@
         });
 
         dtLogs.on("draw", function() {
-            //hideLoader();
+            checkDefaultFilter();
         });
     </script>
 }

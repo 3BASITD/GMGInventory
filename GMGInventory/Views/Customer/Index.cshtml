@@ -585,7 +585,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -679,7 +679,7 @@
         // Validation for Create Modal
         var validateCreate = $("#createForm").validate({
             rules: {
-                Code: { required: true, maxlength: 10 },
+                Code: { required: true, maxlength: 50 },
                 Name: { required: true, maxlength: 100 },
                 CommissionRate: { required: function () { return $("#create-usearearate").prop("checked") == false; }, range: [0, 100.00] },
                 ContactPerson: { maxlength: 50 },
@@ -692,7 +692,7 @@
                 Remarks: { maxlength: 500 }
             },
             messages: {
-                Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                 Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
                 CommissionRate: { required: "", range: "Percent is between 0 and 100." },
                 ContactPerson: { maxlength: "Contact Person must not exceed 50 characters." },
@@ -824,7 +824,7 @@
             // Validation for Edit Modal
             var validateEdit = $("#editForm").validate({
                 rules: {
-                    Code: { required: true, maxlength: 10 },
+                    Code: { required: true, maxlength: 50 },
                     Name: { required: true, maxlength: 100 },
                     CommissionRate: { required: function () { return $("#edit-usearearate").prop("checked") == false; }, range: [0, 100.00] },
                     ContactPerson: { maxlength: 50 },
@@ -834,7 +834,7 @@
                     CreditLimit: { required: true, range: [0, 1999999.99] }
                 },
                 messages: {
-                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 10 characters." },
+                    Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
                     Name: { required: "Please enter name.", maxlength: "Name must not exceed 100 characters." },
                     CommissionRate: { required: "", range: "Percent is between 0 and 100" },
                     ContactPerson: { maxlength: "Contact Person must not exceed 50 characters." },

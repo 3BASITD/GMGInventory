@@ -7,6 +7,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -81,8 +82,8 @@ namespace GMGInventory.Application.Repositories
                              DateModifiedD = brand.DateModified,
                              IsActive = brand.IsActive,
                              Name = brand.Name,
-                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                             UserCreated = userc.FirstName + " " + userc.LastName,
+                             UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName
                          };
             return await brands.ToListAsync();
         }
@@ -97,44 +98,28 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Name.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || (x.UserModified + "").ToLower().Contains(form.SearchValue.ToLower())
-                                    || (x.DateModified + "").ToLower().Contains(form.SearchValue.ToLower()));
+                data = data.Where(s => new[]
+                {
+                    s.Code,
+                    s.Name,
+                    s.UserCreated,
+                    s.DateCreated,
+                    s.UserModified,
+                    s.DateModified
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "Name": data = data.OrderBy(s => s.Name); break;
-                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
-                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "Name": data = data.OrderByDescending(s => s.Name); break;
-                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderByDescending(s => s.DateModified); break;
-                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderByDescending(s => s.DateModified); break;
-                        default: break;
-                    }
-                }
+                    "DateCreated" => isAsc ? data.OrderBy(s => s.DateCreatedD) : data.OrderByDescending(s => s.DateCreatedD),
+                    "DateModified" => isAsc ? data.OrderBy(s => s.DateModifiedD) : data.OrderByDescending(s => s.DateModifiedD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -352,7 +337,7 @@ namespace GMGInventory.Application.Repositories
                 if (string.IsNullOrWhiteSpace(brandVM.Name)) return "Brand Name is required";
 
                 var _code = brandVM.Code.ToLower().Replace("\r", "").Replace("\n", "").Trim();
-                var code = _code.Length > 10 ? _code[..10] : _code;
+                var code = _code.Length > 20 ? _code[..20] : _code;
                 var _name = brandVM.Name.ToLower().Replace("\r", "").Replace("\n", "").Trim();
                 var name = _name.Length > 100 ? _name[..100] : _name;
 

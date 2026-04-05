@@ -17,7 +17,7 @@ namespace GMGInventory.Data
             this.DestinationWarehouse = new HashSet<TransferItem>();
         }
 
-        [Column(TypeName = "nvarchar(10)")]
+        [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]

@@ -170,7 +170,7 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var location = new LocationCode
             {
-                Code = LocationCodeVM.LocationCode.Length > 10 ? LocationCodeVM.LocationCode[..10] : LocationCodeVM.LocationCode,
+                Code = LocationCodeVM.LocationCode.Length > 20 ? LocationCodeVM.LocationCode[..20] : LocationCodeVM.LocationCode,
                 Name = LocationCodeVM.LocationName.Length > 100 ? LocationCodeVM.LocationName[..100] : LocationCodeVM.LocationName,
                 IsActive = true
             };
@@ -190,7 +190,7 @@ namespace GMGInventory.Application.Repositories
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             location.Id = LocationCodeVM.Id;
-            location.Code = LocationCodeVM.LocationCode.Length > 10 ? LocationCodeVM.Code[..10] : LocationCodeVM.LocationCode;
+            location.Code = LocationCodeVM.LocationCode.Length > 20 ? LocationCodeVM.Code[..20] : LocationCodeVM.LocationCode;
             location.Name = LocationCodeVM.LocationName.Length > 100 ? LocationCodeVM.Name[..100] : LocationCodeVM.LocationName;
             location.IsActive = true;
 
@@ -202,7 +202,7 @@ namespace GMGInventory.Application.Repositories
         {
             var _name = (Name + "").ToLower().Replace("\n", "").Replace("\r", "").Trim();
             var name = _name.Length > 100 ? _name[..100] : _name;
-            var code = _name.Length > 10 ? _name[..10] : _name;
+            var code = _name.Length > 15 ? _name[..15] : _name;
             var locationCode = await context.LocationCodes
                                             .Where(s => s.Name.ToLower().Replace("\n", "").Replace("\r", "").Trim() == name
                                                      || s.Code.ToLower().Replace("\n", "").Replace("\r", "").Trim() == code)

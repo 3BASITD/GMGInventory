@@ -217,81 +217,91 @@
     <script src="~/lib/jquery-mask/jquery.mask.js"></script>
     <script src="~/lib/jquery-number-2.1.6/jquery.number.min.js"></script>
     <script src="~/lib/swiper-11.1.14/package/swiper-bundle.min.js"></script>
-    <script src="~/lib//summernote/summernote-bs5.min.js"></script>
+    <script src="~/lib/summernote/summernote-bs5.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        $(document).ready(function () {
-            var layout_is_dark_mode = @Json.Serialize(activeUser.IsDarkMode);
-            var layout_success_message = @Json.Serialize(TempData["SuccessMessage"]);
-            var layout_warning_message = @Json.Serialize(TempData["WarningMessage"]);
-            var layout_error_message = @Json.Serialize(TempData["ErrorMessage"]);
+            $(document).ready(function () {
+                var layout_is_dark_mode = @Json.Serialize(activeUser.IsDarkMode);
+                var layout_success_message = @Json.Serialize(TempData["SuccessMessage"]);
+                var layout_warning_message = @Json.Serialize(TempData["WarningMessage"]);
+                var layout_error_message = @Json.Serialize(TempData["ErrorMessage"]);
 
-            if (layout_is_dark_mode)
-            {
-                $(".table").each(function () {
-                    $(this).addClass("table-dark");
-                });
-            }
+                if (layout_is_dark_mode)
+                {
+                    $(".table").each(function () {
+                        $(this).addClass("table-dark");
+                    });
+                }
 
-            const progressCircle = document.querySelector(".autoplay-progress svg");
-            const progressContent = document.querySelector(".autoplay-progress span");
-            var swiper = new Swiper(".swiper-container", {
-                spaceBetween: 30,
-                centeredSlides: true,
-                autoplay: {
-                    delay: 2500,
-                    disableOnInteraction: false
-                },
-                pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true
-                },
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev"
-                },
-                on: {
-                    autoplayTimeLeft(s, time, progress) {
-                        progressCircle.style.setProperty("--progress", 1 - progress);
-                        progressContent.textContent = `${Math.ceil(time / 1000)}s`;
+                const progressCircle = document.querySelector(".autoplay-progress svg");
+                const progressContent = document.querySelector(".autoplay-progress span");
+                var swiper = new Swiper(".swiper-container", {
+                    spaceBetween: 30,
+                    centeredSlides: true,
+                    autoplay: {
+                        delay: 2500,
+                        disableOnInteraction: false
+                    },
+                    pagination: {
+                        el: ".swiper-pagination",
+                        clickable: true
+                    },
+                    navigation: {
+                        nextEl: ".swiper-button-next",
+                        prevEl: ".swiper-button-prev"
+                    },
+                    on: {
+                        autoplayTimeLeft(s, time, progress) {
+                            progressCircle.style.setProperty("--progress", 1 - progress);
+                            progressContent.textContent = `${Math.ceil(time / 1000)}s`;
+                        }
                     }
+                });
+
+                if (layout_success_message != null || layout_warning_message != null || layout_error_message != null)
+                {
+                    if (layout_success_message != null)
+                            toastr.success(layout_success_message, "Success");
+                    else if (layout_warning_message != null)
+                            toastr.warning(layout_warning_message, "Warning");
+                    else if (layout_error_message != null)
+                            toastr.error(layout_error_message, "Error");
+                }
+
+                // TempData not working fine on Json, use this instead
+                const local_success_message = localStorage.getItem("successMessage");
+                const local_warning_message = localStorage.getItem("warningMessage");
+                const local_error_message = localStorage.getItem("errorMessage");
+                if (local_success_message != null || local_warning_message != null || local_error_message != null)
+                {
+                    if (local_success_message != null){
+                        toastr.success(local_success_message, "Success");
+                        localStorage.removeItem("successMessage");
+                    } else if (local_warning_message != null){
+                        toastr.success(local_warning_message, "Warning");
+                        localStorage.removeItem("warningMessage");
+                    } else if (local_error_message != null){
+                        toastr.success(local_error_message, "Error");
+                        localStorage.removeItem("errorMessage");
+                    }
+
+                    /* sample use
+                        localStorage.setItem("successMessage", data.message);
+                        window.location.reload();
+                    */
                 }
             });
 
-            if (layout_success_message != null || layout_warning_message != null || layout_error_message != null)
-            {
-                if (layout_success_message != null)
-                        toastr.success(layout_success_message, "Success");
-                else if (layout_warning_message != null)
-                        toastr.warning(layout_warning_message, "Warning");
-                else if (layout_error_message != null)
-                        toastr.error(layout_error_message, "Error");
-            }
-
-            // TempData not working fine on Json, use this instead
-            const local_success_message = localStorage.getItem("successMessage");
-            const local_warning_message = localStorage.getItem("warningMessage");
-            const local_error_message = localStorage.getItem("errorMessage");
-            if (local_success_message != null || local_warning_message != null || local_error_message != null)
-            {
-                if (local_success_message != null){
-                    toastr.success(local_success_message, "Success");
-                    localStorage.removeItem("successMessage");
-                } else if (local_warning_message != null){
-                    toastr.success(local_warning_message, "Warning");
-                    localStorage.removeItem("warningMessage");
-                } else if (local_error_message != null){
-                    toastr.success(local_error_message, "Error");
-                    localStorage.removeItem("errorMessage");
-                }
-
-                /* sample use
-                    localStorage.setItem("successMessage", data.message);
-                    window.location.reload();
-                */
-            }
-        });
+            $("form#logoutForm").on("submit", function (event) {
+                //localStorage.clear();
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('BAS_DT')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                //event.preventDefault();
+            });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

@@ -17,7 +17,7 @@
             }
             else
             {
-                <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="bottom-left" role="tooltip">
+                <button type="button" class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add access is required." data-microtip-position="left" role="tooltip">
                     <span class="fas fa-plus"></span> New Role
                 </button>
             }
@@ -85,7 +85,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -107,8 +107,16 @@
                 },
                 { data: "userCreated", name: "UserCreated" },
                 { data: "dateCreated", name: "DateCreated" },
-                { data: "userModified", name: "UserModified" },
-                { data: "dateModified", name: "DateModified" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.userModified || "<span class='text-muted'>N/A</span>";
+                    }, name: "UserModified"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateModified || "<span class='text-muted'>N/A</span>";
+                    }, name: "DateModified"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {

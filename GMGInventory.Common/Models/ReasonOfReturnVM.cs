@@ -5,7 +5,7 @@ namespace GMGInventory.Common.Models
     public class ReasonOfReturnVM : GenericAuditVM
     {
         [Required]
-        [StringLength(10)]
+        [StringLength(50)]
         [Display(Name = "Code")]
         public string ReasonOfReturnCode { get; set; }
 

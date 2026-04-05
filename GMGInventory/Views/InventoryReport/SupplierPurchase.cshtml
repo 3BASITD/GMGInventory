@@ -170,9 +170,8 @@
 
         // Load Select2 for Item
         $("#filter-item").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -222,9 +221,8 @@
 
         // Load Select2 for Supplier
         $("#filter-supplier").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -261,7 +259,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,

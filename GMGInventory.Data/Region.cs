@@ -10,7 +10,7 @@ namespace GMGInventory.Data
             this.Suppliers = new HashSet<Supplier>();
         }
 
-        [Column(TypeName = "nvarchar(10)")]
+        [Column(TypeName = "nvarchar(50)")]
         public string Code { get; set; }
 
         [Column(TypeName = "nvarchar(100)")]

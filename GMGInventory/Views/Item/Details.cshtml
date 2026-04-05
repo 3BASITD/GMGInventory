@@ -4,6 +4,7 @@
     ViewData["Title"] = "Item Details";
     ViewData["TitleDetails"] = $"[{Model.Code}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var barcotechUserAccess = (ViewsAccessVM)ViewData["BarcotechUserAccess"]!;
 }
 
 @section Breadcrumb {
@@ -258,6 +259,12 @@
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="nav-warehouse" role="tabpanel"
                                  aria-labelledby="nav-warehouse-tab">
+                                @if (barcotechUserAccess.CanUploadDownload)
+                                {
+                                <a class="btn btn-secondary btn-sm float-right ml-2" onclick="FetchStockBarcotech()" data-microtip-title="Fetch Stock Record(s) from Barcotech" data-microtip-position="bottom-left" role="tooltip">
+                                    <span class="fas fa-download"></span> Fetch Stock
+                                    </a>            
+                                }
                                 <table class="table table-head-fixed table-striped table-hover table-warehouse">
                                     <thead>
                                         <tr>
@@ -373,8 +380,6 @@
                                     <thead>
                                         <tr>
                                             <th>SR Number</th>
-                                            <th>Item Code</th>
-                                            <th>Item Name</th>
                                             <th>Quantity</th>
                                             <th>Customer</th>
                                             <th>Return Date</th>
@@ -754,6 +759,38 @@
     </div>
 </div>
 
+<div class="modal fade" id="viewStockBTModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Fetched Stock(s) from Barcotech Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2"><em class="text-xs text-muted">The details below are shown only once and are not saved. After closing this page, you won’t be able to view them again. Here’s what happens to the fetched stock records.</em></div>
+                <table class="table table-head-fixed table-striped table-hover table-fetch-bt">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Warehouse</th>
+                            <th>Old Quantity</th>
+                            <th>New Quantity</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Promo Modal -->
 <div class="modal fade" id="promoModal" role="dialog" aria-labelledby="promoModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" role="document">
@@ -838,52 +875,18 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var barcotech_user_access = @Html.Raw(Json.Serialize(barcotechUserAccess));
+        var item_details = @Html.Raw(Json.Serialize(Model));
 
-        // Load Select2 Unit
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Unit")",
-            success: function (data, status, xhr) {
-                $("#add-unit").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    dropdownParent: $("#addModal")
-                });
-                $("#edit-unit").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "<empty>"
-                    },
-                    dropdownParent: $("#editModal")
-                });
-            }
-        });
+        if (user_access.canAdd) {
+            loadSelect2("#add-unit", "#addModal", "@Url.Action("GetOptions2", "Unit")");
+            loadSelect2("#add-equivalent-unit", "#addModal", "@Url.Action("GetOptions2", "Unit")");
+        }
 
-        // Load Select2 Equivalent Unit
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Unit")",
-            success: function (data, status, xhr) {
-                $("#add-equivalent-unit").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    dropdownParent: $("#addModal")
-                });
-                $("#edit-equivalent-unit").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "<empty>"
-                    },
-                    dropdownParent: $("#editModal")
-                });
-            }
-        });
+        if (user_access.canEdit) {
+            loadSelect2("#edit-unit", "#editModal", "@Url.Action("GetOptions2", "Unit")");
+            loadSelect2("#edit-equivalent-unit", "#editModal", "@Url.Action("GetOptions2", "Unit")");
+        }
 
         // Load item for select2
         $("#add-item").select2({
@@ -911,11 +914,9 @@
             dropdownParent: $("#addModal")
         });
 
-
-
         $("#item-code").select2({
             minimumInputLength: 1,
-            placeholder: '@Model?.Code',
+            placeholder: item_details.code,
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -940,9 +941,8 @@
             $("#edit-item-hidden").val($(this).select2("data")[0].id);
         });
 
-
         $("#item-code").on("select2:select", function () {
-            window.location = window.location.href.replace("@Model?.Id", $("#item-code").val());
+            window.location = window.location.href.replace(item_details.id + "", $("#item-code").val());
         });
 
         $("#add-option").on("change", function () {
@@ -959,8 +959,6 @@
             }
         });
 
-
-
         function clearItemForm() {
             $("#add-quantity").val("0");
             $("#add-equivalent-quantity").val("0");
@@ -975,7 +973,7 @@
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetItemConversionVM", "Item")",
-                data: { itemId: @Model?.Id },
+                data: { itemId: item_details.id },
                 success: function (data) {
                     if (data != null) {
                         document.getElementById("add-option").setAttribute("disabled", "disabled");
@@ -1046,7 +1044,7 @@
                 url: "@Url.Action("GetLocationListJson")",
                 type: "POST",
                 data: function (data) {
-                        data.Id = @Model?.Id;
+                        data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1054,7 +1052,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: false,
@@ -1095,7 +1093,7 @@
                     $.ajax({
                         type: "POST",
                         url: "@Url.Action("GetOptions2", "LocationCode")",
-                        data: { itemId: @Model?.Id },
+                        data: { itemId: item_details.id },
                         success: function (data, status, xhr) {
                             $("#create-location").select2({
                                 ajax: null, //already fetched outside
@@ -1131,7 +1129,7 @@
                     type: "POST",
                     url: "@Url.Action("CreateItemLocationJson")",
                     data: {
-                        ItemId: @Model?.Id,
+                        ItemId: item_details.id,
                         LocationCodeId: $("#create-location").val()
                     },
                     success: function (data, status, xhr) {
@@ -1179,7 +1177,7 @@
                 url: "@Url.Action("GetConversionListJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1187,7 +1185,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: false,
@@ -1341,7 +1339,7 @@
                         data: {
                             Id: $("#edit-id").val(),
                             SubItemId: $("#edit-item").val(),
-                            ItemId: @Model?.Id,
+                            ItemId: item_details.id,
                             Quantity: $("#edit-item-hidden").val() != "" ? $("#edit-item-quantity").val() : $("#edit-quantity").val(),
                             UnitId: $("#edit-unit").val(),
                             EquivalentQuantity: $("#edit-equivalent-quantity").val(),
@@ -1421,7 +1419,7 @@
                         type: "POST",
                         url: "@Url.Action("CreateItemConversionJson")",
                         data: {
-                            ItemId: @Model?.Id,
+                            ItemId: item_details.id,
                             Quantity: $("#add-item").val() == "" ? $("#add-quantity").val() : $("#add-item-quantity").val(),
                             UnitId: $("#add-unit").val(),
                             EquivalentQuantity: $("#add-item").val() == "" ? $("#add-equivalent-quantity").val() : null,
@@ -1469,7 +1467,7 @@
                 url: "@Url.Action("GetWarehousesJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1477,7 +1475,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1487,7 +1485,12 @@
                 return: true,
             },
             columns: [
-                { data: "code", name: "Code" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.code + "</a>";
+                    },
+                    name: "Code" 
+                },
                 { data: "name", name: "Name" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 {
@@ -1577,7 +1580,7 @@
                     url: "@Url.Action("GetPurchasesJson")",
                     type: "POST",
                     data: function (data) {
-                        data.Id = @Model?.Id;
+                        data.Id = item_details.id;
                     },
                     beforeSend: function (jqXHR, settings) {
                         settings.isDataTableRequest = true;
@@ -1585,7 +1588,7 @@
                 },
                 processing: true,
                 language: {
-                    processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                    processing: "<div class='dt-loader'>Processing table, please wait...</div>"
                 },
                 serverSide: true,
                 filter: true,
@@ -1595,9 +1598,24 @@
                     return: true,
                 },
                 columns: [
-                    { data: "purchaseNumber", name: "PurchaseNumber" },
-                    { data: "warehouse", name: "Warehouse" },
-                    { data: "supplier", name: "Supplier" },
+                    {
+                        data: function (data, type, dataToSet) {
+                            return "<a href='/PurchaseOrder/Details/" + data.purchaseId + "' class='link-info' target='_blank'>" + data.purchaseNumber + "</a>";
+                        },
+                        name: "PurchaseNumber"
+                    },
+                    {
+                        data: function (data, type, dataToSet) {
+                            return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.warehouse + "</a>";
+                        },
+                        name: "Warehouse"
+                    },
+                    {
+                        data: function (data, type, dataToSet) {
+                            return "<a href='/Supplier/Details/" + data.supplierId + "' class='link-info' target='_blank'>" + data.supplier + "</a>";
+                        },
+                        name: "Supplier"
+                    },
                     { data: "quantity", name: "Quantity", className: "text-end" },
                     { data: "unitCost", name: "UnitCost", className: "text-end" },
                     { data: "totalCost", name: "TotalCost", className: "text-end" },
@@ -1622,7 +1640,7 @@
                 url: "@Url.Action("GetSalesJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1630,7 +1648,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1640,15 +1658,30 @@
                 return: true,
             },
             columns: [
-                { data: "salesNumber", name: "SalesNumber" },
-                { data: "customer", name: "Customer" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesId + "' class='link-info' target='_blank'>" + data.salesNumber + "</a>";
+                    },
+                    name: "SalesNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customer + "</a>";
+                    },
+                    name: "Customer"
+                },
                 { data: "unitPrice", name: "UnitPrice", visible: user_access.canView },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
                 { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
                 { data: "discount1", name: "Discount1", className: "text-end" },
                 { data: "discount2", name: "Discount2", className: "text-end" },
-                { data: "agent", name: "Agent" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agent + "</a>";
+                    },
+                    name: "Agent"
+                },
                 { data: "orderDate", name: "OrderDate" },
                 { data: "orderBy", name: "OrderBy" }
             ],
@@ -1666,7 +1699,7 @@
                 url: "@Url.Action("GetCountsJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1674,7 +1707,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1684,7 +1717,12 @@
                 return: true,
             },
             columns: [
-                { data: "warehouse", name: "Warehouse" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.warehouse + "</a>";
+                    },
+                    name: "Warehouse"
+                },
                 { data: "quantityFrom", name: "QuantityFrom", className: "text-end" },
                 { data: "quantityTo", name: "QuantityTo", className: "text-end" },
                 { data: "quantityAdjusted", name: "QuantityAdjusted", className: "text-end" },
@@ -1697,6 +1735,54 @@
             //hideBatchLoader("count");
         });
 
+        if (barcotech_user_access.canUploadDownload) {
+            var stockDT = $('.table-fetch-bt').DataTable({
+                data: [],
+                filter: true,
+                responsive: true,
+                autoWidth: false,
+                searching: false,
+                //paging: false,
+                columns: [
+                    { data: "item", name: "Item" },
+                    { data: "warehouse", name: "Warehouse" },
+                    { data: "oldQuantity", name: "OldQuantity" },
+                    { data: "newQuantity", name: "NewQuantity" },
+                    { data: "remarks", name: "Remarks" }
+                ],
+                order: [[0, "asc"]]
+            });
+
+            function FetchStockBarcotech() {
+                swal({
+                    title: "Fetch Stock Record(s) from Barcotech",
+                    text: "This action will get all stock records from Barcotech and save it here. The process may take some time, depending on the number of records fetched. Are you sure you want to proceed?",
+                    icon: "warning",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("SyncStock")",
+                            type: "POST",
+                            data: {
+                                ItemId: item_details.id,
+                            },
+                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the process, so some records may be saved while others are not.</small>",
+                            success: function (data, status, xhr) {
+                                stockDT.clear().draw();
+                                $.each(data, function (i, v) {
+                                    stockDT.row.add(v).draw();
+                                });
+                                $("#viewStockBTModal").modal("show");
+                                countDT.ajax.reload();
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
         if (user_access.canView) {
             // Price History
             var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
@@ -1706,7 +1792,7 @@
                     url: "@Url.Action("GetPricesJson")",
                     type: "POST",
                     data: function (data) {
-                        data.Id = @Model?.Id;
+                        data.Id = item_details.id;
                     },
                     beforeSend: function (jqXHR, settings) {
                         settings.isDataTableRequest = true;
@@ -1714,7 +1800,7 @@
                 },
                 processing: true,
                 language: {
-                    processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                    processing: "<div class='dt-loader'>Processing table, please wait...</div>"
                 },
                 serverSide: true,
                 filter: true,
@@ -1744,7 +1830,7 @@
                 url: "@Url.Action("GetTransfersJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1752,7 +1838,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1762,13 +1848,33 @@
                 return: true,
             },
             columns: [
-                { data: "transferNumber", name: "TransferNumber" },
-                { data: "source", name: "Source" },
-                { data: "destination", name: "Destination" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Transfer/Details/" + data.transferNumber + "' class='link-info' target='_blank'>" + data.transferNumber + "</a>";
+                    },
+                    name: "TransferNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.sourceId + "' class='link-info' target='_blank'>" + data.source + "</a>";
+                    },
+                    name: "Source"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.destinationId + "' class='link-info' target='_blank'>" + data.destination + "</a>";
+                    },
+                    name: "Destination"
+                },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "transferDate", name: "TransferDate" },
                 { data: "transferBy", name: "TransferBy" },
-                { data: "remarks", name: "Remarks" }
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.remarks || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "Remarks"
+                }
             ],
             order: [[4, "desc"]]
         }).on("draw.dt", function () {
@@ -1784,7 +1890,7 @@
                 url: "@Url.Action("GetReturnsJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1792,7 +1898,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -1802,15 +1908,23 @@
                 return: true,
             },
             columns: [
-                { data: "returnNumber", name: "ReturnNumber" },
-                { data: "itemCode", name: "ItemCode" },
-                { data: "itemName", name: "ItemName" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesReturn/Details/" + data.returnId + "' class='link-info' target='_blank'>" + data.returnNumber + "</a>";
+                    },
+                    name: "ReturnNumber"
+                },
                 { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "customer", name: "Customer" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customer + "</a>";
+                    },
+                    name: "Customer"
+                },
                 { data: "returnDate", name: "ReturnDate" },
                 { data: "returnBy", name: "ReturnBy" }
             ],
-            order: [[5, "desc"]]
+            order: [[3, "desc"]]
         }).on("draw.dt", function () {
             //hideBatchLoader("return");
         });
@@ -1839,7 +1953,7 @@
                 url: "@Url.Action("GetPromoJson")",
                 type: "POST",
                 data: function (data) {
-                    data.Id = @Model?.Id;
+                    data.Id = item_details.id;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -1847,7 +1961,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -2022,7 +2136,7 @@
                 data: {
                     Id: $("#save-promo-id").val(),
                     Name: $("#save-promo-name").val(),
-                    ItemId: @Model?.Id,
+                    ItemId: item_details.id,
                     EffectiveDateD: $("#save-promo-effective").val() +" "+ $("#save-promo-effective-time").val(),
                     ExpirationDateD: $("#save-promo-expiration").val() +" "+ $("#save-promo-expiration-time").val(),
                     PromoPriceD: $("#save-promo-price").val(),
@@ -2077,7 +2191,7 @@
 
             var formData = new FormData();
             formData.append("File", $("#item-image")[0].files[0]);
-            formData.append("Id", @Model.Id);
+            formData.append("Id", item_details.id);
 
             $.ajax({
                 type: "POST",

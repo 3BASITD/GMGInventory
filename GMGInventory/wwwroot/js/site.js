@@ -108,7 +108,7 @@
             textResizeFactor: 0.2,
             textAutoResize: true,
             progress: true,
-            zIndex: 2147483645
+            zIndex: 1147483647
         });
     });
 
@@ -235,6 +235,28 @@
     //});
 });
 
+function loadSelect2(selector, modal, url) {
+    $(selector).select2({
+        placeholder: {
+            id: "",
+            text: "<empty>"
+        },
+        templateResult: function (repo) {
+            if (repo.loading) {
+                return repo.text;
+            }
+            if (repo.name) {
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            }
+            return repo.text;
+        },
+        ajax: {
+            url: url
+        },
+        dropdownParent: $(modal)
+    });
+}
+
 function ToastrAndConsoleError(title, message) {
     var today = new Date();
     var log = today.toISOString().replace('T', ' ').replace('Z', '').split('.')[0];
@@ -315,7 +337,7 @@ function showLoader(msg) {
         textColor: "#333",
         textResizeFactor: 0.2,
         textAutoResize: true,
-        zIndex: 2147483645
+        zIndex: 1147483647
     });
 
     startTime = new Date();
@@ -369,7 +391,7 @@ function showBatchLoader(mod) {
         $.LoadingOverlay("show", {
             image: "",
             fontawesome: "fa fa-cog fa-spin",
-            zIndex: 2147483645
+            zIndex: 1147483647
         });
 
         batchStartTime = new Date();

@@ -1,13 +1,12 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
+using GMGInventory.Application.Services;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PdfSharp.Quality;
+using Microsoft.Extensions.Options;
 using System.Data;
 
 namespace GMGInventory.Controllers
@@ -15,12 +14,10 @@ namespace GMGInventory.Controllers
     [Authorize]
     public class ItemController(IAccessRepository accessRepository
                               , IItemRepository itemRepository
-                              , ICategoryRepository categoryRepository
-                              , IItemTypeRepository itemTypeRepository
                               , IItemConversionRepository itemConversionRepository
-                              , IBrandRepository brandRepository
                               , IItemLocationRepository itemLocationRepository
-                              , IWarehouseRepository warehouseRepository) : BaseController(accessRepository)
+                              , IAPIBCT_Service apiBCTService
+                              , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(string search, int page)
         {
@@ -64,6 +61,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
+            ViewData["BarcotechUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BarcotechStock)).Convert();
 
             //ItemFilterVM itemFilterVM = new();
             //itemFilterVM.Categories = new(await categoryRepository.GetAllActiveCategoryAsync(-1), "Id", "Name");
@@ -148,6 +146,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
+            ViewData["BarcotechUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BarcotechStock)).Convert();
 
             var item = itemRepository.GetItemViewVM(id);
             if (item == null)
@@ -654,6 +653,14 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var response = await itemRepository.SaveImageAsync(form);
+            return Json(response);
+        }
+
+        public async Task<IActionResult> SyncStock(int? ItemId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechStock, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+            var response = await apiBCTService.SyncStock(apiBCTOptions.Value.URLStock, ItemId);
             return Json(response);
         }
     }

@@ -106,7 +106,7 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(10)]
+        [StringLength(50)]
         [Display(Name = "Code")]
         public string Code { get; set; }
 
@@ -117,7 +117,7 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [StringLength(50)]
         [Display(Name = "Old SKU / Code")]
         public string? OldCode { get; set; }
 
@@ -230,6 +230,7 @@ namespace GMGInventory.Common.Models
         public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
+        public int WarehouseId { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
     }
@@ -237,8 +238,11 @@ namespace GMGInventory.Common.Models
     public class ItemDetailPurchaseVM
     {
         public string PurchaseNumber { get; set; }
+        public int PurchaseId { get; set; }
         public string Warehouse { get; set; }
+        public int WarehouseId { get; set; }
         public string Supplier { get; set; }
+        public int SupplierId { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
         public string UnitCost => string.Format(SystemFormat.StringDecimalComma, UnitCostD);
@@ -259,7 +263,9 @@ namespace GMGInventory.Common.Models
     public class ItemDetailSalesVM
     {
         public string SalesNumber { get; set; }
+        public int SalesId { get; set; }
         public string Customer { get; set; }
+        public int CustomerId { get; set; }
         public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
         public decimal UnitPriceD { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
@@ -273,6 +279,7 @@ namespace GMGInventory.Common.Models
         public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
         public decimal Discount2D { get; set; }
         public string Agent { get; set; }
+        public int AgentId { get; set; }
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
         public DateTime OrderDateD { get; set; }
         public string OrderBy { get; set; }
@@ -281,6 +288,7 @@ namespace GMGInventory.Common.Models
     public class ItemDetailCountVM
     {
         public string Warehouse { get; set; }
+        public int WarehouseId { get; set; }
         public string QuantityFrom => string.Format(SystemFormat.StringIntegerComma, QuantityFromD);
         public int QuantityFromD { get; set; }
         public string QuantityTo => string.Format(SystemFormat.StringIntegerComma, QuantityToD);
@@ -330,7 +338,9 @@ namespace GMGInventory.Common.Models
     {
         public int TransferNumber { get; set; }
         public string Source { get; set; }
+        public int SourceId { get; set; }
         public string Destination { get; set; }
+        public int DestinationId { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
         public string TransferDate => TransferDateD.ToString(SystemFormat.StringDateTime);
@@ -342,11 +352,14 @@ namespace GMGInventory.Common.Models
     public class ItemDetailReturnVM
     {
         public string ReturnNumber { get; set; }
+        public int ReturnId { get; set; }
         public string ItemCode { get; set; }
+        public int ItemId { get; set; }
         public string ItemName { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
-        public string Customer { get; set; }
+        public string? Customer { get; set; }
+        public int? CustomerId { get; set; }
         public string ReturnDate => ReturnDateD.ToString(SystemFormat.StringDateTime);
         public DateTime ReturnDateD { get; set; }
         public string ReturnBy { get; set; }

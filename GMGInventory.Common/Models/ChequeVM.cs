@@ -18,6 +18,7 @@ namespace GMGInventory.Common.Models
         [Required]
         public int CustomerId { get; set; }
 
+        [StringLength(50)]
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
 

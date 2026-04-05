@@ -52,10 +52,10 @@ namespace GMGInventory.Controllers
                 responseModel.Status = "Error";
                 responseModel.Message = "Location code is required";
             }
-            else if (locationCodeVM.LocationCode.Length > 10)
+            else if (locationCodeVM.LocationCode.Length > 20)
             {
                 responseModel.Status = "Error";
-                responseModel.Message = "Location code should be 10 characters";
+                responseModel.Message = "Location code should be 20 characters";
             }
             else if (string.IsNullOrWhiteSpace(locationCodeVM.LocationName))
             {

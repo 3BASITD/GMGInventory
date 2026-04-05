@@ -166,6 +166,80 @@
 
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
+        // Load Select2 for Agent
+        $("#filter-agent").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Agent")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        // Load Select2 for Brand
+        $("#filter-brand").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        // Load Select2 for Item Code
+        $("#filter-item").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $(
+                        "<strong>" + repo.text + "</strong> " +
+                        (repo.text != repo.name
+                            ? "<em class='fw-light'> - " + repo.name + "</em>"
+                            : "") +
+                        "<br />" +
+                        "<small class='text-muted'>" +
+                        (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
+                        (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
+                        "</small>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Item")"
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter-item").on("select2:select", function () {
+            $("#filter-item-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-item").on("select2:unselecting", function (e) {
+            $("#filter-item-name").val("");
+        });
+
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
         var dt_duration = 3600000; // 1 hour
 
@@ -195,9 +269,13 @@
             page: 0,
             length: 10,
             search: { search: "" },
+            AgentId: "",
             Agent: "",
+            BrandId: "",
             Brand: "",
+            ItemId: "",
             Item: "",
+            ItemName: "",
             DateFrom: DateForInput(date_year_ago),
             DateTo: DateForInput(date_today),
         };
@@ -222,9 +300,9 @@
         }
 
         function resetToDefaultDTFilter() {
-            $('#filter-agent').val(defaultDTState.Agent);
-            $('#filter-brand').val(defaultDTState.Brand);
-            $('#filter-item').val(defaultDTState.Item);
+            $('#filter-agent').val(defaultDTState.AgentId).trigger('change');
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $('#filter-item').val(defaultDTState.ItemId);
             $('#filter-to').val(defaultDTState.DateTo);
             $('#filter-from').val(defaultDTState.DateFrom);
             
@@ -240,89 +318,13 @@
             $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
-        // Load Select2 for Item
-        $("#filter-item").select2({
-            minimumInputLength: 1,
-            allowClear: true,
-            placeholder: 'All',
-            templateResult: function (repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-                return $(
-                    "<strong>" + repo.text + "</strong> " +
-                    (repo.text != repo.name
-                        ? "<em class='fw-light'> - " + repo.name + "</em>"
-                        : "") +
-                    "<br />" +
-                    "<small class='text-muted'>" +
-                    (repo.oldCode ? "Old SKU: " + repo.oldCode + "<br />" : "") +
-                    (repo.partNumber ? "Part Number: " + repo.partNumber + "<br />" : "") +
-                    "</small>");
-            },
-            ajax: {
-                url: "@Url.Action("GetOptions", "Item")"
-            },
-            dropdownParent: $("#filterModal")
-        });
-
-        $("#filter-item").on("select2:select", function () {
-            $("#filter-item-name").val($(this).select2("data")[0].name);
-        });
-
-        $("#filter-item").on("select2:unselecting", function (e) {
-            $("#filter-item-name").val("");
-        });
-
-        // Load Select2 for Agent
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Agent")",
-            success: function (data, status, xhr) {
-                $("#filter-agent").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "ALL"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
-        });
-
-        // Load Select2 for Brand
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Brand")",
-            success: function (data, status, xhr) {
-                $("#filter-brand").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "ALL"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
-        });
-
         // Load List on DataTable
-        var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var salesDT = $('.table-sales').DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved = localStorage.getItem(dt_storage);
@@ -340,49 +342,44 @@
                 return null;
             },
             stateSaveParams: function (settings, data) {
-                data.Agent = $("#filter-agent").val();
-                data.AgentText =  $('#filter-agent').select2('data')[0].text;
-                data.Brand = $("#filter-brand").val();
-                data.BrandText = $("#filter-brand").select2('data')[0].text;
-                data.Item = $("#filter-item").val();
-                data.ItemText = $("#filter-item").select2('data')[0].text;
+                data.AgentId = $("#filter-agent").val();
+                data.Agent = $('#filter-agent option:selected').text();
+                data.BrandId = $("#filter-brand").val();
+                data.Brand = $('#filter-brand option:selected').text();
+                data.ItemId = $("#filter-item").val();
+                data.Item = $('#filter-item option:selected').text();
+                data.ItemName = $('#filter-item-name').val();
                 data.DateFrom = $("#filter-from").val();
                 data.DateTo = $("#filter-to").val();
-
-
-
             },
             stateLoadParams: function (settings, data) {
-            // Set the value for Agent, creating a new option if necessary
-                if ($('#filter-agent').find("option[value='" + data.Agent + "']").length) {
-                    $('#filter-agent').val(data.Agent).trigger('change');
-                } else {
-                    // Create a DOM Option and pre-select by default
-                    var newOption = new Option(data.AgentText, data.Agent, true, true);
-                    // Append it to the select
-                    $('#filter-agent').append(newOption).trigger('change');
+                if(data.AgentId) {
+                    var agentOption = new Option(data.Agent, data.AgentId, true, true);
+                    $(agentOption).data('data', {
+                        id: data.AgentId,
+                        text: data.Agent
+                    });
+                    $("#filter-agent").append(agentOption).trigger('change');
+                    $("#filter-agent-name").val(data.Agent);
                 }
-
-                // Set the value for Brand, creating a new option if necessary
-                if ($('#filter-brand').find("option[value='" + data.Brand + "']").length) {
-                    $('#filter-brand').val(data.Brand).trigger('change');
-                } else {
-                    // Create a DOM Option and pre-select by default
-                    var newOption = new Option(data.BrandText, data.Brand, true, true);
-                    // Append it to the select
-                    $('#filter-brand').append(newOption).trigger('change');
+                if(data.BrandId) {
+                    var brandOption = new Option(data.Brand, data.BrandId, true, true);
+                    $(brandOption).data('data', {
+                        id: data.BrandId,
+                        text: data.Brand
+                    });
+                    $("#filter-brand").append(brandOption).trigger('change');
                 }
-
-                // Set the value for Item, creating a new option if necessary
-                if ($('#filter-item').find("option[value='" + data.Item + "']").length) {
-                    $('#filter-item').val(data.Item).trigger('change');
-                } else {
-                    // Create a DOM Option and pre-select by default
-                    var newOption = new Option(data.ItemText, data.Item, true, true);
-                    // Append it to the select
-                    $('#filter-item').append(newOption).trigger('change');
+                if(data.ItemId) {
+                    var itemOption = new Option(data.Item, data.ItemId, true, true);
+                    $(itemOption).data('data', {
+                        id: data.ItemId,
+                        text: data.Item,
+                        name: data.ItemName
+                    });
+                    $("#filter-item").append(itemOption).trigger('change');
+                    $("#filter-item-name").val(data.ItemName);
                 }
-
 
                 $('#filter-from').val(data.DateFrom);
                 $('#filter-to').val(data.DateTo);
@@ -393,15 +390,16 @@
                 type: "POST",
                 data: function (data) {
                     var agentId = $("#filter-agent").val();
-                    var brandId = $("#filter-brand").val();
-                    var itemId = $("#filter-item").val();
+                    if (agentId) data.Agent = agentId;
 
+                    var brandId = $("#filter-brand").val();
+                    if (brandId) data.Brand = brandId;
+
+                    var itemId = $("#filter-item").val();
+                    if (itemId) data.Item = itemId;
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    if (agentId) data.Agent = agentId;
-                    if (brandId) data.Brand = brandId;
-                    if (itemId) data.Item = itemId;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -409,7 +407,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -436,19 +434,13 @@
                 $(api.column(5).footer()).html(FormatStringInteger(json.totalQuantity));
                 $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
             },
-            order: [[0, "desc"]]
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load
         salesDT.on("draw", function () {
-            //hideLoader();
             checkDefaultFilter();
             $(".table-sales thead th").removeClass("text-end");
-        });
-
-        $(".btnFilter").on("click", function () {
-            salesDT.ajax.reload();
-            $("#filterModal").modal("hide");
         });
 
         $(".downloadBtn").click(function (e) {

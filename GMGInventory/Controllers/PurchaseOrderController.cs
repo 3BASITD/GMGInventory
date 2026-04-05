@@ -1,7 +1,5 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -28,9 +26,19 @@ namespace GMGInventory.Controllers
             return Json(await orderRepository.GetTypeOptions(SelectedId));
         }
 
+        public async Task<IActionResult> GetTypeOptions2(string search, int page)
+        {
+            return Json(await orderRepository.GetTypeOptions2(search, page));
+        }
+
         public async Task<IActionResult> GetDeliveryModeOptions(int? SelectedId)
         {
             return Json(await orderRepository.GetDeliveryModeOptions(SelectedId));
+        }
+
+        public async Task<IActionResult> GetDeliveryModeOptions2(string search, int page)
+        {
+            return Json(await orderRepository.GetDeliveryModeOptions2(search, page));
         }
 
         public async Task<IActionResult> GetPurchaseRequestOptions(string search, int page, int RequestTypeId, int? RequestPurposeId, int? RegionId)

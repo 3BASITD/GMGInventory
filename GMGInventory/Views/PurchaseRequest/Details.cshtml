@@ -404,7 +404,7 @@
                                 <button type="button"
                                         class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
                                         data-microtip-title="Add Item&#10;@(canAdd ? "Only draft order can add items" : "Add access is required")"
-                                        data-microtip-position="bottom"
+                                        data-microtip-position="left"
                                         role="tooltip">
                                     <span class="fas fa-plus mr-0"></span>
                                 </button>
@@ -655,7 +655,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -1401,7 +1401,7 @@
                     return false;
                 });
                 if (rowIndexes.length > 0) {
-                    var soMatch = data.salesOrderNumber != "" && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text ? " of " + data.salesOrderNumber : "";
+                    var soMatch = $("#add-so-number").select2("data")[0].text != "" ? " of " + $("#add-so-number").select2("data")[0].text : "";
                     toastr.error($("#add-name").val() + soMatch + " has already been added", "Duplicate");
                 } else {
                     itemDT.row.add({

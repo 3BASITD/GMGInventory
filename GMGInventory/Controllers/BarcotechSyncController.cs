@@ -19,13 +19,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetListJson()
+        public async Task<IActionResult> GetListJson(BarcotechSyncFilter filter)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechSync, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm dtForm = new(Request.Form);
-            return Json(await syncRepository.GetBarcotechStatusListDTAsync(dtForm));
+            return Json(await syncRepository.GetBarcotechStatusListDTAsync(dtForm, filter));
         }
     }
 }

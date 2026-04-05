@@ -42,6 +42,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
+        public int CustomerId { get; set; }
 
         [Display(Name = "Customer Address")]
         public string CustomerAddress { get; set; }
@@ -68,10 +69,10 @@ namespace GMGInventory.Common.Models
         public string FirstName { get; set; }
 
         [Display(Name = "Middle Name")]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; }
 
         [Display(Name = "Last Name")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         [Display(Name = "Areas")]
         public AreaVM Areas { get; set; }

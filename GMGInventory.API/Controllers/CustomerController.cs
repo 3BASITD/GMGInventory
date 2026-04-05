@@ -10,7 +10,7 @@ namespace GMGInventory.API.Controllers
     public class CustomerController(ICustomerRepository customerRepository) : ControllerBase
     {
         [HttpGet("List")]
-        public async Task<IList<APIGeneric>> GetList()
+        public async Task<IList<APICustomer>> GetList()
         {
             return await customerRepository.GetListAPI();
         }

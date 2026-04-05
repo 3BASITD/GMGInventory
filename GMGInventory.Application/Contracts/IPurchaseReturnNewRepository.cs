@@ -10,7 +10,7 @@ namespace GMGInventory.Application.Contracts
         Task<string> GetNewDocumentNumber();
         Task<IList<PurchaseReturnNewVM>> GetListAsync(PurchaseReturnFilter filter);
         Task<ForDataTables<PurchaseReturnNewVM>> GetListDTAsync(DataTablesRequestForm form, PurchaseReturnFilter filter);
-        Task<IList<APIPurchaseReturn>> GetListAPI();
+        Task<IList<APIPurchaseReturn>> GetListAPI(DateTime? dt);
         Task<PurchaseReturnNewDetailedVM?> GetDetails(int returnId);
         Task<IList<PurchaseReturnNewLineItemVM>> GetItemsFromRRListAsync(int purchaseReceivingId);
         Task<IList<PurchaseReturnNewLineItemVM>> GetWithRRItemsListAsync(int purchaseReturnId);

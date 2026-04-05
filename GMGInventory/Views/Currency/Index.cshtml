@@ -16,7 +16,17 @@
             @if (userAccess.CanUploadDownload)
             {
                 <button class="btn btn-primary btn-sm float-right ml-2 btn-sync-hashmicro">
-                    <span class="fas fa-sync"></span>Sync Data from HashMicro
+                    <span class="fas fa-download"></span>Fetch from HashMicro
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Fetch from HashMicro&#10;Download access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-download mr-0"></span>
                 </button>
             }
         </div>
@@ -48,7 +58,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,

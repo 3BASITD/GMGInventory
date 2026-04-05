@@ -491,7 +491,7 @@
                                 <button type="button"
                                         class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
                                         data-microtip-title="Add Item&#10;@(canAdd ? "Only draft order can add items" : "Add access is required")"
-                                        data-microtip-position="bottom"
+                                        data-microtip-position="left"
                                         role="tooltip">
                                     <span class="fas fa-plus mr-0"></span>
                                 </button>
@@ -907,7 +907,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             filter: true,
             responsive: true,
@@ -1207,6 +1207,28 @@
                         return "No available request found";
                     }
                 },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+
+                    var subinfo = [];
+                    subinfo.push("Request count: " + repo.totalQuantity);
+                    if(!repo.disabled)
+                        subinfo.push("Pending count: " + repo.totalIncompleteQuantity);
+                    if(repo.alreadyOn)
+                        subinfo.push("Order on: " + repo.alreadyOn);
+                    if(repo.disabled) {
+                        subinfo.push("<small class='text-info'>Order completed</small>");
+                    }
+
+                    return $(
+                        "<strong>" + repo.text + "</strong><br />" +
+                        "<small>" +
+                        subinfo.join("<br />") +
+                        "</small>"
+                    );
+                },
                 ajax: {
                     url: "@Url.Action("GetPurchaseRequestOptions")",
                     data: function (params) {
@@ -1327,6 +1349,28 @@
                     noResults: function () {
                         return "No available request found";
                     }
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+
+                    var subinfo = [];
+                    subinfo.push("Request count: " + repo.totalQuantity);
+                    if(!repo.disabled)
+                        subinfo.push("Pending count: " + repo.totalIncompleteQuantity);
+                    if(repo.alreadyOn)
+                        subinfo.push("Order on: " + repo.alreadyOn);
+                    if(repo.disabled) {
+                        subinfo.push("<small class='text-info'>Order completed</small>");
+                    }
+
+                    return $(
+                        "<strong>" + repo.text + "</strong><br />" +
+                        "<small>" +
+                        subinfo.join("<br />") +
+                        "</small>"
+                    );
                 },
                 ajax: {
                     url: "@Url.Action("GetPurchaseRequestOptions")",

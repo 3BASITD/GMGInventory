@@ -1165,7 +1165,7 @@
                 return false;
             });
             if (rowIndexes.length > 0) {
-                var soMatch = data.salesOrderNumber != "" && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text ? " of " + data.salesOrderNumber : "";
+                var soMatch = $("#add-so-number").select2("data")[0].text != "" ? " of " + $("#add-so-number").select2("data")[0].text : "";
                 toastr.error($("#add-name").val() + soMatch +" has already been added", "Duplicate");
             } else {
                 var is_for_na_one_time = $("#request-purpose").select2("data")[0]?.text.toLowerCase() == "one-time purchase";

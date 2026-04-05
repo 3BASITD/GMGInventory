@@ -47,11 +47,11 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-12 col-md-4 col-sm-6">
+                <div class="col-12 col-sm-6 col-md-4">
                     <p class="text-sm">
                         @if (userAccess.CanEdit)
                         {
-                            <label for="return-number" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.SRNumber)</label>
+                            <label for="return-number" class="form-label text-muted fw-normal mb-0">@Html.DisplayNameFor(model => model.SRNumber)</label>
                             <input type="text" id="return-number" name="ReturnNumber" class="form-control form-control-sm" value="@Model.SRNumber" />
                         }
                         else
@@ -79,7 +79,7 @@
                     <p class="text-sm">
                         @if (userAccess.CanEdit)
                         {
-                            <label for="return-date" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.ReturnDate)</label>
+                            <label for="return-date" class="form-label text-muted fw-normal mb-0">@Html.DisplayNameFor(model => model.ReturnDate)</label>
                             <input type="date" id="return-date" name="ReturnDate" class="form-control form-control-sm" value="@Model.ReturnDate3" />
                         }
                         else
@@ -127,7 +127,7 @@
                     <p class="text-sm">
                         @if (userAccess.CanEdit)
                         {
-                            <label for="return-remarks" class="form-label fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
+                            <label for="return-remarks" class="form-label text-muted fw-normal mb-0">@Html.DisplayNameFor(model => model.Remarks)</label>
                             <input type="text" id="return-remarks" name="Remarks" class="form-control form-control-sm" value="@Model.Remarks" />
                         }
                         else
@@ -272,7 +272,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             filter: true,
             responsive: true,

@@ -36,7 +36,7 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } 
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
                                                                        equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
                                    let discount2 = (100 - oli.Discount2) / 100
@@ -129,7 +129,7 @@ namespace GMGInventory.Application.Repositories
         {
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId } 
+                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
                                                                        equals new { oli.SalesOrderId, oli.ItemId }
                                    let discount1 = (100 - oli.Discount1) / 100
                                    let discount2 = (100 - oli.Discount2) / 100
@@ -559,15 +559,23 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIGeneric>> GetListAPI()
+        public async Task<IList<APICustomer>> GetListAPI()
         {
             var customers = from customer in context.Customers
                             where customer.IsActive == true
-                            select new APIGeneric
+                            let shipping = customer.ShippingAddresses
+                                                   .Where(s => s.IsDefault)
+                                                   .FirstOrDefault()
+                            select new APICustomer
                             {
                                 Id = customer.Id,
                                 Code = customer.Code,
-                                Name = customer.Name
+                                Name = customer.Name,
+                                Address = shipping == null ? null : shipping.Address,
+                                Email = customer.Email,
+                                PhoneNumber = shipping == null ? null : shipping.PhoneNumber,
+                                FaxNumber = shipping == null ? null : shipping.FaxNumber,
+                                ContactPerson = shipping == null ? null : shipping.ContactPerson
                             };
             return await customers.ToListAsync();
         }
@@ -823,7 +831,7 @@ namespace GMGInventory.Application.Repositories
                              join userc in userManager.Users on brandDiscount.UserCreated equals userc.Id
                              join userm in userManager.Users on brandDiscount.UserModified equals userm.Id into um
                              from userm in um.DefaultIfEmpty()
-                             where brandDiscount.CustomerId == id 
+                             where brandDiscount.CustomerId == id
                              select new CustomerBrandDiscountVM
                              {
                                  Id = brandDiscount.Id,
@@ -845,9 +853,9 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<CustomerBrandDiscountDowloadVM>> GetCustomerBrandDiscountDownload(int id)
         {
             var customerName = context.Customers.Where(c => c.Id == id).Select(c => new
-                                {
-                                    Name = c.Name
-                                }).FirstOrDefault();
+            {
+                Name = c.Name
+            }).FirstOrDefault();
 
             var customerVM = from brand in context.Brands
                              join brandDiscount in context.CustomerBrandDiscount on brand.Id equals brandDiscount.BrandId into cbd
@@ -862,7 +870,7 @@ namespace GMGInventory.Application.Repositories
                              orderby customer.Name descending, brand.Name ascending
                              select new CustomerBrandDiscountDowloadVM
                              {
-                                 Id = brandDiscount == null ? 0 :brandDiscount.Id,
+                                 Id = brandDiscount == null ? 0 : brandDiscount.Id,
                                  CustomerId = id,
                                  CustomerName = customer == null ? customerName.Name : customer.Name,
                                  Discount = brandDiscount == null || brandDiscount.IsActive == false ? 0 : brandDiscount.Discount,
@@ -1052,7 +1060,7 @@ namespace GMGInventory.Application.Repositories
             ResponseModel response = new();
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
-            var checkDiscount = await context.CustomerBrandDiscount.Where(s => (brandDiscountVM.Id == null || (brandDiscountVM.Id != null && brandDiscountVM.Id != s.Id)) 
+            var checkDiscount = await context.CustomerBrandDiscount.Where(s => (brandDiscountVM.Id == null || (brandDiscountVM.Id != null && brandDiscountVM.Id != s.Id))
                                                                                && (s.CustomerId == brandDiscountVM.CustomerId && s.BrandId == brandDiscountVM.BrandId && s.IsActive)).FirstOrDefaultAsync();
             if (checkDiscount != null)
             {
@@ -1061,7 +1069,7 @@ namespace GMGInventory.Application.Repositories
                     response.Status = "Error";
                     response.Message = "Brand already added";
                 }
-                
+
             }
             else
             {
@@ -1090,7 +1098,7 @@ namespace GMGInventory.Application.Repositories
                     brandDiscount.CustomerId = brandDiscountVM.CustomerId;
                     brandDiscount.BrandId = brandDiscountVM.BrandId;
                     brandDiscount.Discount = brandDiscountVM.Discount;
-                    
+
 
                     context.CustomerBrandDiscount.Update(brandDiscount);
                     await context.SaveChangesAsync(currentUserId);
@@ -1196,35 +1204,35 @@ namespace GMGInventory.Application.Repositories
                 response.Status = "Error";
                 response.Message = "Discount is invalid";
             }
-            
+
             else
             {
-                
-                    if (await context.SalesOrderLineItems.AnyAsync(s => s.CustomerBrandDiscountId == discount.Id))
-                    {
 
-                        discount.IsActive = false;
-                        context.CustomerBrandDiscount.Update(discount);
-                        await context.SaveChangesAsync(currentUserId);
+                if (await context.SalesOrderLineItems.AnyAsync(s => s.CustomerBrandDiscountId == discount.Id))
+                {
 
-                        response.Status = "Success";
-                        response.Message = "Discount successfully deactivated";
+                    discount.IsActive = false;
+                    context.CustomerBrandDiscount.Update(discount);
+                    await context.SaveChangesAsync(currentUserId);
 
-
-                    }
-                    else
-                    {
-                        context.CustomerBrandDiscount.Remove(discount);
-                        await context.SaveChangesAsync(currentUserId);
-
-                        response.Status = "Success";
-                        response.Message = "Discount successfully deleted";
+                    response.Status = "Success";
+                    response.Message = "Discount successfully deactivated";
 
 
-                    }
-                   
-                
-                
+                }
+                else
+                {
+                    context.CustomerBrandDiscount.Remove(discount);
+                    await context.SaveChangesAsync(currentUserId);
+
+                    response.Status = "Success";
+                    response.Message = "Discount successfully deleted";
+
+
+                }
+
+
+
             }
 
             return response;
@@ -1298,7 +1306,7 @@ namespace GMGInventory.Application.Repositories
                                            }).ToList()
                              let totalPayment = cp.BackLoad + cp.CashAdvance + cp.Cash + cp.Discount + cp.OffSet + cp.OverPayment + cp.Tax + cp.TKTSolicitation + (cp.SOACRChecks.Sum(s => (decimal?)s.CheckAmount) ?? 0)
                              //let invamttotal = invamt.Sum(s => s.Amount) - soalit.Sum(s => s.CreditAmount + s.DebitAmount + s.FreightCost) - tbr - totalPayment
-                             let invamttotal = totalPayment - invamt.Sum(s=>s.Amount) + cp.OverPayment
+                             let invamttotal = totalPayment - invamt.Sum(s => s.Amount) + cp.OverPayment
                              where cp.CustomerId == id
                              select new CustomerVM
                              {
@@ -1401,10 +1409,10 @@ namespace GMGInventory.Application.Repositories
                        BIRInvoiceNo = inv.ControlNumber,
                        InvoicedDateD = inv.InvoiceDate,
                        InvoicedAmountD = ((from ili in inv.InvoiceLineItems
-                                         join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
-                                         let discount1 = (100 - soli.Discount1) / 100
-                                         let discount2 = (100 - soli.Discount2) / 100
-                                         select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)
+                                           join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
+                                           let discount1 = (100 - soli.Discount1) / 100
+                                           let discount2 = (100 - soli.Discount2) / 100
+                                           select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)
                                          ).Sum() ?? 0)
                                        - (context.CustomerPaymentDetails
                                                  .Where(s => s.InvoiceId == inv.Id)

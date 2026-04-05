@@ -20,58 +20,32 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-3">
+            <div class="col-12 col-sm-6 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Code)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model.Code
                     </b>
                 </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UserCreated)
-                    </span>
-                    <b class="d-block">
-                        @Model.UserCreated
-                    </b>
-                </p>
-
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.Area)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @Model.Area
                     </b>
                 </p>
-
             </div>
-            <div class="col-3">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.FirstName)
-                    </span>
-                    <b class="d-block">
-                        @Model.FirstName
-                    </b>
-                </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DateCreated)
-                    </span>
-                    <b class="d-block">
-                        @Model.DateCreated
-                    </b>
-                </p>
+            <div class="col-12 col-sm-6 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.IsActive)
                     </span>
-                    <b class="d-block">
+                    <b class="d-block form-gayahin">
                         @if (Model.IsActive == true)
                         {
                             <span class="fas fa-check text-success"></span>
@@ -82,52 +56,83 @@
                         }
                     </b>
                 </p>
-
             </div>
-            <div class="col-3">
-
+            <div class="col-12 col-sm-6 col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.FirstName)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model.FirstName
+                    </b>
+                </p>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.MiddleName)
                     </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.MiddleName) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.MiddleName)
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model.MiddleName) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.MiddleName)
                     </b>
                 </p>
-
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UserModified)
-                    </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.UserModified) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.UserModified)
-                    </b>
-                </p>
-
-
             </div>
-
-            <div class="col-3">
+            <div class="col-12 col-sm-6 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
                         @Html.DisplayNameFor(model => model.LastName)
                     </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.LastName) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.LastName)
+                    <b class="d-block form-gayahin">
+                        @(string.IsNullOrWhiteSpace(Model.LastName) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.LastName)
                     </b>
                 </p>
-
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
                 <p class="text-sm">
                     <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.DateModified)
+                        @Html.DisplayNameFor(model => model.UserCreated)
                     </span>
-                    <b class="d-block">
-                        @(string.IsNullOrWhiteSpace(Model.DateModified) ? Html.Raw("<span class='fw-normal'>N/A</span>") : Model.DateModified)
+                    <b class="d-block form-gayahin">
+                        @Model.UserCreated
                     </b>
                 </p>
-
-
             </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </span>
+                    <b class="d-block form-gayahin">
+                        @Model.DateCreated
+                    </b>
+                </p>
+            </div>
+            @if (Model.UserModified != null)
+            {
+                <div class="col-12 col-sm-6 col-md-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UserModified)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model.UserModified
+                        </b>
+                    </p>
+                </div>
+            }
+            @if (Model.DateModified != null)
+            {
+                <div class="col-12 col-sm-6 col-md-4">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.DateModified)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model.DateModified
+                        </b>
+                    </p>
+                </div>
+            }
         </div>
         <div class="row">
             <div class="col-12">
@@ -136,8 +141,8 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-customers">
                                 <a class="nav-link active" id="nav-customers-tab" data-toggle="pill" role="tab"
-                                   data-bs-toggle="tab" data-bs-target="#nav-customers"
-                                   aria-controls="nav-customers" aria-selected="true">
+                                       data-bs-toggle="tab" data-bs-target="#nav-customers"
+                                       aria-controls="nav-customers" aria-selected="true">
                                     Customers
                                 </a>
                             </li>
@@ -218,7 +223,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -228,14 +233,19 @@
                 return: true,
             },
             columns: [
-                { data: "customerName", name: "CustomerName" },
-                { 
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerName + "</a>";
+                    },
+                    name: "CustomerName"
+                },
+                {
                     data: function (data, type, dataToSet) {
                         if(data.customerAddress)
                             return data.customerAddress;
                         else
                             return '<span class="text-muted">N/A</span>';
-                    },  
+                    },
                     name: "CustomerAddress"
                 },
                 {
@@ -245,7 +255,7 @@
                         else
                             return '<span class="text-muted">N/A</span>';
                     },
-                    name: "CustomerEmail" 
+                    name: "CustomerEmail"
                 },
                 {
                     data: function (data, type, dataToSet) {

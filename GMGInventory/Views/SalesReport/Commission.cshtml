@@ -175,9 +175,8 @@
 
         // Load Select2 for Agent
         $("#filter-agent").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -200,7 +199,6 @@
 
         // Load Select2 for Area
         $("#filter-area").select2({
-            //minimumInputLength: 1,
             allowClear: true,
             placeholder: {
                 id: "",
@@ -228,9 +226,8 @@
 
          // Load Select2 for Customer
         $("#filter-customer").select2({
-            minimumInputLength: 1,
             allowClear: true,
-            placeholder: 'All',
+            placeholder: 'ALL',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
@@ -276,7 +273,7 @@
         }
 
         var defaultDTState = {
-            order: [[0, "asc"]],
+            order: [[3, "asc"]],
             page: 0,
             length: 10,
             search: { search: "" },
@@ -340,13 +337,9 @@
         }).DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
-                if (checkDTChanged()) {
-                    var now = new Date().getTime();
-                    var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
-                    localStorage.setItem(dt_storage, JSON.stringify(dtState));
-                } else {
-                    localStorage.removeItem(dt_storage);
-                }
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
             },
             stateLoadCallback: function(settings) {
                 const saved = localStorage.getItem(dt_storage);
@@ -429,7 +422,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true,
@@ -454,7 +447,7 @@
                 $(api.column(5).footer()).html(FormatStringDecimal(json.totalAmount));
                 $(api.column(6).footer()).html(FormatStringDecimal(json.totalAmount2));
             },
-            order: [[3, "asc"]],
+            order: defaultDTState.order,
             rowGroup: {
                 startRender: null,
                 endRender: function (rows, group) {

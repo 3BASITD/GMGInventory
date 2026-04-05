@@ -25,6 +25,13 @@
             btn.prop("disabled", true);
             spn.removeClass("fa-sign-in-alt").addClass("fa-spinner fa-spin");
             msg.html("Signing In...");
+
+            //localStorage.clear();
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('BAS_DT')) {
+                    localStorage.removeItem(key);;
+                }
+            });
         }
         //event.preventDefault();
     });

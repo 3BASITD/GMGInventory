@@ -477,29 +477,40 @@ namespace GMGInventory.Application.Repositories
             return orderVM.ToList();
         }
 
-        public async Task<IList<APISalesOrder>> GetListAPI()
+        public async Task<IList<APISalesOrder>> GetListAPI(DateTime? dt)
         {
             DateTime dtNow = DateTime.Now;
             DateTime dtYesterday = dtNow.AddDays(-1);
 
             var orders = from order in context.SalesOrders
-                         where (order.BarcotechRequestDate == null
-                         || order.BarcotechRequestDate > dtYesterday)
+                         join userc in userManager.Users on order.UserCreated equals userc.Id
+                         join userm in userManager.Users on order.UserModified equals userm.Id into um
+                         from userm in um.DefaultIfEmpty()
+                         where ((dt != null && order.SalesOrderDate.Date == dt.Value.Date)
+                         || (dt == null && (order.BarcotechRequestDate == null
+                         || order.BarcotechRequestDate > dtYesterday)))
                          && order.ApprovedBy != null
                          && order.ApprovedDate != null
                          select new APISalesOrder
                          {
                              Id = order.Id,
                              AgentId = order.AgentId,
+                             AgentCode = order.Agent.Code,
                              CustomerId = order.CustomerId,
+                             CustomerCode = order.Customer.Code,
                              SalesOrderNumber = order.SalesOrderNumber,
                              OrderDate = order.SalesOrderDate,
+                             UserCreated = userc.FirstName + " " + userc.LastName,
+                             DateCreated = order.DateCreated,
+                             LastUserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
+                             LastDateModified = order.DateModified,
                              LineItems = from item in order.SalesOrderLineItems
                                          select new APISalesOrderLineItem
                                          {
                                              Id = item.Id,
                                              LineNumber = item.LineNumber,
                                              ItemCode = item.Item.Code,
+                                             ItemId = item.Item.Id,
                                              Quantity = item.Quantity
                                          }
                          };

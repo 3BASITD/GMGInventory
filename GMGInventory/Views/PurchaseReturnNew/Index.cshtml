@@ -25,7 +25,7 @@
                     <span class="fas fa-plus mr-0"></span>
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
             @if (userAccess.CanUploadDownload)
@@ -129,8 +129,12 @@
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -139,6 +143,10 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        
+        var date_today = new Date();
+        var date_month_ago = new Date();
+        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
 
         SetDateFilter();
         function SetDateFilter() {
@@ -162,69 +170,171 @@
         }
 
         $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Supplier")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("supplier");
+        
+        // Load Select2 for Supplier
+        $("#filter-supplier").select2({
+            placeholder: 'ALL',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
-            success: function (data, status, xhr) {
-                $("#filter-supplier").select2({
-                    ajax: null, //already fetched outside
-                    minimumInputLength: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    templateResult: function (repo) {
-                        if (repo.loading) {
-                            return repo.text;
-                        }
-                        return $("<strong>" + repo.text + "</strong> " + (repo.text != repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                    },
-                    data: data
-                });
-            },
-            complete: function (xhr, status) {
-                $("#filter-supplier").val(null).trigger("change");
-                hideBatchLoader("supplier");
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Supplier")"
             }
         });
-
-        // Load status for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "PurchaseStatus")",
-            beforeSend: function (xhr, error) {
-                showBatchLoader("status");
+        
+        // Load Select2 for Status
+        $("#filter-status").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
             },
-            success: function (data, status, xhr) {
-                $("#filter-status").select2({
-                    ajax: null, //already fetched outside
-                    minimumResultsForSearch: -1,
-                    allowClear: true,
-                    placeholder: "ALL",
-                    data: data
-                });
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return repo.text;
             },
-            complete: function (xhr, status) {
-                $("#filter-status").val(null).trigger("change");
-                hideBatchLoader("status");
-            }
+            ajax: {
+                url: "@Url.Action("GetOptions2", "PurchaseStatus")"
+            },
+            dropdownParent: $('#filterModal'),
+            minimumResultsForSearch: -1
         });
 
-        $(".btnFilter").on("click", function () {
-            returnDT.ajax.reload();
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
             $("#filterModal").modal("hide");
-        });
+            returnDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        };
 
-        var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            returnDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[8, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            SupplierId: "",
+            Supplier: "",
+            DateFrom: DateForInput(date_month_ago),
+            DateTo: DateForInput(date_today),
+            StatusId: "",
+            Status: ""
+        };
+
+        function checkDTChanged() {
+            if(!returnDT) return false;
+            
+            return JSON.stringify(returnDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   returnDT.page.info().start != defaultDTState.page ||
+                   returnDT.page.len() != defaultDTState.length ||
+                   (returnDT.search() || "") != defaultDTState.search.search ||
+                   ($('#filter-supplier').val() ?? "") != defaultDTState.SupplierId ||
+                   ($("#filter-from").val() ?? "") != defaultDTState.DateFrom ||
+                   ($("#filter-to").val() ?? "") != defaultDTState.DateTo ||
+                   ($("#filter-status").val() ?? "") != defaultDTState.StatusId;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            $("#filter-supplier").val(defaultDTState.SupplierId).trigger('change');
+            $("#filter-from").val(defaultDTState.DateFrom);
+            $("#filter-to").val(defaultDTState.DateTo);
+            $("#filter-status").val(defaultDTState.StatusId).trigger('change');
+            
+            localStorage.removeItem(dt_storage);
+
+            if (returnDT) {
+                returnDT.state.clear();
+                returnDT.order(defaultDTState.order);
+                returnDT.page(defaultDTState.page);
+                returnDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
+
+        var returnDT = $('.table-return').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.SupplierId = $('#filter-supplier').val();
+                data.Supplier = $('#filter-supplier option:selected').text();
+                data.DateFrom = $("#filter-from").val();
+                data.DateTo = $("#filter-to").val();
+                data.StatusId = $("#filter-status").val();
+                data.Status = $('#filter-status option:selected').text();
+            },
+            stateLoadParams: function (settings, data) {
+                if (data.SupplierId) {
+                    var supplierOption = new Option(data.Supplier, data.SupplierId, true, true);
+                    $(supplierOption).data('data', {
+                        id: data.SupplierId,
+                        text: data.Supplier
+                    });
+                    $("#filter-supplier").append(supplierOption).trigger('change');
+                }
+                $("#filter-from").val(data.DateFrom);
+                $("#filter-to").val(data.DateTo);
+                if (data.StatusId) {
+                    var statusOption = new Option(data.Status, data.StatusId, true, true);
+                    $(statusOption).data('data', {
+                        id: data.StatusId,
+                        text: data.Status
+                    });
+                    $("#filter-status").append(statusOption).trigger('change');
+                }
+            },
             ajax: {
                 url: "@Url.Action("GetListDTJson")",
                 type: "POST",
                 data: function (data) {
-                    data.SupplierId = $("#filter-supplier").val();
+                    var supplierId = $('#filter-supplier').val();
+                    if (supplierId) data.SupplierId = supplierId;
+
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                     data.StatusId = $("#filter-status").val();
@@ -235,7 +345,7 @@
             },
             processing: true,
             language: {
-                processing: "<div class='dt-loader'>Loading table, please wait...</div>"
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
             },
             serverSide: true,
             filter: true, 
@@ -285,17 +395,12 @@
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
                         actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
-                        // if (data.status.toLowerCase() == "draft" && data.orderBy == $("#current-user-nickname").val()) {
-                        //     if (user_access.canDelete) {
-                        //         actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete Draft" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
-                        //     }
-                        // }
                         return actions + "</div>";
                     },
                     responsivePriority: 1
                 }
             ],
-            order: [[8, "desc"]],
+            order: defaultDTState.order,
             createdRow: function (row, data, dataIndex) {
                 if (data.status.toLowerCase() == 'resubmitted') {
                     $(row).addClass('table-danger');
@@ -311,7 +416,7 @@
         });
 
         returnDT.on("draw", function () {
-            //hideLoader();
+            checkDefaultFilter();
         });
 
         if (user_access.canUploadDownload) {
@@ -322,7 +427,6 @@
 
                 urlQuery.push("DateFrom=" + $("#filter-from").val());
                 urlQuery.push("DateTo=" + $("#filter-to").val());
-
 
                 window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
             });

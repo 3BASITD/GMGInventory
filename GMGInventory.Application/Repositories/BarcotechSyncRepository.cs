@@ -15,9 +15,13 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
         }
 
-        private async Task<IList<BarcotechSyncVM>> GetBarcotechStatusListAsync()
+        private async Task<IList<BarcotechSyncVM>> GetBarcotechStatusListAsync(BarcotechSyncFilter filter)
         {
-            var syncStatus = from sync in context.BarcotechSyncs
+            var syncStatus = from sync in context.BarcotechSyncs.AsNoTracking()
+                             where (filter.Module == null || sync.ModuleName.Trim().ToLower() == filter.Module.Trim().ToLower())
+                             && ((filter.IncludeSuccess == true && sync.SyncStatus.Trim().ToLower() == "success")
+                             || (filter.IncludeFail == true && sync.SyncStatus.Trim().ToLower() == "fail")
+                             || (filter.IncludeException == true && sync.SyncStatus.Trim().ToLower() == "exception"))
                              select new BarcotechSyncVM
                              {
                                  Id = sync.Id,
@@ -30,11 +34,11 @@ namespace GMGInventory.Application.Repositories
             return await syncStatus.ToListAsync();
         }
 
-        public async Task<ForDataTables<BarcotechSyncVM>> GetBarcotechStatusListDTAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<BarcotechSyncVM>> GetBarcotechStatusListDTAsync(DataTablesRequestForm form, BarcotechSyncFilter filter)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetBarcotechStatusListAsync()).AsQueryable();
+            var data = (await GetBarcotechStatusListAsync(filter)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found

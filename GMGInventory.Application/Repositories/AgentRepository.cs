@@ -5,9 +5,8 @@ using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -121,16 +120,16 @@ namespace GMGInventory.Application.Repositories
                          {
                              Id = agent.Id,
                              FirstName = agent.FirstName,
-                             MiddleName = agent.MiddleName ?? "-",
-                             LastName = agent.LastName ?? "-",
+                             MiddleName = agent.MiddleName,
+                             LastName = agent.LastName,
                              Area = agent.Area.Name,
                              AreaId = agent.Area.Id,
                              Code = agent.Code,
                              IsActive = agent.IsActive,
                              DateCreatedD = agent.DateCreated,
                              DateModifiedD = agent.DateModified,
-                             UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                             UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                             UserCreated = userc.FirstName + " " + userc.LastName,
+                             UserModified = userm == null ? null : userc.FirstName + " " + userc.LastName
                          };
             return await agents.ToListAsync();
         }
@@ -145,53 +144,31 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.FirstName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.MiddleName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.LastName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Area.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateCreated.ToString().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserModified.ToLower().ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateModified.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Code,
+                    s.FirstName,
+                    s.MiddleName,
+                    s.LastName,
+                    s.Area,
+                    s.UserCreated,
+                    s.DateCreated,
+                    s.UserModified,
+                    s.DateModified
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "FirstName": data = data.OrderBy(s => s.FirstName); break;
-                        case "MiddleName": data = data.OrderBy(s => s.MiddleName); break;
-                        case "LastName": data = data.OrderBy(s => s.LastName); break;
-                        case "Area": data = data.OrderBy(s => s.Area); break;
-                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
-                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "FirstName": data = data.OrderByDescending(s => s.FirstName); break;
-                        case "MiddleName": data = data.OrderByDescending(s => s.MiddleName); break;
-                        case "LastName": data = data.OrderByDescending(s => s.LastName); break;
-                        case "Area": data = data.OrderByDescending(s => s.Area); break;
-                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
-                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderByDescending(s => s.DateModifiedD); break;
-                        default: break;
-                    }
-                }
+                    "DateCreated" => isAsc ? data.OrderBy(s => s.DateCreatedD) : data.OrderByDescending(s => s.DateCreatedD),
+                    "DateModified" => isAsc ? data.OrderBy(s => s.DateModifiedD) : data.OrderByDescending(s => s.DateModifiedD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -242,53 +219,31 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.Code.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.FirstName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.MiddleName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.LastName.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.Area.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.UserCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || x.DateCreated.ToLower().Contains(form.SearchValue.ToLower())
-                                    || (x.UserModified + "").ToLower().Contains(form.SearchValue.ToLower())
-                                    || (x.DateModified + "").ToLower().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.Code,
+                    s.FirstName,
+                    s.MiddleName,
+                    s.LastName,
+                    s.Area,
+                    s.UserCreated,
+                    s.DateCreated,
+                    s.UserModified,
+                    s.DateModified
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderBy(s => s.Code); break;
-                        case "FirstName": data = data.OrderBy(s => s.FirstName); break;
-                        case "MiddleName": data = data.OrderBy(s => s.MiddleName); break;
-                        case "LastName": data = data.OrderBy(s => s.LastName); break;
-                        case "Area": data = data.OrderBy(s => s.Area); break;
-                        case "UserCreated": data = data.OrderBy(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderBy(s => s.DateCreatedD); break;
-                        case "UserModified": data = data.OrderBy(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderBy(s => s.DateModifiedD); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-                    {
-                        case "Code": data = data.OrderByDescending(s => s.Code); break;
-                        case "FirstName": data = data.OrderByDescending(s => s.FirstName); break;
-                        case "MiddleName": data = data.OrderByDescending(s => s.MiddleName); break;
-                        case "LastName": data = data.OrderByDescending(s => s.LastName); break;
-                        case "Area": data = data.OrderByDescending(s => s.Area); break;
-                        case "UserCreated": data = data.OrderByDescending(s => s.UserCreated); break;
-                        case "DateCreated": data = data.OrderByDescending(s => s.DateCreatedD); break;
-                        case "UserModified": data = data.OrderByDescending(s => s.UserModified); break;
-                        case "DateModified": data = data.OrderByDescending(s => s.DateModifiedD); break;
-                        default: break;
-                    }
-                }
+                    "DateCreated" => isAsc ? data.OrderBy(s => s.DateCreatedD) : data.OrderByDescending(s => s.DateCreatedD),
+                    "DateModified" => isAsc ? data.OrderBy(s => s.DateModifiedD) : data.OrderByDescending(s => s.DateModifiedD),
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();
@@ -326,6 +281,7 @@ namespace GMGInventory.Application.Repositories
                           where agent.Id == id
                           select new AgentVM
                           {
+                              CustomerId = cust.Id,
                               CustomerName = cust.Name,
                               CustomerAddress = cust.ShippingAddresses
                                                     .Where(s => s.IsDefault == true)
@@ -350,39 +306,24 @@ namespace GMGInventory.Application.Repositories
             // search data when search value found
             if (!string.IsNullOrWhiteSpace(form.SearchValue))
             {
-                data = data.Where(x => x.CustomerName.ToString().Contains(form.SearchValue)
-                                    || x.CustomerAddress.ToString().Contains(form.SearchValue)
-                                    || x.CustomerEmail.ToString().Contains(form.SearchValue)
-                                    || x.CustomerContactNo.ToString().Contains(form.SearchValue));
+                data = data.Where(s => new[]
+                {
+                    s.CustomerName,
+                    s.CustomerAddress,
+                    s.CustomerEmail,
+                    s.CustomerContactNo
+                }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
             filterRecord = data.Count();
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumnDirection == "asc")
+                bool isAsc = form.SortColumnDirection == "asc";
+                data = form.SortColumn switch
                 {
-                    switch (form.SortColumn)
-                    {
-                        case "CustomerName": data = data.OrderBy(s => s.CustomerName); break;
-                        case "CustomerAddress": data = data.OrderBy(s => s.CustomerAddress); break;
-                        case "CustomerEmail": data = data.OrderBy(s => s.CustomerEmail); break;
-                        case "CustomerContactNo": data = data.OrderBy(s => s.CustomerContactNo); break;
-                        default: break;
-                    }
-                }
-                else if (form.SortColumnDirection == "desc")
-                {
-                    switch (form.SortColumn)
-
-                    {
-                        case "CustomerName": data = data.OrderByDescending(s => s.CustomerName); break;
-                        case "CustomerAddress": data = data.OrderByDescending(s => s.CustomerAddress); break;
-                        case "CustomerEmail": data = data.OrderByDescending(s => s.CustomerEmail); break;
-                        case "CustomerContactNo": data = data.OrderByDescending(s => s.CustomerContactNo); break;
-                        default: break;
-                    }
-                }
+                    _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
+                };
             }
             //pagination
             var pageList = data.Skip(form.Skip).Take(form.PageSize).ToList();

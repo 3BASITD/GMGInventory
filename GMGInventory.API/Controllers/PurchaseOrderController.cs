@@ -9,9 +9,9 @@ namespace GMGInventory.API.Controllers
     public class PurchaseOrderController(IPurchaseOrderNewRepository purchaseOrderRepository) : ControllerBase
     {
         [HttpGet("List")]
-        public async Task<IList<APIPurchaseOrder>> GetList()
+        public async Task<IList<APIPurchaseOrder>> GetList(DateTime? date)
         {
-            return await purchaseOrderRepository.GetListAPI();
+            return await purchaseOrderRepository.GetListAPI(date);
         }
     }
 }
