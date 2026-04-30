@@ -4,7 +4,6 @@ using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -160,40 +159,38 @@ namespace GMGInventory.Application.Repositories
             //    total_count = query.Count()
             //};
 
-            
-            var requests =
-                from prli in context.PurchaseRequestLineItems
-                where string.IsNullOrWhiteSpace(search) || prli.PurchaseRequest.DocumentNumber.Contains(search)
-                   && prli.PurchaseRequest.TypeId == RequestTypeId
-                   && (RequestPurposeId == null || prli.PurchaseRequest.PurposeId == RequestPurposeId)
-                   && prli.PurchaseRequest.Status.Name.ToLower() == "approved"
-                   && (RegionId == null || prli.SalesOrder.Customer.Area.Region.Id == RegionId)
-                group prli by new { prli.PurchaseRequest.Id, prli.PurchaseRequest.DocumentNumber, Status = prli.PurchaseRequest.Status.Name } into g
-                orderby g.Key.Id ascending
-                select new
-                {
-                    g.Key.Id,
-                    DocumentNumber = g.Key.DocumentNumber + (g.Key.Status.ToLower() == "approved" ? "" : (" (" + g.Key.Status + ")")),
-                    TotalQuantity = g.Sum(s => s.Quantity),
-                    //ActiveOnlyEnabler = (ActiveOnly == true && g.Key.Status.ToLower() == "approved")
-                    //                 || (ActiveOnly == false && g.Key.Status.ToLower() != "disapproved")
-                };
 
-            var filteredRequests = await requests
-                .Skip((page - 1) * 50)
-                .Take(50)
-                .ToListAsync();
+            var requests = from prli in context.PurchaseRequestLineItems
+                           where (string.IsNullOrWhiteSpace(search) || prli.PurchaseRequest.DocumentNumber.Contains(search))
+                              && prli.PurchaseRequest.TypeId == RequestTypeId
+                              && (RequestPurposeId == null || prli.PurchaseRequest.PurposeId == RequestPurposeId)
+                              /*&& prli.PurchaseRequest.Status.Name.ToLower() == "approved"*/
+                              && (RegionId == null || prli.SalesOrder.Customer.Area.Region.Id == RegionId)
+                           group prli by new { prli.PurchaseRequest.Id, prli.PurchaseRequest.DocumentNumber, Status = prli.PurchaseRequest.Status.Name } into g
+                           orderby g.Key.Id ascending
+                           select new
+                           {
+                               g.Key.Id,
+                               DocumentNumber = g.Key.DocumentNumber + (g.Key.Status.ToLower() == "approved" ? "" : (" (" + g.Key.Status + ")")),
+                               TotalQuantity = g.Sum(s => s.Quantity),
+                               //ActiveOnlyEnabler = (ActiveOnly == true && g.Key.Status.ToLower() == "approved")
+                               //                 || (ActiveOnly == false && g.Key.Status.ToLower() != "disapproved")
+                           };
+
+            var filteredRequests = await requests.Skip((page - 1) * 50)
+                                                 .Take(50)
+                                                 .ToListAsync();
 
             var filteredRequestsOn = filteredRequests.Select(s =>
             {
                 var ordq = context.PurchaseOrderNewLineItems
                                   .Where(poli => poli.RequestItem.PurchaseRequest.Id == s.Id
-                                              && poli.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                              /*&& poli.PurchaseOrder.Status.Name.ToLower() == "approved"*/)
                                   .Sum(poli => (int?)poli.Quantity) ?? 0;
 
                 var alreadyOn = string.Join(", ", context.PurchaseOrderNewLineItems
                                                          .Where(poli => poli.RequestItem.PurchaseRequest.Id == s.Id
-                                                                     && poli.PurchaseOrder.Status.Name.ToLower() == "approved")
+                                                                     /*&& poli.PurchaseOrder.Status.Name.ToLower() == "approved"*/)
                                                          .Select(poli => poli.PurchaseOrder.DocumentNumber)
                                                          .Distinct()
                                                          .ToList());
@@ -247,6 +244,8 @@ namespace GMGInventory.Application.Repositories
                                Quantity = prli.Quantity,
                                Unit = prli.Item == null ? prli.Unit.Name : prli.Item.Unit.Name,
                                UnitId = prli.Item == null ? prli.Unit.Id : prli.Item.Unit.Id,
+                               SalesOrderId = prli.SalesOrder.Id,
+                               SalesOrderNumber = prli.SalesOrder.SalesOrderNumber,
                                Served = ponli.Select(a => (int?)a.Quantity).Sum() ?? 0,
                                OrderedOn = ponli.Count() > 0 ? string.Join(", ", ponli.Select(s => s.PurchaseOrder.DocumentNumber)) : "",
                                Disabled = (ponli.Select(a => (int?)a.Quantity).Sum() ?? 0) >= prli.Quantity,
@@ -275,7 +274,7 @@ namespace GMGInventory.Application.Repositories
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
                          && (string.IsNullOrWhiteSpace(search)
-                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || (order.SalesOrderNumber.Trim().ToLower().Contains(search.Trim().ToLower())))
                          && (regionId == null || order.Customer.Area.Region.Id == regionId)
                          //&& oli.Any(s => s.Quantity > s.Stock)
                          orderby order.SalesOrderNumber ascending
@@ -400,7 +399,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         switch (form.SortColumn)
                         {
-                            case "OrderDate": data = data.OrderBy(s => s.OrderDateD); break;
+                            case "OrderDate": data = data.OrderBy(s => s.OrderDateD).ThenBy(s => s.DocumentNumber); break;
                             default: break;
                         }
                     }
@@ -408,7 +407,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         switch (form.SortColumn)
                         {
-                            case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD); break;
+                            case "OrderDate": data = data.OrderByDescending(s => s.OrderDateD).ThenByDescending(s => s.DocumentNumber); break;
                             default: break;
                         }
                     }
@@ -431,7 +430,10 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ItemFromPurchaseRequestVM>> GetPurchaseRequestItems(int PurchaseRequestId)
         {
+
             var itemVM = await (from request in context.PurchaseRequestLineItems
+                                //join latest in itemLatestCost on request.ItemId equals latest.ItemId into latestg
+                                //from latest in latestg.DefaultIfEmpty()
                                 let orderQuantity = context.PurchaseOrderNewLineItems
                                                             .Where(s => s.RequestItemId == request.Id)
                                                             .Sum(s => (int?)s.Quantity) ?? 0
@@ -448,8 +450,30 @@ namespace GMGInventory.Application.Repositories
                                     RequestQuantityD = request.Quantity,
                                     Unit = request.Item.Unit.Code,
                                     UnitId = request.Item.Unit.Id,
-                                    UnitCostD = 0
+                                    //UnitCostD = latest == null ? 0 : latest.UnitCost
                                 }).ToListAsync();
+
+            var itemIds = itemVM.Select(s => s.ItemId).ToList();
+
+            var itemLatestCost = await context.PurchaseOrderNewLineItems
+                                              .Where(s => s.RequestItem.ItemId.HasValue && itemIds.Contains(s.RequestItem.ItemId.Value))
+                                              .GroupBy(s => s.RequestItem.ItemId.Value)
+                                              .Select(g => new
+                                              {
+                                                  ItemId = g.Key,
+                                                  UnitCost = g.OrderByDescending(s => s.DateCreated)
+                                                              .Select(s => s.UnitCost)
+                                                              .FirstOrDefault()
+                                              })
+                                              .ToListAsync();
+            var latestMap = itemLatestCost.ToDictionary(x => x.ItemId, x => x.UnitCost);
+            foreach (var item in itemVM)
+            {
+                //var latest = itemLatestCost.Where(s => s.ItemId == item.ItemId).FirstOrDefault();
+
+                //item.UnitCostD = latest == null ? 0 : latest.UnitCost;
+                item.UnitCostD = latestMap.TryGetValue(item.ItemId, out var cost) ? cost : 0;
+            }
 
             return itemVM;
         }
@@ -534,14 +558,10 @@ namespace GMGInventory.Application.Repositories
                               TypeId = order.Type.Id,
                               RequestType = order.Type.RequestType.Name,
                               RequestTypeId = order.Type.RequestType.Id,
-                              RequestPurpose = item == null
-                                             ? null
-                                             : item.RequestItem.PurchaseRequest.Purpose.Name,
-                              RequestPurposeId = item == null
-                                               ? null
-                                               : item.RequestItem.PurchaseRequest.Purpose.Id,
-                              Region = firstrequest.SalesOrderId == null ? "" : firstrequest.SalesOrder.Customer.Area.Region.Name,
-                              RegionId = firstrequest.SalesOrderId == null ? (int?)null : firstrequest.SalesOrder.Customer.Area.Region.Id,
+                              RequestPurpose = order.Purpose.Name,
+                              RequestPurposeId = order.Purpose.Id,
+                              Region = order.Region == null ? null : order.Region.Name,
+                              RegionId = order.Region == null ? null : order.Region.Id,
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               SupplierContactPerson = order.Supplier.ContactPerson + "",
@@ -605,6 +625,8 @@ namespace GMGInventory.Application.Repositories
                               LineNumber = order.LineNumber,
                               PurchaseRequestId = order.RequestItem.PurchaseRequest.Id,
                               PurchaseRequestNumber = order.RequestItem.PurchaseRequest.DocumentNumber,
+                              SalesOrderId = order.RequestItem.SalesOrder.Id,
+                              SalesOrderNumber = order.RequestItem.SalesOrder.SalesOrderNumber,
                               RequestItemId = order.RequestItem.Id,
                               ItemId = order.RequestItem.Item == null ? null : order.RequestItem.Item.Id,
                               ItemCode = order.RequestItem.Item == null ? null : order.RequestItem.Item.Code,
@@ -733,8 +755,10 @@ namespace GMGInventory.Application.Repositories
                         {
                             DocumentNumber = docNumber,
                             TypeId = form.TypeId,
+                            PurposeId = form.PurposeId,
                             SupplierId = form.SupplierId,
                             TermId = form.TermsId,
+                            RegionId = form.RegionId,
                             CurrencyId = form.CurrencyId,
                             CurrencyRate = form.CurrencyRate,
                             DeliveryModeId = form.DeliveryModeId,

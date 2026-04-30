@@ -48,9 +48,9 @@ namespace GMGInventory.Common.Models
     {
         public IList<PurchaseOrderRVM> Contents { get; set; }
         public string GroupBy { get; set; }
-        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
         public DateTime DateFromD { get; set; }
-        public string DateTo => DateToD.ToString(SystemFormat.StringDate2);
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
         public DateTime DateToD { get; set; }
         public string Supplier { get; set; }
         public string Item { get; set; }
@@ -107,9 +107,9 @@ namespace GMGInventory.Common.Models
     {
         public IList<PurchaseReturnRVM> Contents { get; set; }
         public string GroupBy { get; set; }
-        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
         public DateTime DateFromD { get; set; }
-        public string DateTo => DateToD.ToString(SystemFormat.StringDate2);
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
         public DateTime DateToD { get; set; }
         public string Supplier { get; set; }
         public string Item { get; set; }
@@ -167,9 +167,9 @@ namespace GMGInventory.Common.Models
     {
         public IList<PurchaseReceivingRVM> Contents { get; set; }
         public string GroupBy { get; set; }
-        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate2);
+        public string DateFrom => DateFromD.ToString(SystemFormat.StringDate);
         public DateTime DateFromD { get; set; }
-        public string DateTo => DateToD.ToString(SystemFormat.StringDate2);
+        public string DateTo => DateToD.ToString(SystemFormat.StringDate);
         public DateTime DateToD { get; set; }
         public string Supplier { get; set; }
         public string Item { get; set; }
@@ -178,7 +178,7 @@ namespace GMGInventory.Common.Models
         public decimal TotalAmountD { get; set; }
         public string TotalAmount2 => string.Format(SystemFormat.StringDecimalComma, TotalAmount2D);
         public decimal TotalAmount2D { get; set; }
-        public string DatePrinted => DateTime.Now.ToString(SystemFormat.StringDate2);
+        public string DatePrinted => DateTime.Now.ToString(SystemFormat.StringDate);
         public string DocNo { get; set; }
     }
     #endregion

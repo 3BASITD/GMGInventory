@@ -77,7 +77,7 @@
                             @Html.DisplayNameFor(model => model.DateFrom)
                         </span>
                         <b class="d-block">
-                            @Model.DateFrom
+                            @(string.IsNullOrWhiteSpace(Model.DateFrom) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.DateFrom)
                         </b>
                     </p>
                 </div>
@@ -87,7 +87,7 @@
                             @Html.DisplayNameFor(model => model.DateTo)
                         </span>
                         <b class="d-block">
-                            @Model.DateTo
+                            @(string.IsNullOrWhiteSpace(Model.DateTo) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.DateTo)
                         </b>
                     </p>
                 </div>

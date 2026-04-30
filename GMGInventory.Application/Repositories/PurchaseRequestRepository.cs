@@ -177,7 +177,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         switch (form.SortColumn)
                         {
-                            case "RequestDate": data = data.OrderBy(s => s.RequestDateD); break;
+                            case "RequestDate": data = data.OrderBy(s => s.RequestDateD).ThenBy(s => s.DocumentNumber); break;
                             default: break;
                         }
                     }
@@ -185,7 +185,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         switch (form.SortColumn)
                         {
-                            case "RequestDate": data = data.OrderByDescending(s => s.RequestDateD); break;
+                            case "RequestDate": data = data.OrderByDescending(s => s.RequestDateD).ThenByDescending(s => s.DocumentNumber); break;
                             default: break;
                         }
                     }

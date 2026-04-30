@@ -17,7 +17,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@(titleDetails == null ? "" : $"{titleDetails} ")@title | 3BAS Tigers Inc</title>
+    <title>@(titleDetails == null ? "" : $"{titleDetails} ")@title | @await Component.InvokeAsync("LayoutData", new { viewType = "CompanyTitle" })</title>
     <link rel="icon" href="~/images/box.ico" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -49,7 +49,7 @@
                 <a asp-controller="Home" asp-action="Index" class="navbar-brand brand-link">
                     <img src="~/images/3BAS.png" alt="BAS" class="brand-image" style="margin-top:-3px;margin-right:0.8rem" />
                     @* <img src="~/images/3BAS.png" alt="BAS" class="brand-image img-circle bg-white" style="margin-top:-3px;" /> *@
-                    <span class="brand-text font-weight-light">3BAS TIGER INC</span>
+                    @await Component.InvokeAsync("LayoutData", new { viewType = "CompanyNavbar" })
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -187,7 +187,7 @@
         <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
     </form>
 
-    <div id="partial-holder" class="text-sm"></div>
+    <div id="partial-holder" class="text-sm mb-0"></div>
     <div id="for-print"></div>
     <input type="hidden" id="current-user-nickname" value="@activeUser.Nickname" />
     <input type="hidden" class="current-user-role" value="temp" />

@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -32,88 +33,8 @@ namespace GMGInventory.Application.Repositories
         {
             try
             {
-                var invoiceAmounts = from scli in context.SOACRLineItems
-                                     where (/*!string.IsNullOrWhiteSpace(form.SearchValue)
-                                     ||*/ form.SortColumn == null
-                                     || form.SortColumn.Trim().ToLower() == "totalamount"
-                                     || form.SortColumn.Trim().ToLower() == "balance"
-                                     || form.SortColumn.Trim().ToLower() == "overpayment")
-                                     && (scli.Invoice.Status.Code.Trim().ToLower() == "invoiced" || scli.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                     join ili in context.InvoiceLineItems on scli.InvoiceId equals ili.InvoiceId
-                                     join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
-                                     group new { scli, ili, soli } by scli.SOACRId into g
-                                     select new
-                                     {
-                                         SOACRId = g.Key,
-                                         TotalAmount = g.Sum(s => (decimal?)s.ili.Quantity *
-                                                                  s.ili.UnitPrice *
-                                                                  (100 - s.soli.Discount1) / 100m *
-                                                                  (100 - s.soli.Discount2) / 100m *
-                                                                  (100 - (s.soli.Discount3 == null ? 0 : s.soli.Discount3)) / 100m *
-                                                                  (100 - (s.soli.Discount4 == null ? 0 : s.soli.Discount4)) / 100m *
-                                                                  (100 - (s.soli.Discount5 == null ? 0 : s.soli.Discount5)) / 100m) ?? 0
-                                     };
-
-                var tbrAmounts = from scli in context.SOACRLineItems
-                                 where (/*!string.IsNullOrWhiteSpace(form.SearchValue)
-                                 ||*/ form.SortColumn == null
-                                 || form.SortColumn.Trim().ToLower() == "tbr"
-                                 || form.SortColumn.Trim().ToLower() == "balance"
-                                 || form.SortColumn.Trim().ToLower() == "overpayment")
-                                 && (scli.Invoice.Status.Code.Trim().ToLower() == "invoiced" || scli.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                 join sclit in context.SOACRLineItemTBRs on scli.Id equals sclit.SOACRLineItemId
-                                 group sclit by scli.SOACRId into g
-                                 select new
-                                 {
-                                     SOACRId = g.Key,
-                                     TotalAmount = g.Sum(s => (decimal?)s.Amount) ?? 0
-                                 };
-
-                var paidAmounts = from cpd in context.CustomerPaymentDetails
-                                  where (/*!string.IsNullOrWhiteSpace(form.SearchValue)
-                                  ||*/ form.SortColumn == null
-                                  || form.SortColumn.Trim().ToLower() == "paidamount"
-                                  || form.SortColumn.Trim().ToLower() == "balance"
-                                  || form.SortColumn.Trim().ToLower() == "overpayment")
-                                  && (cpd.Invoice.Status.Code.Trim().ToLower() == "invoiced" || cpd.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                  group cpd by cpd.CustomerPayment.SOACRId into g
-                                  select new
-                                  {
-                                      SOACRId = g.Key,
-                                      TotalAmount = g.Sum(s => (decimal?)s.PaidAmount) ?? 0
-                                  };
-
-                var soacrItems = from scli in context.SOACRLineItems
-                                 where (/*!string.IsNullOrWhiteSpace(form.SearchValue)
-                                 ||*/ form.SortColumn == null
-                                 || form.SortColumn.Trim().ToLower() == "credit"
-                                 || form.SortColumn.Trim().ToLower() == "debit"
-                                 || form.SortColumn.Trim().ToLower() == "freightcharge"
-                                 || form.SortColumn.Trim().ToLower() == "balance"
-                                 || form.SortColumn.Trim().ToLower() == "overpayment")
-                                 && (scli.Invoice.Status.Code.Trim().ToLower() == "invoiced" || scli.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                 group scli by scli.SOACRId into g
-                                 select new
-                                 {
-                                     SOACRId = g.Key,
-                                     CreditAmount = g.Sum(s => (decimal?)s.CreditAmount) ?? 0,
-                                     DebitAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
-                                     FreightCost = g.Sum(s => (decimal?)s.FreightCost) ?? 0
-                                 };
+                // nilipat yung mga pera after ng page filter para bumilis magload
                 var soacr = from soa in context.SOACRs
-                            let invoiceAmount = invoiceAmounts.Where(s => s.SOACRId == soa.Id)
-                                                              .Sum(s => (decimal?)s.TotalAmount) ?? 0
-                            let tbrAmount = tbrAmounts.Where(s => s.SOACRId == soa.Id)
-                                                      .Sum(s => (decimal?)s.TotalAmount) ?? 0
-                            let paidAmount = paidAmounts.Where(s => s.SOACRId == soa.Id)
-                                                      .Sum(s => (decimal?)s.TotalAmount) ?? 0
-                            let creditAmount = soacrItems.Where(s => s.SOACRId == soa.Id)
-                                                      .Sum(s => (decimal?)s.CreditAmount) ?? 0
-                            let debitAmount = soacrItems.Where(s => s.SOACRId == soa.Id)
-                                                      .Sum(s => (decimal?)s.DebitAmount) ?? 0
-                            let freightAmount = soacrItems.Where(s => s.SOACRId == soa.Id)
-                                                      .Sum(s => (decimal?)s.FreightCost) ?? 0
-                            let balance = invoiceAmount + debitAmount + tbrAmount - creditAmount - paidAmount
                             select new SOACRVM
                             {
                                 Id = soa.Id,
@@ -121,68 +42,8 @@ namespace GMGInventory.Application.Repositories
                                 Customer = soa.Customer.Name,
                                 Type = soa.SOACRType.Code,
                                 SOAFromD = soa.SOAFrom,
-                                SOAToD = soa.SOATo,
-
-                                TotalAmountD = invoiceAmount,
-                                TBRD = tbrAmount,
-                                PaidAmountD = paidAmount,
-                                CreditD = creditAmount,
-                                DebitD = debitAmount,
-                                FreightChargeD = freightAmount,
-
-                                BalanceD = balance > 0 ? balance : 0,
-                                OverPaymentD = balance < 0 ? Math.Abs(balance) : 0
+                                SOAToD = soa.SOATo
                             };
-
-                /*var soacr = from soa in context.SOACRs
-                            let invoiceTotals = soa.SOACRLineItems
-                                                   .Where(s => (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft"))
-                                                   .SelectMany(scli => scli.Invoice
-                                                                           .InvoiceLineItems
-                                                                           .Join(context.SalesOrderLineItems,
-                                                                                 ili => new { scli.Invoice.SalesOrderId, ili.ItemId },
-                                                                                 soli => new { soli.SalesOrderId, soli.ItemId },
-                                                                                 (ili, soli) => new
-                                                                                 {
-                                                                                     Amount = (decimal?)ili.Quantity *
-                                                                                              ili.UnitPrice *
-                                                                                              (100 - soli.Discount1) / 100m *
-                                                                                              (100 - soli.Discount2) / 100m
-                                                                                 }
-                                                                           )
-                                                   )
-                                                   .Sum(s => s.Amount) ?? 0
-                            let tbrTotal = soa.SOACRLineItems
-                                              .SelectMany(scli => context.SOACRLineItemTBRs
-                                                                         .Where(s => s.SOACRLineItemId == scli.Id))
-                                              .Sum(s => (decimal?)s.Amount) ?? 0
-                            let paymentTotal = soa.SOACRLineItems
-                                                  .SelectMany(scli => context.CustomerPaymentDetails
-                                                                             .Where(s => s.InvoiceId == scli.InvoiceId
-                                                                                      && s.CustomerPayment.SOACR.Id == soa.Id))
-                                                  .Sum(p => (decimal?)p.PaidAmount) ?? 0
-                            let creditTotal = soa.SOACRLineItems.Sum(scli => (decimal?)scli.CreditAmount) ?? 0
-                            let debitTotal = soa.SOACRLineItems.Sum(scli => (decimal?)scli.DebitAmount) ?? 0
-                            let freightTotal = soa.SOACRLineItems.Sum(scli => (decimal?)scli.FreightCost) ?? 0
-                            let balance = invoiceTotals + debitTotal + tbrTotal - creditTotal - paymentTotal
-                            select new SOACRVM
-                            {
-                                Id = soa.Id,
-                                Customer = soa.Customer.Name,
-                                Type = soa.SOACRType.Code,
-                                SOAFromD = soa.SOAFrom,
-                                SOAToD = soa.SOATo,
-
-                                TotalAmountD = invoiceTotals,
-                                TBRD = tbrTotal,
-                                PaidAmountD = paymentTotal,
-                                CreditD = creditTotal,
-                                DebitD = debitTotal,
-                                FreightChargeD = freightTotal,
-
-                                BalanceD = balance > 0 ? balance : 0,
-                                OverPaymentD = balance < 0 ? Math.Abs(balance) : 0,
-                            };*/
 
                 return await soacr.ToListAsync();
             }
@@ -213,15 +74,7 @@ namespace GMGInventory.Application.Repositories
                     s.Customer,
                     s.Type,
                     s.SOAFrom,
-                    s.SOATo,
-                    //s.TotalAmountD.ToString(),
-                    //s.TBRD.ToString(),
-                    //s.CreditD.ToString(),
-                    //s.DebitD.ToString(),
-                    //s.PaidAmountD.ToString(),
-                    //s.FreightChargeD.ToString(),
-                    //s.BalanceD.ToString(),
-                    //s.OverPaymentD.ToString()
+                    s.SOATo
                 }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
             }
             // get total count of records after search
@@ -234,14 +87,6 @@ namespace GMGInventory.Application.Repositories
                 {
                     "SOAFrom" => isAsc ? data.OrderBy(s => s.SOAFromD) : data.OrderByDescending(s => s.SOAFromD),
                     "SOATo" => isAsc ? data.OrderBy(s => s.SOAToD) : data.OrderByDescending(s => s.SOAToD),
-                    "TotalAmount" => isAsc ? data.OrderBy(s => s.TotalAmountD) : data.OrderByDescending(s => s.TotalAmountD),
-                    "TBR" => isAsc ? data.OrderBy(s => s.TBRD) : data.OrderByDescending(s => s.TBRD),
-                    "Credit" => isAsc ? data.OrderBy(s => s.CreditD) : data.OrderByDescending(s => s.CreditD),
-                    "Debit" => isAsc ? data.OrderBy(s => s.DebitD) : data.OrderByDescending(s => s.DebitD),
-                    "PaidAmount" => isAsc ? data.OrderBy(s => s.PaidAmountD) : data.OrderByDescending(s => s.PaidAmountD),
-                    "FreightCharge" => isAsc ? data.OrderBy(s => s.FreightChargeD) : data.OrderByDescending(s => s.FreightChargeD),
-                    "Balance" => isAsc ? data.OrderBy(s => s.BalanceD) : data.OrderByDescending(s => s.BalanceD),
-                    "OverPayment" => isAsc ? data.OrderBy(s => s.OverPaymentD) : data.OrderByDescending(s => s.OverPaymentD),
                     _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
                 };
             }
@@ -324,7 +169,7 @@ namespace GMGInventory.Application.Repositories
                 var debit = soacr?.DebitAmount ?? 0;
                 var freight = soacr?.FreightCost ?? 0;
 
-                var balance = invoice + debit + tbr - credit - paid;
+                var balance = invoice - tbr - credit + debit - paid + freight;
 
                 pl.TotalAmountD = invoice;
                 pl.TBRD = tbr;
@@ -583,7 +428,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<int> GenerateCRAsync(int CustomerId, int[] InvoiceIds)
         {
             var soaType = await context.SOACRTypes.Where(s => s.Name.ToLower() == "counter receipt").Select(s => s.Id).FirstAsync();
-            var invoices = await context.Invoices.Where(s => InvoiceIds.Contains(s.Id)).ToListAsync();
+            var invoices = await context.Invoices
+                                        .Where(s => InvoiceIds.Contains(s.Id)
+                                                 && (s.Status.Code.Trim().ToLower() == "invoiced" || s.Status.Code.Trim().ToLower() == "draft"))
+                                        .ToListAsync();
 
             var soa = new SOACR
             {

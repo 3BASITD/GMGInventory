@@ -153,15 +153,17 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIGeneric>> GetListAPI()
+        public async Task<IList<APIWarehouse>> GetListAPI()
         {
             var warehouses = from warehouse in context.Warehouses
-                             where warehouse.IsActive == true
-                             select new APIGeneric
+                             //where warehouse.IsActive == true
+                             select new APIWarehouse
                              {
                                  Id = warehouse.Id,
                                  Code = warehouse.Code,
-                                 Name = warehouse.Name
+                                 Name = warehouse.Name,
+                                 IsActive = warehouse.IsActive,
+                                 IsMain = warehouse.IsMain == true
                              };
             return await warehouses.ToListAsync();
         }

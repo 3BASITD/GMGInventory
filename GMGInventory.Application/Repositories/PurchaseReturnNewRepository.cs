@@ -165,7 +165,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         switch (form.SortColumn)
                         {
-                            case "ReturnDate": data = data.OrderBy(s => s.ReturnDateD); break;
+                            case "ReturnDate": data = data.OrderBy(s => s.ReturnDateD).ThenBy(s => s.DocumentNumber); break;
                             default: break;
                         }
                     }
@@ -173,7 +173,7 @@ namespace GMGInventory.Application.Repositories
                     {
                         switch (form.SortColumn)
                         {
-                            case "ReturnDate": data = data.OrderByDescending(s => s.ReturnDateD); break;
+                            case "ReturnDate": data = data.OrderByDescending(s => s.ReturnDateD).ThenByDescending(s => s.DocumentNumber); break;
                             default: break;
                         }
                     }

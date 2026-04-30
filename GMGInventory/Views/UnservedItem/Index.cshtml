@@ -11,11 +11,11 @@
         <div class="card-tools mr-1">
             @if (userAccess.CanUploadDownload)
             {
-                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 downloadBtn">
+                <button type="button" class="btn btn-info btn-sm float-right ml-2 downloadBtn">
                     <span class="fas fa-download"></span> Download
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -55,6 +55,9 @@
                         @Html.DisplayNameFor(model => model.UnservedQuantity)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.TotalAmount)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.QuantityOnHand)
                     </th>
                     <th>
@@ -71,6 +74,26 @@
                     </th>
                 </tr>
             </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th class="text-end">Total</th>
+                    <th></th><!--Quantity-->
+                    <th></th><!--Packed Quantity-->
+                    <th></th><!--Unserved Quantity-->
+                    <th></th><!--Total Amount-->
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
@@ -89,9 +112,40 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-region" class="form-label mb-0">Region</label>
-                            <select id="filter-region" style="width:100%">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
                                 <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-brand-name" class="form-label mb-0">Brand Name</label>
+                            <input type="text" id="filter-brand-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-region" class="form-label mb-0">Region</label>
+                            <select id="filter-region" class="form-control form-control-sm" style="width:100%">
+                                <option value="">ALL</option>
+                                <option value="ML">MM & Luzon</option>
+                                <option value="VM">Visayas & Mindanao</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Sales Order Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
                             </select>
                         </div>
                     </div>
@@ -99,20 +153,24 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">Order Date From</label>
+                            <label for="filter-from" class="form-label mb-0">From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-to" class="control-label mb-0">Order Date To</label>
+                            <label for="filter-to" class="control-label mb-0">To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -122,59 +180,228 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
+        // Load Select2 for Brand
+        $("#filter-brand").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
                 }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        $("#filter-brand").on("select2:select", function () {
+            $("#filter-brand-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-brand").on("select2:unselecting", function (e) {
+            $("#filter-brand-name").val("");
+        });
+        
+        var date_today = new Date();
+        var first_day_month = new Date(date_today.getFullYear(), date_today.getMonth(), 1);
+
+        $("#filter-from").val(DateForInput(first_day_month));
+        $("#filter-to").val(DateForInput(date_today));
+
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
+        });
+
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function () {
+            var selected = $(this).val();
+
+            var from = null;
+            var to = new Date(date_today);
+
+            if (selected === "") {
+                $("#filter-from").prop("readonly", false);
+                $("#filter-to").prop("readonly", false);
+                return;
             }
 
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
+            $("#filter-from").prop("readonly", true);
+            $("#filter-to").prop("readonly", true);
+
+            if (selected === "TD") { // Today
+                from = new Date(date_today);
+                to = new Date(date_today);
+            } else if (selected === "L7D") { // Last 7 Days
+                from = new Date(date_today);
+                from.setDate(date_today.getDate() - 6);
+            } else if (selected === "MTD") { // Month to Date
+                from = first_day_month;
+            } else if (selected === "LM") { // Last Month
+                from = new Date(date_today.getFullYear(), date_today.getMonth() - 1, 1);
+                to = new Date(date_today.getFullYear(), date_today.getMonth(), 0);
+            } else if (selected === "YTD") { // Year to Date
+                from = new Date(date_today.getFullYear(), 0, 1);
             }
+
+            $("#filter-from").val(DateForInput(from));
+            $("#filter-to").val(DateForInput(to));
+        });
+
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            dataTable.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
         }
 
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            dataTable.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
 
-        // Load region data for select2
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Region")",
-            success: function (data, status, xhr) {
-                $("#filter-region").select2({
-                    ajax: null, //already fetched outside
-                    allowClear: true,
-                    placeholder: '<empty>',
-                    data: $.map(data, function (v, i) {
-                        return v.text.toLowerCase() == "luzon" || v.text.toLowerCase() == "visayas" || v.text.toLowerCase() == "mindanao" ? v : null;
-                    }),
-                    minimumResultsForSearch: Infinity
-                });
+        var defaultDTState = {
+            order: [[4, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            BrandId: "",
+            BrandCode: "",
+            Brand: "",
+            Region: "",
+            Preset: "MTD",
+            DateFrom: DateForInput(first_day_month),
+            DateTo: DateForInput(date_today),
+        };
+
+        function checkDTChanged() {
+            if(!dataTable) return false;
+            
+            return JSON.stringify(dataTable.order()) != JSON.stringify(defaultDTState.order) ||
+                   dataTable.page.info().start != defaultDTState.page ||
+                   dataTable.page.len() != defaultDTState.length ||
+                   (dataTable.search() || "") != defaultDTState.search.search ||
+                   $("#filter-brand").val() != defaultDTState.BrandId ||
+                   $("#filter-region").val() != defaultDTState.Region ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $("#filter-brand-name").val(defaultDTState.Brand);
+            $('#filter-region').val(defaultDTState.Region).trigger('change');
+            $('#filter-preset').val(defaultDTState.Preset).trigger('change');
+            $('#filter-from').prop("readonly", true);
+            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-to').prop("readonly", true);
+            $('#filter-to').val(defaultDTState.DateTo);
+            
+            localStorage.removeItem(dt_storage);
+
+            if (dataTable) {
+                dataTable.state.clear();
+                dataTable.order(defaultDTState.order);
+                dataTable.page(defaultDTState.page);
+                dataTable.search(defaultDTState.search.search);
             }
-        });
-
-        $(".btnFilter").on("click", function () {
-            dataTable.ajax.reload();
-        });
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
 
         // Load List on DataTable
         var dataTable = $('.table-unserved').on('preXhr.dt', function(e, settings, data) {
             //showLoader();
         }).DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.BrandId = $('#filter-brand').val();
+                data.BrandCode = $('#filter-brand option:selected').text();
+                data.Brand = $('#filter-brand-name').val();
+                data.Region = $('#filter-region').val();
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.BrandId) {
+                    var brandOption = new Option(data.BrandCode, data.BrandId, true, true);
+                    $(brandOption).data('data', {
+                        id: data.BrandId,
+                        text: data.BrandCode,
+                        name: data.Brand
+                    });
+                    $("#filter-brand").append(brandOption).trigger('change');
+                    $("#filter-brand-name").val(data.Brand);
+                }
+                $('#filter-region').val(data.Region).trigger('change');
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 data: function (data) {
+                    var brandId = $("#filter-brand").val();
+                    if (brandId) data.Brand = brandId;
+
                     var regionId = $("#filter-region").val();
-                    if (regionId) data.Region = regionId;
+                    if (regionId) data.Region2 = regionId;
 
                     data.StartDate = $("#filter-from").val();
                     data.EndDate = $("#filter-to").val();
@@ -196,56 +423,75 @@
                 return: true,
             },
             columns: [
-                { data: "item", name: "Item" },
-                { data: "itemName", name: "ItemName" },
-                { data: "oldSKU", name: "OldSKU" },
-                { data: "orderDate", name: "OrderDate" },
-                { data: "salesOrderNumber", name: "SalesOrderNumber" },
-                { data: "customer", name: "Customer" },
                 {
-                    data: "unitPrice",// function(data, type, dataToSet) { return data.unitPrice.toFixed(2); },
-                    name: "UnitPrice",
-                    className: "text-end"
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.item + "</a>";
+                    },
+                    name: "Item" ,
+                    responsivePriority: 1
                 },
-                { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
-                { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end" },
-                { data: "quantityOnHand", name: "QuantityOnHand", className: "text-end" },
-                {
-                    data: "discount1",//function(data, type, dataToSet) { return data.discount1.toFixed(2); },
-                    name: "Discount1",
-                    className: "text-end"
+                { data: "itemName", name: "ItemName", responsivePriority: 14 },
+                { data: "oldSKU", name: "OldSKU", responsivePriority: 15 },
+                { data: "orderDate", name: "OrderDate", responsivePriority: 11 },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.salesOrderNumber + "</a>";
+                    },
+                    name: "SalesOrderNumber",
+                    responsivePriority: 10
                 },
                 {
-                    data: "discount2",//function(data, type, dataToSet) { return data.discount2.toFixed(2); },
-                    name: "Discount2",
-                    className: "text-end"
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customer + "</a>";
+                    },
+                    name: "Customer", 
+                    responsivePriority: 12
                 },
-                { data: "agent", name: "Agent" },
-                { data: "createdBy", name: "CreatedBy" }
+                { data: "unitPrice", name: "UnitPrice", className: "text-end", responsivePriority: 3 },
+                { data: "quantity", name: "Quantity", className: "text-end", responsivePriority: 6 },
+                { data: "packedQuantity", name: "PackedQuantity", className: "text-end", responsivePriority: 5 },
+                { data: "unservedQuantity", name: "UnservedQuantity", className: "text-end", responsivePriority: 2 },
+                { data: "totalAmount", name: "TotalAmount", className: "text-end", responsivePriority: 4 },
+                { data: "quantityOnHand", name: "QuantityOnHand", className: "text-end", responsivePriority: 7 },
+                { data: "discount1", name: "Discount1", className: "text-end", responsivePriority: 8 },
+                { data: "discount2", name: "Discount2", className: "text-end", responsivePriority: 9 },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agent + "</a>";
+                    },
+                    name: "Agent", 
+                    responsivePriority: 13
+                },
+                { data: "createdBy", name: "CreatedBy", responsivePriority: 16 }
             ],
-            order: [[1, "desc"]]
+            footerCallback: function (row, data, start, end, display) {
+                var json = dataTable.ajax.json();
+                var api = this.api(), data;
+                
+                $(api.column(7).footer()).html(FormatStringInteger(json.totalQuantity));
+                $(api.column(8).footer()).html(FormatStringInteger(json.totalQuantity2));
+                $(api.column(9).footer()).html(FormatStringInteger(json.totalQuantity3));
+                $(api.column(10).footer()).html(FormatStringDecimal(json.totalAmount));
+            },
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load
         dataTable.on("draw", function () {
             //hideLoader();
+            checkDefaultFilter();
+            $(".table-unserved thead th").removeClass("text-end");
         });
 
-        
-            $(".downloadBtn").click(function (e) {
-                var urlQuery = [];
-                if ($("#filter-region").val()) { urlQuery.push("Region=" + $("#filter-region").val()); }
+        $(".downloadBtn").click(function (e) {
+            var urlQuery = [];
+            if ($("#filter-brand").val()) { urlQuery.push("Brand=" + $("#filter-brand").val()); }
+            if ($("#filter-region").val()) { urlQuery.push("Region2=" + $("#filter-region").val()); }
 
-                urlQuery.push("StartDate=" + $("#filter-from").val());
-                urlQuery.push("EndDate=" + $("#filter-to").val());
-               
+            urlQuery.push("StartDate=" + $("#filter-from").val());
+            urlQuery.push("EndDate=" + $("#filter-to").val());
 
-
-                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
-            });
-        
-
-       
+            window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+        });
     </script>
-    }
+}

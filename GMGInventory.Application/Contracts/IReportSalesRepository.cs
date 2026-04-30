@@ -34,7 +34,7 @@ namespace GMGInventory.Application.Contracts
         Task<IList<DailySalesRVM>> FilteredDailySales(ListFilterSalesModel filter);
         Task<DailySalesPVM> PrintDailySales(ListFilterSalesModel filter);
 
-        Task<IList<SalesInvoiceRVM>> GetSalesInvoice(ListFilterSalesModel filter);
+        Task<IList<SalesInvoiceRVM>> GetSalesInvoice(ListFilterSalesModel filter, bool IsPaged = false);
         Task<ForDataTables<SalesInvoiceRVM>> GetSalesInvoiceDT(DataTablesRequestForm form, ListFilterSalesModel filter);
         Task<SalesInvoicePVM> PrintSalesInvoice(ListFilterSalesModel filter);
 

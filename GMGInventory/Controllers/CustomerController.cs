@@ -1,15 +1,12 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
-using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
-using GMGInventory.Data;
 using GMGInventory.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PdfSharp.Quality;
 using System.Data;
+using System.IO.Compression;
 
 namespace GMGInventory.Controllers
 {
@@ -320,7 +317,7 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
-
+/*
             DataTable dt = new("Customer");
             dt.Columns.AddRange([
                 new DataColumn("Code"),
@@ -357,6 +354,97 @@ namespace GMGInventory.Controllers
             return File(stream.ToArray(),
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             DateTime.Now.ToString("yyyyMMdd") + " Customers.xlsx");
+            */
+
+            // Base structure
+            DataTable CreateTable()
+            {
+                DataTable dt = new("Customer");
+                dt.Columns.AddRange([
+                    new DataColumn("Code"),
+                    new DataColumn("Name"),
+                    new DataColumn("Commission Rate"),
+                    new DataColumn("Region"),
+                    new DataColumn("Area"),
+                    new DataColumn("Customer Type"),
+                    new DataColumn("Email"),
+                    new DataColumn("Agent"),
+                    new DataColumn("TIN"),
+                    new DataColumn("VAT"),
+                    new DataColumn("Credit Term"),
+                    new DataColumn("Credit Limit"),
+                    new DataColumn("Remarks")
+                ]);
+                return dt;
+            }
+
+            var customers = await customerRepository.GetAllCustomerAsync();
+
+            var activeCustomers = customers.Where(s => s.IsActive).ToList();
+            var inactiveCustomers = customers.Where(s => !s.IsActive).ToList();
+
+            byte[] GenerateExcel(List<CustomerVM> list, bool isInactive = false)
+            {
+                var dt = CreateTable();
+
+                foreach (var c in list)
+                {
+                    dt.Rows.Add(
+                        c.Code, c.Name, c.CommissionRateD,
+                        c.RegionName, c.AreaName, c.CustomerTypeName,
+                        c.Email, c.AgentName, c.TIN, c.VAT,
+                        c.CreditTermName, c.CreditLimit, c.Remarks
+                    );
+                }
+
+                using var wb = new XLWorkbook();
+                var ws = wb.Worksheets.Add("Customers");
+
+                int startRow = 1;
+
+                if (isInactive)
+                {
+                    ws.Cell(1, 1).Value = "⚠ NOTE: This file is for reference only. Uploading this will activate inactive customers.";
+                    ws.Range(1, 1, 1, dt.Columns.Count).Merge();
+
+                    ws.Cell(1, 1).Style.Font.Bold = true;
+                    ws.Cell(1, 1).Style.Font.FontColor = XLColor.Red;
+                    ws.Cell(1, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    startRow = 2;
+                }
+
+                ws.Cell(startRow, 1).InsertTable(dt);
+
+                using var stream = new MemoryStream();
+                wb.SaveAs(stream);
+                return stream.ToArray();
+            }
+
+            var activeExcel = GenerateExcel(activeCustomers);
+            var inactiveExcel = GenerateExcel(inactiveCustomers, true);
+
+            using var zipStream = new MemoryStream();
+            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            {
+                var activeEntry = archive.CreateEntry("Active Customers.xlsx");
+                using (var entryStream = activeEntry.Open())
+                {
+                    await entryStream.WriteAsync(activeExcel, 0, activeExcel.Length);
+                }
+
+                var inactiveEntry = archive.CreateEntry("Inactive Customers.xlsx");
+                using (var entryStream = inactiveEntry.Open())
+                {
+                    await entryStream.WriteAsync(inactiveExcel, 0, inactiveExcel.Length);
+                }
+            }
+
+            return File(
+                zipStream.ToArray(),
+                "application/zip",
+                DateTime.Now.ToString("yyyyMMdd") + " Customers.zip"
+            );
         }
 
         public async Task<IActionResult> DownloadDiscountFile(int id)

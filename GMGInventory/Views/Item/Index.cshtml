@@ -1405,13 +1405,14 @@
                                     row$.append($('<td/>').html(cellValue));
                             }
 
-                            var hasUnexpectedColumns = requiredColumns.some(col => !columns.includes(col));
+                            var missingColumns = requiredColumns.filter(col => !columns.includes(col));
 
-                            if (hasUnexpectedColumns) {
-                                row$.append($('<td/>').html("Unexpected columns detected! Stopping upload."));
+                            if (missingColumns.length > 0) {
+                                var message = "Missing required columns: " + missingColumns.join(", ");
+                                row$.append($('<td/>').html(message));
                                 $("#upload-table").append(row$);
                                 clearInterval(uploadInterval);
-                                toastr.error("Unexpected columns found. Upload stopped.", "Error");
+                                toastr.error(message, "Error");
                                 return;
                             } else {
                                 SaveXLSX(

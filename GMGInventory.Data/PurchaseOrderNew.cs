@@ -19,6 +19,14 @@ namespace GMGInventory.Data
         public int TypeId { get; set; }
         public virtual PurchaseOrderType Type { get; set; }
 
+        [ForeignKey("PurposeId")]
+        public int? PurposeId { get; set; }
+        public virtual PurchaseRequestPurpose Purpose { get; set; }
+
+        [ForeignKey("RegionId")]
+        public int? RegionId { get; set; }
+        public virtual Region Region { get; set; }
+
         [ForeignKey("SupplierId")]
         public int SupplierId { get; set; }
         public virtual Supplier Supplier { get; set; }

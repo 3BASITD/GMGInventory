@@ -163,6 +163,7 @@ namespace GMGInventory.Data
         public DbSet<ChequeStatus> ChequeStatuses { get; set; }
         //public DbSet<CreditDebitMemo> CreditDebitMemos { get; set; }
         //public DbSet<CreditDebitMemoType> CreditDebitMemoTypes { get; set; }
+        public DbSet<Configuration> Configurations { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<CreditTerm> CreditTerms { get; set; }
         public DbSet<Currency> Currencies { get; set; }

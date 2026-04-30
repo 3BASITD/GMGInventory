@@ -51,7 +51,7 @@ namespace GMGInventory.Application.Repositories
                          where order.Status.Code.ToLower() != "posted"
                          && quantityOrdered != quantityInvoiced
                          && (string.IsNullOrWhiteSpace(search)
-                         || (order.Id.ToString().ToLower().Contains(search.ToLower().Trim())))
+                         || (order.Id.ToString().ToLower().Contains(search.Trim().ToLower())))
                          orderby order.Id ascending
                          select new JsonOptionsModel
                          {

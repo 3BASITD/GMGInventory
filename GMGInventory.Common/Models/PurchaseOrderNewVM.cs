@@ -145,8 +145,10 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
         public int TypeId { get; set; }
+        public int? PurposeId { get; set; }
         public int SupplierId { get; set; }
         public int TermsId { get; set; }
+        public int? RegionId { get; set; }
         public int CurrencyId { get; set; }
         public decimal CurrencyRate { get; set; }
         public int DeliveryModeId { get; set; }
@@ -176,6 +178,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Purchase Request Ref #")]
         public string? PurchaseRequestNumber { get; set; }
+        public int? SalesOrderId { get; set; }
+        public string? SalesOrderNumber { get; set; }
         public int RequestItemId { get; set; }
         public int? ItemId { get; set; }
 

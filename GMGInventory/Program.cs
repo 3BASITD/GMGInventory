@@ -30,7 +30,9 @@ builder.Services.AddDbContext<AppOrderDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\GMGInventory\Keys"))
+    .PersistKeysToFileSystem(
+        new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "keys"))
+    )
     .SetApplicationName("GMGInventory");
 
 builder.Services.Configure<APIHMSettings>(builder.Configuration.GetSection("APIHMSettings"));
@@ -67,6 +69,7 @@ builder.Services.AddScoped(typeof(IBusinessStyleRepository), typeof(BusinessStyl
 builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
 builder.Services.AddScoped(typeof(IChequeRepository), typeof(ChequeRepository));
 builder.Services.AddScoped(typeof(IChequeStatusRepository), typeof(ChequeStatusRepository));
+builder.Services.AddScoped(typeof(IConfigurationRepository), typeof(ConfigurationRepository));
 builder.Services.AddScoped(typeof(ICountryRepository), typeof(CountryRepository));
 builder.Services.AddScoped(typeof(ICreditTermRepository), typeof(CreditTermRepository));
 builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));

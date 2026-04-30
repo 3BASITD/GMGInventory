@@ -33,6 +33,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetOptions(string search, int page)
         {
+            /*
             var latestPrices = context.ItemPrices
                                       .Where(s => s.DateCreated <= DateTime.Now)
                                       .GroupBy(s => s.ItemId)
@@ -74,6 +75,48 @@ namespace GMGInventory.Application.Repositories
                             NetPriceD = price == null || price.LatestPrice == null ? -999999 : price.LatestPrice.NetSellingPrice,
                             QuantityD = 0,
                             RetailPriceD = price == null || price.LatestPrice == null ? -999999 : price.LatestPrice.RetailSellingPrice,
+                            UnitId = item.Unit == null ? -1 : item.Unit.Id,
+                            Unit = item.Unit == null ? "" : item.Unit.Code,
+                            BrandId = item.BrandId
+                        };
+            var itemsFiltered = await items.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonItemOptionsModel>
+            {
+                //incomplete_results = false,
+                items = itemsFiltered,
+                total_count = items.Count()
+            };
+            */
+            var items = from item in context.Items
+                                          .Include(s => s.Unit)
+                        from price in context.ItemPrices
+                                             .Where(s => s.ItemId == item.Id
+                                                      && s.DateCreated <= DateTime.Now)
+                                             .OrderByDescending(s => s.DateCreated)
+                                             .Take(1)
+                                             .DefaultIfEmpty()
+
+                        let inventory = context.ItemInventories
+                                               .Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true)
+                                               .Sum(s => (int?)s.Quantity) ?? 0
+                        where item.IsActive == true
+                           && (string.IsNullOrWhiteSpace(search)
+                           || item.Code.ToLower().Contains(search.ToLower())
+                           || item.Name.ToLower().Contains(search.ToLower())
+                           || (item.OldCode + "").ToLower().Contains(search.ToLower())
+                           || (item.PartNumber + "").ToLower().Contains(search.ToLower()))
+                        orderby item.Code ascending
+                        select new JsonItemOptionsModel
+                        {
+                            Id = item.Id.ToString(),
+                            InventoryCount = inventory,
+                            Text = item.Code,
+                            Name = item.Name,
+                            OldCode = item.OldCode,
+                            PartNumber = item.PartNumber + "",
+                            NetPriceD = price == null ? -999999 : price.NetSellingPrice,
+                            QuantityD = 0,
+                            RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
                             UnitId = item.Unit == null ? -1 : item.Unit.Id,
                             Unit = item.Unit == null ? "" : item.Unit.Code,
                             BrandId = item.BrandId
@@ -1808,8 +1851,8 @@ namespace GMGInventory.Application.Repositories
                 if (string.IsNullOrWhiteSpace(itemFile.Size)) return "Item Size is required";
 
                 var category = await context.Categories
-                                            .Where(s => s.Name.ToLower().Trim() == itemFile.Category.ToLower().Trim()
-                                                     || s.Code.ToLower().Trim() == itemFile.Category.ToLower().Trim())
+                                            .Where(s => s.Name.Trim().ToLower() == itemFile.Category.Trim().ToLower()
+                                                     || s.Code.Trim().ToLower() == itemFile.Category.Trim().ToLower())
                                             .FirstOrDefaultAsync();
                 if (category == null) return $"Invalid Category: {itemFile.Category} not found";
 

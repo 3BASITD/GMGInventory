@@ -1549,24 +1549,33 @@
                 },
                 { data: "grossPrice", name: "GrossPrice", className: "form-cell text-end grossprice" },
                 {
-                    data: function (data, type, dataToSet) {
-                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            return data.servedQuantity;
-                        } else {
-                            return '<span data-microtip-title="Packed Qty [' + data.packedQuantity + '] - Returned Qty [' + data.returnedQuantity + ']" data-microtip-position="bottom-left" role="tooltip">' + data.servedQuantity + '</span>';
+                    data: "servedQuantity",
+                    render: function (data, type, row) {
+                        if (type === "display") {
+                            if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                                return data;
+                            } else {
+                                return '<span data-microtip-title="Packed Qty [' + data.packedQuantity + '] - Returned Qty [' + data.returnedQuantity + ']" data-microtip-position="bottom-left" role="tooltip">' + data + '</span>';
+                            }
                         }
+
+                        return data;
                     },
                     name: "ServedQuantity",
                     className: "form-cell text-end servedquantity"
                 },
                 {
                     data: "unservedQuantity",
-                    data: function (data, type, dataToSet) {
-                        if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
-                            return data.unservedQuantity;
-                        } else {
-                            return '<span data-microtip-title="Order Qty [' + data.quantity + '] - (Packed Qty [' + data.packedQuantity + '] - Returned Qty [' + data.returnedQuantity + '])" data-microtip-position="bottom-left" role="tooltip">' + data.unservedQuantity + '</span>';
+                    render: function (data, type, row) {
+                        if (type === "display") {
+                            if (so_details.status.toLowerCase().includes("draft") && user_access.canEdit) {
+                                return data;
+                            } else {
+                                return '<span data-microtip-title="Order Qty [' + row.quantity + '] - (Packed Qty [' + row.packedQuantity + '] - Returned Qty [' + row.returnedQuantity + '])" data-microtip-position="bottom-left" role="tooltip">' + data + '</span>';
+                            }
                         }
+
+                        return data;
                     },
                     name: "UnservedQuantity",
                     className: "form-cell text-end unservedquantity"

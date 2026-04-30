@@ -928,9 +928,11 @@
                 },
                 { data: "lineNumber", name: "LineNumber", className: "form-cell" },
                 { 
-                    data: "purchaseRequestNumber",
                     data: function (data, type, dataToSet) {
-                        return `<a href="/PurchaseRequest/Details/${data.purchaseRequestId}" class="link-info" target="_blank">${data.purchaseRequestNumber}</a>`;
+                        var msg = `<a href="/PurchaseRequest/Details/${data.purchaseRequestId}" class="link-info" target="_blank">${data.purchaseRequestNumber}</a>`;
+                        if (data.salesOrderId)
+                            msg += ` (<a href="/SalesOrder/Details/${data.salesOrderId}" class="link-info" target="_blank">${data.salesOrderNumber}</a>)`;
+                        return msg;
                     },
                     name: "PurchaseRequestNumber", 
                     className: "form-cell" 
@@ -1017,7 +1019,7 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        if (po_data.status.toLowerCase() == "approved" || po_data.status.toLowerCase() == "approved (completed)") {
+                        if (po_data.status.toLowerCase().startsWith("approved")) {
                             if(!user_access.canEdit || data.quantityUpdateCount > 2) {
                                 actions += '<button type="button" class="btn btn-warning btn-xs btn-history-quantity" data-microtip-title="Update Quantity History" data-microtip-position="left" role="tooltip"><span class="fas fa-history"></span></button>';
                             } else {
@@ -1275,9 +1277,11 @@
                                 if (repo.loading) {
                                     return repo.text;
                                 }
+                                console.log(repo);
                                 return $(
                                     "<strong>" + repo.text + "</strong><br />" +
                                     "<small>" +
+                                    (repo.salesOrderId != null ? "Sales Order: " + repo.salesOrderNumber + "<br />": "") +
                                     "Requested Quantity: " + repo.quantity + " " + repo.unit + "<br />" +
                                     (repo.disabled ? ("Already Ordered On: " + repo.orderedOn)
                                                    : ("Unordered Quantity: " + repo.unorderedQuantity + " " + repo.unit + "<br />" +
@@ -1418,7 +1422,10 @@
                     {
                         orderable: false,
                         data: function (data, type, dataToSet) {
-                            return data.remainingQuantityD == 0 ? '' : '<input class="prchkclassrequest" type="checkbox" ' + ( data.toOrder == true ? 'checked="checked" ' : '') + 'name="requestitemchk_' + data.id + '" onchange="PRRowSelect(this)" />';
+                            if(data.remainingQuantityD == 0)
+                                return '<strong class="text-success" data-microtip-title="All request have been ordered" data-microtip-position="right" role="tooltip">Completed</strong>';
+                            else
+                                return '<input class="prchkclassrequest" type="checkbox" ' + ( data.toOrder == true ? 'checked="checked" ' : '') + 'name="requestitemchk_' + data.id + '" onchange="PRRowSelect(this)" />';
                         }
                     },
                     { data: "itemCode", name: "ItemCode" },
@@ -1630,6 +1637,7 @@
                 var rowIndexes = [];
                 itemDT.rows(function (idx, data, node) {
                     if (data.itemDescription == $("#add-name").select2("data")[0].text
+                     && data.salesOrderId == $("#add-name").select2("data")[0].salesOrderId
                      && data.purchaseRequestId == $("#add-pr-number").select2("data")[0].id) {
                         rowIndexes.push(idx);
                     }
@@ -1643,6 +1651,8 @@
                         lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                         purchaseRequestId: $("#add-pr-number").select2("data")[0].id,
                         purchaseRequestNumber: $("#add-pr-number").select2("data")[0].text,
+                        salesOrderId: $("#add-name").select2("data")[0].salesOrderId,
+                        salesOrderNumber: $("#add-name").select2("data")[0].salesOrderNumber,
                         requestItemId: $("#add-name").select2("data")[0].id,
                         itemId: $("#add-name").select2("data")[0].itemId,
                         itemCode: $("#add-name").select2("data")[0].itemCode,

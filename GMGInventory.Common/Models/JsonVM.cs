@@ -16,6 +16,7 @@ namespace GMGInventory.Common.Models
         public IList<T> Data { get; set; }
         public int TotalQuantity { get; set; }
         public int TotalQuantity2 { get; set; }
+        public int TotalQuantity3 { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalAmount2 { get; set; }
         public IList<T> AdditionalData { get; set; }
@@ -200,6 +201,8 @@ namespace GMGInventory.Common.Models
         public string Unit { get; set; }
         public decimal UnitCost { get; set; }
         public int Served { get; set; }
+        public int? SalesOrderId { get; set; }
+        public string? SalesOrderNumber { get; set; }
         public int UnorderedQuantity => Math.Max(0, Quantity - Served);
         public string? OrderedOn { get; set; }
         public bool Disabled { get; set; }

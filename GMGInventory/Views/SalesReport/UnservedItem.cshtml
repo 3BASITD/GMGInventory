@@ -86,15 +86,28 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-4">
                         <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-4">
                         <div class="form-group">
-                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <label for="filter-to" class="control-label mb-0">To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
@@ -113,33 +126,6 @@
 
 @section Scripts {
     <script>
-
-        var date_today = new Date();
-        var date_month_ago = new Date();
-        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
         // Load Select2 for Brand
         $("#filter-brand").select2({
@@ -166,6 +152,63 @@
 
         $("#filter-brand").on("select2:unselecting", function (e) {
             $("#filter-brand-name").val("");
+        });
+
+        var date_today = new Date();
+        var first_day_month = new Date(date_today.getFullYear(), date_today.getMonth(), 1);
+
+        $("#filter-from").val(DateForInput(first_day_month));
+        $("#filter-to").val(DateForInput(date_today));
+
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
+        });
+
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function () {
+            var selected = $(this).val();
+
+            var from = null;
+            var to = new Date(date_today);
+
+            if (selected === "") {
+                $("#filter-from").prop("readonly", false);
+                $("#filter-to").prop("readonly", false);
+                return;
+            }
+
+            $("#filter-from").prop("readonly", true);
+            $("#filter-to").prop("readonly", true);
+
+            if (selected === "TD") { // Today
+                from = new Date(date_today);
+                to = new Date(date_today);
+            } else if (selected === "L7D") { // Last 7 Days
+                from = new Date(date_today);
+                from.setDate(date_today.getDate() - 6);
+            } else if (selected === "MTD") { // Month to Date
+                from = first_day_month;
+            } else if (selected === "LM") { // Last Month
+                from = new Date(date_today.getFullYear(), date_today.getMonth() - 1, 1);
+                to = new Date(date_today.getFullYear(), date_today.getMonth(), 0);
+            } else if (selected === "YTD") { // Year to Date
+                from = new Date(date_today.getFullYear(), 0, 1);
+            }
+            
+            $("#filter-preset").val("MTD");
+            $("#filter-from").val(DateForInput(from));
+            $("#filter-to").val(DateForInput(to));
         });
 
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
@@ -200,7 +243,8 @@
             BrandId: "",
             BrandCode: "",
             Brand: "",
-            DateFrom: DateForInput(date_month_ago),
+            Preset: "MTD",
+            DateFrom: DateForInput(first_day_month),
             DateTo: DateForInput(date_today),
         };
 
@@ -212,6 +256,7 @@
                    salesDT.page.len() != defaultDTState.length ||
                    (salesDT.search() || "") != defaultDTState.search.search ||
                    $("#filter-brand").val() != defaultDTState.BrandId ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
                    $('#filter-from').val() != defaultDTState.DateFrom ||
                    $('#filter-to').val() != defaultDTState.DateTo;
         }
@@ -224,7 +269,10 @@
         function resetToDefaultDTFilter() {
             $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
             $("#filter-brand-name").val(defaultDTState.Brand);
+            $('#filter-preset').val(defaultDTState.Preset).trigger('change');
+            $('#filter-from').prop("readonly", true);
             $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-to').prop("readonly", true);
             $('#filter-to').val(defaultDTState.DateTo);
             
             localStorage.removeItem(dt_storage);
@@ -268,6 +316,7 @@
                 data.BrandId = $('#filter-brand').val();
                 data.BrandCode = $('#filter-brand option:selected').text();
                 data.Brand = $('#filter-brand-name').val();
+                data.Preset = $('#filter-preset').val();
                 data.DateFrom = $('#filter-from').val();
                 data.DateTo = $('#filter-to').val();
             },
@@ -282,7 +331,10 @@
                     $("#filter-brand").append(brandOption).trigger('change');
                     $("#filter-brand-name").val(data.Brand);
                 }
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
                 $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
                 $('#filter-to').val(data.DateTo);
             },
             ajax: {
@@ -290,10 +342,10 @@
                 type: "POST",
                 data: function (data) {
                     var brandId = $("#filter-brand").val();
+                    if (brandId) data.Brand = brandId;
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    if (brandId) data.Brand = brandId;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;

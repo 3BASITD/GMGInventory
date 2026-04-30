@@ -35,7 +35,7 @@ namespace GMGInventory.Application.Repositories
                          join user in userManager.Users on order.UserCreated equals user.Id
                          where order.Status.Code != "Draft"
                          && (string.IsNullOrWhiteSpace(search)
-                         || (order.PONumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || (order.PONumber.Trim().ToLower().Contains(search.Trim().ToLower())))
                          orderby order.PONumber ascending
                          select new JsonPurchaseOrderOptionsModel
                          {
@@ -61,7 +61,7 @@ namespace GMGInventory.Application.Repositories
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
                          && (string.IsNullOrWhiteSpace(search)
-                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || (order.SalesOrderNumber.Trim().ToLower().Contains(search.Trim().ToLower())))
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
                          {
@@ -104,7 +104,7 @@ namespace GMGInventory.Application.Repositories
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
                          && (string.IsNullOrWhiteSpace(search)
-                         || (order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || (order.SalesOrderNumber.Trim().ToLower().Contains(search.Trim().ToLower())))
                          && (regionId == null || order.Customer.Area.Region.Id == regionId)
                          //&& oli.Any(s => s.Quantity > s.Stock)
                          orderby order.SalesOrderNumber ascending
@@ -139,9 +139,9 @@ namespace GMGInventory.Application.Repositories
             var orders = from order in context.SalesOrders
                          where order.Invoices.Any(s => (s.Status.Code.Trim().ToLower() == "invoiced" || s.Status.Code.Trim().ToLower() == "draft"))
                          && (string.IsNullOrWhiteSpace(search)
-                         || order.SalesOrderNumber.ToLower().Trim().Contains(search.ToLower().Trim())
-                         || order.Invoices.Any(s => s.InvoiceNumber.ToLower().Trim().Contains(search.ToLower().Trim()))
-                         || order.Invoices.Any(s => s.ControlNumber.ToLower().Trim().Contains(search.ToLower().Trim())))
+                         || order.SalesOrderNumber.Trim().ToLower().Contains(search.Trim().ToLower())
+                         || order.Invoices.Any(s => s.InvoiceNumber.Trim().ToLower().Contains(search.Trim().ToLower()))
+                         || order.Invoices.Any(s => s.ControlNumber.Trim().ToLower().Contains(search.Trim().ToLower())))
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
                          {
@@ -445,16 +445,6 @@ namespace GMGInventory.Application.Repositories
                                                      : null,
                                ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate,
                                IsAllPacked = !orderIncompletePack.Contains(order.Id),
-                               //PurchaseRequestDetail = string.Join(", ",
-                               //                        context.PurchaseRequestLineItems
-                               //                        .Where(prli => prli.SalesOrderId == order.Id)
-                               //                        .Join(context.PurchaseRequests,
-                               //                              prli => prli.PurchaseRequestId,
-                               //                              pr => pr.Id,
-                               //                              (prli, pr) => new { pr, prli })
-                               //                        .Select(x => $"{x.pr.DocumentNumber}-[{x.pr.Status.Name}]")
-                               //                        .Distinct()
-                               //                        ),
                                PurchaseRequestDetail = string.Join(", ", order.PurchaseRequestLineItems
                                                                               .Select(s => new
                                                                               {

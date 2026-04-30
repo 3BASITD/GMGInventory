@@ -1,0 +1,11 @@
+﻿@using static GMGInventory.ViewComponents.LayoutDataViewComponent
+@model ConfigurationModel
+
+@{
+    var temp = (Model?.Value ?? "").Split('|');
+    
+    var part1 = temp.Length > 0 ? temp[0] : "";
+    var part2 = temp.Length > 1 ? temp[1] : "";
+}
+
+<b>@part1</b>@part2

@@ -45,6 +45,9 @@
                         @Html.DisplayNameFor(model => model.SalesOrderNumber)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.ControlNumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Region)
                     </th>
                     <th>
@@ -56,7 +59,7 @@
                 <tr>
                     <th colspan="5" class="text-end">Total</th>
                     <th></th>
-                    <th colspan="3" class="text-end"></th>
+                    <th colspan="4" class="text-end"></th>
                 </tr>
             </tfoot>
         </table>
@@ -450,6 +453,7 @@
                 { data: "brand", name: "Brand" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "salesOrderNumber", name: "SalesOrderNumber" },
+                { data: "controlNumber", name: "ControlNumber" },
                 { data: "region", name: "Region" },
                 { data: "area", name: "Area" }
             ],

@@ -321,10 +321,10 @@ namespace GMGInventory.Application.Repositories
                                  TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
                                  DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
                                  Supplier = poItems.PurchaseOrder.Supplier.Name,
-                                 //ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return
-                                 ReturnDateD = (from rtrn in preceive.PurchaseReturnLineItem
-                                                orderby rtrn.PurchaseReturn.ReturnDate descending
-                                                select rtrn.PurchaseReturn.ReturnDate.Date).First(),
+                                 ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return pero di matandaan. kaya binalik uli
+                                 //ReturnDateD = (from rtrn in preceive.PurchaseReturnLineItem
+                                 //               orderby rtrn.PurchaseReturn.ReturnDate descending
+                                 //               select rtrn.PurchaseReturn.ReturnDate.Date).First(),
                                  UnservedQuantity = poItems.Quantity - preceive.Quantity,
                                  UnservedAmount = (poItems.Quantity - preceive.Quantity) * preceive.OrderItem.UnitCost
                              };

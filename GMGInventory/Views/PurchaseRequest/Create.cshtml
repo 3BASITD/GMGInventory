@@ -547,6 +547,8 @@
             });
         });
 
+        let isReverting = false;
+
         // Load request type data for select2
         function loadTypeOptions(selectedType, selectedPurpose) {
             return new Promise((resolve) => {
@@ -595,6 +597,7 @@
                             data: data,
                             minimumResultsForSearch: -1
                         }).on("change", function () {
+                            if (isReverting) return;
                             changingTypePurposeOrRegion();
                         });
                     },
@@ -616,6 +619,7 @@
                     data: data,
                     minimumResultsForSearch: -1
                 }).on("change", function () {
+                    if (isReverting) return;
                     if ($.fn.select2 && $("#request-type").hasClass("select2-hidden-accessible") && $("#request-purpose").hasClass("select2-hidden-accessible")) {
                         changingTypePurposeOrRegion();
                     }
@@ -629,7 +633,7 @@
 
             var typeText = $("#request-type").select2("data")[0]?.text.toLowerCase() || "";
             var purposeText = $("#request-purpose").select2("data")[0]?.text.toLowerCase() || "";
-            var selectedRegion = typeText == "non-automotive" && purposeText == "one-time purchase" ? $("#order-region").val() : null;
+            var selectedRegion = typeText == "automotive" && purposeText == "rush order" ? $("#request-region").val() : null;
             if (itemDT.data().length > 0 && (selectedType != currentType || selectedPurpose != currentPurpose || selectedRegion != currentRegion)) {
                 var changed = selectedType != currentType ? "Request Type"
                             : selectedPurpose != currentPurpose ? "Request Purpose"
@@ -650,9 +654,11 @@
                         currentPurpose = selectedPurpose;
                         currentRegion = selectedRegion;
                     } else {
+                        isReverting = true;
                         $("#request-type").val(currentType).trigger("change");
                         $("#request-purpose").val(currentPurpose).trigger("change");
                         $("#request-region").val(currentRegion).trigger("change");
+                        isReverting = false;
                     }
                 });
             } else {
@@ -1071,6 +1077,8 @@
         $(".createBtn").on("click", clearItemForm);
 
         function clearItemForm() {
+            $("#add-so-number").val("").trigger("change");
+            $("#add-so-customer").val("").trigger("change");
             $("#add-code").val("").trigger("change");
             $("#add-part").val("");
             $("#add-name").val("");

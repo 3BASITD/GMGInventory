@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public PurchaseRequestPurpose()
         {
+            this.PurchaseOrderNews = new HashSet<PurchaseOrderNew>();
             this.PurchaseRequests = new HashSet<PurchaseRequest>();
         }
 
@@ -13,6 +14,7 @@ namespace GMGInventory.Data
         public int TypeId { get; set; }
         public virtual PurchaseRequestType Type { get; set; }
 
+        public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public ICollection<PurchaseRequest> PurchaseRequests { get; set; }
     }
 }

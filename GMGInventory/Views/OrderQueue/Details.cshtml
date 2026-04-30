@@ -1,7 +1,8 @@
 ﻿@model OrderQueueDetailsVM
 
 @{
-    ViewData["Title"] = $"[{Model.OrderNumber}] Order Queue Details";
+    ViewData["Title"] = "Order Queue Details";
+    ViewData["TitleDetails"] = $"[{Model.OrderNumber}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 

@@ -168,11 +168,11 @@ namespace GMGInventory.Sync
             try
             {
                 if (string.IsNullOrWhiteSpace(api_receiving.receiving_code))
-                    errors.Add($"Invalid Receiving Code: {api_receiving.receiving_code}");
+                    errors.Add($"Invalid Receiving Code: not provided");
 
                 if (string.IsNullOrWhiteSpace(api_receiving.id))
                 {
-                    errors.Add($"Invalid Receiving Id: {api_receiving.id}");
+                    errors.Add($"Invalid Receiving Id: not provided");
                 }
                 else
                 {
@@ -216,10 +216,13 @@ namespace GMGInventory.Sync
                             errors.Add($"Invalid Order Item: {api_receiving.item_code} not found in {purchaseOrder.DocumentNumber}");
 
                         var quantity = 0;
-                        if (api_receiving.qty_request != null && int.TryParse(api_receiving.qty_request, out var q))
+                        if (api_receiving.qty_scan != null && int.TryParse(api_receiving.qty_scan, out var q))
                             quantity = q;
-                        if (quantity <= 0)
-                            errors.Add($"Invalid Quantity: {api_receiving.qty_request}");
+
+                        if (string.IsNullOrWhiteSpace(api_receiving.qty_scan))
+                            errors.Add($"Invalid Quantity: not provided");
+                        else if (quantity <= 0)
+                            errors.Add($"Invalid Quantity: {api_receiving.qty_scan}");
 
                         if (errors.Count() == 0)
                         {
@@ -234,7 +237,7 @@ namespace GMGInventory.Sync
                             if (receive == null)
                             {
                                 var status = await context.PurchaseStatuses
-                                                          .Where(s => s.Name.ToLower() == "submitted")
+                                                          .Where(s => s.Name.ToLower() == "approved")
                                                           .FirstAsync();
 
                                 var procurementHelper = new ProcurementHelper();
@@ -249,7 +252,9 @@ namespace GMGInventory.Sync
                                     Remarks = api_receiving.remarks,
                                     StatusId = status.Id,
                                     PurchaseOrderId = purchaseOrder!.Id,
-                                    WarehouseId = warehouse!.Id
+                                    WarehouseId = warehouse!.Id,
+                                    ApproverId = userId,
+                                    BarcotechReceivingCode = api_receiving.receiving_code
                                 };
                                 await context.PurchaseReceivings.AddAsync(receive);
                                 await context.SaveChangesAsync(userId);
@@ -296,13 +301,13 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_receiving.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_receiving.id) ? "Not Provided" : api_receiving.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
             }
 
             if (errors.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_receiving.id, "Fail", string.Join("||", errors));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_receiving.id) ? "Not Provided" : api_receiving.id, "Fail", string.Join("||", errors));
             if (success.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_receiving.id, "Success", string.Join("||", success));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_receiving.id) ? "Not Provided" : api_receiving.id, "Success", string.Join("||", success));
         }
 
         private async Task SaveOutbound(ApplicationDbContext context, APIBCT_Outbound api_outbound)
@@ -315,11 +320,11 @@ namespace GMGInventory.Sync
             {
 
                 if (string.IsNullOrWhiteSpace(api_outbound.packing_number))
-                    errors.Add($"Invalid Packing Number: {api_outbound.packing_number}");
+                    errors.Add($"Invalid Packing Number: not provided");
 
                 if (string.IsNullOrWhiteSpace(api_outbound.id))
                 {
-                    errors.Add($"Invalid Packing Id: {api_outbound.id}");
+                    errors.Add($"Invalid Packing Id: not provided");
                 }
                 else
                 {
@@ -362,13 +367,19 @@ namespace GMGInventory.Sync
                         var quantity = 0;
                         if (api_outbound.qty_scan != null && int.TryParse(api_outbound.qty_scan, out var qty))
                             quantity = qty;
-                        if (quantity <= 0)
+
+                        if (string.IsNullOrWhiteSpace(api_outbound.qty_scan))
+                            errors.Add($"Invalid Quantity: not provided");
+                        else if (quantity <= 0)
                             errors.Add($"Invalid Quantity: {api_outbound.qty_scan}");
 
                         var boxNumber = 1;
                         if (api_outbound.carton_number != null && int.TryParse(api_outbound.carton_number, out var bn))
                             boxNumber = bn;
-                        if (boxNumber <= 0)
+
+                        if (string.IsNullOrWhiteSpace(api_outbound.carton_number))
+                            errors.Add($"Invalid Box Number: not provided");
+                        else if (boxNumber <= 0)
                             errors.Add($"Invalid Box Number: {api_outbound.carton_number}");
 
                         if (errors.Count() == 0)
@@ -397,7 +408,7 @@ namespace GMGInventory.Sync
                                     PackDate = packDate,
                                     WarehouseId = warehouse!.Id,
                                     Remarks = api_outbound.remarks,
-                                    BarcotechOutboundCode = api_outbound.outbound_code
+                                    BarcotechOutboundCode = api_outbound.packing_number
                                 };
                                 await context.Packs.AddAsync(pack);
                                 await context.SaveChangesAsync(userId);
@@ -449,13 +460,13 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_outbound.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_outbound.id) ? "Not Provided" : api_outbound.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
             }
 
             if (errors.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_outbound.id, "Fail", string.Join("||", errors));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_outbound.id) ? "Not Provided" : api_outbound.id, "Fail", string.Join("||", errors));
             if (success.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_outbound.id, "Success", string.Join("||", success));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_outbound.id) ? "Not Provided" : api_outbound.id, "Success", string.Join("||", success));
         }
 
         private async Task SaveReturn(ApplicationDbContext context, APIBCT_Return api_return)
@@ -467,11 +478,11 @@ namespace GMGInventory.Sync
             try
             {
                 if (string.IsNullOrWhiteSpace(api_return.return_code))
-                    errors.Add($"Invalid Return Code: {api_return.return_code}");
+                    errors.Add($"Invalid Return Code: not provided");
 
                 if (string.IsNullOrWhiteSpace(api_return.id))
                 {
-                    errors.Add($"Invalid Return Id: {api_return.id}");
+                    errors.Add($"Invalid Return Id: not provided");
                 }
                 else
                 {
@@ -507,7 +518,10 @@ namespace GMGInventory.Sync
                         var quantity = 0;
                         if (api_return.qty_returned != null && int.TryParse(api_return.qty_returned, out var q))
                             quantity = q;
-                        if (quantity <= 0)
+
+                        if (string.IsNullOrWhiteSpace(api_return.qty_returned))
+                            errors.Add($"Invalid Quantity: not provided");
+                        else if (quantity <= 0)
                             errors.Add($"Invalid Quantity: {api_return.qty_returned}");
 
                         if (errors.Count() == 0)
@@ -545,7 +559,7 @@ namespace GMGInventory.Sync
                                     CustomerId = customer!.Id,
                                     ReturnDate = returnDate,
                                     Remarks = reason == null ? api_return.remarks : "",
-                                    BarcotechReturnCode = api_return.outbound_code
+                                    BarcotechReturnCode = api_return.return_code
                                 };
                                 await context.SalesReturns.AddAsync(sreturn);
                                 await context.SaveChangesAsync(userId);
@@ -633,13 +647,13 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_return.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_return.id) ? "Not Provided" : api_return.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
             }
 
             if (errors.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_return.id, "Fail", string.Join("||", errors));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_return.id) ? "Not Provided" : api_return.id, "Fail", string.Join("||", errors));
             if (success.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_return.id, "Success", string.Join("||", success));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_return.id) ? "Not Provided" : api_return.id, "Success", string.Join("||", success));
         }
 
         private async Task SaveTransfer(ApplicationDbContext context, APIBCT_Transfer api_transfer)
@@ -651,11 +665,11 @@ namespace GMGInventory.Sync
             try
             {
                 if (string.IsNullOrWhiteSpace(api_transfer.transfer_code))
-                    errors.Add($"Invalid Transfer Code: {api_transfer.transfer_code}");
+                    errors.Add($"Invalid Transfer Code: not provided");
 
                 if (string.IsNullOrWhiteSpace(api_transfer.id))
                 {
-                    errors.Add($"Invalid Transfer Id: {api_transfer.id}");
+                    errors.Add($"Invalid Transfer Id: not provided");
                 }
                 else
                 {
@@ -721,7 +735,10 @@ namespace GMGInventory.Sync
                         var quantity = 0;
                         if (api_transfer.qty_transferred != null && int.TryParse(api_transfer.qty_transferred, out var q))
                             quantity = q;
-                        if (quantity <= 0)
+
+                        if (string.IsNullOrWhiteSpace(api_transfer.qty_transferred))
+                            errors.Add($"Invalid Quantity: not provided");
+                        else if (quantity <= 0)
                             errors.Add($"Invalid Quantity: {api_transfer.qty_transferred}");
 
                         if (errors.Count() == 0)
@@ -793,13 +810,13 @@ namespace GMGInventory.Sync
             }
             catch (Exception ex)
             {
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_transfer.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_transfer.id) ? "Not Provided" : api_transfer.id, "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
             }
 
             if (errors.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_transfer.id, "Fail", string.Join("||", errors));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_transfer.id) ? "Not Provided" : api_transfer.id, "Fail", string.Join("||", errors));
             if (success.Count() > 0)
-                await SaveBarcotechSyncLatestLog(context, moduleName, api_transfer.id, "Success", string.Join("||", success));
+                await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_transfer.id) ? "Not Provided" : api_transfer.id, "Success", string.Join("||", success));
         }
 
         private async Task SaveBarcotechSyncLatestLog(ApplicationDbContext context, string module, string pk, string status, string remarks, string? trace = null)

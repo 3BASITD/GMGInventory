@@ -54,7 +54,9 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             DataTable dt = new DataTable("Agent Sales per Item");
-            dt.Columns.AddRange(new DataColumn[8] {
+            dt.Columns.AddRange([
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("DateInvoice")),
+                new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("ControlNumber")),
                 new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Agent")),
                 new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Brand")),
                 new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("ItemType")),
@@ -63,11 +65,13 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Quantity")),
                 new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Price")),
                 new DataColumn(chelper.DisplayName<AgentSalesPerItemRVM>("Amount"))
-            });
+            ]);
             var sales = await reportSalesRepository.GetAgentSalesPerItem(filter);
             foreach (var sale in sales)
             {
-                dt.Rows.Add(sale.Agent,
+                dt.Rows.Add(sale.DateInvoice,
+                            sale.ControlNumber,
+                            sale.Agent,
                             sale.Brand,
                             sale.ItemType,
                             sale.ItemCode,
@@ -962,24 +966,28 @@ namespace GMGInventory.Controllers
                              + "-"
                              + filter.DateTo.GetValueOrDefault().ToString("MMddyy"));
             dt.Columns.AddRange([
+                new DataColumn(chelper.DisplayName<OutboundRVM>("InvoiceDate")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("OldSkuCode")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("ItemCode")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("ItemName")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("Brand")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("Quantity")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("SalesOrderNumber")),
+                new DataColumn(chelper.DisplayName<OutboundRVM>("ControlNumber")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("Region")),
                 new DataColumn(chelper.DisplayName<OutboundRVM>("Area"))
             ]);
             var items = await reportSalesRepository.GetOutbound(filter);
             foreach (var item in items)
             {
-                dt.Rows.Add(item.OldSkuCode,
+                dt.Rows.Add(item.InvoiceDate,
+                            item.OldSkuCode,
                             item.ItemCode,
                             item.ItemName,
                             item.Brand,
                             item.Quantity,
                             item.SalesOrderNumber,
+                            item.ControlNumber,
                             item.Region,
                             item.Area);
             }

@@ -178,4 +178,10 @@ namespace GMGInventory.Common.Models
         public string? ContactPerson { get; set; }
         public string Region { get; set; }
     }
+
+    public class APIWarehouse : APIGeneric
+    {
+        public bool IsActive { get; set; }
+        public bool IsMain { get; set; }
+    }
 }

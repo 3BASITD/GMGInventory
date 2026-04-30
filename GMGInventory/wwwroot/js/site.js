@@ -24,9 +24,8 @@
 
     $.ajaxSetup({
         error: function (xhr, status, error) {
-            //if (xhr.status === 0) {
-            //    toastr.error("Connection refused. Please check your server or network.", "Error");
-            //} else
+            if (xhr.status === 0 || status === "abort") return;
+
             if (xhr.status === 400)
                 toastr.error("The request was invalid. Please try again.", "400 Bad Request");
             else if (xhr.status === 401)
@@ -44,12 +43,7 @@
             else {
                 toastr.error("There seems to be a problem loading some data. Please reload the page and try again.", "Unknown Error");
                 console.error("Unknown error encountered while loading ajax");
-                console.error("xhr");
-                console.log(xhr);
-                console.error("status");
-                console.log(status);
-                console.error("error");
-                console.log(error);
+                console.log({ xhr, status, error });
             }
             hideLoader();
         }
@@ -506,14 +500,11 @@ function FormatStringInteger(num) {
 
 function DateForInput(date) {
     var d = new Date(Date.parse(date));
-    var day = d.getDate();
-    var month = d.getMonth() + 1;
+    var day = String(d.getDate()).padStart(2, "0");
+    var month = String(d.getMonth() + 1).padStart(2, "0");
     var year = d.getFullYear();
 
-    if (month < 10) month = "0" + month;
-    if (day < 10) day = "0" + day;
-
-    return year + "-" + month + "-" + day;
+    return `${year}-${month}-${day}`;
 }
 
 function cellDTNumberValue(i) {

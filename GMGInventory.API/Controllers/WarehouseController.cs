@@ -8,7 +8,7 @@ namespace GMGInventory.API.Controllers
     public class WarehouseController(IWarehouseRepository warehouseRepository) : ControllerBase
     {
         [HttpGet("List")]
-        public async Task<IList<APIGeneric>> GetList()
+        public async Task<IList<APIWarehouse>> GetList()
         {
             return await warehouseRepository.GetListAPI();
         }

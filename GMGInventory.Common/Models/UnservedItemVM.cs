@@ -9,6 +9,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Code")]
         public string Item { get; set; }
+        public int ItemId { get; set; }
 
         [Display(Name = "Old SKU")]
         public string? OldSKU { get; set; }
@@ -22,9 +23,11 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SalesOrderNumber { get; set; }
+        public int SalesOrderId { get; set; }
 
         [Display(Name = "Customer")]
         public string Customer { get; set; }
+        public int CustomerId { get; set; }
 
         [Display(Name = "Unit Price")]
         public string UnitPrice => string.Format(SystemFormat.StringDecimalComma, UnitPriceD);
@@ -42,6 +45,10 @@ namespace GMGInventory.Common.Models
         public string UnservedQuantity => string.Format(SystemFormat.StringIntegerComma, UnservedQuantityD);
         public int UnservedQuantityD { get; set; }
 
+        [Display(Name = "Total Amount")]
+        public string TotalAmount => string.Format(SystemFormat.StringDecimalComma, TotalAmountD);
+        public decimal TotalAmountD => UnitPriceD * UnservedQuantityD;
+
         [Display(Name = "Quantity on Hand")]
         public string QuantityOnHand => string.Format(SystemFormat.StringIntegerComma, QuantityOnHandD);
         public int QuantityOnHandD { get; set; }
@@ -56,6 +63,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Agent")]
         public string Agent { get; set; }
+        public int AgentId { get; set; }
 
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
@@ -63,8 +71,10 @@ namespace GMGInventory.Common.Models
 
     public class UnservedItemFilter
     {
+        public int? Brand { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int? Region { get; set; }
+        public string? Region2 { get; set; }
     }
 }

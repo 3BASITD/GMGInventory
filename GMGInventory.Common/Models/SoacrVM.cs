@@ -18,11 +18,11 @@ namespace GMGInventory.Common.Models
         public string Type { get; set; }
 
         [Display(Name = "Date From")]
-        public string SOAFrom => SOAFromD == null ? "-" : SOAFromD.Value.ToString(SystemFormat.StringDate);
+        public string? SOAFrom => SOAFromD == null ? null : SOAFromD.Value.ToString(SystemFormat.StringDate);
         public DateTime? SOAFromD { get; set; }
 
         [Display(Name = "Date To")]
-        public string SOATo => SOAToD == null ? "-" : SOAToD.Value.ToString(SystemFormat.StringDate);
+        public string? SOATo => SOAToD == null ? null : SOAToD.Value.ToString(SystemFormat.StringDate);
         public DateTime? SOAToD { get; set; }
 
         [Display(Name = "Total Amount")]
@@ -124,11 +124,11 @@ namespace GMGInventory.Common.Models
         public string Type { get; set; }
 
         [Display(Name = "Date From")]
-        public string DateFrom => DateFromD == null ? "" : DateFromD.Value.ToString(SystemFormat.StringDate);
+        public string? DateFrom => DateFromD == null ? null : DateFromD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DateFromD { get; set; }
 
         [Display(Name = "Date To")]
-        public string DateTo => DateToD == null ? "" : DateToD.Value.ToString(SystemFormat.StringDate);
+        public string? DateTo => DateToD == null ? null : DateToD.Value.ToString(SystemFormat.StringDate);
         public DateTime? DateToD { get; set; }
 
         public List<SOACRItemsVM> Items { get; set; }
@@ -243,11 +243,11 @@ namespace GMGInventory.Common.Models
         public string Agent { get; set; }
         public string AgentCode { get; set; }
         public string CreditTerm { get; set; }
-        public string DateFrom => DateFromD == null ? "" : DateFromD.Value.ToString(SystemFormat.StringDate);
-        public string DateFrom2 => DateFromD == null ? "" : DateFromD.Value.ToString(SystemFormat.StringDate2);
+        public string? DateFrom => DateFromD == null ? null : DateFromD.Value.ToString(SystemFormat.StringDate);
+        public string? DateFrom2 => DateFromD == null ? null : DateFromD.Value.ToString(SystemFormat.StringDate2);
         public DateTime? DateFromD { get; set; }
-        public string DateTo => DateToD == null ? "" : DateToD.Value.ToString(SystemFormat.StringDate);
-        public string DateTo2 => DateToD == null ? "" : DateToD.Value.ToString(SystemFormat.StringDate2);
+        public string? DateTo => DateToD == null ? null : DateToD.Value.ToString(SystemFormat.StringDate);
+        public string? DateTo2 => DateToD == null ? null : DateToD.Value.ToString(SystemFormat.StringDate2);
         public DateTime? DateToD { get; set; }
         public string TotalInvoiceAmount => string.Format(SystemFormat.StringDecimalComma, TotalInvoiceAmountD);
         public decimal TotalInvoiceAmountD => Contents.Sum(s => s.InvoiceAmountD);

@@ -24,6 +24,12 @@
             <thead>
                 <tr>
                     <th>
+                        @Html.DisplayNameFor(model => model.DateInvoice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ControlNumber)
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.Agent)
                     </th>
                     <th>
@@ -47,15 +53,11 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Amount)
                     </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.DateInvoice)
-                    </th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="5" class="text-end">Total</th>
-                    <th></th>
+                    <th colspan="7" class="text-end">Total</th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -417,6 +419,8 @@
                 return: true,
             },
             columns: [
+                { data: "dateInvoice", name: "DateInvoice" },
+                { data: "controlNumber", name: "ControlNumber" },
                 { data: "agent", name: "Agent" },
                 { data: "brand", name: "Brand" },
                 { data: "itemType", name: "ItemType" },
@@ -424,15 +428,14 @@
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "price", name: "Price", className: "text-end" },
-                { data: "amount", name: "Amount", className: "text-end" },
-                { data: "dateInvoice", name: "DateInvoice" }
+                { data: "amount", name: "Amount", className: "text-end" }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();
                 var api = this.api(), data;
 
-                $(api.column(5).footer()).html(FormatStringInteger(json.totalQuantity));
-                $(api.column(7).footer()).html(FormatStringDecimal(json.totalAmount));
+                $(api.column(7).footer()).html(FormatStringInteger(json.totalQuantity));
+                $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount));
             },
             order: defaultDTState.order
         });

@@ -7,6 +7,7 @@ namespace GMGInventory.Data
         public Region()
         {
             this.Areas = new HashSet<Area>();
+            this.PurchaseOrderNews = new HashSet<PurchaseOrderNew>();
             this.Suppliers = new HashSet<Supplier>();
         }
 
@@ -19,6 +20,7 @@ namespace GMGInventory.Data
         public bool IsActive { get; set; }
 
         public ICollection<Area> Areas { get; set; }
+        public ICollection<PurchaseOrderNew> PurchaseOrderNews { get; set; }
         public ICollection<Supplier> Suppliers { get; set; }
     }
 }

@@ -57,6 +57,9 @@
                     @Html.DisplayNameFor(model => model.Outbounds.First().SalesOrderNumber)
                 </th>
                 <th>
+                    @Html.DisplayNameFor(model => model.Outbounds.First().ControlNumber)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.Outbounds.First().Region)
                 </th>
                 <th>
@@ -75,6 +78,7 @@
                     <td>@item.Brand</td>
                     <td class="right-text"><nobr>@item.Quantity</nobr></td>
                     <td>@item.SalesOrderNumber</td>
+                    <td>@item.ControlNumber</td>
                     <td>@item.Region</td>
                     <td>@item.Area</td>
                 </tr>
@@ -84,7 +88,7 @@
             <tr>
                 <th colspan="5" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
-                <th colspan="3" class="text-end"></th>
+                <th colspan="4" class="text-end"></th>
             </tr>
         </tfoot>
     </table>

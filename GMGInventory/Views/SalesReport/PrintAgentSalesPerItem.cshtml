@@ -36,6 +36,12 @@
         <thead>
             <tr>
                 <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().DateInvoice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contents.First().ControlNumber)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.Contents.First().Agent)
                 </th>
                 <th>
@@ -59,15 +65,14 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Contents.First().Amount)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Contents.First().DateInvoice)
-                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model.Contents)
             {
                 <tr>
+                    <td><nobr>@item.DateInvoice</nobr></td>
+                    <td>@item.ControlNumber</td>
                     <td><nobr>@item.Agent</nobr></td>
                     <td><nobr>@item.Brand</nobr></td>
                     <td><nobr>@item.ItemType</nobr></td>
@@ -76,17 +81,15 @@
                     <td class="right-text"><nobr>@item.Quantity</nobr></td>
                     <td class="right-text"><nobr>@item.Price</nobr></td>
                     <td class="right-text"><nobr>@item.Amount</nobr></td>
-                    <td class="right-text"><nobr>@item.DateInvoice</nobr></td>
                 </tr>
             }
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="5" class="right-text">Total</th>
+                <th colspan="7" class="right-text">Total</th>
                 <th class="right-text"><nobr>@Model.TotalQuantity</nobr></th>
                 <th></th>
                 <th class="right-text"><nobr>@Model.TotalAmount</nobr></th>
-                <th></th>
             </tr>
         </tfoot>
     </table>
