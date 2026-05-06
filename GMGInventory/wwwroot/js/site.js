@@ -229,8 +229,9 @@
     //});
 });
 
-function loadSelect2(selector, modal, url) {
+function loadSelect2(selector, modal, url, allowClear = false) {
     $(selector).select2({
+        allowClear: allowClear,
         placeholder: {
             id: "",
             text: "<empty>"

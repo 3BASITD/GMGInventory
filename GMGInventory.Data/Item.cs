@@ -46,6 +46,10 @@ namespace GMGInventory.Data
         public int UnitId { get; set; }
         public Unit Unit { get; set; }
 
+        [ForeignKey("ItemClassId")]
+        public int? ItemClassId { get; set; }
+        public ItemClass ItemClass { get; set; }
+
         [ForeignKey("CategoryId")]
         public int CategoryId { get; set; }
         public Category Category { get; set; }

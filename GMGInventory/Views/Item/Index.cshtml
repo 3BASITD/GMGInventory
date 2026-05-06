@@ -115,12 +115,22 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
+                            <label for="filter-item-class" class="form-label mb-0">Item Class</label>
+                            <select id="filter-item-class" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
                             <label for="filter-category" class="form-label mb-0">Category</label>
                             <select id="filter-category" style="width:100%">
                                 <option></option>
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-6">
                         <div class="form-group">
                             <label for="filter-item-type" class="form-label mb-0">Item Type</label>
@@ -129,8 +139,6 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-6">
                         <div class="form-group">
                             <label for="filter-brand" class="form-label mb-0">Brand</label>
@@ -139,6 +147,8 @@
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-6">
                         <div class="form-group">
                             <label for="filter-warehouse" class="form-label mb-0">Warehouse</label>
@@ -147,8 +157,6 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-6">
                         <div class="form-group">
                             <label for="filter-status" class="form-label mb-0">Status</label>
@@ -213,8 +221,6 @@
                                         <input type="text" name="Name" id="create-name" class="form-control form-control-sm" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-old-code" class="control-label mb-0 d-block">Old SKU / Code</label>
@@ -227,8 +233,6 @@
                                         <input type="text" name="PartNumber" id="create-part-number" class="form-control form-control-sm" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
@@ -241,8 +245,6 @@
                                         <input type="text" name="ModelNumber" id="create-model-number" class="form-control form-control-sm" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-size" class="control-label mb-0 d-block">Size</label>
@@ -256,8 +258,13 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="create-item-class" class="control-label mb-0 d-block">Item Class</label>
+                                        <select name="ItemClass" id="create-item-class" class="form-control" style="width: 100%">
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-category" class="control-label mb-0 d-block">Category</label>
@@ -272,8 +279,6 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-brand" class="control-label mb-0 d-block">Brand</label>
@@ -287,8 +292,6 @@
                                         <input type="number" step="0.01" min="0" max="1999999.99" name="BeginningCost" id="create-beginning-cost" class="form-control form-control-sm" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="create-retail-price" class="control-label mb-0 d-block">Gross Price</label>
@@ -345,8 +348,6 @@
                                     <input type="text" name="Name" id="edit-name" class="form-control form-control-sm" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-old-code" class="control-label mb-0 d-block">Old SKU / Code</label>
@@ -359,8 +360,6 @@
                                     <input type="text" name="PartNumber" id="edit-part-number" class="form-control form-control-sm" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-interchange-number" class="control-label mb-0 d-block">Interchange Number</label>
@@ -373,12 +372,17 @@
                                     <input type="text" name="ModelNumber" id="edit-model-number" class="form-control form-control-sm" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-size" class="control-label mb-0 d-block">Size</label>
                                     <input type="text" name="Size" id="edit-size" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="edit-item-class" class="control-label mb-0 d-block">Item Class</label>
+                                    <select name="ItemClass" id="edit-item-class" class="form-control" style="width: 100%">
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -388,8 +392,6 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-item-type" class="control-label mb-0 d-block">Item Type</label>
@@ -404,8 +406,6 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit-beginning-cost" class="control-label mb-0 d-block">Beginning Cost <small class="text-info" data-microtip-title="Leave 0 if supposed empty" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
@@ -592,6 +592,29 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         var barcotech_user_access = @Html.Raw(Json.Serialize(barcotechUserAccess));
 
+        // Load Select2 for Item Class
+        $("#filter-item-class").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "ItemClass")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
         // Load Select2 for Category
         $("#filter-category").select2({
             tags: true,
@@ -684,6 +707,7 @@
         if (user_access.canAdd) {
             loadSelect2("#create-unit", "#createModal", "@Url.Action("GetOptions2", "Unit")");
             loadSelect2("#create-brand", "#createModal", "@Url.Action("GetOptions2", "Brand")");
+            loadSelect2("#create-item-class", "#createModal", "@Url.Action("GetOptions2", "ItemClass")", true);
             loadSelect2("#create-item-type", "#createModal", "@Url.Action("GetOptions2", "ItemType")");
             loadSelect2("#create-category", "#createModal", "@Url.Action("GetOptions2", "Category")");
             loadSelect2("#create-warehouse", "#createModal", "@Url.Action("GetOptions2", "Warehouse")");
@@ -692,6 +716,7 @@
         if (user_access.canEdit) {
             loadSelect2("#edit-unit", "#editModal", "@Url.Action("GetOptions2", "Unit")");
             loadSelect2("#edit-brand", "#editModal", "@Url.Action("GetOptions2", "Brand")");
+            loadSelect2("#edit-item-class", "#editModal", "@Url.Action("GetOptions2", "ItemClass")", true);
             loadSelect2("#edit-item-type", "#editModal", "@Url.Action("GetOptions2", "ItemType")");
             loadSelect2("#edit-category", "#editModal", "@Url.Action("GetOptions2", "Category")");
             loadSelect2("#edit-warehouse", "#editModal", "@Url.Action("GetOptions2", "Warehouse")");
@@ -730,6 +755,8 @@
             page: 0,
             length: 10,
             search: { search: "" },
+            ItemClassId: "",
+            ItemClass: "",
             CategoryId: "",
             Category: "",
             ItemTypeId: "",
@@ -748,6 +775,7 @@
                    itemDT.page.info().start != defaultDTState.page ||
                    itemDT.page.len() != defaultDTState.length ||
                    (itemDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-item-class").val() != defaultDTState.ItemClassId ||
                    $("#filter-category").val() != defaultDTState.CategoryId ||
                    $("#filter-item-type").val() != defaultDTState.ItemTypeId ||
                    $('#filter-brand').val() != defaultDTState.BrandId ||
@@ -761,6 +789,7 @@
         }
 
         function resetToDefaultDTFilter() {
+            $("#filter-item-class").val(defaultDTState.ItemClassId).trigger('change');
             $("#filter-category").val(defaultDTState.CategoryId).trigger('change');
             $("#filter-item-type").val(defaultDTState.ItemTypeId).trigger('change');
             $("#filter-brand").val(defaultDTState.BrandId).trigger('change');
@@ -803,6 +832,8 @@
             },
             stateSaveParams: function (settings, data) {
                 data.CustomerId = $('#filter-customer').val();
+                data.ItemClass = $('#filter-item-class option:selected').text();
+                data.ItemClassId = $('#filter-item-class').val();
                 data.Category = $('#filter-category option:selected').text();
                 data.CategoryId = $('#filter-category').val();
                 data.ItemType = $('#filter-item-type option:selected').text();
@@ -814,6 +845,14 @@
                 data.StatusId = $('#filter-status').val();
             },
             stateLoadParams: function (settings, data) {
+                if(data.ItemClassId) {
+                    var itemClassOption = new Option(data.ItemClass, data.ItemClassId, true, true);
+                    $(itemClassOption).data('data', {
+                        id: data.ItemClassId,
+                        text: data.ItemClass
+                    });
+                    $("#filter-item-class").append(itemClassOption).trigger('change');
+                }
                 if(data.CategoryId) {
                     var categoryOption = new Option(data.Category, data.CategoryId, true, true);
                     $(categoryOption).data('data', {
@@ -852,6 +891,16 @@
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
                 data: function (data) {
+                    var itemClassId = $("#filter-item-class").val();
+                    if (itemClassId) {
+                        if ($("#filter-item-class").select2("data")[0].text != $("#filter-item-class").val()) {
+                            data.ItemClassId = itemClassId;
+                        } else {
+                            data.ItemClassId = 0;
+                            data.ItemClassKeyword = itemClassId;
+                        }
+                    }
+
                     var categoryId = $("#filter-category").val();
                     if (categoryId) {
                         if ($("#filter-category").select2("data")[0].text != $("#filter-category").val()) {
@@ -924,12 +973,22 @@
                 { data: "name", name: "Name" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.oldCode ?? '<span class="text-muted">N/A</span>';
+                        return data.oldCode || '<span class="text-muted">N/A</span>';
                     },
                     name: "OldCode"
                 },
-                { data: "partNumber", name: "PartNumber" },
-                { data: "interchangeNumber", name: "InterchangeNumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.partNumber || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "PartNumber" 
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.interchangeNumber || '<span class="text-muted">N/A</span>';
+                    },
+                    name: "InterchangeNumber"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         if(data.warehouse) {
@@ -1041,8 +1100,8 @@
                             ${img}
                             <h5>${d.name}</h5>
                             <p><strong>Code:</strong> ${d.code}</p>
-                            <p><strong>Part Number:</strong> ${d.partNumber}</p>
-                            <p><strong>Interchange Number:</strong> ${d.interchangeNumber}</p>
+                            <p><strong>Part Number:</strong> ${d.partNumber || '<span class="text-muted">N/A</span>'}</p>
+                            <p><strong>Interchange Number:</strong> ${d.interchangeNumber || '<span class="text-muted">N/A</span>'}</p>
                             ${actions}
                         </div>
                     </div>
@@ -1174,6 +1233,7 @@
                             InterchangeNumber: $("#edit-interchange-number").val(),
                             ModelNumber: $("#edit-model-number").val(),
                             Size: $("#edit-size").val(),
+                            ItemClassId: $("#edit-item-class").val(),
                             CategoryId: $("#edit-category").val(),
                             ItemTypeId: $("#edit-item-type").val(),
                             BrandId: $("#edit-brand").val(),
@@ -1258,10 +1318,11 @@
                 $("#create-interchange-number").val("");
                 $("#create-model-number").val("");
                 $("#create-size").val("");
-                $("#create-unit").prop("selectedIndex", 0).trigger("change");
-                $("#create-category").prop("selectedIndex", 0).trigger("change");
-                $("#create-item-type").prop("selectedIndex", 0).trigger("change");
-                $("#create-brand").prop("selectedIndex", 0).trigger("change");
+                $("#create-unit").val("").trigger("change");
+                $("#create-item-class").val("").trigger("change");
+                $("#create-category").val("").trigger("change");
+                $("#create-item-type").val("").trigger("change");
+                $("#create-brand").val("").trigger("change");
                 $("#create-beginning-cost").val("");
                 $("#create-retail-price").val("");
                 $("#create-net-price").val("");
@@ -1277,8 +1338,13 @@
                     InterchangeNumber: { maxlength: 200 },
                     ModelNumber: { maxlength: 200 },
                     Size: { required: true, maxlength: 50 },
-                    RetailPrice: { required: true, range: [0, 1999999.99] },
-                    NetPrice: { required: true, range: [0, 1999999.99] }
+                    Unit: { required: true },
+                    Category: { required: true },
+                    ItemType: { required: true },
+                    Brand: { required: true },
+                    BeginningCost: { required: true, range: [0, 1999999.99] },
+                    RetailPrice: { required: true, range: [1, 1999999.99] },
+                    NetPrice: { required: true, range: [1, 1999999.99] }
                 },
                 messages: {
                     Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
@@ -1288,8 +1354,13 @@
                     InterchangeNumber: { maxlength: "Interchange number must not exceed 200 characters." },
                     ModelNumber: { maxlength: "Model number must not exceed 200 characters." },
                     Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." },
-                    RetailPrice: { required: "Please enter new Retail Price.", range: "Price must be between 0-1999999.99." },
-                    NetPrice: { required: "Please enter new Net Price.", range: "Price must be between 0-1999999.99." }
+                    Unit: { required: "Please select a unit." },
+                    Category: { required: "Please select a category." },
+                    ItemType: { required: "Please select a item type." },
+                    Brand: { required: "Please select a brand." },
+                    BeginningCost: { required: "Please enter new Beginning Cost.", range: "Cost must be between 0-1999999.99." },
+                    RetailPrice: { required: "Please enter new Retail Price.", range: "Price must be between 1-1999999.99." },
+                    NetPrice: { required: "Please enter new Net Price.", range: "Price must be between 1-1999999.99." }
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
@@ -1313,6 +1384,7 @@
                         RetailPriceD: $("#create-retail-price").val(),
                         Size: $("#create-size").val(),
                         UnitId: $("#create-unit").val(),
+                        ItemClassId: $("#create-item-class").val(),
                         CategoryId: $("#create-category").val(),
                         ItemTypeId: $("#create-item-type").val(),
                         BrandId: $("#create-brand").val(),
@@ -1389,7 +1461,7 @@
 
                     var requiredColumns = [
                     "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse",
-                    "Model Number", "Category", "Item Type", "Brand", "Size", "Unit", "Quantity on Hand",
+                    "Model Number", "Item Class", "Category", "Item Type", "Brand", "Size", "Unit", "Quantity on Hand",
                     "Beginning Cost", "Gross Price", "Net Price", "Is Active"
                     ];
 
@@ -1423,6 +1495,7 @@
                                     json_of_excel[index]["Interchange Number"],
                                     json_of_excel[index]["Warehouse"],
                                     json_of_excel[index]["Model Number"],
+                                    json_of_excel[index]["Item Class"],
                                     json_of_excel[index]["Category"],
                                     json_of_excel[index]["Item Type"],
                                     json_of_excel[index]["Brand"],
@@ -1448,7 +1521,7 @@
                 }
             }
 
-            function SaveXLSX(code, name, oldcode, part, interchange, warehouse, model, category, itemtype, brand, size, unit, quantity, beginningcost, grossprice, netprice, isActive, rownum) {
+            function SaveXLSX(code, name, oldcode, part, interchange, warehouse, model, itemClass, category, itemtype, brand, size, unit, quantity, beginningcost, grossprice, netprice, isActive, rownum) {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("UploadJson")",
@@ -1460,6 +1533,7 @@
                         InterchangeNumber: interchange,
                         Warehouse: warehouse,
                         ModelNumber: model,
+                        ItemClass: itemClass,
                         Category: category,
                         ItemType: itemtype,
                         Brand: brand,
@@ -1509,6 +1583,7 @@
 
             $(".downloadBtn").click(function (e) {
                 var urlQuery = [];
+                if ($("#filter-item-clas").val()) { urlQuery.push("ItemClassId=" + $("#filter-item-class").val()); }
                 if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
                 if ($("#filter-item-type").val()) { urlQuery.push("ItemTypeId=" + $("#filter-item-type").val()); }
                 if ($("#filter-brand").val()) { urlQuery.push("BrandId=" + $("#filter-brand").val()); }

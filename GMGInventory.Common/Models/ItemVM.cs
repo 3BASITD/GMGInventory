@@ -7,6 +7,11 @@ namespace GMGInventory.Common.Models
 {
     public class ItemFilterVM
     {
+
+        [Display(Name = "Item Class")]
+        public int? ItemClassId { get; set; }
+        public string? ItemClassKeyword { get; set; }
+
         [Display(Name = "Category")]
         public int? CategoryId { get; set; }
         public string? CategoryKeyword { get; set; }
@@ -55,6 +60,10 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Model Number")]
         public string? ModelNumber { get; set; }
+
+        [Display(Name = "Item Class")]
+        public string? ItemClass { get; set; }
+        public int? ItemClassId { get; set; }
 
         [Display(Name = "Category")]
         public string Category { get; set; }
@@ -170,6 +179,9 @@ namespace GMGInventory.Common.Models
 
     public class ItemViewVM : ItemVM
     {
+        [Display(Name = "Item Class")]
+        public string ItemClass { get; set; }
+
         [Display(Name = "Brand")]
         public string Brand { get; set; }
 
@@ -213,6 +225,7 @@ namespace GMGInventory.Common.Models
         public string Warehouse { get; set; }
         public decimal BeginningCost { get; set; }
         public string ModelNumber { get; set; }
+        public string? ItemClass { get; set; }
         public string Category { get; set; }
         public string ItemType { get; set; }
         public string Brand { get; set; }

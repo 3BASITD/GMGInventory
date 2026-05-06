@@ -33,17 +33,17 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
         {
             var users = from user in userManager.Users
-                         where string.IsNullOrWhiteSpace(search)
-                            || user.UserName.ToLower().Contains(search.ToLower())
-                            || (user.FirstName + "").ToLower().Contains(search.ToLower())
-                            || (user.LastName + "").ToLower().Contains(search.ToLower())
+                        where string.IsNullOrWhiteSpace(search)
+                           || user.UserName.ToLower().Contains(search.ToLower())
+                           || (user.FirstName + "").ToLower().Contains(search.ToLower())
+                           || (user.LastName + "").ToLower().Contains(search.ToLower())
                         orderby user.UserName ascending
-                         select new JsonNameOptionsModel
-                         {
-                             Id = user.Id.ToString(),
-                             Text = user.UserName,
-                             Name = user.FirstName + " " + user.LastName
-                         };
+                        select new JsonNameOptionsModel
+                        {
+                            Id = user.Id.ToString(),
+                            Text = user.UserName,
+                            Name = user.FirstName + " " + user.LastName
+                        };
             var usersFiltered = await users.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonNameOptionsModel>
             {
@@ -165,20 +165,27 @@ namespace GMGInventory.Application.Repositories
         {
             List<string> tables = new List<string>();
 
-             if(await context.Agents.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Agents"); }
+            if (await context.Accesses.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Accesses"); }
+            if (await context.Agents.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Agents"); }
             if (await context.Areas.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Areas"); }
             if (await context.AuditLogs.AnyAsync(s => s.UserId == id)) { tables.Add("Audit Logs"); }
             if (await context.Brands.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Brands"); }
+            if (await context.BusinessStyles.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Business Styles"); }
             if (await context.Categories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Categories"); }
+            if (await context.Cheques.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Cheques"); }
             if (await context.CreditTerms.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Credit Terms"); }
-            if (await context.CustomerPayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customer Payments"); }
+            if (await context.CustomerBrandDiscount.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customer Brand Discounts"); }
             if (await context.CustomerPaymentDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customer Payment Details"); }
+            if (await context.CustomerPayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customer Payments"); }
             if (await context.Customers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Customers"); }
+            if (await context.Drivers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Drivers"); }
             if (await context.Forwarders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Forwarders"); }
+            if (await context.HomeImages.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Home Images"); }
             if (await context.InvoiceLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Invoice Line Items"); }
-            //if( await context.InvoicePayments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Invoice Payments"); }
             if (await context.Invoices.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Invoices"); }
+            if (await context.ItemConversions.AnyAsync(s => s.UserCreated == id)) { tables.Add("Item Conversions"); }
             if (await context.ItemInventories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Inventories"); }
+            if (await context.ItemLocations.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Locations"); }
             if (await context.ItemPrices.AnyAsync(s => s.UserCreated == id)) { tables.Add("Item Prices"); }
             if (await context.Items.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Items"); }
             if (await context.ItemTypes.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Types"); }
@@ -186,28 +193,39 @@ namespace GMGInventory.Application.Repositories
             if (await context.PackReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Pack Return Line Items"); }
             if (await context.PackReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Pack Returns"); }
             if (await context.Packs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Packs"); }
-            //if(await context.PaymentDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Payment Details"); }
-            //if(await context.Payments.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Payments"); }
             if (await context.PhysicalCountHistories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Physical Count Histories"); }
             if (await context.PurchaseOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Order Line Items"); }
+            if (await context.PurchaseOrderNewLineItemNewCosts.AnyAsync(s => s.UserCreated == id)) { tables.Add("Purchase Order Line Items Cost"); }
+            if (await context.PurchaseOrderNewLineItemNewQuantities.AnyAsync(s => s.UserCreated == id)) { tables.Add("Purchase Order Line Items Quantity"); }
+            if (await context.PurchaseOrderNewLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Order Line Items"); }
             if (await context.PurchaseOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Orders"); }
+            if (await context.PurchaseReceivingLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Receiving Line Items"); }
+            if (await context.PurchaseReceivings.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Receivings"); }
+            if (await context.PurchaseRequestLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Request Line Items"); }
+            if (await context.PurchaseRequests.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Requests"); }
             if (await context.PurchaseReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Return Line Items"); }
+            if (await context.PurchaseReturnNewLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Return Line Items"); }
+            if (await context.PurchaseReturnNews.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Returns"); }
             if (await context.PurchaseReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Purchase Returns"); }
+            if (await context.ReasonOfReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Reason of Returns"); }
+            if (await context.ReceptaclePrintHistories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Receptacle Print Histories"); }
+            if (await context.Regions.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Regions"); }
             if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Delivery Monitorings"); }
             if (await context.SalesOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Line Items"); }
             if (await context.SalesOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Orders"); }
-            //if(await context.SalesReturnAppliedAmounts.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Return Applied Amounts"); }
+            if (await context.SalesOrderSources.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Sources"); }
             if (await context.SalesReturnLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Return Line Items"); }
             if (await context.SalesReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Returns"); }
-            //if(await context.SalesReturnTotalReturnAmounts.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales REturn To"); }
+            if (await context.ServiceLevelAgreements.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Service Level Agreements"); }
             if (await context.ShippingAddresses.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Shipping Addresses"); }
             if (await context.SOACRChecks.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOA CR Checks"); }
             if (await context.SOACRLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOA CR Line Items"); }
-            if (await context.SOACRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOACRs"); }
             if (await context.SOACRLineItemTBRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOA CR Line Item TBRs"); }
+            if (await context.SOACRs.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("SOACRs"); }
             if (await context.Suppliers.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Suppliers"); }
             if (await context.TransferItemDetails.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Transfer Item Details"); }
             if (await context.TransferItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Transfer Items"); }
+            if (await context.Vehicles.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Vehicles"); }
             if (await context.Warehouses.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Warehouses"); }
 
             return tables;

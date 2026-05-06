@@ -28,145 +28,143 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-3">
-                <p class="text-sm">
-                    <label for="item-code" class="text-muted fw-normal mb-0">
+            <div class="col-9">
+                <div class="row">
+                    <div class="col-md-4 text-sm">
+                        <label for="item-code" class="text-muted fw-normal mb-0">
+                            @Html.DisplayNameFor(model => model.Code)
+                        </label>
+                        <select id="item-code" class="s2-bold s2ph-bold s2ph-dark" style="width: 100%;">
+                        </select>
+                        @*<span class="text-muted">
                         @Html.DisplayNameFor(model => model.Code)
-                    </label>
-                    <select id="item-code" class="s2-bold s2ph-bold s2ph-dark" style="width: 100%;">
-                    </select>
-                    @*<span class="text-muted">
-                    @Html.DisplayNameFor(model => model.Code)
-                    </span>
-                    <b class="d-block">
-                    @Model?.Code
-                    </b>*@
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.OldCode)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.OldCode
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Name)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.Name
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.InterchangeNumber)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @(string.IsNullOrWhiteSpace(Model?.InterchangeNumber) ? "-" : Model.InterchangeNumber)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ModelNumber)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @(string.IsNullOrWhiteSpace(Model?.ModelNumber) ? "-" : Model.ModelNumber)
-                    </b>
-                </p>
-            </div>
-            <div class="col-3">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.PartNumber)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @(string.IsNullOrWhiteSpace(Model?.PartNumber) ? "-" : Model.PartNumber)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Category)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.Category
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.ItemType)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.ItemType
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Brand)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.Brand
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        Location Codes
-                    </span>
-                    <div style="display:flex">
-                        <b class="d-block form-gayahin">
-                            @(string.IsNullOrWhiteSpace(Model?.LocationCodes) ? "N/A" : Model?.LocationCodes)
-                        </b>
-                        <button class="btn btn-warning btn-xs locationCodeBtn ml-2" data-bs-toggle="modal" data-bs-target="#addLocationCodeModal" data-microtip-title="Edit Location Codes"><span class="fas fa-pencil-alt"></span></button>
+                        </span>
+                        <b class="d-block">
+                        @Model?.Code
+                        </b>*@
                     </div>
-                </p>
-            </div>
-            <div class="col-3">
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.BeginningCost)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @(string.IsNullOrWhiteSpace(Model?.BeginningCost) ? "N/A" : Model.BeginningCost)
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.UnitCode)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.UnitCode
-                    </b>
-                </p>
-                <p class="text-sm">
-                    <span class="text-muted">
-                        @Html.DisplayNameFor(model => model.Size)
-                    </span>
-                    <b class="d-block form-gayahin">
-                        @Model?.Size
-                    </b>
-                </p>
-                @if (userAccess.CanView)
-                {
-                    <p class="text-sm">
+                    <div class="col-md-4 text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.RetailPrice)
+                            @Html.DisplayNameFor(model => model.PartNumber)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.RetailPrice
+                            @(string.IsNullOrWhiteSpace(Model?.PartNumber) ? Html.Raw("<span class='text-muted fw-normal'>N/A</span>") : Model.PartNumber)
                         </b>
-                    </p>
-                }
-                @if (userAccess.CanView)
-                {
-                    <p class="text-sm">
+                    </div>
+                    <div class="col-md-4 text-sm">
                         <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.NetPrice)
+                            @Html.DisplayNameFor(model => model.BeginningCost)
                         </span>
                         <b class="d-block form-gayahin">
-                            @Model?.NetPrice
+                            @(string.IsNullOrWhiteSpace(Model?.BeginningCost) ? Html.Raw("<span class='text-muted fw-normal'>N/A</span>") : Model.BeginningCost)
                         </b>
-                    </p>
-                }
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.OldCode)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @(string.IsNullOrWhiteSpace(Model?.OldCode) ? Html.Raw("<span class='text-muted fw-normal'>N/A</span>") : Model.OldCode)
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Category)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.Category
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.UnitCode)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.UnitCode
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Name)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.Name
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ItemType)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.ItemType
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Size)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.Size
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.InterchangeNumber)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @(string.IsNullOrWhiteSpace(Model?.InterchangeNumber) ? Html.Raw("<span class='text-muted fw-normal'>N/A</span>") : Model.InterchangeNumber)
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.Brand)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @Model?.Brand
+                        </b>
+                    </div>
+                    @if (userAccess.CanView)
+                    {
+                        <div class="col-md-4 text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.RetailPrice)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.RetailPrice
+                            </b>
+                        </div>
+                    }
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.ModelNumber)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @(string.IsNullOrWhiteSpace(Model?.ModelNumber) ? Html.Raw("<span class='text-muted fw-normal'>N/A</span>") : Model.ModelNumber)
+                        </b>
+                    </div>
+                    <div class="col-md-4 text-sm">
+                        <span class="text-muted">
+                            Location Codes
+                        </span>
+                        <div style="display:flex">
+                            <b class="d-block form-gayahin">
+                                @(string.IsNullOrWhiteSpace(Model?.LocationCodes) ? Html.Raw("<span class='text-muted fw-normal'>N/A</span>") : Model.LocationCodes)
+                            </b>
+                            <button class="btn btn-warning btn-xs locationCodeBtn ml-2" data-bs-toggle="modal" data-bs-target="#addLocationCodeModal" data-microtip-title="Edit Location Codes"><span class="fas fa-pencil-alt"></span></button>
+                        </div>
+                    </div>
+                    @if (userAccess.CanView)
+                    {
+                        <div class="col-md-4 text-sm">
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.NetPrice)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model?.NetPrice
+                            </b>
+                        </div>
+                    }
+                </div>
             </div>
             <div class="col-3">
                 @if (string.IsNullOrWhiteSpace(Model.Image))
@@ -261,9 +259,9 @@
                                  aria-labelledby="nav-warehouse-tab">
                                 @if (barcotechUserAccess.CanUploadDownload)
                                 {
-                                <a class="btn btn-secondary btn-sm float-right ml-2" onclick="FetchStockBarcotech()" data-microtip-title="Fetch Stock Record(s) from Barcotech" data-microtip-position="bottom-left" role="tooltip">
-                                    <span class="fas fa-download"></span> Fetch Stock
-                                    </a>            
+                                    <a class="btn btn-secondary btn-sm float-right ml-2" onclick="FetchStockBarcotech()" data-microtip-title="Fetch Stock Record(s) from Barcotech" data-microtip-position="bottom-left" role="tooltip">
+                                        <span class="fas fa-download"></span> Fetch Stock
+                                    </a>
                                 }
                                 <table class="table table-head-fixed table-striped table-hover table-warehouse">
                                     <thead>
@@ -1489,7 +1487,7 @@
                     data: function (data, type, dataToSet) {
                         return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.code + "</a>";
                     },
-                    name: "Code" 
+                    name: "Code"
                 },
                 { data: "name", name: "Name" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
