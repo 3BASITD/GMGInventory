@@ -82,6 +82,7 @@ builder.Services.AddScoped(typeof(IDriverRepository), typeof(DriverRepository));
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
 builder.Services.AddScoped(typeof(IHomeImageRepository), typeof(HomeImageReporitory));
 builder.Services.AddScoped(typeof(IInvoiceRepository), typeof(InvoiceRepository));
+builder.Services.AddScoped(typeof(IItemClassRepository), typeof(ItemClassRepository));
 builder.Services.AddScoped(typeof(IItemConversionRepository), typeof(ItemConversionRepository));
 builder.Services.AddScoped(typeof(IItemLocationRepository), typeof(ItemLocationRepository));
 builder.Services.AddScoped(typeof(IItemPriceRepository), typeof(ItemPriceRepository));

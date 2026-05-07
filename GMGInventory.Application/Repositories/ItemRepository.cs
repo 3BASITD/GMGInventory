@@ -385,67 +385,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<ItemCommonVM>> GetAllAsync(ItemFilterVM filter)
         {
-            //var WarehouseInventory = from inv in context.ItemInventories
-            //                         select new
-            //                         {
-            //                             ItemId = inv.ItemId,
-            //                             Quantity = inv.Quantity,
-            //                             Warehouse = inv.Warehouse.Name,
-            //                             HasWarehouse = filter.WarehouseId == null || inv.WarehouseId == filter.WarehouseId
-            //                         };
-            //var itemsVM = await (from item in context.Items
-            //                     from price in context.ItemPrices
-            //                                          .Where(s => s.ItemId == item.Id
-            //                                                   && s.DateCreated.Date <= DateTime.Now)
-            //                                          .OrderByDescending(s => s.DateCreated)
-            //                                          .Take(1)
-            //                                          .DefaultIfEmpty()
-            //                     join inventory in WarehouseInventory on item.Id equals inventory.ItemId
-            //                     let quantityPacked = context.PackLineItems
-            //                                                 .Where(s => s.ItemId == item.Id)
-            //                                                 .Sum(s => (int?)s.Quantity) ?? 0
-            //                     let quantityInvoiced = context.InvoiceLineItems
-            //                                                   .Where(s => s.ItemId == item.Id)
-            //                                                   .Sum(s => (int?)s.Quantity) ?? 0
-            //                     let quantityReturned = context.SalesReturnLineItems
-            //                                                   .Where(s => s.ItemId == item.Id)
-            //                                                   .Sum(s => (int?)s.Quantity) ?? 0
-            //                     where (!filter.ActiveOnly || (filter.ActiveOnly && item.IsActive))
-            //                         && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
-            //                         && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
-            //                         && (filter.BrandId == null || filter.BrandId == item.BrandId)
-            //                         && inventory.HasWarehouse == true
-            //                     select new ItemCommonVM
-            //                     {
-            //                         Brand = item.Brand.Name,
-            //                         BrandId = item.Brand.Id,
-            //                         Category = item.Category.Name,
-            //                         CategoryId = item.Category.Id,
-            //                         Code = item.Code,
-            //                         Id = item.Id,
-            //                         ItemType = item.ItemType.Name,
-            //                         ItemTypeId = item.ItemType.Id,
-            //                         InterchangeNumber = item.InterchangeNumber + "",
-            //                         LocationCode = item.LocationCode == null ? null : item.LocationCode.Code,
-            //                         LocationCodeId = item.LocationCode == null ? null : item.LocationCode.Id,
-            //                         ModelNumber = item.ModelNumber + "",
-            //                         Name = item.Name,
-            //                         NetPriceD = price == null ? 0 : price.NetSellingPrice,
-            //                         PartNumber = item.PartNumber + "",
-            //                         QuantityInventoryD = inventory.Quantity,
-            //                         QuantityServedD = quantityPacked - quantityReturned,
-            //                         QuantityInvoiceD = quantityInvoiced,
-            //                         RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
-            //                         Size = item.Size,
-            //                         Unit = item.Unit.Name,
-            //                         UnitId = item.Unit.Id,
-            //                         Warehouse = inventory.Warehouse,
-            //                         IsActive = item.IsActive,
-            //                         GiveAction = false
-            //                     }).ToListAsync();
-            // Code, Name,  PartNumber, InterchangeNumber, Warehouse, GrossPrice, NetPrice, QuantityOnHand
-
-            // Code, Name, PartNumber, InterchangeNumber, Warehouse, ModelNumber, Category, ItemType, Brand, Size, Unit, Quantity
             if (filter.IsTable != false)
             {
                 var itemsVM = from item in context.Items.AsNoTracking()
@@ -455,7 +394,8 @@ namespace GMGInventory.Application.Repositories
                                               .Where(s => s.DateCreated.Date <= DateTime.Now)
                                               .OrderByDescending(s => s.DateCreated)
                                               .FirstOrDefault()
-                              where (filter.CategoryId == null || filter.CategoryId == item.Category.Id || (filter.CategoryId == 0 && (item.Category.Code + " " + item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
+                              where (filter.ItemClassId == null || filter.ItemClassId == item.ItemClass.Id || (filter.ItemClassId == 0 && (item.ItemClass.Code + " " + item.ItemClass.Name).ToLower().Contains((filter.ItemClassKeyword + "").ToLower())))
+                                 && (filter.CategoryId == null || filter.CategoryId == item.Category.Id || (filter.CategoryId == 0 && (item.Category.Code + " " + item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
                                  && (filter.BrandId == null || filter.BrandId == item.Brand.Id || (filter.BrandId == 0 && (item.Brand.Code + " " + item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
                                  && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemType.Id || (filter.ItemTypeId == 0 && (item.ItemType.Code + " " + item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
                                  && (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
@@ -470,6 +410,8 @@ namespace GMGInventory.Application.Repositories
                                   InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   BeginningCostD = item.BeginningCost,
+                                  ItemClass = item.ItemClass.Code.Replace("\n", "").Replace("\r", "").Trim(),
+                                  ItemClassId = item.ItemClassId,
                                   Category = item.Category.Code.Replace("\n", "").Replace("\r", "").Trim(),
                                   CategoryId = item.CategoryId,
                                   ItemType = item.ItemType.Code.Replace("\n", "").Replace("\r", "").Trim(),
@@ -494,7 +436,8 @@ namespace GMGInventory.Application.Repositories
                 var itemsVM = from item in context.Items.AsNoTracking()
                               //join inventory in context.ItemInventories on item.Id equals inventory.ItemId into gin
                               //from inventory in gin.DefaultIfEmpty()
-                              where (filter.CategoryId == null || filter.CategoryId == item.Category.Id || (filter.CategoryId == 0 && (item.Category.Code + " " + item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
+                              where (filter.ItemClassId == null || filter.ItemClassId == item.ItemClass.Id || (filter.ItemClassId == 0 && (item.ItemClass.Code + " " + item.ItemClass.Name).ToLower().Contains((filter.ItemClassKeyword + "").ToLower())))
+                                 && (filter.CategoryId == null || filter.CategoryId == item.Category.Id || (filter.CategoryId == 0 && (item.Category.Code + " " + item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
                                  && (filter.BrandId == null || filter.BrandId == item.Brand.Id || (filter.BrandId == 0 && (item.Brand.Code + " " + item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
                                  && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemType.Id || (filter.ItemTypeId == 0 && (item.ItemType.Code + " " + item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
                                  //&& (filter.WarehouseId == null || filter.WarehouseId == inventory.WarehouseId)
@@ -508,6 +451,8 @@ namespace GMGInventory.Application.Repositories
                                   PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
+                                  ItemClass = item.ItemClass.Name.Replace("\n", "").Replace("\r", "").Trim(),
+                                  ItemClassId = item.ItemClassId,
                                   BeginningCostD = item.BeginningCost,
                                   Category = item.Category.Name.Replace("\n", "").Replace("\r", "").Trim(),
                                   CategoryId = item.CategoryId,
@@ -545,6 +490,7 @@ namespace GMGInventory.Application.Repositories
                     s.PartNumber,
                     s.InterchangeNumber + "",
                     s.ModelNumber + "",
+                    s.ItemClass + "",
                     s.Category,
                     s.ItemType,
                     s.Brand,
@@ -584,6 +530,8 @@ namespace GMGInventory.Application.Repositories
                                    PartNumber = j.PartNumber,
                                    InterchangeNumber = j.InterchangeNumber,
                                    ModelNumber = j.ModelNumber,
+                                   ItemClass = j.ItemClass,
+                                   ItemClassId = j.ItemClassId,
                                    BeginningCostD = j.BeginningCostD,
                                    Category = j.Category,
                                    CategoryId = j.CategoryId,
@@ -614,10 +562,11 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<APIItem>> GetListAPI(int? CategoryId, int? ItemTypeId, int? BrandId)
+        public async Task<IList<APIItem>> GetListAPI(int? ItemClassId, int? CategoryId, int? ItemTypeId, int? BrandId)
         {
             var items = from item in context.Items
-                        where (CategoryId == null || CategoryId == item.CategoryId)
+                        where (ItemClassId == null || ItemClassId == item.ItemClassId)
+                        && (CategoryId == null || CategoryId == item.CategoryId)
                         && (ItemTypeId == null || ItemTypeId == item.ItemTypeId)
                         && (BrandId == null || BrandId == item.BrandId)
                         select new APIItem
@@ -630,6 +579,7 @@ namespace GMGInventory.Application.Repositories
                             InterchangeNumber = item.InterchangeNumber,
                             Size = item.Size,
                             UnitCode = item.Unit.Code,
+                            ItemClassCode = item.ItemClass.Code,
                             CategoryCode = item.Category.Code,
                             ItemTypeCode = item.ItemType.Code,
                             BrandCode = item.Brand.Code,
@@ -661,6 +611,7 @@ namespace GMGInventory.Application.Repositories
                               Code = item.Code,
                               Id = item.Id,
                               InterchangeNumber = item.InterchangeNumber + "",
+                              ItemClass = item.ItemClass.Name,
                               ItemType = item.ItemType.Name,
                               IsActive = item.IsActive,
                               BeginningCostD = item.BeginningCost,
@@ -683,10 +634,10 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<ItemFileVM>> GetAllFileAsync()
         {
             var itemsVM = from item in context.Items
-                              //.Include(s => s.Category)
-                              //.Include(s => s.ItemType)
-                              //.Include(s => s.Brand)
-                              //.Include(s => s.Unit)
+                          //.Include(s => s.Category)
+                          //.Include(s => s.ItemType)
+                          //.Include(s => s.Brand)
+                          //.Include(s => s.Unit)
                           let inventory = context.ItemInventories
                                                  .Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true)
                                                  .Sum(s => (int?)s.Quantity) ?? 0
@@ -696,6 +647,7 @@ namespace GMGInventory.Application.Repositories
                               Category = item.Category.Name,
                               Code = item.Code,
                               Id = item.Id,
+                              ItemClass = item.ItemClass.Name,
                               ItemType = item.ItemType.Name,
                               InterchangeNumber = item.InterchangeNumber + "",
                               ModelNumber = item.ModelNumber + "",
@@ -761,6 +713,7 @@ namespace GMGInventory.Application.Repositories
                 Code = itemVM.Code,
                 InterchangeNumber = itemVM.InterchangeNumber + "",
                 IsActive = true,
+                ItemClassId = itemVM.ItemClassId,
                 ItemTypeId = itemVM.ItemTypeId,
                 BeginningCost = itemVM.BeginningCostD == 0 ? null : itemVM.BeginningCostD,
                 ModelNumber = itemVM.ModelNumber + "",
@@ -776,8 +729,8 @@ namespace GMGInventory.Application.Repositories
             var itemPrice = new ItemPrice
             {
                 ItemId = item.Id,
-                NetSellingPrice = itemVM.NetPriceD == null ? -1 : itemVM.NetPriceD.Value,
-                RetailSellingPrice = itemVM.RetailPriceD == null ? -1 : itemVM.RetailPriceD.Value
+                NetSellingPrice = itemVM.NetPriceD == null ? 0 : itemVM.NetPriceD.Value,
+                RetailSellingPrice = itemVM.RetailPriceD == null ? 0 : itemVM.RetailPriceD.Value
             };
             await context.ItemPrices.AddAsync(itemPrice);
             await context.SaveChangesAsync(currentUserId);
@@ -785,7 +738,7 @@ namespace GMGInventory.Application.Repositories
             var itemInventories = new ItemInventory
             {
                 ItemId = item.Id,
-                Quantity = itemVM.QuantityD == null ? -1 : itemVM.QuantityD.Value,
+                Quantity = itemVM.QuantityD == null ? 0 : itemVM.QuantityD.Value,
                 WarehouseId = itemVM.WarehouseId == 0 || itemVM.WarehouseId == null
                             ? context.Warehouses.Where(s => s.IsMain == true).Select(s => s.Id).FirstOrDefault()
                             : itemVM.WarehouseId.Value
@@ -816,6 +769,7 @@ namespace GMGInventory.Application.Repositories
             item.BrandId = itemVM.BrandId;
             item.CategoryId = itemVM.CategoryId;
             item.InterchangeNumber = itemVM.InterchangeNumber + "";
+            item.ItemClassId = itemVM.ItemClassId;
             item.ItemTypeId = itemVM.ItemTypeId;
             item.BeginningCost = itemVM.BeginningCostD == 0 ? null : itemVM.BeginningCostD;
             item.ModelNumber = itemVM.ModelNumber + "";
@@ -1715,7 +1669,7 @@ namespace GMGInventory.Application.Repositories
                 var worksheet = workbook.Worksheets.First();
 
                 var headers = worksheet.Row(1).Cells().Select(c => c.GetString().Trim()).ToList();
-                var requiredHeaders = new[] { "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse", "Model Number", "Category", "Item Type", "Brand", "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price", "Is Active" };
+                var requiredHeaders = new[] { "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse", "Model Number", "Item Class", "Category", "Item Type", "Brand", "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price", "Is Active" };
 
                 var missingColumns = new List<string>();
                 foreach (var col in requiredHeaders)
@@ -1733,6 +1687,7 @@ namespace GMGInventory.Application.Repositories
                 int interchangeNumberCol = headers.IndexOf("Interchange Number") + 1;
                 int warehouseCol = headers.IndexOf("Warehouse") + 1;
                 int modelNumberCol = headers.IndexOf("Model Number") + 1;
+                int itemClassCol = headers.IndexOf("Item Class") + 1;
                 int categoryCol = headers.IndexOf("Category") + 1;
                 int itemTypeCol = headers.IndexOf("Item Type") + 1;
                 int brandCol = headers.IndexOf("Brand") + 1;
@@ -1756,6 +1711,7 @@ namespace GMGInventory.Application.Repositories
                         InterchangeNumber = row.Cell(interchangeNumberCol).GetString(),
                         Warehouse = row.Cell(warehouseCol).GetString(),
                         ModelNumber = row.Cell(modelNumberCol).GetString(),
+                        ItemClass = row.Cell(itemClassCol).GetString(),
                         Category = row.Cell(categoryCol).GetString(),
                         ItemType = row.Cell(itemTypeCol).GetString(),
                         Brand = row.Cell(brandCol).GetString(),
@@ -1786,17 +1742,18 @@ namespace GMGInventory.Application.Repositories
                 newSheet.Cell(2, 5).Value = "Interchange Number";
                 newSheet.Cell(2, 6).Value = "Warehouse";
                 newSheet.Cell(2, 7).Value = "Model Number";
-                newSheet.Cell(2, 8).Value = "Category";
-                newSheet.Cell(2, 9).Value = "Item Type";
-                newSheet.Cell(2, 10).Value = "Brand";
-                newSheet.Cell(2, 11).Value = "Size";
-                newSheet.Cell(2, 12).Value = "Unit";
-                newSheet.Cell(2, 13).Value = "Quantity on Hand";
-                newSheet.Cell(2, 14).Value = "Beginning Cost";
-                newSheet.Cell(2, 15).Value = "Gross Price";
-                newSheet.Cell(2, 16).Value = "Net Price";
-                newSheet.Cell(2, 17).Value = "Is Active";
-                newSheet.Cell(2, 18).Value = "Status for Uploading";
+                newSheet.Cell(2, 8).Value = "Item Class";
+                newSheet.Cell(2, 9).Value = "Category";
+                newSheet.Cell(2, 10).Value = "Item Type";
+                newSheet.Cell(2, 11).Value = "Brand";
+                newSheet.Cell(2, 12).Value = "Size";
+                newSheet.Cell(2, 13).Value = "Unit";
+                newSheet.Cell(2, 14).Value = "Quantity on Hand";
+                newSheet.Cell(2, 15).Value = "Beginning Cost";
+                newSheet.Cell(2, 16).Value = "Gross Price";
+                newSheet.Cell(2, 17).Value = "Net Price";
+                newSheet.Cell(2, 18).Value = "Is Active";
+                newSheet.Cell(2, 19).Value = "Status for Uploading";
 
                 for (int i = 0; i < xclitems.Count; i++)
                 {
@@ -1808,17 +1765,18 @@ namespace GMGInventory.Application.Repositories
                     newSheet.Cell(i + 3, 5).Value = p.InterchangeNumber;
                     newSheet.Cell(i + 3, 6).Value = p.Warehouse;
                     newSheet.Cell(i + 3, 7).Value = p.ModelNumber;
-                    newSheet.Cell(i + 3, 8).Value = p.Category;
-                    newSheet.Cell(i + 3, 9).Value = p.ItemType;
-                    newSheet.Cell(i + 3, 10).Value = p.Brand;
-                    newSheet.Cell(i + 3, 11).Value = p.Size;
-                    newSheet.Cell(i + 3, 12).Value = p.Unit;
-                    newSheet.Cell(i + 3, 13).Value = p.Quantity;
-                    newSheet.Cell(i + 3, 14).Value = p.BeginningCost;
-                    newSheet.Cell(i + 3, 15).Value = p.GrossPrice;
-                    newSheet.Cell(i + 3, 16).Value = p.NetPrice;
-                    newSheet.Cell(i + 3, 17).Value = p.IsActive ? "Yes" : "No";
-                    newSheet.Cell(i + 3, 18).Value = p.Status;
+                    newSheet.Cell(i + 3, 8).Value = p.ItemClass;
+                    newSheet.Cell(i + 3, 9).Value = p.Category;
+                    newSheet.Cell(i + 3, 10).Value = p.ItemType;
+                    newSheet.Cell(i + 3, 11).Value = p.Brand;
+                    newSheet.Cell(i + 3, 12).Value = p.Size;
+                    newSheet.Cell(i + 3, 13).Value = p.Unit;
+                    newSheet.Cell(i + 3, 14).Value = p.Quantity;
+                    newSheet.Cell(i + 3, 15).Value = p.BeginningCost;
+                    newSheet.Cell(i + 3, 16).Value = p.GrossPrice;
+                    newSheet.Cell(i + 3, 17).Value = p.NetPrice;
+                    newSheet.Cell(i + 3, 18).Value = p.IsActive ? "Yes" : "No";
+                    newSheet.Cell(i + 3, 19).Value = p.Status;
                 }
 
                 using var outStream = new MemoryStream();
@@ -1849,6 +1807,16 @@ namespace GMGInventory.Application.Repositories
                 if (string.IsNullOrWhiteSpace(itemFile.Code)) return "Item Code is required";
                 if (string.IsNullOrWhiteSpace(itemFile.Name)) return "Item Name is required";
                 if (string.IsNullOrWhiteSpace(itemFile.Size)) return "Item Size is required";
+
+                int? itemClassId = null;
+                if (itemFile.ItemClass != null)
+                {
+                    var itemClass = await context.ItemClasses
+                                                 .Where(s => s.Name.ToLower() == (itemFile.ItemClass).ToLower())
+                                                 .FirstOrDefaultAsync();
+                    if (itemClass == null) return $"Invalid Item Class: {itemFile.ItemClass} not found";
+                    else itemClassId = itemClass.Id;
+                }
 
                 var category = await context.Categories
                                             .Where(s => s.Name.Trim().ToLower() == itemFile.Category.Trim().ToLower()
@@ -1895,6 +1863,7 @@ namespace GMGInventory.Application.Repositories
                     item.PartNumber = !string.IsNullOrWhiteSpace(partNumber) ? partNumber : item.PartNumber;
                     item.InterchangeNumber = !string.IsNullOrWhiteSpace(interchangeNumber) ? interchangeNumber : item.InterchangeNumber;
                     item.ModelNumber = !string.IsNullOrWhiteSpace(modelNumber) ? modelNumber : item.ModelNumber;
+                    item.ItemClassId = itemClassId;
                     item.Size = size;
                     item.UnitId = unit.Id;
                     item.CategoryId = category.Id;
@@ -1917,6 +1886,7 @@ namespace GMGInventory.Application.Repositories
                         PartNumber = partNumber,
                         InterchangeNumber = interchangeNumber,
                         ModelNumber = modelNumber,
+                        ItemClassId = itemClassId,
                         Size = size,
                         UnitId = unit.Id,
                         CategoryId = category.Id,

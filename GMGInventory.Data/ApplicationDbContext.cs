@@ -183,6 +183,7 @@ namespace GMGInventory.Data
         //public DbSet<InvoiceSequence> InvoiceSequences { get; set; }
         public DbSet<InvoiceType> InvoiceTypes { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<ItemClass> ItemClasses { get; set; }
         public DbSet<ItemConversion> ItemConversions { get; set; }
         public DbSet<ItemInventory> ItemInventories { get; set; }
         public DbSet<ItemLocation> ItemLocations { get; set; }

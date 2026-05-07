@@ -254,6 +254,7 @@ namespace GMGInventory.Application.Repositories
                                  .FirstOrDefault();
 
                 i.IsValidItem = itm != null;
+                i.ItemClass = itm != null && itm.ItemClass != null ? itm.ItemClass.Name : null;
 
                 if (itm != null)
                 {

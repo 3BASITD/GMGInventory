@@ -44,6 +44,7 @@ namespace GMGInventory.Common.Models
         public string? Brand { get; set; }
         public string? Model { get; set; }
         public bool IsValidItem { get; set; }
+        public string? ItemClass { get; set; }
 
         public string? ItemId { get; set; }
 

@@ -53,6 +53,7 @@ namespace GMGInventory.Common.Models
         public string? InterchangeNumber { get; set; }
         public string Size { get; set; }
         public string? UnitCode { get; set; }
+        public string? ItemClassCode { get; set; }
         public string? CategoryCode { get; set; }
         public string? ItemTypeCode { get; set; }
         public string? BrandCode { get; set; }
