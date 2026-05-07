@@ -1175,7 +1175,7 @@
                 // Actions upon Display Edit Modal
                 $(".editBtn").click(function (e) {
                     var data = itemDT.row($(this).parents('tr')).data();
-
+                    
                     $("#edit-id").val(data.id);
                     $("#edit-code").val(data.code);
                     $("#edit-name").val(data.name);
@@ -1184,6 +1184,8 @@
                     $("#edit-interchange-number").val(data.interchangeNumber);
                     $("#edit-model-number").val(data.modelNumber);
                     $("#edit-size").val(data.size);
+                    var itemClassOption = new Option(data.itemClass, data.itemClassId, true, true);
+                    $("#edit-item-class").append(itemClassOption).trigger("change");
                     var brandOption = new Option(data.brand, data.brandId, true, true);
                     $("#edit-brand").append(brandOption).trigger("change");
                     var categoryOption = new Option(data.category, data.categoryId, true, true);
@@ -1202,7 +1204,8 @@
                         PartNumber: { maxlength: 200 },
                         InterchangeNumber: { maxlength: 200 },
                         ModelNumber: { maxlength: 200 },
-                        Size: { required: true, maxlength: 50 }
+                        Size: { required: true, maxlength: 50 },
+                        BeginningCost: { required: true, range: [0, 1999999.99] }
                     },
                     messages: {
                         Code: { required: "Please enter code.", maxlength: "Code must not exceed 50 characters." },
@@ -1211,7 +1214,8 @@
                         PartNumber: { maxlength: "Part number must not exceed 200 characters." },
                         InterchangeNumber: { maxlength: "Interchange number must not exceed 200 characters." },
                         ModelNumber: { maxlength: "Model number must not exceed 200 characters." },
-                        Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." }
+                        Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." },
+                        BeginningCost: { required: "Please enter new Beginning Cost.", range: "Cost must be between 0-1999999.99." }
                     },
                     submitHandler: function (form, event) {
                         event.preventDefault();

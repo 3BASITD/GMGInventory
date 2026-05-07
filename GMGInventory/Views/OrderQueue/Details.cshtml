@@ -162,6 +162,7 @@
                                     <th>Item Code</th>
                                     <th>Old Item Code</th>
                                     <th>Item Name</th>
+                                    <th>Item Class</th>
                                     <th>Brand</th>
                                     <th>Model</th>
                                     <th>Size</th>
@@ -231,6 +232,11 @@
                                                 @item.ItemName
                                             }
                                         </td>
+                                        <td>
+                                            @(string.IsNullOrWhiteSpace(item.ItemClass) 
+                                            ? Html.Raw("<span class='text-muted'>N/A</span>") 
+                                            : item.ItemClass)
+                                        </td>
                                         <td>@item.Brand</td>
                                         <td>
                                             @(string.IsNullOrWhiteSpace(item.Model) 
@@ -261,9 +267,19 @@
                                         var totalQuantity = string.Format("{0:#,##0}",Model.Items.Sum(s => s.QuantityD));
                                         var totalPrice = string.Format("{0:#,##0.00}",Model.Items.Sum(s => s.ExtendedPriceD));
                                     }
-                                    <th colspan="8">Total</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>Total</th>
                                     <th class="text-end">@totalQuantity</th>
-                                    <th colspan="3"></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
                                     <th class="text-end">@totalPrice</th>
                                 </tr>
                             </tfoot>
@@ -282,22 +298,31 @@
 
         var itemDT = $('.table-item').DataTable({
             order: [[1, "asc"]],
+            orderFixed: [[4, 'asc']],
             columnDefs: [
                 {
-                    targets: [2, 5, 6, 7],
+                    targets: [2, 5, 6, 7, 8],
                     render: function(data, type, row, meta) {
                         if (type == "sort") {
                             var text = $('<div>').html(data).text().trim();
 
                             if (!text || text.toLowerCase() == "n/a") {
-                                return "~~~~";
+                                return "\uffff";
                             }
                             return text;
                         }
                         return data;
                     }
                 }
-            ]
+            ],
+            rowGroup: {
+                startRender: function (rows, group) {
+                    return $('<tr/>').append('<td colspan="13"><strong>Item Class: ' + group + '</strong></td>');
+                },
+                dataSrc: function (row) {
+                    return row.itemClass;
+                }
+            }
         });
 
         $(".checkall").on("change", function() {
