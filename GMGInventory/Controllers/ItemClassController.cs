@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,11 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetOptions2(string search, int page)
         {
             return Json(await itemTypeRepository.GetOptions2(search, page));
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            return View();
         }
     }
 }

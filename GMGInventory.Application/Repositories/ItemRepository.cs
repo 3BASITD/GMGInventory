@@ -1812,35 +1812,40 @@ namespace GMGInventory.Application.Repositories
                 if (itemFile.ItemClass != null)
                 {
                     var itemClass = await context.ItemClasses
-                                                 .Where(s => s.Name.ToLower() == (itemFile.ItemClass).ToLower())
+                                                 .Where(s => s.Code.Trim().ToLower() == (itemFile.ItemClass).Trim().ToLower()
+                                                          || s.Name.Trim().ToLower() == (itemFile.ItemClass).Trim().ToLower())
                                                  .FirstOrDefaultAsync();
                     if (itemClass == null) return $"Invalid Item Class: {itemFile.ItemClass} not found";
                     else itemClassId = itemClass.Id;
                 }
 
                 var category = await context.Categories
-                                            .Where(s => s.Name.Trim().ToLower() == itemFile.Category.Trim().ToLower()
-                                                     || s.Code.Trim().ToLower() == itemFile.Category.Trim().ToLower())
+                                            .Where(s => s.Code.Trim().ToLower() == itemFile.Category.Trim().ToLower()
+                                                     || s.Name.Trim().ToLower() == itemFile.Category.Trim().ToLower())
                                             .FirstOrDefaultAsync();
                 if (category == null) return $"Invalid Category: {itemFile.Category} not found";
 
                 var itemType = await context.ItemTypes
-                                            .Where(s => s.Name.ToLower() == itemFile.ItemType.ToLower())
+                                            .Where(s => s.Code.Trim().ToLower() == itemFile.ItemType.Trim().ToLower()
+                                                     || s.Name.Trim().ToLower() == itemFile.ItemType.Trim().ToLower())
                                             .FirstOrDefaultAsync();
                 if (itemType == null) return $"Invalid Item Type: {itemFile.ItemType} not found";
 
                 var brand = await context.Brands
-                                         .Where(s => s.Name.ToLower() == itemFile.Brand.ToLower())
+                                         .Where(s => s.Code.Trim().ToLower() == itemFile.Brand.Trim().ToLower()
+                                                  || s.Name.Trim().ToLower() == itemFile.Brand.Trim().ToLower())
                                          .FirstOrDefaultAsync();
                 if (brand == null) return $"Invalid Brand: {itemFile.Brand} not found";
 
                 var unit = await context.Units
-                                        .Where(s => s.Name.ToLower() == itemFile.Unit.ToLower())
+                                        .Where(s => s.Code.Trim().ToLower() == itemFile.Unit.Trim().ToLower()
+                                                 || s.Name.Trim().ToLower() == itemFile.Unit.Trim().ToLower())
                                         .FirstOrDefaultAsync();
                 if (unit == null) return $"Invalid Unit: {itemFile.Unit} not found";
 
                 var warehouse = await context.Warehouses
-                                             .Where(s => s.Code.Trim().ToLower() == itemFile.Warehouse.ToLower())
+                                             .Where(s => s.Code.Trim().ToLower() == itemFile.Warehouse.Trim().ToLower()
+                                                      || s.Name.Trim().ToLower() == itemFile.Warehouse.Trim().ToLower())
                                              .FirstOrDefaultAsync();
                 if (warehouse == null) return $"Invalid Warehouse: {itemFile.Warehouse} not found";
 

@@ -14,7 +14,7 @@
     <div class="card-header">
         <span class="card-title po-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (Model.Status.ToLower().Contains("pending"))
+            @* @if (Model.Status.ToLower().Contains("pending"))
             {
                 @if (userAccess.CanEdit == false)
                 {
@@ -23,8 +23,8 @@
                     </button>
                 }
                 else if(Model.IsValidAgent == false
-                     || Model.IsValidCustomer == false
-                     || Model.Items.Any(s=>s.IsValidItem == false))
+                     || Model.IsValidCustomer == false)
+                     //|| Model.Items.Any(s=>s.IsValidItem == false))
                 {
                     <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore All&#10;Record contains invalid data." data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-broom"></span>
@@ -42,8 +42,39 @@
                 <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore All&#10;Action not allowed, only permitted for pending status" data-microtip-position="bottom-left" role="tooltip">
                     <span class="fas fa-broom"></span>
                 </button>
+            } *@
+            @if (Model.Status.ToLower().Contains("pending") || Model.Status.ToLower().Contains("partial"))
+            {
+                @if (userAccess.CanEdit == false)
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore Selected&#10;Edit access is required." data-microtip-position="bottom-left" role="tooltip">
+                        <span class="fas fa-broom"></span> 
+                    </button>
+                }
+                else if(Model.IsValidAgent == false
+                     || Model.IsValidCustomer == false)
+                     //|| Model.Items.Any(s=>s.IsValidItem == false))
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore Selected&#10;Record contains invalid data." data-microtip-position="bottom-left" role="tooltip">
+                        <span class="fas fa-broom"></span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger btn-sm float-right ml-2" onclick="IgnoreOrderItem()">
+                        <span class="fas fa-broom"></span> Ignore Selected
+                    </button>
+                }
             }
-            @if (Model.Status.ToLower().Contains("ignored") == false)
+            else
+            {
+                <button type="button" class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Ignore Selected&#10;Action not allowed, only permitted for pending status" data-microtip-position="bottom-left" role="tooltip">
+                    <span class="fas fa-broom"></span>
+                </button>
+            }
+            @* @if (Model.Status.ToLower().Contains("ignored") == false) *@
+            
+            @if (Model.Status.ToLower().Contains("pending") || Model.Status.ToLower().Contains("partial"))
             {
                 @if (userAccess.CanAdd == false)
                 {
@@ -52,8 +83,8 @@
                     </button>
                 }
                 else if(Model.IsValidAgent == false
-                     || Model.IsValidCustomer == false
-                     || Model.Items.Any(s => s.IsValidItem == false))
+                     || Model.IsValidCustomer == false)
+                     //|| Model.Items.Any(s => s.IsValidItem == false))
                 {
                     <button type="button" class="btn btn-success btn-sm float-right ml-2 ui-state-disabled" data-microtip-title="Add Selected to Sales Order&#10;Record contains invalid data." data-microtip-position="bottom-left" role="tooltip">
                         <span class="fas fa-plus"></span>
@@ -192,6 +223,12 @@
                                                     <span class="fas fa-exclamation-triangle"></span>
                                                 </span>
                                             }
+                                            else if(item.SalesOrderNumber != null && item.SalesOrderNumber.ToLower().Contains("ignored"))
+                                            {
+                                                <span class="text-danger" data-microtip-title="This item is ignored and can no longer be selected to add to a sales order." data-microtip-position="right" role="tooltip">
+                                                    <span class="fas fa-times"></span>
+                                                </span>
+                                            } 
                                             else if(string.IsNullOrWhiteSpace(item.SalesOrderNumber) == false)
                                             {
                                                 @Html.ActionLink(item.SalesOrderNumber,
@@ -199,19 +236,13 @@
                                                                  "SalesOrder", 
                                                                  new { id = item.SalesOrderId }, 
                                                                  new { @class = "text-info", 
-                                                                       @data_microtip_title = "Item already added to Sales Order " + item.SalesOrderNumber, 
-                                                                       @data_microtip_position = "right", 
-                                                                       role = "tooltip" })
-                                            } 
-                                            else if(Model.Status.ToLower().Contains("ignored"))
-                                            {
-                                                <span class="text-danger" data-microtip-title="Cannot add items from an ignored order." data-microtip-position="right" role="tooltip">
-                                                    <span class="fas fa-times"></span>
-                                                </span>
+                                                                       role = "tooltip",
+                                                                       target = "_blank" })
                                             } 
                                             else
                                             {
-                                                <input type="checkbox" class="checkrow" data-row-id="@item.Id" />
+                                                var checkRowGroup = item.ItemClass == null ? "null" : item.ItemClass.Replace(" ", "").ToLower();
+                                                <input type="checkbox" class="checkrow checkrowgroup-@checkRowGroup" data-row-id="@item.Id" />
                                             }
                                         </td>
                                         <td>@item.Code</td>
@@ -232,7 +263,8 @@
                                                 @item.ItemName
                                             }
                                         </td>
-                                        <td>
+                                        @* <td data-order="@(string.IsNullOrWhiteSpace(item.ItemClass) ? "0" : "1_" + item.ItemClass)"> *@
+                                            <td>
                                             @(string.IsNullOrWhiteSpace(item.ItemClass) 
                                             ? Html.Raw("<span class='text-muted'>N/A</span>") 
                                             : item.ItemClass)
@@ -297,9 +329,24 @@
         var order_details = @Html.Raw(Json.Serialize(Model));
 
         var itemDT = $('.table-item').DataTable({
+            paging: false,
             order: [[1, "asc"]],
             orderFixed: [[4, 'asc']],
             columnDefs: [
+                {
+                    targets: 4,
+                    visible: false,
+                    render: function (data, type, row) {
+                        if (type === 'sort') {
+                            if (data == null ||
+                                data.includes('N/A')) {
+                                return '';
+                            }
+                            return $('<div>').html(data).text().toLowerCase();
+                        }
+                        return data;
+                    }
+                },
                 {
                     targets: [2, 5, 6, 7, 8],
                     render: function(data, type, row, meta) {
@@ -317,19 +364,66 @@
             ],
             rowGroup: {
                 startRender: function (rows, group) {
-                    return $('<tr/>').append('<td colspan="13"><strong>Item Class: ' + group + '</strong></td>');
+                    var normalizedGroup = group.trim().toLowerCase();
+
+                    var isNoGroup = normalizedGroup == "no group";
+                    var isInvalid = normalizedGroup == "invalid item";
+
+                    var groupLabel = isNoGroup ? "<span class='text-muted'>N/A</span>" : 
+                                     isInvalid ? `<span class='text-warning fw-normal'>
+                                                    No Item Class because Item is invalid
+                                                  </span>` :
+                                     group;
+                    var groupCheckbox = isNoGroup ? "<input type='checkbox' class='checkgroup checkgroup-null float-right' />" :
+                                        isInvalid ? `<span class='text-warning fw-normal float-right'>
+                                                    <span class='fas fa-exclamation-triangle'></span>
+                                                  </span>` :
+                                        "<input type='checkbox' class='checkgroup checkgroup-" + normalizedGroup.replace(" ", "") + " float-right' />";
+                    return $('<tr/>').append('<td colspan="4"><strong>Item Class:&emsp;' + groupLabel + '</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>' + groupCheckbox + '</td>');
                 },
                 dataSrc: function (row) {
-                    return row.itemClass;
+                    var value = $(row[4]).text().trim().toLowerCase();
+                    return value == "no group" || value == "n/a" ? "No Group" : row[4];
                 }
             }
         });
 
-        $(".checkall").on("change", function() {
+        $(document).on("change", ".checkall", function() {
             $(".checkrow").prop("checked", $(this).prop("checked"));
+            $(".checkgroup").prop("checked", $(this).prop("checked"));
         });
 
-        $(".checkrow").on("change", function() {
+        $(document).on("change", ".checkgroup", function() {
+            var classList = $(this).attr("class");
+            var groupName = classList.split(" ").find(c => c.startsWith("checkgroup-")).replace("checkgroup-", "");
+            
+            $(".checkrowgroup-" + groupName).prop("checked", $(this).prop("checked"));
+
+            checkCheckboxIfAll();
+        });
+
+        $(document).on("change", ".checkrow", function() {
+            var classList = $(this).attr("class");
+            var groupName = classList.split(" ").find(c => c.startsWith("checkrowgroup-")).replace("checkrowgroup-", "");
+            
+            var rows_group_count = $(".checkrowgroup-" + groupName).length;
+            var checked_group_count = $(".checkrowgroup-" + groupName + ":checked").length;
+
+            if(checked_group_count == 0) {
+                $(".checkgroup-" + groupName).prop("checked", false);
+                $(".checkgroup-" + groupName).prop("indeterminate", false);
+            } else if(checked_group_count == rows_group_count) {
+                $(".checkgroup-" + groupName).prop("checked", true);
+                $(".checkgroup-" + groupName).prop("indeterminate", false);
+            } else {
+                $(".checkgroup-" + groupName).prop("checked", false);
+                $(".checkgroup-" + groupName).prop("indeterminate", true);
+            }
+
+            checkCheckboxIfAll();
+        });
+
+        function checkCheckboxIfAll() {
             var rows_count = $(".checkrow").length;
             var checked_count = $(".checkrow:checked").length;
             if(checked_count == 0) {
@@ -342,7 +436,7 @@
                 $(".checkall").prop("checked", false);
                 $(".checkall").prop("indeterminate", true);
             }
-        });
+        }
 
         if (user_access.canAdd) {
             function AddToSalesOrder() {
@@ -395,35 +489,83 @@
         }
 
         if (user_access.canEdit) {
-            function MarkIgnoreOrder(ordernum) {
-                swal({
-                    title: "Ignore All",
-                    text: "Are you sure you want to mark this order record to ignore?",
-                    icon: "error",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $.ajax({
-                            url: "@Url.Action("MarkIgnoreOrder")",
-                            type: "POST",
-                            data: {
-                                OrderNumber: order_details.orderNumber
-                            },
-                            success: function (data, status, xhr) {
-                                if (data.status == "Success") {
-                                    //swal.close();
-                                    window.location.reload();
-                                    toastr.success(data.message, data.status);
-                                } else {
-                                    //toastr.error(data.message, data.status);
-                                    ToastrAndConsoleError(data.status, data.message);
-                                }
+            // function MarkIgnoreOrder(ordernum) {
+            //     swal({
+            //         title: "Ignore All",
+            //         text: "Are you sure you want to mark this order record to ignore?",
+            //         icon: "error",
+            //         buttons: true,
+            //         dangerMode: true
+            //     }).then((confirm) => {
+            //         if (confirm) {
+            //             $.ajax({
+            //                 url: "@Url.Action("MarkIgnoreOrder")",
+            //                 type: "POST",
+            //                 data: {
+            //                     OrderNumber: order_details.orderNumber
+            //                 },
+            //                 success: function (data, status, xhr) {
+            //                     if (data.status == "Success") {
+            //                         //swal.close();
+            //                         window.location.reload();
+            //                         toastr.success(data.message, data.status);
+            //                     } else {
+            //                         //toastr.error(data.message, data.status);
+            //                         ToastrAndConsoleError(data.status, data.message);
+            //                     }
+            //                 }
+            //             });
+            //         }
+            //     });
+            // };
+            
+            function IgnoreOrderItem() {
+                var row_selected = $(".checkrow:checked").map(function () {
+                                                                  return $(this).data("row-id");
+                                                              }).get();
+                if (row_selected.length == 0) {
+                    toastr.warning("Select at least one row to proceed with ignoring item", "No selected row");
+                } else {
+                    var timesAdded = "";
+                    // if (order_details.convertTimes > 0) {
+                    //     timesAdded += " <strong>This order already added " + order_details.convertTimes + " time(s)</strong>, adding it again might result to duplicate sales order.";
+                    // }
+
+                    swal({
+                        title: "Ignore Selected Item",
+                        content: {
+                            element: "div",
+                            attributes: {
+                                style: "color: black;text-align: center;",
+                                innerHTML: "Are you sure you want to ignore the selected item(s)?" + timesAdded
                             }
-                        });
-                    }
-                });
-            };
+                        },
+                        icon: "info",
+                        buttons: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            $.ajax({
+                                url: "@Url.Action("Ignore")",
+                                type: "POST",
+                                data: {
+                                    OrderNumber: order_details.orderNumber,
+                                    ItemIds: row_selected
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        //swal.close();
+                                        window.location.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        //toastr.error(data.message, data.status);
+                                        ToastrAndConsoleError(data.status, data.message);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
         }
     </script>
 }

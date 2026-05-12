@@ -6,7 +6,7 @@ namespace GMGInventory.Data
     {
         public SalesOrderSourced()
         {
-            this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
+            //this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -18,6 +18,6 @@ namespace GMGInventory.Data
 
         public string? Status { get; set; }
 
-        public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
+        //public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
     }
 }

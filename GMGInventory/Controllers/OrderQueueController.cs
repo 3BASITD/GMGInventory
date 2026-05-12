@@ -57,6 +57,15 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> Ignore(string OrderNumber, List<int> ItemIds)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await queueRepository.IgnoreOrder(OrderNumber, ItemIds));
+        }
+
+        [HttpPost]
         public async Task<IActionResult> MarkIgnoreOrder(string OrderNumber)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderQueue, AccessTypes.Edit);

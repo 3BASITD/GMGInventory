@@ -460,8 +460,8 @@ namespace GMGInventory.Application.Repositories
                                WithREYCOJITLPDelivery = order.WithREYCOJITLPDelivery.Name,
                                SpecialInstruction = order.SpecialInstruction,
                                Remarks = order.Remarks,
-                               OrderQueueNumber = order.SalesOrderLineItems
-                                                       .Select(s => s.SalesOrderSource.SourceOrderNumber)
+                               OrderQueueNumber = order.SalesOrderSources
+                                                       .Select(s => s.SourceOrderNumber)
                                                        .FirstOrDefault()
                            });
             return orderVM.ToList();

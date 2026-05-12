@@ -38,6 +38,19 @@
         visibility: hidden;
     }
 
+        nav .dropdown-menu .container {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+            nav .dropdown-menu .container .row,
+            nav .dropdown-menu .container .col-md-4,
+            nav .dropdown-menu .container .col-md-6,
+            nav .dropdown-menu .container .col-md-12 {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
         nav .dropdown-menu.dropdown-menu-reports,
         nav .dropdown-menu.dropdown-menu-option {
             right: 0;

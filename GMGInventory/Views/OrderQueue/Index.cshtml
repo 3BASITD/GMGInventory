@@ -49,9 +49,10 @@
                             <select id="filter-status" class="form-control form-control-sm">
                                 <option value="">All</option>
                                 <option value="Pending">Pending</option>
-                                <option value="Partial">Added Partially</option>
-                                <option value="Full">Fully Added</option>
-                                <option value="Ignored">Ignored</option>
+                                <option value="PartialAdded">Added Partially</option>
+                                <option value="FullAdded">Fully Added</option>
+                                <option value="PartialIgnored">Added Partially</option>
+                                <option value="FullIgnored">Fully Added</option>
                             </select>
                         </div>
                     </div>
@@ -267,7 +268,19 @@
                     name: "Customer"
                 },
                 { data: "extendedPrice", name: "ExtendedPrice" },
-                { data: "status", name: "Status" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if (data.status.toLowerCase().includes("partial")) {
+                            return `
+                                <span data-microtip-title="Added Count / Ignored Count / Item Count" data-microtip-position="right" role="tooltip">
+                                    ${data.addedCount}/${data.ignoredCount}/${data.itemCount}
+                                </span>`;
+                        } else {
+                            return data.status;
+                        }
+                    },
+                    name: "Status"
+                },
                 { data: "dateCreated", name: "DateCreated" },
                 {
                     orderable: false,

@@ -15,10 +15,11 @@ namespace GMGInventory.Data
             this.PhysicalCountHistories = new HashSet<PhysicalCountHistory>();
             this.PurchaseOrderLineItems = new HashSet<PurchaseOrderLineItem>();
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
+            this.SalesOrderItemSources = new HashSet<SalesOrderItemSource>();
             this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
             this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
             this.TransferItemDetails = new HashSet<TransferItemDetail>();
-            this.ItemLocations = new HashSet<ItemLocation>();
+            this.ItemLocations = new HashSet<ItemLocation>(); 
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -84,6 +85,7 @@ namespace GMGInventory.Data
         public ICollection<PurchaseOrderLineItem> PurchaseOrderLineItems { get; set; }
         public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }
         public ICollection<SalesOrderLineItem> SalesOrderLineItems { get; set; }
+        public ICollection<SalesOrderItemSource> SalesOrderItemSources { get; set; }
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         //public ICollection<StockCard> StockCards { get; set; }
         public ICollection<TransferItemDetail> TransferItemDetails { get; set; }

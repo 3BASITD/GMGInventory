@@ -1041,7 +1041,7 @@
                             actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
                             if (data.isActive) {
                                 if (user_access.canEdit) {
-                                    actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                                    actions += '<button data-id="' + data.id + '" class="btn btn-warning btn-xs editBtn" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                                 }
                                 if (user_access.canDelete) {
                                     actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
@@ -1083,7 +1083,7 @@
                 actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + d.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
                 if (d.isActive) {
                     if (user_access.canEdit) {
-                        actions += '<button class="btn btn-warning btn-xs editBtn" data-bs-toggle="modal" data-bs-target="#editModal" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                        actions += '<button data-id="' + d.id + '" class="btn btn-warning btn-xs editBtn" data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                     }
                     if (user_access.canDelete) {
                         actions += '<button data-id="' + d.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
@@ -1174,7 +1174,9 @@
             if (user_access.canEdit) {
                 // Actions upon Display Edit Modal
                 $(".editBtn").click(function (e) {
-                    var data = itemDT.row($(this).parents('tr')).data();
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    var data = itemDT.data().toArray().find(s => s.id == id);
                     
                     $("#edit-id").val(data.id);
                     $("#edit-code").val(data.code);
@@ -1184,8 +1186,12 @@
                     $("#edit-interchange-number").val(data.interchangeNumber);
                     $("#edit-model-number").val(data.modelNumber);
                     $("#edit-size").val(data.size);
-                    var itemClassOption = new Option(data.itemClass, data.itemClassId, true, true);
-                    $("#edit-item-class").append(itemClassOption).trigger("change");
+                    if (data.itemClass) {
+                        var itemClassOption = new Option(data.itemClass, data.itemClassId, true, true);
+                        $("#edit-item-class").append(itemClassOption).trigger("change");
+                    } else {
+                        $("#edit-item-class").val("").trigger("change");
+                    }
                     var brandOption = new Option(data.brand, data.brandId, true, true);
                     $("#edit-brand").append(brandOption).trigger("change");
                     var categoryOption = new Option(data.category, data.categoryId, true, true);
@@ -1193,6 +1199,8 @@
                     var itemTypeOption = new Option(data.itemType, data.itemTypeId, true, true);
                     $("#edit-item-type").append(itemTypeOption).trigger("change");
                     $("#edit-beginning-cost").val(data.beginningCostD);
+
+                    $("#editModal").modal("show");
                 });
 
                 // Validation for Edit Modal
@@ -1554,7 +1562,7 @@
                             $("#upload-row" + rownum + "tr").remove();
                             duplicate_upload++;
                         } else {
-                            $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                            $("#upload-row" + rownum + "td").html(data.message);
                         }
                     },
                     error: function (xhr, status, error) {

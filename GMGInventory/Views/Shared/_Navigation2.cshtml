@@ -30,14 +30,14 @@ else
 {
     <ul class="navbar-nav">
         @if (navPages.Contains(PageNames.CustomerPurchaseHistory.ToEnumString())
+            || navPages.Contains(PageNames.OrderQueue.ToEnumString())
+            || navPages.Contains(PageNames.SalesOrder.ToEnumString())
             || navPages.Contains(PageNames.PackingListing.ToEnumString())
             || navPages.Contains(PageNames.Receptacle.ToEnumString())
-            || navPages.Contains(PageNames.SalesReturn.ToEnumString())
-            || navPages.Contains(PageNames.SalesOrder.ToEnumString())
-            || navPages.Contains(PageNames.SalesOrderDelivery.ToEnumString())
             || navPages.Contains(PageNames.SalesInvoice.ToEnumString())
-            || navPages.Contains(PageNames.ShippingList.ToEnumString())
-            || navPages.Contains(PageNames.OrderQueue.ToEnumString()))
+            || navPages.Contains(PageNames.SalesOrderDelivery.ToEnumString())
+            || navPages.Contains(PageNames.SalesReturn.ToEnumString())
+            || navPages.Contains(PageNames.ShippingList.ToEnumString()))
         {
             var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "Receptacle", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice", "ShippingList" }).Contains(currentController ?? "");
 
@@ -59,7 +59,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "CustomerPurchaseHistory" ? "active" : "")"
-                               asp-area="" asp-controller="CustomerPurchaseHistory" asp-action="Index">
+                                   asp-area="" asp-controller="CustomerPurchaseHistory" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🕒</span>
@@ -73,11 +73,29 @@ else
                             </a>
                         </li>
                     }
+                    @if (navPages.Contains(PageNames.OrderQueue.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "OrderQueue" ? "active" : "")"
+                                   asp-area="" asp-controller="OrderQueue" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">📋</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-clipboard-list"></span>
+                                }
+                                Order Queue
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.SalesOrder.ToEnumString()))
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "SalesOrder" ? "active" : "")"
-                               asp-area="" asp-controller="SalesOrder" asp-action="Index">
+                                   asp-area="" asp-controller="SalesOrder" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📝</span>
@@ -95,7 +113,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Pack" ? "active" : "")"
-                               asp-area="" asp-controller="Pack" asp-action="Index">
+                                   asp-area="" asp-controller="Pack" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📦</span>
@@ -113,7 +131,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Receptacle" ? "active" : "")"
-                               asp-area="" asp-controller="Receptacle" asp-action="Index">
+                                   asp-area="" asp-controller="Receptacle" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🗳️</span>
@@ -131,7 +149,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "SalesInvoice" ? "active" : "")"
-                               asp-area="" asp-controller="SalesInvoice" asp-action="Index">
+                                   asp-area="" asp-controller="SalesInvoice" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🧾</span>
@@ -149,7 +167,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "SalesOrderDelivery" ? "active" : "")"
-                               asp-area="" asp-controller="SalesOrderDelivery" asp-action="Index">
+                                   asp-area="" asp-controller="SalesOrderDelivery" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🚚</span>
@@ -167,7 +185,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "SalesReturn" ? "active" : "")"
-                               asp-area="" asp-controller="SalesReturn" asp-action="Index">
+                                   asp-area="" asp-controller="SalesReturn" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">↩️</span>
@@ -185,7 +203,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Shipping" ? "active" : "")"
-                               asp-area="" asp-controller="Shipping" asp-action="Index">
+                                   asp-area="" asp-controller="Shipping" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📜</span>
@@ -199,30 +217,12 @@ else
                             </a>
                         </li>
                     }
-                    @if (navPages.Contains(PageNames.OrderQueue.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "OrderQueue" ? "active" : "")"
-                               asp-area="" asp-controller="OrderQueue" asp-action="Index">
-                                @if (newIcon)
-                                {
-                                    <span class="emoji">📋</span>
-                                }
-                                else
-                                {
-
-                                    <span class="nav-icon fas fa-clipboard-list"></span>
-                                }
-                                Order Queue
-                            </a>
-                        </li>
-                    }
                 </ul>
             </li>
         }
 
-        @if (navPages.Contains(PageNames.Item.ToEnumString())
-            || navPages.Contains(PageNames.ItemBasic.ToEnumString())
+        @if (navPages.Contains(PageNames.ItemBasic.ToEnumString())
+            || navPages.Contains(PageNames.Item.ToEnumString())
             || navPages.Contains(PageNames.PriceList.ToEnumString())
             || navPages.Contains(PageNames.PriceUpdate.ToEnumString())
             || navPages.Contains(PageNames.PurchaseReturn.ToEnumString())
@@ -251,7 +251,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Item" ? "active" : "")"
-                               asp-area="" asp-controller="Item" asp-action="Index">
+                                   asp-area="" asp-controller="Item" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📦</span>
@@ -269,7 +269,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "PriceList" ? "active" : "")"
-                               asp-area="" asp-controller="PriceList" asp-action="Index">
+                                   asp-area="" asp-controller="PriceList" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">💲</span>
@@ -287,7 +287,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "PriceUpdate" ? "active" : "")"
-                               asp-area="" asp-controller="PriceUpdate" asp-action="Index">
+                                   asp-area="" asp-controller="PriceUpdate" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🔄</span>
@@ -343,7 +343,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Warehouse" ? "active" : "")"
-                               asp-area="" asp-controller="Warehouse" asp-action="Index">
+                                   asp-area="" asp-controller="Warehouse" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🏢</span>
@@ -361,7 +361,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Transfer" ? "active" : "")"
-                               asp-area="" asp-controller="Transfer" asp-action="Index">
+                                   asp-area="" asp-controller="Transfer" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🔀</span>
@@ -379,7 +379,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "UnservedItem" ? "active" : "")"
-                               asp-area="" asp-controller="UnservedItem" asp-action="Index">
+                                   asp-area="" asp-controller="UnservedItem" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📭</span>
@@ -397,12 +397,13 @@ else
             </li>
         }
 
-        @if (navPages.Contains(PageNames.PurchaseRequest.ToEnumString())
+        @if (navPages.Contains(PageNames.Ordering.ToEnumString())
+            || navPages.Contains(PageNames.PurchaseRequest.ToEnumString())
             || navPages.Contains(PageNames.PurchaseOrder.ToEnumString())
             || navPages.Contains(PageNames.PurchaseReceiving.ToEnumString())
             || navPages.Contains(PageNames.PurchaseReturnNew.ToEnumString()))
         {
-            var navProcurementActive = (new List<string> { "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "");
+            var navProcurementActive = (new List<string> { "Ordering", "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuProcurement" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navProcurementActive ? "active" : "")">
@@ -418,11 +419,29 @@ else
                     PROCUREMENT
                 </a>
                 <ul aria-labelledby="menuProcurement" class="dropdown-menu mt-lg-3 border-0 shadow">
+                    @if (navPages.Contains(PageNames.Ordering.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Ordering" ? "active" : "")"
+                                   asp-area="" asp-controller="Ordering" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">📅</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-calendar-check"></span>
+                                }
+                                Ordering
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.PurchaseRequest.ToEnumString()))
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseRequest" ? "active" : "")"
-                               asp-area="" asp-controller="PurchaseRequest" asp-action="Index">
+                                   asp-area="" asp-controller="PurchaseRequest" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📝</span>
@@ -440,7 +459,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseOrder" ? "active" : "")"
-                               asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
+                                   asp-area="" asp-controller="PurchaseOrder" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📑</span>
@@ -458,7 +477,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseReceive" ? "active" : "")"
-                               asp-area="" asp-controller="PurchaseReceive" asp-action="Index">
+                                   asp-area="" asp-controller="PurchaseReceive" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📥</span>
@@ -476,7 +495,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "PurchaseReturnNew" ? "active" : "")"
-                               asp-area="" asp-controller="PurchaseReturnNew" asp-action="Index">
+                                   asp-area="" asp-controller="PurchaseReturnNew" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">↩️</span>
@@ -494,12 +513,13 @@ else
             </li>
         }
 
-        @if (navPages.Contains(PageNames.Customer.ToEnumString())
+        @if (navPages.Contains(PageNames.Cheque.ToEnumString())
+            || navPages.Contains(PageNames.Customer.ToEnumString())
+            || navPages.Contains(PageNames.KYC.ToEnumString())
             || navPages.Contains(PageNames.Payment.ToEnumString())
-            || navPages.Contains(PageNames.SOACR.ToEnumString())
-            || navPages.Contains(PageNames.Cheque.ToEnumString()))
+            || navPages.Contains(PageNames.SOACR.ToEnumString()))
         {
-            var navCreditsCollectionActive = (new List<string> { "Customer", "Payment", "Soacr", "Cheque" }).Contains(currentController ?? "");
+            var navCreditsCollectionActive = (new List<string> { "Cheque", "Customer", "KYC", "Payment", "Soacr" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuCC" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navCreditsCollectionActive ? "active" : "")">
@@ -519,7 +539,7 @@ else
                     {
                         <li>
                             <a class="dropdown-item @(currentController == "Cheque" ? "active" : "")"
-                               asp-area="" asp-controller="Cheque" asp-action="Index">
+                                   asp-area="" asp-controller="Cheque" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">🏦</span>
@@ -537,7 +557,7 @@ else
                     {
                         <li class="nav-item">
                             <a class="dropdown-item @(currentController == "Customer" ? "active" : "")"
-                               asp-area="" asp-controller="Customer" asp-action="Index">
+                                   asp-area="" asp-controller="Customer" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">👤</span>
@@ -551,11 +571,29 @@ else
                             </a>
                         </li>
                     }
+                    @if (navPages.Contains(PageNames.KYC.ToEnumString()))
+                    {
+                        <li class="nav-item">
+                            <a class="dropdown-item @(currentController == "KYC" ? "active" : "")"
+                                   asp-area="" asp-controller="KYC" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">🪪</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-id-card"></span>
+                                }
+                                KYC
+                            </a>
+                        </li>
+                    }
                     @if (navPages.Contains(PageNames.Payment.ToEnumString()))
                     {
                         <li class="nav-item">
                             <a class="dropdown-item @(currentController == "Payment" ? "active" : "")"
-                               asp-area="" asp-controller="Payment" asp-action="Index">
+                                   asp-area="" asp-controller="Payment" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">💳</span>
@@ -573,7 +611,7 @@ else
                     {
                         <li class="nav-item">
                             <a class="dropdown-item @(currentController == "Soacr" ? "active" : "")"
-                               asp-area="" asp-controller="Soacr" asp-action="Index">
+                                   asp-area="" asp-controller="Soacr" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📄</span>
@@ -595,24 +633,49 @@ else
         @if (navPages.Contains(PageNames.Accesses.ToEnumString())
             || navPages.Contains(PageNames.Agents.ToEnumString())
             || navPages.Contains(PageNames.Areas.ToEnumString())
+            || navPages.Contains(PageNames.BarcotechSync.ToEnumString())
             || navPages.Contains(PageNames.Brands.ToEnumString())
             || navPages.Contains(PageNames.Categories.ToEnumString())
             || navPages.Contains(PageNames.Currency.ToEnumString())
             || navPages.Contains(PageNames.Driver.ToEnumString())
             || navPages.Contains(PageNames.Forwarders.ToEnumString())
             || navPages.Contains(PageNames.HomeImage.ToEnumString())
+            || navPages.Contains(PageNames.ItemClass.ToEnumString())
             || navPages.Contains(PageNames.ItemTypes.ToEnumString())
             || navPages.Contains(PageNames.LocationCodes.ToEnumString())
             || navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString())
             || navPages.Contains(PageNames.Regions.ToEnumString())
             || navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString())
             || navPages.Contains(PageNames.Suppliers.ToEnumString())
+            || navPages.Contains(PageNames.SystemSettings.ToEnumString())
             || navPages.Contains(PageNames.Users.ToEnumString())
             || navPages.Contains(PageNames.Vehicle.ToEnumString())
-            || navPages.Contains(PageNames.AuditLogs.ToEnumString())
-            || navPages.Contains(PageNames.BarcotechSync.ToEnumString()))
+            || navPages.Contains(PageNames.AuditLogs.ToEnumString()))
         {
-            var navAdministrationActive = (new List<string> { "Agent", "Access", "Area", "Brand", "Category", "Forwarder", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "Supplier", "User", "HomeImage", "AuditLog", "BarcotechSync" }).Contains(currentController ?? "");
+            var navAdministrationActive = (new List<string> { "Access", "Agent", "Area", "BarcotechSync", "Brand", "Category", "Currency", "Driver", "Forwarder", "HomeImage", "ItemClass", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "ServiceLevelAgreement", "Supplier", "SystemSettings", "User", "Vehicle", "AuditLog" }).Contains(currentController ?? "");
+            var navAdministrationActiveCount = (navPages.Contains(PageNames.Accesses.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Agents.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Areas.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.BarcotechSync.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Brands.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Categories.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Currency.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Driver.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Forwarders.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.HomeImage.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.ItemClass.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.ItemTypes.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.LocationCodes.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Regions.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Suppliers.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.SystemSettings.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Users.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.Vehicle.ToEnumString()) ? 1 : 0) +
+                                               (navPages.Contains(PageNames.AuditLogs.ToEnumString()) ? 1 : 0);
+            var widthForMoreActive = navAdministrationActiveCount > 18 ? "right:0;left:auto;width:480px;" : "";
+            var colForMoreActive = navAdministrationActiveCount > 18 ? "col-md-6" : "col-md-12";
 
             <li class="nav-item dropdown">
                 <a id="menuAdministration" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navAdministrationActive ? "active" : "")">
@@ -627,351 +690,390 @@ else
                     }
                     ADMINISTRATION
                 </a>
-                <ul aria-labelledby="menuAdministration" class="dropdown-menu mt-lg-3 border-0 shadow">
-                    @if (navPages.Contains(PageNames.Accesses.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Access" ? "active" : "")"
-                               asp-area="" asp-controller="Access" asp-action="Index">
-                                @if (newIcon)
+                <div aria-labelledby="menuAdministration" class="dropdown-menu mt-lg-3 border-0 shadow" style="@widthForMoreActive">
+                    <div class="container">
+                        <div class="row" style="width:100%">
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Accesses.ToEnumString()))
                                 {
-                                    <span class="emoji">🔑</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Access" ? "active" : "")"
+                                           asp-area="" asp-controller="Access" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🔑</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-user-tag"></span>
+                                            <span class="nav-icon fas fa-user-tag"></span>
+                                        }
+                                        Access
+                                    </a>
                                 }
-                                Access
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Agents.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Agent" ? "active" : "")"
-                               asp-area="" asp-controller="Agent" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Agents.ToEnumString()))
                                 {
-                                    <span class="emoji">🧑‍💼</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Agent" ? "active" : "")"
+                                           asp-area="" asp-controller="Agent" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🧑‍💼</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-user-secret"></span>
+                                            <span class="nav-icon fas fa-user-secret"></span>
+                                        }
+                                        Agents
+                                    </a>
                                 }
-                                Agents
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Areas.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Area" ? "active" : "")"
-                               asp-area="" asp-controller="Area" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Areas.ToEnumString()))
                                 {
-                                    <span class="emoji">🗺️</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Area" ? "active" : "")"
+                                           asp-area="" asp-controller="Area" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🗺️</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-map-marker-alt"></span>
+                                            <span class="nav-icon fas fa-map-marker-alt"></span>
+                                        }
+                                        Areas
+                                    </a>
                                 }
-                                Areas
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Brands.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Brand" ? "active" : "")"
-                               asp-area="" asp-controller="Brand" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.BarcotechSync.ToEnumString()))
                                 {
-                                    <span class="emoji">🏷️</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "BarcotechSync" ? "active" : "")"
+                                           asp-area="" asp-controller="BarcotechSync" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🔄</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-trademark"></span>
+                                            <span class="nav-icon fas fa-sync"></span>
+                                        }
+                                        Barcotech Sync Status
+                                    </a>
                                 }
-                                Brands
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Categories.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Category" ? "active" : "")"
-                               asp-area="" asp-controller="Category" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Brands.ToEnumString()))
                                 {
-                                    <span class="emoji">🗂️</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Brand" ? "active" : "")"
+                                           asp-area="" asp-controller="Brand" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🏷️</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-network-wired"></span>
+                                            <span class="nav-icon fas fa-trademark"></span>
+                                        }
+                                        Brands
+                                    </a>
                                 }
-                                Categories
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Currency.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Currency" ? "active" : "")"
-                               asp-area="" asp-controller="Currency" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Categories.ToEnumString()))
                                 {
-                                    <span class="emoji">💱</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Category" ? "active" : "")"
+                                           asp-area="" asp-controller="Category" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🗂️</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-ruble-sign"></span>
+                                            <span class="nav-icon fas fa-network-wired"></span>
+                                        }
+                                        Categories
+                                    </a>
                                 }
-                                Currencies
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Driver.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Driver" ? "active" : "")"
-                               asp-area="" asp-controller="Driver" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Currency.ToEnumString()))
                                 {
-                                    <span class="emoji">👨‍🔧</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Currency" ? "active" : "")"
+                                           asp-area="" asp-controller="Currency" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">💱</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-address-card"></span>
+                                            <span class="nav-icon fas fa-ruble-sign"></span>
+                                        }
+                                        Currencies
+                                    </a>
                                 }
-                                Drivers
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Forwarders.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Forwarder" ? "active" : "")"
-                               asp-area="" asp-controller="Forwarder" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Driver.ToEnumString()))
                                 {
-                                    <span class="emoji">🚛</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Driver" ? "active" : "")"
+                                           asp-area="" asp-controller="Driver" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">👨‍🔧</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-shipping-fast"></span>
+                                            <span class="nav-icon fas fa-address-card"></span>
+                                        }
+                                        Drivers
+                                    </a>
                                 }
-                                Forwarders
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.HomeImage.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "HomeImage" ? "active" : "")"
-                               asp-area="" asp-controller="HomeImage" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Forwarders.ToEnumString()))
                                 {
-                                    <span class="emoji">🖼️</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Forwarder" ? "active" : "")"
+                                           asp-area="" asp-controller="Forwarder" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🚛</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-chalkboard"></span>
+                                            <span class="nav-icon fas fa-shipping-fast"></span>
+                                        }
+                                        Forwarders
+                                    </a>
                                 }
-                                Home Images
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.ItemTypes.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "ItemType" ? "active" : "")"
-                               asp-area="" asp-controller="ItemType" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.HomeImage.ToEnumString()))
                                 {
-                                    <span class="emoji">🧩</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "HomeImage" ? "active" : "")"
+                                           asp-area="" asp-controller="HomeImage" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🖼️</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-keyboard"></span>
+                                            <span class="nav-icon fas fa-chalkboard"></span>
+                                        }
+                                        Home Images
+                                    </a>
                                 }
-                                Item Types
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.LocationCodes.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "LocationCode" ? "active" : "")"
-                               asp-area="" asp-controller="LocationCode" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.ItemClass.ToEnumString()))
                                 {
-                                    <span class="emoji">📍</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "ItemClass" ? "active" : "")"
+                                           asp-area="" asp-controller="ItemClass" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🏷️</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa fa-location-arrow"></span>
+                                            <span class="nav-icon fas fa-tags"></span>
+                                        }
+                                        Item Classes
+                                    </a>
                                 }
-                                Location Codes
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "ReasonsOfReturn" ? "active" : "")"
-                               asp-area="" asp-controller="ReasonsOfReturn" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.ItemTypes.ToEnumString()))
                                 {
-                                    <span class="emoji">🔄</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "ItemType" ? "active" : "")"
+                                           asp-area="" asp-controller="ItemType" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🧩</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa fa-undo"></span>
+                                            <span class="nav-icon fas fa-keyboard"></span>
+                                        }
+                                        Item Types
+                                    </a>
                                 }
-                                Reasons of Return
-                            </a>
-                        </li>
-                    }
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.LocationCodes.ToEnumString()))
+                                {
+                                    <a class="dropdown-item @(currentController == "LocationCode" ? "active" : "")"
+                                           asp-area="" asp-controller="LocationCode" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">📍</span>
+                                        }
+                                        else
+                                        {
 
-                    @if (navPages.Contains(PageNames.Regions.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Region" ? "active" : "")"
-                               asp-area="" asp-controller="Region" asp-action="Index">
-                                @if (newIcon)
-                                {
-                                    <span class="emoji">🌍</span>
+                                            <span class="nav-icon fas fa fa-location-arrow"></span>
+                                        }
+                                        Location Codes
+                                    </a>
                                 }
-                                else
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString()))
                                 {
+                                    <a class="dropdown-item @(currentController == "ReasonsOfReturn" ? "active" : "")"
+                                           asp-area="" asp-controller="ReasonsOfReturn" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🔄</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa fa-map"></span>
+                                            <span class="nav-icon fas fa fa-undo"></span>
+                                        }
+                                        Reasons of Return
+                                    </a>
                                 }
-                                Regions
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "ServiceLevelAgreement" ? "active" : "")"
-                               asp-area="" asp-controller="ServiceLevelAgreement" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Regions.ToEnumString()))
                                 {
-                                    <span class="emoji">🕒</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Region" ? "active" : "")"
+                                           asp-area="" asp-controller="Region" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🌍</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-clock"></span>
+                                            <span class="nav-icon fas fa fa-map"></span>
+                                        }
+                                        Regions
+                                    </a>
                                 }
-                                Service Level Agreements
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Suppliers.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
-                               asp-area="" asp-controller="Supplier" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString()))
                                 {
-                                    <span class="emoji">🏭</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "ServiceLevelAgreement" ? "active" : "")"
+                                           asp-area="" asp-controller="ServiceLevelAgreement" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🕒</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-handshake"></span>
+                                            <span class="nav-icon fas fa-clock"></span>
+                                        }
+                                        Service Level Agreements
+                                    </a>
                                 }
-                                Suppliers
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Users.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "User" ? "active" : "")"
-                               asp-area="" asp-controller="User" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Suppliers.ToEnumString()))
                                 {
-                                    <span class="emoji">👥</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
+                                           asp-area="" asp-controller="Supplier" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🏭</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-user-cog"></span>
+                                            <span class="nav-icon fas fa-handshake"></span>
+                                        }
+                                        Suppliers
+                                    </a>
                                 }
-                                Users
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.Vehicle.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "Vehicle" ? "active" : "")"
-                               asp-area="" asp-controller="Vehicle" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.SystemSettings.ToEnumString()))
                                 {
-                                    <span class="emoji">🚚</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "SystemSettings" ? "active" : "")"
+                                           asp-area="" asp-controller="SystemSettings" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🛠️</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-truck-moving"></span>
+                                            <span class="nav-icon fas fa-sliders"></span>
+                                        }
+                                        System Settings
+                                    </a>
                                 }
-                                Vehicles
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.AuditLogs.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "AuditLog" ? "active" : "")"
-                               asp-area="" asp-controller="AuditLog" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Users.ToEnumString()))
                                 {
-                                    <span class="emoji">📊</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "User" ? "active" : "")"
+                                           asp-area="" asp-controller="User" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">👥</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-clipboard-list"></span>
+                                            <span class="nav-icon fas fa-user-cog"></span>
+                                        }
+                                        Users
+                                    </a>
                                 }
-                                Audit Logs
-                            </a>
-                        </li>
-                    }
-                    @if (navPages.Contains(PageNames.BarcotechSync.ToEnumString()))
-                    {
-                        <li>
-                            <a class="dropdown-item @(currentController == "BarcotechSync" ? "active" : "")"
-                               asp-area="" asp-controller="BarcotechSync" asp-action="Index">
-                                @if (newIcon)
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.Vehicle.ToEnumString()))
                                 {
-                                    <span class="emoji">🔄</span>
-                                }
-                                else
-                                {
+                                    <a class="dropdown-item @(currentController == "Vehicle" ? "active" : "")"
+                                           asp-area="" asp-controller="Vehicle" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">🚚</span>
+                                        }
+                                        else
+                                        {
 
-                                    <span class="nav-icon fas fa-sync"></span>
+                                            <span class="nav-icon fas fa-truck-moving"></span>
+                                        }
+                                        Vehicles
+                                    </a>
                                 }
-                                Barcotech Sync Status
-                            </a>
-                        </li>
-                    }
-                </ul>
+                            </div>
+                            <div class="@colForMoreActive">
+                                @if (navPages.Contains(PageNames.AuditLogs.ToEnumString()))
+                                {
+                                    <a class="dropdown-item @(currentController == "AuditLog" ? "active" : "")"
+                                           asp-area="" asp-controller="AuditLog" asp-action="Index">
+                                        @if (newIcon)
+                                        {
+                                            <span class="emoji">📊</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="nav-icon fas fa-clipboard-list"></span>
+                                        }
+                                        Audit Logs
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </li>
         }
 

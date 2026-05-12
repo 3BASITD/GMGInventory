@@ -23,6 +23,7 @@ namespace GMGInventory.Common.Models
         public int ConvertTimes { get; set; }
         public int ItemCount { get; set; }
         public int AddedCount { get; set; }
+        public int IgnoredCount { get; set; }
         public string Status { get; set; }
 
         [Display(Name = "Date Created")]
