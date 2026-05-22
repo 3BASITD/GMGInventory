@@ -5,7 +5,7 @@ namespace GMGInventory.Application.Contracts
     public interface ISalesReturnRepository
     {
         Task<SalesReturnVM?> GetDetailsAsync(int? Id);
-        Task<ForDataTables<SalesReturnVM>> GetListDTAsync(DataTablesRequestForm form);
+        Task<ForDataTables<SalesReturnVM>> GetListDTAsync(DataTablesRequestForm form, DateTime dtFrom, DateTime dtTo);
         Task<IList<APISalesReturn>> GetListAPI(DateTime? dt);
         Task<IList<SalesReturnItemVM>> GetItemsAsync(int salesReturnId);
         Task<string> GetNextFormattedNumber();

@@ -19,7 +19,6 @@ namespace GMGInventory.Data
             this.SalesOrderLineItems = new HashSet<SalesOrderLineItem>();
             this.SalesReturnLineItems = new HashSet<SalesReturnLineItem>();
             this.TransferItemDetails = new HashSet<TransferItemDetail>();
-            this.ItemLocations = new HashSet<ItemLocation>(); 
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -89,6 +88,5 @@ namespace GMGInventory.Data
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
         //public ICollection<StockCard> StockCards { get; set; }
         public ICollection<TransferItemDetail> TransferItemDetails { get; set; }
-        public ICollection<ItemLocation> ItemLocations { get; set; }
     }
 }

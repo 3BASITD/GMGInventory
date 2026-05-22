@@ -64,12 +64,12 @@ builder.Services.AddScoped(typeof(IAccessRepository), typeof(AccessRepository));
 builder.Services.AddScoped(typeof(IAgentRepository), typeof(AgentRepository));
 builder.Services.AddScoped(typeof(IAreaRepository), typeof(AreaRepository));
 builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
+builder.Services.AddScoped(typeof(IBarcotechSyncRepository), typeof(BarcotechSyncRepository));
 builder.Services.AddScoped(typeof(IBrandRepository), typeof(BrandRepository));
 builder.Services.AddScoped(typeof(IBusinessStyleRepository), typeof(BusinessStyleRepository));
 builder.Services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
 builder.Services.AddScoped(typeof(IChequeRepository), typeof(ChequeRepository));
 builder.Services.AddScoped(typeof(IChequeStatusRepository), typeof(ChequeStatusRepository));
-builder.Services.AddScoped(typeof(IConfigurationRepository), typeof(ConfigurationRepository));
 builder.Services.AddScoped(typeof(ICountryRepository), typeof(CountryRepository));
 builder.Services.AddScoped(typeof(ICreditTermRepository), typeof(CreditTermRepository));
 builder.Services.AddScoped(typeof(ICurrencyRepository), typeof(CurrencyRepository));
@@ -77,6 +77,7 @@ builder.Services.AddScoped(typeof(ICustomerAccountStatusRepository), typeof(Cust
 builder.Services.AddScoped(typeof(ICustomerPurchaseRepository), typeof(CustomerPurchaseRepository));
 builder.Services.AddScoped(typeof(ICustomerRepository), typeof(CustomerRepository));
 builder.Services.AddScoped(typeof(ICustomerTypeRepository), typeof(CustomerTypeRepository));
+builder.Services.AddScoped(typeof(IDeliveryMonitoringRepository), typeof(DeliveryMonitoringRepository));
 builder.Services.AddScoped(typeof(IDeliveryTimeRepository), typeof(DeliveryTimeRepository));
 builder.Services.AddScoped(typeof(IDriverRepository), typeof(DriverRepository));
 builder.Services.AddScoped(typeof(IForwarderRepository), typeof(ForwarderRepository));
@@ -84,7 +85,6 @@ builder.Services.AddScoped(typeof(IHomeImageRepository), typeof(HomeImageReporit
 builder.Services.AddScoped(typeof(IInvoiceRepository), typeof(InvoiceRepository));
 builder.Services.AddScoped(typeof(IItemClassRepository), typeof(ItemClassRepository));
 builder.Services.AddScoped(typeof(IItemConversionRepository), typeof(ItemConversionRepository));
-builder.Services.AddScoped(typeof(IItemLocationRepository), typeof(ItemLocationRepository));
 builder.Services.AddScoped(typeof(IItemPriceRepository), typeof(ItemPriceRepository));
 builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped(typeof(IItemTransferRepository), typeof(ItemTransferRepository));
@@ -116,12 +116,13 @@ builder.Services.AddScoped(typeof(IShippingRepository), typeof(ShippingRepositor
 builder.Services.AddScoped(typeof(ISoacrLineItemRepository), typeof(SoacrLineItemRepository));
 builder.Services.AddScoped(typeof(ISoacrRepository), typeof(SoacrRepository));
 builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
-builder.Services.AddScoped(typeof(IBarcotechSyncRepository), typeof(BarcotechSyncRepository));
+builder.Services.AddScoped(typeof(ISystemSettingRepository), typeof(SystemSettingRepository));
 builder.Services.AddScoped(typeof(IUnitRepository), typeof(UnitRepository));
 builder.Services.AddScoped(typeof(IUnservedItemRepository), typeof(UnservedItemRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IVehicleRepository), typeof(VehicleRepository));
 builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseRepository));
+builder.Services.AddScoped(typeof(IWarehouseDashboardRepository), typeof(WarehouseDashboardRepository));
 
 builder.Services.AddScoped(typeof(ITrackerRepository), typeof(TrackerRepository));
 

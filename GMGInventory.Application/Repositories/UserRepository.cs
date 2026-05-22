@@ -185,7 +185,6 @@ namespace GMGInventory.Application.Repositories
             if (await context.Invoices.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Invoices"); }
             if (await context.ItemConversions.AnyAsync(s => s.UserCreated == id)) { tables.Add("Item Conversions"); }
             if (await context.ItemInventories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Inventories"); }
-            if (await context.ItemLocations.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Locations"); }
             if (await context.ItemPrices.AnyAsync(s => s.UserCreated == id)) { tables.Add("Item Prices"); }
             if (await context.Items.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Items"); }
             if (await context.ItemTypes.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Item Types"); }
@@ -211,6 +210,7 @@ namespace GMGInventory.Application.Repositories
             if (await context.ReceptaclePrintHistories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Receptacle Print Histories"); }
             if (await context.Regions.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Regions"); }
             if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Delivery Monitorings"); }
+            if (await context.SalesOrderItemSources.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Item Sources"); }
             if (await context.SalesOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Line Items"); }
             if (await context.SalesOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Orders"); }
             if (await context.SalesOrderSources.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Sources"); }

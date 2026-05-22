@@ -1,13 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Page Not Found";
+﻿@model IList<SystemSettingVM>
+@{
+    var errorTitle = Model.FirstOrDefault(s => s.Name == "Error404Title")?.Value ?? "Page Not Found";
+    var errorDescription = Model.FirstOrDefault(s => s.Name == "Error404Description")?.Value ?? "The page or resource you’re looking for could not be found.";
+    var errorSolution = Model.FirstOrDefault(s => s.Name == "Error404Solution")?.Value ?? "It may have been moved, deleted, or the URL might be incorrect. Please check the URL or return to the homepage.";
+
+    ViewData["Title"] = @errorTitle;
 }
 
 <div class="container full-height d-flex align-items-center justify-content-center">
     <div class="text-center">
         <h1 class="display-1 text-danger">404</h1>
-        <h2 class="display-4">Page Not Found</h2>
-        <p class="lead">The page or resource you’re looking for could not be found.</p>
-        <p>It may have been moved, deleted, or the URL might be incorrect. Please check the URL or return to the homepage.</p>
+        <h2 class="display-4">@errorTitle</h2>
+        <p class="lead">@errorDescription</p>
+        <p>@errorSolution</p>
         <a href="/" class="btn btn-primary">Return to Homepage</a>
+        <p class="text-muted text-xs mt-5">Error message can be modified by the system administrator.</p>
     </div>
 </div>

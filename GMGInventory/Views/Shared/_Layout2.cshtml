@@ -51,8 +51,7 @@
         <nav class="main-header navbar navbar-expand-lg @(activeUser.IsDarkMode ? "navbar-dark" : "navbar-white navbar-light") to-stick nav-sticked">
             <div class="container-fluid">
                 <a asp-controller="Home" asp-action="Index" class="navbar-brand brand-link">
-                    <img src="~/images/3BAS.png" alt="BAS" class="brand-image" style="margin-top:-3px;margin-right:0.8rem" />
-                    @* <img src="~/images/3BAS.png" alt="BAS" class="brand-image img-circle bg-white" style="margin-top:-3px;" /> *@
+                    @await Component.InvokeAsync("LayoutData", new { viewType = "NavigationImage" })
                     @await Component.InvokeAsync("LayoutData", new { viewType = "CompanyNavbar" })
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -237,7 +236,8 @@
     <script src="~/lib/swiper-11.1.14/package/swiper-bundle.min.js"></script>
     <script src="~/lib/summernote/summernote-bs5.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
+    
+    @await Component.InvokeAsync("LayoutData", new { viewType = "ErrorJson" })
     <script>
             $(document).ready(function () {
                 var layout_is_dark_mode = @Json.Serialize(activeUser.IsDarkMode);

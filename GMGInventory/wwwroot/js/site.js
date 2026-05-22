@@ -22,32 +22,32 @@
         "hideMethod": "slideUp"
     };
 
-    $.ajaxSetup({
-        error: function (xhr, status, error) {
-            if (xhr.status === 0 || status === "abort") return;
+    //$.ajaxSetup({
+    //    error: function (xhr, status, error) {
+    //        if (xhr.status === 0 || status === "abort") return;
 
-            if (xhr.status === 400)
-                toastr.error("The request was invalid. Please try again.", "400 Bad Request");
-            else if (xhr.status === 401)
-                toastr.error("Please log in to access this action.", "401 Unauthorized");
-            else if (xhr.status === 403)
-                toastr.error("You don't have permission to do this action.", "403 Forbidden");
-            else if (xhr.status === 404)
-                toastr.error("Function could not be found", "404 Not Found");
-            else if (xhr.status === 500)
-                toastr.error("Something went wrong on our end. Please try again later.", "500 Internal Server Error");
-            else if (xhr.status === 502)
-                toastr.error("We’re having trouble connecting to the server. Please try again soon.", "502 Bad Gateway");
-            else if (xhr.status === 503)
-                toastr.error("The service is temporarily unavailable. Please check back shortly.", "503 Service Unavailable");
-            else {
-                toastr.error("There seems to be a problem loading some data. Please reload the page and try again.", "Unknown Error");
-                console.error("Unknown error encountered while loading ajax");
-                console.log({ xhr, status, error });
-            }
-            hideLoader();
-        }
-    });
+    //        if (xhr.status === 400)
+    //            toastr.error("The request was invalid. Please try again.", "400 Bad Request");
+    //        else if (xhr.status === 401)
+    //            toastr.error("Please log in to access this action.", "401 Unauthorized");
+    //        else if (xhr.status === 403)
+    //            toastr.error("You don't have permission to do this action.", "403 Forbidden");
+    //        else if (xhr.status === 404)
+    //            toastr.error("Function could not be found", "404 Not Found");
+    //        else if (xhr.status === 500)
+    //            toastr.error("Something went wrong on our end. Please try again later.", "500 Internal Server Error");
+    //        else if (xhr.status === 502)
+    //            toastr.error("We’re having trouble connecting to the server. Please try again soon.", "502 Bad Gateway");
+    //        else if (xhr.status === 503)
+    //            toastr.error("The service is temporarily unavailable. Please check back shortly.", "503 Service Unavailable");
+    //        else {
+    //            toastr.error("There seems to be a problem loading some data. Please reload the page and try again.", "Unknown Error");
+    //            console.error("Unknown error encountered while loading ajax");
+    //            console.log({ xhr, status, error });
+    //        }
+    //        hideLoader();
+    //    }
+    //});
 
     $('.select2option').select2({
         allowClear: true,
@@ -89,7 +89,7 @@
     });
 
     $(document).ajaxSend(function (event, jqxhr, settings) {
-        if (settings.isDataTableRequest) return;
+        if (settings.isDataTableRequest || settings.noLoader) return;
 
         var msg = settings.loaderMessage || "";
 
@@ -620,4 +620,60 @@ function toStr(str, defaultValue = "") {
     if (str == null) return defaultValue;
     str = String(str).trim();
     return str === "" ? defaultValue : str;
+}
+
+$(document).on("input", "textarea.auto-adjust-row", function () {
+    this.style.height = "auto";
+
+    const maxHeight = this.scrollHeight;
+
+    const lineHeight = parseFloat($(this).css("line-height"));
+    const maxAllowedHeight = lineHeight * 3;
+
+    this.style.height = Math.min(maxHeight, maxAllowedHeight) + "px";
+    this.style.overflowY = (maxHeight > maxAllowedHeight) ? "scroll" : "hidden";
+});
+
+function getFilterDefaultDateTo() {
+    return new Date();
+}
+
+function getFilterDefaultDateFrom() {
+    var date_before = new Date();
+    date_before.setDate(date_before.getDate() - 6);
+
+    return date_before;
+}
+
+function applyFilterPreset(selected) {
+    var date_to = getFilterDefaultDateTo();
+
+    var from = null;
+    var to = date_to;
+
+    if (selected === "") {
+        $("#filter-from").prop("readonly", false);
+        $("#filter-to").prop("readonly", false);
+        return;
+    }
+
+    $("#filter-from").prop("readonly", true);
+    $("#filter-to").prop("readonly", true);
+
+    if (selected === "TD") { // Today
+        from = new Date(date_to);
+    } else if (selected === "L7D") { // Last 7 Days
+        from = new Date(date_to);
+        from.setDate(date_to.getDate() - 6);
+    } else if (selected === "MTD") { // Month to Date
+        from = new Date(date_to.getFullYear(), date_to.getMonth(), 1);
+    } else if (selected === "LM") { // Last Month
+        from = new Date(date_to.getFullYear(), date_to.getMonth() - 1, 1);
+        to = new Date(date_to.getFullYear(), date_to.getMonth(), 0);
+    } else if (selected === "YTD") { // Year to Date
+        from = new Date(date_to.getFullYear(), 0, 1);
+    }
+
+    $("#filter-from").val(DateForInput(from));
+    $("#filter-to").val(DateForInput(to));
 }

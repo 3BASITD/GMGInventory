@@ -25,7 +25,7 @@
                     <span class="fas fa-upload mr-0"></span>
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -83,23 +83,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-12">
-                        <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">Invoice Date From</label>
-                            <input type="date" id="filter-from" class="form-control form-control-sm" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="form-group">
-                            <label for="filter-to" class="control-label mb-0">Invoice Date To</label>
-                            <input type="date" id="filter-to" class="form-control form-control-sm" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-status" class="control-label mb-0">Status</label>
                             <select id="filter-status" class="form-control form-control-sm">
@@ -110,9 +94,40 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Invoice Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Invoice Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
@@ -188,36 +203,131 @@
     <script>
         var hashmicro_user_access = @Html.Raw(Json.Serialize(hashMicroUserAccess));
 
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
+        $("#filter-preset").val("L7D");
+        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
+        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
 
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
 
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-
-        $(".btnFilter").on("click", function () {
-            invoiceDT.ajax.reload();
-            $("#filterModal").modal("hide");
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
         });
 
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function() {
+            applyFilterPreset($(this).val());
+        });
+
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        $(".btnFilter").on("click", function () {
+            $("#filterModal").modal("hide");
+            invoiceDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        });
+
+        $(".btnReset").on("click", function () {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            invoiceDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        });
+
+        var defaultDTState = {
+            order: [[0, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo()),
+            StatusId: ""
+        };
+
+        function checkDTChanged() {
+            if(!invoiceDT) return false;
+            
+            return JSON.stringify(invoiceDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   invoiceDT.page.info().start != defaultDTState.page ||
+                   invoiceDT.page.len() != defaultDTState.length ||
+                   (invoiceDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo ||
+                   $('#filter-status').val() != defaultDTState.StatusId;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+            $('#filter-status').val(defaultDTState.StatusId);
+            
+            if (invoiceDT) {
+                invoiceDT.state.clear();
+                invoiceDT.order(defaultDTState.order);
+                invoiceDT.page(defaultDTState.page);
+                invoiceDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
+
         // Load List on DataTable
-        var invoiceDT = $('.table-invoice').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var invoiceDT = $('.table-invoice').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $("#filter-from").val();
+                data.DateTo = $("#filter-to").val();
+                data.StatusId = $("#filter-status").val();
+            },
+            stateLoadParams: function (settings, data) {
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+                $('#filter-status').val(data.StatusId);
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 data: function (data) {
@@ -285,13 +395,13 @@
                     responsivePriority: 1
                 }
             ],
-            order: [[0, "desc"]]
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load
         invoiceDT.on("draw", function () {
             $(".table-invoice th").removeClass("text-end");
-            //hideLoader();
+            checkDefaultFilter();
         });
 
         if (hashmicro_user_access.canUploadDownload) {

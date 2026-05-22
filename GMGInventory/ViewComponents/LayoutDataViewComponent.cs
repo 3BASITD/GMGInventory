@@ -5,34 +5,38 @@ namespace GMGInventory.ViewComponents
 {
     public class LayoutDataViewComponent : ViewComponent
     {
-        private readonly IConfigurationRepository config;
+        private readonly ISystemSettingRepository setting;
 
-        public LayoutDataViewComponent(IConfigurationRepository config)
+        public LayoutDataViewComponent(ISystemSettingRepository setting)
         {
-            this.config = config;
+            this.setting = setting;
         }
 
         public async Task<IViewComponentResult> InvokeAsync(string viewType = "CompanyTitle")
         {
-            var allowedViews = new HashSet<string>
-            {
-                "CompanyLogin",
-                "CompanyNavbar",
-                "CompanyTitle"
-            };
+            //var allowedViews = new HashSet<string>
+            //{
+            //    "CompanyLogin",
+            //    "CompanyNavbar",
+            //    "CompanyTitle",
+            //    "LoginImage",
+            //    "NavigationImage"
+            //};
 
-            if (!allowedViews.Contains(viewType))
-                viewType = "Default";
+            //if (!allowedViews.Contains(viewType))
+            //    viewType = "Default";
 
-            var content = await config.GetValue(viewType);
-            if (string.IsNullOrEmpty(content))
-                content = "3BAS Tigers Inc...";
+            var contents = await setting.GetSystemSettings();
+            //if (string.IsNullOrEmpty(content))
+            //    content = "3BAS Tigers Inc.";
 
-            return View(viewType, new ConfigurationModel
-            {
-                Name = viewType,
-                Value = content
-            });
+            //return View(viewType, new ConfigurationModel
+            //{
+            //    Name = viewType,
+            //    Value = content
+            //});
+
+            return View(viewType, contents);
         }
 
         public class ConfigurationModel

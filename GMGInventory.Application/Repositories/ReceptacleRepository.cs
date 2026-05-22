@@ -32,8 +32,9 @@ namespace GMGInventory.Application.Repositories
                         join userc in userManager.Users on p.UserCreated equals userc.Id
                         join userm in userManager.Users on p.UserModified equals userm.Id into m
                         from userm in m.DefaultIfEmpty()
-                        where (filter.CustomerId == null
-                            || filter.CustomerId == p.SalesOrder.Customer.Id)
+                        where (filter.CustomerId == null || filter.CustomerId == p.SalesOrder.Customer.Id || (filter.CustomerId == 0 && (p.SalesOrder.Customer.Code + " " + p.SalesOrder.Customer.Name).ToLower().Contains((filter.CustomerKeyword + "").ToLower())))
+                            //&& filter.DateFrom <= p.PackDate
+                            //&& p.PackDate <= filter.DateTo
                             && filter.DateFrom <= (p.DateModified == null ? p.DateCreated : p.DateModified.Value).Date
                             && (p.DateModified == null ? p.DateCreated : p.DateModified.Value).Date <= filter.DateTo
                         select new ReceptacleVM

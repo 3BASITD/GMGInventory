@@ -1,0 +1,290 @@
+﻿@{
+    ViewData["Title"] = "Warehouse Dashboard";
+}
+
+<div class="alert alert-warning" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>We’re currently working on this page to bring you new features and improvements. Please check back again soon.
+</div>
+
+<div class="card" id="ordersCard">
+    <div class="card-header">
+        <h3 class="card-title">@ViewData["Title"]</h3>
+
+        <div class="card-tools">
+            <button class="btn btn-primary btn-fullscreen" data-microtip-title="View in Fullscreen" data-microtip-position="left" role="tooltip">
+                <span class="fas fa-expand mr-0"></span>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info" role="alert">
+            <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a paid version.
+        </div>
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary">
+                        <h3 class="card-title">Incoming Orders</h3>
+                        <div class="card-tools">
+                            <span class="badge badge-primary order-count ml-1" data-microtip-title="Incomming Order(s) Today" data-microtip-position="bottom" role="tooltip">0</span>
+                            <span class="badge badge-warning backlog-count ml-1" data-microtip-title="Draft or Submitted (not yet Approved) Order(s) before Today" data-microtip-position="bottom" role="tooltip">0</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped table-hover table-incomming">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>SO Number</th>
+                                    <th>Customer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" class="text-center">
+                                        <em class="text-muted">No incoming orders yet today</em>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-reverse">
+                        <h3 class="card-title">Order Fulfillment</h3>
+                        <div class="card-tools">
+                            <div class="btn-group shadow-lg fulfillment-btns">
+                                <button class="btn btn-outline-secondary fulfillment-previous" style="font-family:Arial,Helvetica,sans-serif;font-variant-emoji:text;">
+                                    ◀
+                                </button>
+                                <button class="btn btn-outline-secondary fulfillment-date">
+                                    TODAY
+                                </button>
+                                <button class="btn btn-outline-secondary fulfillment-next" style="font-family:Arial,Helvetica,sans-serif;font-variant-emoji:text;">
+                                    ▶
+                                </button>
+                                <button class="btn btn-secondary fulfillment-all" data-include-done="false">
+                                    DONE EXCLUDED
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <table class="table table-striped table-hover table-fulfillment">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>SO Number</th>
+                                    <th>Customer</th>
+                                    <th>Picking</th>
+                                    <th>Packing</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        <em class="text-muted">Nothing to show for selected date</em>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="text-end">
+            <span class="text-muted text-xs">Live feeds loaded every 5 seconds</span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $(".btn-fullscreen").on("click", function () {
+                var target = $(this).closest(".card").find(".card-body")[0];
+
+                if (!document.fullscreenElement)
+                    target.requestFullscreen().catch(err => { console.log(err); });
+                else
+                    document.exitFullscreen();
+            });
+
+            var today = new Date().toISOString().split('T')[0];
+            $(".fulfillment-date").text("TODAY");
+            $(".fulfillment-date").data("date", today);
+                
+            $(".fulfillment-next").addClass("ui-state-disabled");
+            $(".fulfillment-date").addClass("ui-state-disabled");
+            
+            LoadDetails();
+
+            $(".fulfillment-date").on("click", function() {
+                var today = new Date().toISOString().split('T')[0];
+                $(".fulfillment-date").text("TODAY");
+                $(".fulfillment-date").data("date", today);
+                
+                $(".fulfillment-next").addClass("ui-state-disabled");
+                $(".fulfillment-date").addClass("ui-state-disabled");
+
+                LoadDetails();
+            });
+            
+            $(".fulfillment-next, .fulfillment-previous").on("click", function() {
+                var current = $(".fulfillment-date").data("date");
+                var date = new Date(current);
+
+                if ($(this).hasClass("fulfillment-next")) {
+                    var next = new Date(date);
+                    next.setDate(next.getDate() + 1);
+
+                    if (next > today) return;
+
+                    date = next;
+                } else {
+                    date.setDate(date.getDate() - 1);
+                }
+
+                var newDate = date.toISOString().split("T")[0];
+                var today = new Date().toISOString().split('T')[0];
+
+                if (newDate == today) {
+                    $(".fulfillment-date").text("TODAY");
+                    $(".fulfillment-next").addClass("ui-state-disabled");
+                    $(".fulfillment-date").addClass("ui-state-disabled");
+                } else {
+                    $(".fulfillment-date").text(newDate);
+                    $(".fulfillment-next").removeClass("ui-state-disabled");
+                    $(".fulfillment-date").removeClass("ui-state-disabled");
+                }
+                $(".fulfillment-date").data("date", newDate);
+
+                LoadDetails();
+            });
+
+            $(".fulfillment-all").on("click", function() {
+                var include_done = $(this).data("include-done");
+                if(include_done) {
+                    $(this).text("DONE EXCLUDED");
+                    $(this).data("include-done", false);
+                    $(this).addClass("btn-secondary");
+                    $(this).removeClass("btn-success");
+                } else {
+                    $(this).text("DONE INCLUDED");
+                    $(this).data("include-done", true);
+                    $(this).addClass("btn-success");
+                    $(this).removeClass("btn-secondary");
+                }
+                
+                LoadDetails();
+            });
+        });
+        
+        //setInterval(LoadDetails, 5000);
+
+        function LoadDetails() {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetIncomingOrders")",
+                beforeSend: function (jqXHR, settings) {
+                    settings.noLoader = true;
+                },
+                success: function (data) {
+                    if (data.todayCount > 0) {
+                        $(".order-count").text(data.todayCount + " Order(s)");
+                        $(".order-count").show();
+                    } else {
+                        $(".order-count").hide();
+                    }
+
+                    if (data.backlogCount > 0) {
+                        $(".backlog-count").text(data.backlogCount + " Backlog(s)");
+                        $(".backlog-count").show();
+                    } else {
+                        $(".backlog-count").hide();
+                    }
+
+                    var rows = "";
+                    if (data.orders && data.orders.length > 0) {
+                        data.orders.forEach((order, index) => {
+                            const rowClass = index % 2 === 0 ? "even" : "odd";
+                            rows += `
+                                <tr class="${rowClass}">
+                                    <td><a href="/SalesOrder/Details/${order.salesOrderId}" class="link-info" target="_blank">${order.salesOrderNumber}</a></td>
+                                    <td><a href="/Customer/Details/${order.customerId}" class="link-info" target="_blank">${order.customer}</a></td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        rows = `
+                            <tr>
+                                <td colspan="2" class="text-center">
+                                    <em class="text-muted">No incoming orders yet today</em>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    $(".table-incomming tbody").html(rows);
+                }
+            });
+
+            
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOrderFulfillments")",
+                data: {
+                    date: $(".fulfillment-date").data("date"),
+                    includeDone: $(".fulfillment-all").data("include-done")
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.noLoader = true;
+                    
+                    $(".fulfillment-btns").addClass("ui-state-disabled");
+                },
+                success: function (data) {
+                    var rows = "";
+                    if (data && data.length > 0) {
+                        data.forEach((order, index) => {
+                            var rowClass = index % 2 === 0 ? "even" : "odd";
+                            var pickingStatus = order.pickingStatus == "NOT STARTED" ? "<span class='badge badge-secondary'>NOT STARTED</span>"
+                                              : order.pickingStatus == "ONGOING" ? "<span class='badge badge-warning'>ONGOING</span>"
+                                              : order.pickingStatus == "DONE" ? "<span class='badge badge-success'>DONE</span>"
+                                              : "<span class='badge badge-danger'>UNKNOWN</span>";
+                            var packingStatus = order.packingStatus == "NOT STARTED" ? "<span class='badge badge-secondary'>NOT STARTED</span>"
+                                              : order.packingStatus == "ONGOING" ? "<span class='badge badge-warning'>ONGOING</span>"
+                                              : order.packingStatus == "DONE" ? "<span class='badge badge-success'>DONE</span>"
+                                              : "<span class='badge badge-danger'>UNKNOWN</span>";
+                            rows += `
+                                <tr class="${rowClass}">
+                                    <td><a href="/SalesOrder/Details/${order.salesOrderId}" class="link-info" target="_blank" style="white-space:nowrap;">${order.salesOrderNumber}</a></td>
+                                    <td><a href="/Customer/Details/${order.customerId}" class="link-info" target="_blank">${order.customer}</a></td>
+                                    <td>${pickingStatus}</td>
+                                    <td>${packingStatus}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        var selected_date = $(".fulfillment-date").data("date");
+                        rows = `
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    <em class="text-muted">Nothing to show for ${selected_date}</em>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    $(".table-fulfillment tbody").html(rows);
+                },
+                complete: function () {
+                    $(".fulfillment-btns").removeClass("ui-state-disabled");
+                }
+            });
+        }
+    </script>
+}

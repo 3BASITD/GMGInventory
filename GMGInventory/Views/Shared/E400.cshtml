@@ -1,13 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Bad Request";
+﻿@model IList<SystemSettingVM>
+@{
+    var errorTitle = Model.FirstOrDefault(s => s.Name == "Error400Title")?.Value ?? "Bad Request";
+    var errorDescription = Model.FirstOrDefault(s => s.Name == "Error400Description")?.Value ?? "The server couldn't understand your request due to invalid syntax.";
+    var errorSolution = Model.FirstOrDefault(s => s.Name == "Error400Solution")?.Value ?? "Please check the information you’ve entered and try again. If the issue continues, contact administrator for assistance.";
+
+    ViewData["Title"] = @errorTitle;
 }
 
 <div class="container full-height d-flex align-items-center justify-content-center">
     <div class="text-center">
         <h1 class="display-1 text-danger">400</h1>
-        <h2 class="display-4">Bad Request</h2>
-        <p class="lead">The server couldn't understand your request due to invalid syntax.</p>
-        <p>Please check the information you’ve entered and try again. If the issue continues, contact administrator for assistance.</p>
+        <h2 class="display-4">@errorTitle</h2>
+        <p class="lead">@errorDescription</p>
+        <p>@errorSolution</p>
         <a href="/" class="btn btn-primary">Return to Homepage</a>
+        <p class="text-muted text-xs mt-5">Error message can be modified by the system administrator.</p>
     </div>
 </div>

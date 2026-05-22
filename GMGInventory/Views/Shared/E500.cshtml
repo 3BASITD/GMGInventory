@@ -1,13 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Internal Server Error";
+﻿@model IList<SystemSettingVM>
+@{
+    var errorTitle = Model.FirstOrDefault(s => s.Name == "Error500Title")?.Value ?? "Internal Server Error";
+    var errorDescription = Model.FirstOrDefault(s => s.Name == "Error500Description")?.Value ?? "Oops! Something went wrong on our end.";
+    var errorSolution = Model.FirstOrDefault(s => s.Name == "Error500Solution")?.Value ?? "Our servers encountered an unexpected problem and couldn’t complete your request. Please try again later. If the issue persists, feel free to contact administrator.";
+
+    ViewData["Title"] = @errorTitle;
 }
 
 <div class="container full-height d-flex align-items-center justify-content-center">
     <div class="text-center">
         <h1 class="display-1 text-danger">500</h1>
-        <h2 class="display-4">Internal Server Error</h2>
-        <p class="lead">Oops! Something went wrong on our end.</p>
-        <p>Our servers encountered an unexpected problem and couldn’t complete your request. Please try again later. If the issue persists, feel free to contact administrator.</p>
+        <h2 class="display-4">@errorTitle</h2>
+        <p class="lead">@errorDescription</p>
+        <p>@errorSolution</p>
         <a href="/" class="btn btn-primary">Return to Homepage</a>
+        <p class="text-muted text-xs mt-5">Error message can be modified by the system administrator.</p>
     </div>
 </div>

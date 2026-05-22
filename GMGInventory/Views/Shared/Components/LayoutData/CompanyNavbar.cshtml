@@ -1,8 +1,9 @@
 ﻿@using static GMGInventory.ViewComponents.LayoutDataViewComponent
-@model ConfigurationModel
+@model IList<SystemSettingVM>
 
 @{
-    var temp = Model.Value.ToUpper();
+    var value = Model.FirstOrDefault(s => s.Name == "CompanyNavbar")?.Value ?? "";
+    var temp = value.ToUpper();
 }
 
 <span class="brand-text font-weight-light">@temp</span>

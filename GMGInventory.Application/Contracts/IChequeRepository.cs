@@ -1,5 +1,6 @@
 ﻿using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace GMGInventory.Application.Contracts
 {
@@ -14,5 +15,7 @@ namespace GMGInventory.Application.Contracts
 
         Task<bool> UploadCombinationExistAsync(ChequeVM chequeVM);
         Task<ChequePVM> PrintCheque(ListFilterChequeModel filter);
+        Task<ResponseModelData<FileVM>> UploadFile(IFormFile file);
+        Task<string> SaveChequeFromFile(ChequeVM cheque);
     }
 }

@@ -1,0 +1,340 @@
+﻿@{
+    ViewData["Title"] = "Delivery Monitoring";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="alert alert-warning" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>We’re currently working on this page to bring you new features and improvements. Please check back again soon.
+</div>
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a paid version.
+</div>
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-delivery">
+            <thead>
+                <tr>
+                    <th>Sales Order Date</th>
+                    <th>Sales Order Number</th>
+                    <th>Order Queue Number</th>
+                    <th>Service Level Agreement</th>
+                    <th>Customer</th>
+                    <th>Sales Order Prepared By</th>
+                    <th>Special Instruction</th>
+                    <th>Forwarder</th>
+                    <th>Sales Order Approved By</th>
+                    <th>Status 1</th>
+                    <th>Status 2</th>
+                    <th>Status 3</th>
+                    <th>Status 4</th>
+                    <th>Status 5</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Sales Order Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Sales Order Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        $("#filter-preset").val("L7D");
+        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
+        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
+
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
+        });
+
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function() {
+            applyFilterPreset($(this).val());
+        });
+
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            deliveryDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            deliveryDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[1, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
+        };
+
+        function checkDTChanged() {
+            if(!deliveryDT) return false;
+            
+            return JSON.stringify(deliveryDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   deliveryDT.page.info().start != defaultDTState.page ||
+                   deliveryDT.page.len() != defaultDTState.length ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+            
+            if (deliveryDT) {
+                deliveryDT.state.clear();
+                deliveryDT.order(defaultDTState.order);
+                deliveryDT.page(defaultDTState.page);
+                deliveryDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
+
+        var deliveryDT = $('.table-delivery').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
+            ajax: {
+                url: "@Url.Action("GetListDT")",
+                data: function (data) {
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                },
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                { data: "dateOrder", name: "DateOrder" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.salesOrderNumber + "</a>";
+                    },
+                    name: "SalesOrderNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        if(data.orderQueueNumber)
+                            return `<a href="/OrderQueue/Details/${data.orderQueueNumber}" class="link-info" target="_blank">${data.orderQueueNumber}</a>`;
+                        else
+                            return '<span class="text-muted">N/A</span>';
+                    },
+                    name: "OrderQueueNumber",
+                    responsivePriority: 11
+                },
+                { data: "serviceLevelAgreement", name: "ServiceLevelAgreement" },
+                { data: "customer", name: "Customer" }, 
+                { data: "soPreparedBy", name: "SOPreparedBy" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.specialInstruction || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "SpecialInstruction"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.forwarder || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "Forwarder"
+                },
+                { data: "soApprovedBy", name: "SOApprovedBy" },
+                { data: "status1", name: "Status1", orderable: false },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return data.status2 || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "Status2"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return data.status3 || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "Status3"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return data.status4 || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "Status4"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return data.status5 || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "Status5"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (user_access.canEdit) {
+                            actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Item Class" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                        }
+
+                        if (user_access.canDelete) {
+                            actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete Item Class" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
+                        }
+                        actions += '</div>';
+                        return actions;
+                    },
+                    responsivePriority: 1
+                }
+            ],
+            order: defaultDTState.order
+        });
+
+        deliveryDT.on("draw", function () {
+            // swal({
+            //     icon: 'warning',
+            //     title: 'Payment Pending',
+            //     text: atob("WW91IGFyZSBhYm91dCB0byB1c2UgYW4g") + atob("dW5wYWlkIHY0IGVuaGFuY2VtZW50IA==") + atob("ZmVhdHVyZS4="),
+            //     button: 'Continue'
+            // });
+            checkDefaultFilter();
+        });
+    </script>
+}

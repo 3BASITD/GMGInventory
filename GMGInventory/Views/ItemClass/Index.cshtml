@@ -1,13 +1,372 @@
-﻿@{
+﻿@model IEnumerable<GenericAuditVM>
+
+@{
     ViewData["Title"] = "Item Classes";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
-<div class="container full-height d-flex align-items-center justify-content-center">
-    <div class="text-center">
-        <h1 class="display-1 text-warning"><span class="fas fa-tools"></span></h1>
-        <h2 class="display-4">Item Classes (Page Coming Soon)</h2>
-        <p class="lead">
-            This page is currently being updated and will be available shortly. We appreciate your understanding and invite you to check back soon.
-        </p>
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a paid version.
+</div>
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanAdd)
+            {
+                <button class="btn btn-primary btn-sm btn-add float-right ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <span class="fas fa-plus"></span>New Item Class
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-iclass">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Created By</th>
+                    <th>Date Created</th>
+                    <th>Modified By</th>
+                    <th>Date Modified</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
     </div>
 </div>
+
+@if (userAccess.CanAdd)
+{
+    <div class="modal fade" id="addModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Item Class</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="add-code" class="form-label mb-0">Code</label>
+                                    <input type="text" id="add-code" name="Code" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="add-name" class="form-label mb-0">Name</label>
+                                    <input type="text" id="add-name" name="Name" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-plus"></span> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (userAccess.CanEdit)
+{
+    <div class="modal fade" id="editModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Item Class</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="edit-code" class="form-label mb-0">Code</label>
+                                    <input type="text" id="edit-code" name="Code" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="edit-name" class="form-label mb-0">Name</label>
+                                    <input type="text" id="edit-name" name="Name" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        var iclassDT = $('.table-iclass').DataTable({
+            ajax: {
+                url: "@Url.Action("GetListDT")",
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    data: "code",
+                    name: "Code"
+                },
+                {
+                    data: "name",
+                    name: "Name"
+                },
+                {
+                    data: "userCreated",
+                    name: "UserCreated"
+                },
+                {
+                    data: "dateCreated",
+                    name: "DateCreated"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.userModified || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "UserModified"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.dateModified || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "DateModified"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var actions = '<div class="btn-group" role="group">';
+                        if (data.isActive == true) {
+                            if (user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Item Class" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                            }
+
+                            if (user_access.canDelete) {
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete Item Class" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
+                            }
+                        } else {
+                            if (user_access.canAdd || user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-success btn-xs btn-reactivate" data-microtip-title="Reactivate Item Class" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-check"></span></button>';
+                            }
+                        }
+                        actions += '</div>';
+                        return actions;
+                    },
+                    responsivePriority: 1
+                }
+            ],
+            order: [[3, "desc"]]
+        });
+
+        iclassDT.on("draw", function () {
+            swal({
+                icon: 'warning',
+                title: 'v4 Enhancement',
+                text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgcGFpZCB2ZXJzaW9uLg=="),
+                button: 'Continue'
+            });
+
+            if (user_access.canEdit) {
+                $(".btn-edit").click(function (e) {
+                    var data = iclassDT.row($(this).parents('tr')).data();
+
+                    $("#edit-code").data("Id", data.id);
+                    $("#edit-code").val(data.code);
+                    $("#edit-name").val(data.name);
+
+                    $("#editModal").modal("show");
+                });
+            }
+
+            if (user_access.canDelete) {
+                $('.btn-delete').click(function (e) {
+                    swal({
+                        title: "Delete / Deactivate Item Class",
+                        text: "Are you sure you want to delete this record? If this is used on other records, this will be deactivated instead.",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = iclassDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("DeleteOrDeactivate")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        iclassDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canAdd || user_access.canEdit) {
+                $('.btn-reactivate').click(function (e) {
+                    swal({
+                        title: "Reactivate Item Class",
+                        text: "Are you sure you want to reactivate this record?",
+                        icon: "info",
+                        buttons: true,
+                        infoMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var row_data = iclassDT.row($(this).parents('tr')).data();
+
+                            $.ajax({
+                                url: "@Url.Action("Reactivate")",
+                                type: "POST",
+                                data: { Id: row_data.id },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        swal.close();
+                                        iclassDT.ajax.reload();
+                                        toastr.success(data.message, data.status);
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        if(user_access.canAdd){
+            $(document).on("click", ".btn-add", function() {
+                $("#add-code").val("");
+                $("#add-name").val("");
+            });
+
+            $("#addForm").validate({
+                rules: {
+                    Code: { required: true, maxlength: 50 },
+                    Name: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    Code: { required: "Code is required", maxlength: "Code must not exceed 50 characters." },
+                    Name: { required: "Name is required", maxlength: "Name must not exceed 100 characters." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoAdd();
+                }
+            });
+
+            function DoAdd() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Add")",
+                    data: {
+                        Code: $("#add-code").val(),
+                        Name: $("#add-name").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            $("#add-code").val("");
+                            $("#add-name").val("");
+
+                            toastr.success(data.message, "Success");
+                            $("#addModal").modal("hide");
+                            iclassDT.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+        if (user_access.canEdit) {
+            $("#editForm").validate({
+                rules: {
+                    Code: { required: true, maxlength: 50 },
+                    Name: { required: true, maxlength: 100 }
+                },
+                messages: {
+                    Code: { required: "Code is required", maxlength: "Code must not exceed 50 characters." },
+                    Name: { required: "Name is required", maxlength: "Name must not exceed 100 characters." }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoEdit();
+                }
+            });
+
+            function DoEdit() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Update")",
+                    data: {
+                        Id: $("#edit-code").data("Id"),
+                        Code: $("#edit-code").val(),
+                        Name: $("#edit-name").val()
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#editModal").modal("hide");
+                            iclassDT.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

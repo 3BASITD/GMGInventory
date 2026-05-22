@@ -246,6 +246,8 @@ namespace GMGInventory.Common.Models
         public int WarehouseId { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
+        public string? LocationCode { get; set; }
+        public int? LocationCodeId { get; set; }
     }
 
     public class ItemDetailPurchaseVM

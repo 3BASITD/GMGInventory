@@ -351,7 +351,6 @@ namespace GMGInventory.Application.Repositories
 
             foreach (var item in formVM.Items)
             {
-                #region ItemInventories
                 var sourceItem = await context.ItemInventories
                                                .Where(s => s.WarehouseId == formVM.Source && s.ItemId == item.Id)
                                                .FirstAsync();
@@ -373,7 +372,7 @@ namespace GMGInventory.Application.Repositories
                 await context.SaveChangesAsync(currentUserId);
 
                 var destinationItem = await context.ItemInventories
-                                                   .Where(s => s.WarehouseId == formVM.Destination && s.ItemId == item.Id)
+                                                   .Where(s => s.WarehouseId == formVM.Destination && s.LocationCodeId == item.LocationCodeId && s.ItemId == item.Id)
                                                    .FirstOrDefaultAsync();
 
                 var destinationQuantity = 0;
@@ -389,7 +388,8 @@ namespace GMGInventory.Application.Repositories
                     {
                         ItemId = item.Id,
                         Quantity = item.Quantity,
-                        WarehouseId = formVM.Destination
+                        WarehouseId = formVM.Destination,
+                        LocationCodeId = item.LocationCodeId
                     };
                     await context.ItemInventories.AddAsync(destinationItem);
                 }
@@ -405,24 +405,6 @@ namespace GMGInventory.Application.Repositories
                 };
                 context.PhysicalCountHistories.Add(countHistoryDestination);
                 await context.SaveChangesAsync(currentUserId);
-                #endregion
-
-                #region LocationCode
-                var locationCodes = await context.ItemLocations.Where(x => x.ItemId == item.Id && x.LocationCodeId == item.LocationCodeId).Select(x => x.LocationCodeId).ToListAsync();
-                if (!locationCodes.Contains(item.LocationCodeId.GetValueOrDefault()))
-                {
-                    if (item.LocationCodeId != null)
-                    {
-                        var itemLoc = new ItemLocation
-                        {
-                            ItemId = item.Id,
-                            LocationCodeId = item.LocationCodeId ?? 0
-                        };
-                        await context.ItemLocations.AddAsync(itemLoc);
-                        await context.SaveChangesAsync(currentUserId);
-                    }
-                }
-                #endregion
             }
 
             return transferVM.Id;

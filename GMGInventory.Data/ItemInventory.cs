@@ -13,5 +13,9 @@ namespace GMGInventory.Data
         public Item Item { get; set; }
 
         public int Quantity { get; set; }
+
+        [ForeignKey("LocationCodeId")]
+        public int? LocationCodeId { get; set; }
+        public LocationCode LocationCode { get; set; }
     }
 }

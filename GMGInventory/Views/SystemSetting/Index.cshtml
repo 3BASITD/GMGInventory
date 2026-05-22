@@ -1,0 +1,649 @@
+﻿@model List<SystemSettingVM>
+@{
+    ViewData["Title"] = "System Branding";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+
+    string GetValue(string name) => Model.FirstOrDefault(s => s.Name == name)?.Value;
+}
+
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a paid version.
+</div>
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="d-flex align-items-center">
+                        <h3 class="card-title mr-4 mb-0">
+                            System Branding
+                        </h3>
+                        <ul class="nav nav-pills" id="brandingTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="branding-tab" data-bs-toggle="tab" href="#branding" role="tab">
+                                    Branding
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="errors-tab" data-bs-toggle="tab" href="#errors" role="tab">
+                                    Error Pages / Popups
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="branding" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        Login Page Logo
+                                    </label>
+                                    <div class="border rounded bg-light p-3 text-center">
+                                        @{
+                                            var loginImage = @GetValue("LoginImage");
+                                        }
+                                        @if (string.IsNullOrWhiteSpace(loginImage))
+                                        {
+                                            <img src="/images/no_image.png" class="img-fluid rounded mb-3 clickable login-image" style="max-height:140px; object-fit:contain;" />
+                                        } else {
+                                            <img src="/images/Logo/@loginImage" class="img-fluid rounded mb-3 clickable login-image" style="max-height:140px; object-fit:contain;" />
+                                        }
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <input type="file" id="login-image" class="d-none" name="ItemImage" accept="image/*" onchange="UploadLogin()" />
+                                                <label for="login-image" class="btn btn-primary btn-sm w-100 fw-normal">
+                                                    <i class="fas fa-upload mr-1"></i>
+                                                    Change Logo
+                                                </label>
+                                            </div>
+                                            <div class="col-6">
+                                                <button class="btn btn-danger btn-sm w-100" type="button" onclick="RemoveLogin('LoginImage')">
+                                                    <i class="fas fa-undo mr-1"></i>
+                                                    Revert Back
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="form-label">
+                                        Sidebar Logo
+                                    </label>
+                                    <div class="border rounded bg-light p-3 text-center">
+                                        @{
+                                            var navigationImage = @GetValue("NavigationImage");
+                                        }
+                                        @if (string.IsNullOrWhiteSpace(navigationImage))
+                                        {
+                                            <img src="/images/3BAS.png" class="img-fluid rounded mb-3 clickable navigation-image" style="max-height:140px; object-fit:contain;" />
+                                        }
+                                        else
+                                        {
+                                            <img src="/images/Logo/@navigationImage" class="img-fluid rounded mb-3 clickable navigation-image" style="max-height:140px; object-fit:contain;" />
+                                        }
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <input type="file" id="navigation-image" class="d-none" name="NavigationImage" accept="image/*" onchange="UploadNavigation()" />
+                                                <label for="navigation-image" class="btn btn-primary btn-sm w-100 fw-normal">
+                                                    <i class="fas fa-upload mr-1"></i>
+                                                    Change Logo
+                                                </label>
+                                            </div>
+                                            <div class="col-6">
+                                                <button class="btn btn-danger btn-sm w-100" type="button" onclick="RemoveLogin('NavigationImage')">
+                                                    <i class="fas fa-undo mr-1"></i>
+                                                    Revert Back
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-primary" onclick="SaveTitle()">
+                                        <i class="fas fa-save mr-1"></i>
+                                        Save Titles
+                                    </button>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Login Page Title
+                                    </label>
+                                    <input type="text" id="login-title" class="form-control" placeholder="3BAS|Tigers Inc" value="@GetValue("CompanyLogin")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Navbar / Topbar Title
+                                    </label>
+                                    <input type="text" id="navigation-title" class="form-control" placeholder="3BAS Tigers Inc" value="@GetValue("CompanyNavbar")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Browser Tab Title
+                                    </label>
+                                    <input type="text" id="browser-title" class="form-control" placeholder="3BAS Tigers Inc." value="@GetValue("CompanyTitle")">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="errors" role="tabpanel">
+                        <div class="d-flex justify-content-end mb-3">
+                            <button class="btn btn-primary" onclick="SaveError()">
+                                <i class="fas fa-save mr-1"></i>
+                                Save Error Messages
+                            </button>
+                        </div>
+                        <div class="accordion" id="errorAccordion">
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse400">
+                                        <strong>400 - Bad Request</strong>
+                                    </button>
+                                </div>
+                                <div id="collapse400" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <a class="float-right" href="/Home/Error?statuscode=400" target="_blank">
+                                            Preview
+                                        </a>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-400-title">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-400-title" class="form-control" placeholder="Bad Request" value="@GetValue("Error400Title")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-400-description">
+                                                Description
+                                            </label>
+                                            <textarea id="error-400-description" class="form-control auto-adjust-row" rows="1" placeholder="The server couldn't understand your request due to invalid syntax.">@GetValue("Error400Description")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-400-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-400-solution" class="form-control auto-adjust-row" rows="1" placeholder="Please check the information you’ve entered and try again. If the issue continues, contact administrator for assistance.">@GetValue("Error400Solution")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-400-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-400-popup" class="form-control auto-adjust-row" rows="1" placeholder="The request was invalid. Please try again.">@GetValue("Error400Popup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse401">
+                                        <strong>401 - Unauthorized</strong>
+                                    </button>
+                                </div>
+                                <div id="collapse401" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-401-title">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-401-title" class="form-control" placeholder="Unauthorized" value="@GetValue("Error401Title")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-403-description">
+                                                Description
+                                            </label>
+                                            <textarea id="error-401-description" class="form-control auto-adjust-row text-muted" rows="1" placeholder="Page will be redirected to login page instead of showing 401 page." readonly="readonly"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-401-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-401-solution" class="form-control auto-adjust-row text-muted" rows="1" placeholder="Page will be redirected to login page instead of showing 401 page." readonly="readonly"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-401-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-401-popup" class="form-control auto-adjust-row" rows="1" placeholder="Please log in to access this action.">@GetValue("Error401Popup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse403">
+                                        <strong>403 - Forbidden</strong>
+                                    </button>
+                                </div>
+                                <div id="collapse403" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <a class="float-right" href="/Home/Error?statuscode=403" target="_blank">
+                                            Preview
+                                        </a>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-403-title">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-403-title" class="form-control" placeholder="Forbidden" value="@GetValue("Error403Title")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-403-description">
+                                                Description
+                                            </label>
+                                            <textarea id="error-403-description" class="form-control auto-adjust-row" rows="1" placeholder="You don’t have permission to view this page or perform this action.">@GetValue("Error403Description")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-403-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-403-solution" class="form-control auto-adjust-row" rows="1" placeholder="If you believe you should have access, please contact administrator.">@GetValue("Error403Solution")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-403-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-403-popup" class="form-control auto-adjust-row" rows="1" placeholder="You don't have permission to do this action.">@GetValue("Error403Popup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse404">
+                                        <strong>404 - Not Found</strong>
+                                    </button>
+                                </div>
+
+                                <div id="collapse404" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <a class="float-right" href="/Home/Error?statuscode=404" target="_blank">
+                                            Preview
+                                        </a>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-404-title">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-404-title" class="form-control" placeholder="Not Found" value="@GetValue("Error404Title")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-404-description">
+                                                Description
+                                            </label>
+                                            <textarea id="error-404-description" class="form-control auto-adjust-row" rows="1" placeholder="The page or resource you’re looking for could not be found.">@GetValue("Error404Description")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-404-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-404-solution" class="form-control auto-adjust-row" rows="1" placeholder="It may have been moved, deleted, or the URL might be incorrect. Please check the URL or return to the homepage.">@GetValue("Error404Solution")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-404-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-404-popup" class="form-control auto-adjust-row" rows="1" placeholder="Function could not be found.">@GetValue("Error400Popup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse500">
+                                        <strong>500 - Internal Server Error</strong>
+                                    </button>
+                                </div>
+                                <div id="collapse500" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <a class="float-right" href="/Home/Error?statuscode=500" target="_blank">
+                                            Preview
+                                        </a>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-500-title">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-500-title" class="form-control" placeholder="Internal Server Error" value="@GetValue("Error500Title")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-500-description">
+                                                Description
+                                            </label>
+                                            <textarea id="error-500-description" class="form-control auto-adjust-row" rows="1" placeholder="Oops! Something went wrong on our end.">@GetValue("Error500Description")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-500-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-500-solution" class="form-control auto-adjust-row" rows="1" placeholder="Our servers encountered an unexpected problem and couldn’t complete your request. Please try again later. If the issue persists, feel free to contact administrator.">@GetValue("Error500Solution")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-500-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-500-popup" class="form-control auto-adjust-row" rows="1" placeholder="Something went wrong on our end. Please try again later.">@GetValue("Error500Popup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse502">
+                                        <strong>502 - Bad Gateway</strong>
+                                    </button>
+                                </div>
+                                <div id="collapse502" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <a class="float-right" href="/Home/Error?statuscode=502" target="_blank">
+                                            Preview
+                                        </a>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-502-title">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-502-title" class="form-control" placeholder="Bad Gateway" value="@GetValue("Error502Title")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-502-title">
+                                                Description
+                                            </label>
+                                            <textarea id="error-502-description" class="form-control auto-adjust-row" rows="1" placeholder="We're having trouble reaching the server.">@GetValue("Error502Description")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-502-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-502-solution" class="form-control auto-adjust-row" rows="1" placeholder="One of the servers involved in processing your request is unavailable or returned an invalid response. This is usually temporary, so please try again in a few moments.">@GetValue("Error502Solution")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-502-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-502-popup" class="form-control auto-adjust-row" rows="1" placeholder="We’re having trouble connecting to the server. Please try again soon.">@GetValue("Error502Popup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse503">
+                                        <strong>503 - Service Unavailable</strong>
+                                    </button>
+                                </div>
+                                <div id="collapse503" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <a class="float-right" href="/Home/Error?statuscode=503" target="_blank">
+                                            Preview
+                                        </a>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-503-title">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-503-title" class="form-control" placeholder="Service Unavailable" value="@GetValue("Error503Title")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-503-description">
+                                                Description
+                                            </label>
+                                            <textarea id="error-503-description" class="form-control auto-adjust-row" rows="1" placeholder="Our service is temporarily unavailable due to maintenance or high traffic.">@GetValue("Error503Description")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-503-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-503-solution" class="form-control auto-adjust-row" rows="1" placeholder="We’re working to resolve the issue as quickly as possible. Please check back soon.">@GetValue("Error503Solution")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-503-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-503-popup" class="form-control auto-adjust-row" rows="1" placeholder="The service is temporarily unavailable. Please check back shortly.">@GetValue("Error503Popup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header p-0">
+                                    <button class="btn btn-link btn-block text-left p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapsexxx">
+                                        <strong>XXX - Generic Errors</strong>
+                                    </button>
+                                </div>
+                                <div id="collapsexxx" class="collapse" data-bs-parent="#errorAccordion">
+                                    <div class="card-body">
+                                        <a class="float-right" href="/Home/Error?statuscode=xxx" target="_blank">
+                                            Preview
+                                        </a>
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Title
+                                            </label>
+                                            <input type="text" id="error-xxx-title" class="form-control" placeholder="Unknown Error" value="@GetValue("ErrorXXXTitle")">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Description
+                                            </label>
+                                            <textarea id="error-xxx-description" class="form-control auto-adjust-row" rows="1" placeholder="An unknown error have been encountered.">@GetValue("ErrorXXXDescription")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-xxx-solution">
+                                                Page Solution
+                                            </label>
+                                            <textarea id="error-xxx-solution" class="form-control auto-adjust-row" rows="1" placeholder="Please contact the administrator.">@GetValue("ErrorXXXSolution")</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="error-xxx-popup">
+                                                Popup Message
+                                            </label>
+                                            <textarea id="error-xxx-popup" class="form-control auto-adjust-row" rows="1" placeholder="There seems to be a problem loading some data. Please reload the page and try again.">@GetValue("ErrorXXXPopup")</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.getElementById("navigation-title").addEventListener("input", function () {
+          this.value = this.value.toUpperCase();
+        });
+
+        $(document).on("blur", "input[placeholder], textarea[placeholder]", function () {
+            if ($(this).val().trim() === "") {
+                $(this).val($(this).attr("placeholder"));
+            }
+        });
+
+        function UploadLogin() {
+            var formData = new FormData();
+            formData.append("File", $("#login-image")[0].files[0]);
+            formData.append("Name", "LoginImage");
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveImage")",
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                enctype: "multipart/form-data",
+                processData: false,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        $(".login-image").attr("src", "/images/Logo/" + data.newRow);
+                        toastr.success(data.message, "Success");
+                    }
+                }
+            });
+        }
+
+        function UploadNavigation() {
+            var formData = new FormData();
+            formData.append("File", $("#navigation-image")[0].files[0]);
+            formData.append("Name", "NavigationImage");
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveImage")",
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                enctype: "multipart/form-data",
+                processData: false,
+                success: function (data, status, xhr) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        $(".navbar-brand .brand-image").attr("src", "/images/Logo/" + data.newRow);
+                        $(".navigation-image").attr("src", "/images/Logo/" + data.newRow);
+                        toastr.success(data.message, "Success");
+                    }
+                }
+            });
+        }
+
+        function RemoveLogin(name) {
+            swal({
+                title: "Default Logo",
+                text: "Are you sure you want to revert back the default image logo?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((confirm) => {
+                if (confirm) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("RemoveImage")",
+                        data: {
+                            Name: name
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                if(name == "LoginImage") {
+                                    $(".login-image").attr("src", "/images/no_image.png");
+                                } else if(name == "NavigationImage") {
+                                    $(".navigation-image").attr("src", "/images/3BAS.png");
+                                    $(".navbar-brand .brand-image").attr("src", "/images/3BAS.png");
+                                }
+                                toastr.success(data.message, "Success");
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function SaveTitle() {
+            var settings = [
+                    { name: "CompanyLogin", value: $("#login-title").val() || $("#login-title").attr("placeholder") },
+                    { name: "CompanyNavbar", value: ($("#navigation-title").val() || $("#navigation-title").attr("placeholder")).toUpperCase() },
+                    { name: "CompanyTitle", value: $("#browser-title").val() || $("#browser-title").attr("placeholder") }
+                ];
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UpdateSettings")",
+                data: {
+                    Name: "title settings",
+                    Settings: settings
+                },
+                success: function (data) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                        $("title").text("System Branding | " + $("#browser-title").val());
+                        $(".navbar-brand .brand-text").text($("#navigation-title").val());
+                    }
+                }
+            });
+        }
+
+        function SaveError() {
+            var settings = [
+                    { name: "Error400Title", value: $("#error-400-title").val() || $("#error-400-title").attr("placeholder") },
+                    { name: "Error400Description", value: $("#error-400-description").val() || $("#error-400-description").attr("placeholder") },
+                    { name: "Error400Solution", value: $("#error-400-solution").val() || $("#error-400-solution").attr("placeholder") },
+                    { name: "Error400Popup", value: $("#error-400-popup").val() || $("#error-400-popup").attr("placeholder") },
+
+                    { name: "Error401Title", value: $("#error-401-title").val() || $("#error-401-title").attr("placeholder") },
+                    { name: "Error401Popup", value: $("#error-401-popup").val() || $("#error-401-popup").attr("placeholder") },
+
+                    { Name: "Error403Title", Value: $("#error-403-title").val() || $("#error-403-title").attr("placeholder") },
+                    { Name: "Error403Description", Value: $("#error-403-description").val() || $("#error-403-description").attr("placeholder") },
+                    { Name: "Error403Solution", Value: $("#error-403-solution").val() || $("#error-403-solution").attr("placeholder") },
+                    { Name: "Error403Popup", Value: $("#error-403-popup").val() || $("#error-403-popup").attr("placeholder") },
+
+                    { Name: "Error404Title", Value: $("#error-404-title").val() || $("#error-404-title").attr("placeholder") },
+                    { Name: "Error404Description", Value: $("#error-404-description").val() || $("#error-404-description").attr("placeholder") },
+                    { Name: "Error404Solution", Value: $("#error-404-solution").val() || $("#error-404-solution").attr("placeholder") },
+                    { Name: "Error404Popup", Value: $("#error-404-popup").val() || $("#error-404-popup").attr("placeholder") },
+
+                    { Name: "Error500Title", Value: $("#error-500-title").val() || $("#error-500-title").attr("placeholder") },
+                    { Name: "Error500Description", Value: $("#error-500-description").val() || $("#error-500-description").attr("placeholder") },
+                    { Name: "Error500Solution", Value: $("#error-500-solution").val() || $("#error-500-solution").attr("placeholder") },
+                    { Name: "Error500Popup", Value: $("#error-500-popup").val() || $("#error-500-popup").attr("placeholder") },
+
+                    { Name: "Error502Title", Value: $("#error-502-title").val() || $("#error-502-title").attr("placeholder") },
+                    { Name: "Error502Description", Value: $("#error-502-description").val() || $("#error-502-description").attr("placeholder") },
+                    { Name: "Error502Solution", Value: $("#error-502-solution").val() || $("#error-502-solution").attr("placeholder") },
+                    { Name: "Error502Popup", Value: $("#error-502-popup").val() || $("#error-502-popup").attr("placeholder") },
+
+                    { Name: "Error503Title", Value: $("#error-503-title").val() || $("#error-503-title").attr("placeholder") },
+                    { Name: "Error503Description", Value: $("#error-503-description").val() || $("#error-503-description").attr("placeholder") },
+                    { Name: "Error503Solution", Value: $("#error-503-solution").val() || $("#error-503-solution").attr("placeholder") },
+                    { Name: "Error503Popup", Value: $("#error-503-popup").val() || $("#error-503-popup").attr("placeholder") },
+
+                    { Name: "ErrorXXXTitle", Value: $("#error-xxx-title").val() || $("#error-xxx-title").attr("placeholder") },
+                    { Name: "ErrorXXXDescription", Value: $("#error-xxx-description").val() || $("#error-xxx-description").attr("placeholder") },
+                    { Name: "ErrorXXXSolution", Value: $("#error-xxx-solution").val() || $("#error-xxx-solution").attr("placeholder") },
+                    { Name: "ErrorXXXPopup", Value: $("#error-xxx-popup").val() || $("#error-xxx-popup").attr("placeholder") }
+                ];
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UpdateSettings")",
+                data: {
+                    Name: "error settings",
+                    Settings: settings
+                },
+                success: function (data) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                    }
+                }
+            });
+        }
+
+        // $(document).on("click", ".btn", function() {
+        //     swal({
+        //         icon: 'warning',
+        //         title: 'v4 Enhancement',
+        //         text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgcGFpZCB2ZXJzaW9uLg=="),
+        //         button: 'Continue'
+        //     });
+        // });
+    </script>
+}

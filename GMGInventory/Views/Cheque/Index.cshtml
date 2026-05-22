@@ -26,14 +26,27 @@
             }
             @if (userAccess.CanUploadDownload)
             {
-                <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                @* <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                    <span class="fas fa-upload"></span> Upload
+                </button> *@
+                @* <div class="dropdown float-right ml-2">
+                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuUpload" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuUpload">
+                        <li><a class="dropdown-item btn-details-upload uploadBtn" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload &amp; Track per Row</a></li>
+                        <li><a class="dropdown-item btn-details-upload uploadFileBtn" data-bs-toggle="modal" data-bs-target="#uploadFileModal">Upload Whole File</a></li>
+                    </ul>
+                </div> *@
+                <button type="button" class="btn btn-secondary btn-sm float-right uploadFileBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadFileModal">
                     <span class="fas fa-upload"></span> Upload
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
                     <span class="fas fa-download"></span> Download
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -171,12 +184,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="edit-collectDate" class="control-label mb-0 d-block">Collect Date</label>
-                                    <input type="date" id="edit-collectDate" name="CollectDate" class="form-control form-control-sm" />
+                                    <label for="edit-refNo" class="control-label mb-0 d-block">Ref No</label>
+                                    <input name="RefNo" id="edit-refNo" class="form-control form-control-sm" readonly="readonly" />
                                 </div>
                                 <div class="form-group">
-                                    <label for="edit-refNo" class="control-label mb-0 d-block">Ref No</label>
-                                    <input name="RefNo" id="edit-refNo" class="form-control form-control-sm" />
+                                    <label for="edit-collectDate" class="control-label mb-0 d-block">Collect Date</label>
+                                    <input type="date" id="edit-collectDate" name="CollectDate" class="form-control form-control-sm" />
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-customer" class="form-label mb-0">Customer Code</label>
@@ -195,6 +208,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label for="edit-checkNo" class="control-label mb-0 d-block">Check No</label>
+                                    <input name="CheckNo" id="edit-checkNo" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                                <div class="form-group">
                                     <label for="edit-checkDate" class="control-label mb-0 d-block">Check Date</label>
                                     <input type="date" id="edit-checkDate" name="CheckDate" class="form-control form-control-sm" />
                                 </div>
@@ -205,10 +222,6 @@
                                 <div class="form-group">
                                     <label for="edit-branch" class="control-label mb-0 d-block">Branch</label>
                                     <input name="Branch" id="edit-branch" class="form-control form-control-sm" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="edit-checkNo" class="control-label mb-0 d-block">Check No</label>
-                                    <input name="CheckNo" id="edit-checkNo" class="form-control form-control-sm" />
                                 </div>
                                 <input type="hidden" id="edit-id" />
                             </div>
@@ -266,6 +279,36 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadFileModal" role="dialog" aria-labelledby="uploadFileModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload File</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-excel-file">Excel File</label>
+                        <input type="file" id="upload-excel-file" name="file"
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="DoFileUpload()">
                         <span class="fas fa-upload"></span> Upload
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -348,6 +391,29 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
+                            <label for="filter-createdBy" class="form-label mb-0">Created By</label>
+                            <select id="filter-createdBy" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
                             <label for="filter-from" class="form-label mb-0">Check Date From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
@@ -359,19 +425,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-createdBy" class="form-label mb-0">Created By</label>
-                            <select id="filter-createdBy" style="width:100%">
-                                <option></option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -381,29 +441,30 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+        
+        $("#filter-preset").val("L7D");
+        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
+        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
 
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
 
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
+        });
 
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function() {
+            applyFilterPreset($(this).val());
+        });
 
         // Load Select2 for Customer
         $("#filter-customer").select2({
@@ -503,10 +564,150 @@
             }
         });
 
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            chequeDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            chequeDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[3, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Customer: "",
+            CustomerId: "",
+            Status: "",
+            StatusId: "",
+            CreatedBy: "",
+            CreatedById: "",
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
+        };
+
+        function checkDTChanged() {
+            if(!chequeDT) return false;
+            
+            return JSON.stringify(chequeDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   chequeDT.page.info().start != defaultDTState.page ||
+                   chequeDT.page.len() != defaultDTState.length ||
+                   (chequeDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-customer").val() != defaultDTState.CustomerId ||
+                   $("#filter-status").val() != defaultDTState.StatusId ||
+                   $("#filter-createdBy").val() != defaultDTState.CreatedById ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-customer').val(defaultDTState.CustomerId).trigger('change');
+            $('#filter-status').val(defaultDTState.StatusId).trigger('change');
+            $('#filter-createdBy').val(defaultDTState.CreatedById).trigger('change');
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+            
+            if (chequeDT) {
+                chequeDT.state.clear();
+                chequeDT.order(defaultDTState.order);
+                chequeDT.page(defaultDTState.page);
+                chequeDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
+
         // Load List on DataTable
-        var chequeDT = $('.table-cheque').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var chequeDT = $('.table-cheque').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.Customer = $('#filter-customer option:selected').text();
+                data.CustomerId = $('#filter-customer').val();
+                data.Status = $('#filter-status option:selected').text();
+                data.StatusId = $('#filter-status').val();
+                data.CreatedBy = $('#filter-createdBy option:selected').text();
+                data.CreatedById = $('#filter-createdBy').val();
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.CustomerId) {
+                    var customerOption = new Option(data.Customer, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.Customer
+                    });
+                    $("#filter-customer").append(customerOption).trigger('change');
+                }
+                if(data.StatusId) {
+                    var statusOption = new Option(data.Status, data.StatusId, true, true);
+                    $(statusOption).data('data', {
+                        id: data.StatusId,
+                        text: data.Status
+                    });
+                    $("#filter-status").append(statusOption).trigger('change');
+                }
+                if(data.CreatedById) {
+                    var createdByOption = new Option(data.CreatedBy, data.CreatedById, true, true);
+                    $(createdByOption).data('data', {
+                        id: data.CreatedById,
+                        text: data.CreatedBy
+                    });
+                    $("#filter-createdBy").append(createdByOption).trigger('change');
+                }
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
@@ -562,13 +763,13 @@
                     responsivePriority: 1
                 }
             ],
-            order: [[0, "desc"]]
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load
         chequeDT.on("draw", function () {
-            //hideLoader();
-         
+            checkDefaultFilter();
+
             $('.detailsBtn').click(function (e) {
                 var data = chequeDT.row($(this).parents('tr')).data();
                 $(".modal-detail-collectDate").html(data.collectDate);
@@ -613,7 +814,7 @@
                     $("#edit-check").val(data.check);
                     $("#edit-branch").val(data.branch);
                     $("#edit-checkNo").val(data.checkNo);
-                    $("#edit-amount").val(data.amount);
+                    $("#edit-amount").val(data.amountD);
                     $("#edit-status").val(data.statusId).trigger("change");
                 });
 
@@ -808,7 +1009,7 @@
                         }
                         if (columns.includes("CollectDate") == false
                             || columns.includes("RefNo") == false
-                            || columns.includes("CustomerCode") == false
+                            || columns.includes("CustomerName") == false
                             || columns.includes("CheckDate") == false
                             || columns.includes("Check") == false
                             || columns.includes("Branch") == false
@@ -818,7 +1019,7 @@
                             row$.append($('<td/>').html("Unexpected columns"));
                             UploadRowDone();
                         } else {
-                            SaveXLSX(json_of_excel[i]["CollectDate"], json_of_excel[i]["RefNo"], json_of_excel[i]["CustomerCode"], json_of_excel[i]["CheckDate"], json_of_excel[i]["Check"], json_of_excel[i]["Branch"], json_of_excel[i]["CheckNo"], json_of_excel[i]["Amount"], json_of_excel[i]["Status"], rowNum);
+                            SaveXLSX(json_of_excel[i]["CollectDate"], json_of_excel[i]["RefNo"], json_of_excel[i]["CustomerName"], json_of_excel[i]["CheckDate"], json_of_excel[i]["Check"], json_of_excel[i]["Branch"], json_of_excel[i]["CheckNo"], json_of_excel[i]["Amount"], json_of_excel[i]["Status"], rowNum);
                             row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                         }
                         $("#upload-table").append(row$);
@@ -826,14 +1027,14 @@
                 }
             }
 
-            function SaveXLSX(collectDate, refNo, customerCode, checkDate, check, branch, checkNo, amount, status, rownum) {
+            function SaveXLSX(collectDate, refNo, customerName, checkDate, check, branch, checkNo, amount, status, rownum) {
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("UploadJson")",
                     data: {
                         CollectDateD: collectDate,
                         RefNo: refNo,
-                        CustomerCode: customerCode,
+                        CustomerName: customerName,
                         CheckDateD: checkDate,
                         Check: check,
                         Branch: branch,
@@ -864,6 +1065,64 @@
                 }
             }
 
+            
+            function DoFileUpload() {
+                var formData = new FormData();
+                formData.append("File", $("#upload-excel-file")[0].files[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadFileJson")",
+                    data: formData,
+                    loaderMessage: "Please wait while this completes. Whole file is being processed on server.<br><small class=\"text-muted\">Reloading the page will stop the process, which may result in some excel rows to fail.</small>",
+                    //async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    xhrFields: {
+                        responseType: 'blob'  // important for file
+                    },
+                    //enctype: "multipart/form-data",
+                    success: function (data, status, xhr) {
+                        let statusHeader = xhr.getResponseHeader("X-Status");
+                        let messageHeader = xhr.getResponseHeader("X-Message");
+                        if (statusHeader == "Error") {
+                            toastr.error(messageHeader, "Error");
+                        } else {
+                            // Create a temporary download link
+                            let blob = new Blob([data]);
+                            let url = window.URL.createObjectURL(blob);
+
+                            let a = document.createElement("a");
+                            a.href = url;
+
+                            let disposition = xhr.getResponseHeader('Content-Disposition');
+                            let fileName = "Result.xlsx";
+                            if (disposition) {
+                                // try UTF-8 encoded filename first
+                                let utf8Match = disposition.match(/filename\*=UTF-8''(.+)/);
+                                if (utf8Match && utf8Match[1]) {
+                                    fileName = decodeURIComponent(utf8Match[1]);
+                                } else {
+                                    // fallback to normal filename
+                                    let normalMatch = disposition.match(/filename="?([^";]+)"?/);
+                                    if (normalMatch && normalMatch[1]) fileName = normalMatch[1];
+                                }
+                            }
+                            a.download = fileName;
+                            a.click();
+
+                            window.URL.revokeObjectURL(url);
+
+                            chequeDT.ajax.reload();
+
+                            toastr.success(messageHeader, "Success");
+
+                            $("#uploadFileModal").modal("hide");
+                        }
+                    }
+                });
+            }
         }
 
         if (user_access.canPrint) {

@@ -138,45 +138,45 @@ namespace GMGInventory.Controllers
             DateTime.Now.ToString("yyyyMMdd") + " Cheques.xlsx");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UploadJson(ChequeVM chequeVM)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Cheque, AccessTypes.UploadDownload);
-            if (redirectResult != null) return redirectResult;
+        //[HttpPost]
+        //public async Task<IActionResult> UploadJson(ChequeVM chequeVM)
+        //{
+        //    var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Cheque, AccessTypes.UploadDownload);
+        //    if (redirectResult != null) return redirectResult;
 
-            ResponseModel responseModel = new();
-            if (await chequeRepository.UploadCombinationExistAsync(chequeVM))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Already exist";
-            }
-            else if (await chequeRepository.IsRefNoExistAsync(chequeVM.RefNo))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Ref No already in use";
-            }
-            else
-            {
-                int? CustomerId = await customerRepository.GetIdByCodeAsync(chequeVM.CustomerCode);
-                int? StatusId = await chequeStatusRepository.GetIdByCodeAsync(chequeVM.StatusCode);
+        //    ResponseModel responseModel = new();
+        //    if (await chequeRepository.UploadCombinationExistAsync(chequeVM))
+        //    {
+        //        responseModel.Status = "Error";
+        //        responseModel.Message = "Already exist";
+        //    }
+        //    else if (await chequeRepository.IsRefNoExistAsync(chequeVM.RefNo))
+        //    {
+        //        responseModel.Status = "Error";
+        //        responseModel.Message = "Ref No already in use";
+        //    }
+        //    else
+        //    {
+        //        int? CustomerId = await customerRepository.GetIdByCodeAsync(chequeVM.CustomerCode);
+        //        int? StatusId = await chequeStatusRepository.GetIdByCodeAsync(chequeVM.StatusCode);
 
-                if (CustomerId == null)
-                {
-                    responseModel.Status = "Error";
-                    responseModel.Message = "Unknown Customer";
-                }
-                else
-                {
-                    chequeVM.CustomerId = CustomerId.Value;
-                    chequeVM.StatusId = StatusId.Value;
+        //        if (CustomerId == null)
+        //        {
+        //            responseModel.Status = "Error";
+        //            responseModel.Message = "Unknown Customer";
+        //        }
+        //        else
+        //        {
+        //            chequeVM.CustomerId = CustomerId.Value;
+        //            chequeVM.StatusId = StatusId.Value;
 
-                    await chequeRepository.AddAsync(chequeVM);
-                    responseModel.Status = "Success";
-                    responseModel.Message = "Cheque added";
-                }
-            }
-            return Json(responseModel);
-        }
+        //            await chequeRepository.AddAsync(chequeVM);
+        //            responseModel.Status = "Success";
+        //            responseModel.Message = "Cheque added";
+        //        }
+        //    }
+        //    return Json(responseModel);
+        //}
 
         public async Task<IActionResult> PrintCheques(ListFilterChequeModel filter)
         {
@@ -184,6 +184,41 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             return View(await chequeRepository.PrintCheque(filter));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadJson(ChequeVM itemVM)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Cheque, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(new ResponseModel()
+            {
+                Status = "Success",
+                Message = await chequeRepository.SaveChequeFromFile(itemVM)
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFileJson(IFormFile file)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Cheque, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await chequeRepository.UploadFile(file);
+
+            if (response.Data == null)
+            {
+                return Json(response);
+            }
+            else
+            {
+                Response.Headers["X-Status"] = response.Status;
+                Response.Headers["X-Message"] = response.Message;
+                return File(response.Data.Content,
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            response.Data.FileName);
+            }
         }
     }
 }

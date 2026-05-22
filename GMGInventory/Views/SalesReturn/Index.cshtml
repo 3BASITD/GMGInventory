@@ -11,10 +11,13 @@
         <div class="card-tools">
             @if (userAccess.CanAdd)
             {
-                <a class="btn btn-primary btn-sm float-right" asp-action="Create">
+                <a class="btn btn-primary btn-sm float-right ml-2" asp-action="Create">
                     <span class="fas fa-plus"></span> New Sales Return
                 </a>
             }
+            <button class="btn btn-secondary btn-sm float-right btn-filter ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
@@ -49,16 +52,187 @@
     </div>
 </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        $("#filter-preset").val("L7D");
+        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
+        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
+
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
+        });
+
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function() {
+            applyFilterPreset($(this).val());
+        });
+
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        $(".btnFilter").on("click", function () {
+            $("#filterModal").modal("hide");
+            returnDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        });
+
+        $(".btnReset").on("click", function () {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            returnDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        });
+
+        var defaultDTState = {
+            order: [[5, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
+        };
+
+        function checkDTChanged() {
+            if(!returnDT) return false;
+            
+            return JSON.stringify(returnDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   returnDT.page.info().start != defaultDTState.page ||
+                   returnDT.page.len() != defaultDTState.length ||
+                   (returnDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+            
+            if (returnDT) {
+                returnDT.state.clear();
+                returnDT.order(defaultDTState.order);
+                returnDT.page(defaultDTState.page);
+                returnDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
 
         // Load List on DataTable
-        var returnDT = $('.table-return').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var returnDT = $('.table-return').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $("#filter-from").val();
+                data.DateTo = $("#filter-to").val();
+            },
+            stateLoadParams: function (settings, data) {
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
+                data: function (data) {
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
                 }
@@ -117,12 +291,12 @@
                     responsivePriority: 1
                 }
             ],
-            order: [[5, "desc"]]
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load
         returnDT.on("draw", function () {
-            //hideLoader();
+            checkDefaultFilter();
         });
     </script>
     }

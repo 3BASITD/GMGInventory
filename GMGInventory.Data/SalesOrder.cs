@@ -10,7 +10,7 @@ namespace GMGInventory.Data
         public SalesOrder()
         {
             this.SalesOrderResubmits = new HashSet<SalesOrder>();
-            this.SalesOrderSources = new HashSet<SalesOrderSourced>();
+            this.SalesOrderItemSources = new HashSet<SalesOrderItemSource>();
             this.Invoices = new HashSet<Invoice>();
             this.Packs = new HashSet<Pack>();
             this.PurchaseRequestLineItems = new HashSet<PurchaseRequestLineItem>();
@@ -80,7 +80,7 @@ namespace GMGInventory.Data
         public DateTime? BarcotechRequestDate { get; set; }
 
         public ICollection<SalesOrder> SalesOrderResubmits { get; set; }
-        public ICollection<SalesOrderSourced> SalesOrderSources { get; set; }
+        public ICollection<SalesOrderItemSource> SalesOrderItemSources { get; set; }
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<Pack> Packs { get; set; }
         public ICollection<PurchaseRequestLineItem> PurchaseRequestLineItems { get; set; }

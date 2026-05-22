@@ -24,13 +24,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetListJson()
+        public async Task<IActionResult> GetListJson(DateTime DateFrom, DateTime DateTo)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesReturn, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
             DataTablesRequestForm form = new DataTablesRequestForm(Request.Form);
-            return Json(await salesReturnRepository.GetListDTAsync(form));
+            return Json(await salesReturnRepository.GetListDTAsync(form, DateFrom, DateTo));
         }
 
         public async Task<IActionResult> Details(int? Id)

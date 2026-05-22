@@ -89,7 +89,9 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("KYC")] KYC,
         [PageNamesString("Item Class")] ItemClass,
         [PageNamesString("Ordering")] Ordering,
-        [PageNamesString("System Settings")] SystemSettings
+        [PageNamesString("System Settings")] SystemSettings,
+        [PageNamesString("Delivery Monitoring")] DeliveryMonitoring,
+        [PageNamesString("Warehouse Dashboard")] WarehouseDashboard
     }
 
     public static class PageNameExtensions

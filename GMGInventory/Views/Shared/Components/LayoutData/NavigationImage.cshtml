@@ -1,0 +1,13 @@
+﻿@using static GMGInventory.ViewComponents.LayoutDataViewComponent
+@model IList<SystemSettingVM>
+
+@{
+    var value = Model.FirstOrDefault(s => s.Name == "NavigationImage")?.Value ?? "";
+}
+@if (!string.IsNullOrWhiteSpace(value))
+{
+    <img src="/images/Logo/@value" alt="BAS" class="brand-image" style="margin-top:-3px;margin-right:0.8rem" />
+    @* <img src="~/images/3BAS.png" alt="BAS" class="brand-image img-circle bg-white" style="margin-top:-3px;" /> *@
+} else {
+    <img src="~/images/3BAS.png" alt="BAS" class="brand-image" style="margin-top:-3px;margin-right:0.8rem" />
+}

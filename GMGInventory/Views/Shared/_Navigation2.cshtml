@@ -37,9 +37,11 @@ else
             || navPages.Contains(PageNames.SalesInvoice.ToEnumString())
             || navPages.Contains(PageNames.SalesOrderDelivery.ToEnumString())
             || navPages.Contains(PageNames.SalesReturn.ToEnumString())
-            || navPages.Contains(PageNames.ShippingList.ToEnumString()))
+            || navPages.Contains(PageNames.ShippingList.ToEnumString())
+            || navPages.Contains(PageNames.DeliveryMonitoring.ToEnumString())
+            || navPages.Contains(PageNames.WarehouseDashboard.ToEnumString()))
         {
-            var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "Receptacle", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice", "ShippingList" }).Contains(currentController ?? "");
+            var navSalesActive = (new List<string> { "CustomerPurchaseHistory", "Pack", "Receptacle", "SalesReturn", "SalesOrder", "SalesOrderDelivery", "SalesInvoice", "ShippingList", "DeliveryMonitoring", "WarehouseDashboard" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuSales" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navSalesActive ? "active" : "")">
@@ -214,6 +216,42 @@ else
                                     <span class="nav-icon fas fa-shipping-fast"></span>
                                 }
                                 Shipping List
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.DeliveryMonitoring.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "DeliveryMonitoring" ? "active" : "")"
+                                   asp-area="" asp-controller="DeliveryMonitoring" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">🛰️</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-satellite-dish"></span>
+                                }
+                                Delivery Monitoring
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.WarehouseDashboard.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "WarehouseDashboard" ? "active" : "")"
+                                   asp-area="" asp-controller="WarehouseDashboard" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">⚡</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-network-wired"></span>
+                                }
+                                Warehouse Dashboard
                             </a>
                         </li>
                     }
@@ -652,7 +690,7 @@ else
             || navPages.Contains(PageNames.Vehicle.ToEnumString())
             || navPages.Contains(PageNames.AuditLogs.ToEnumString()))
         {
-            var navAdministrationActive = (new List<string> { "Access", "Agent", "Area", "BarcotechSync", "Brand", "Category", "Currency", "Driver", "Forwarder", "HomeImage", "ItemClass", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "ServiceLevelAgreement", "Supplier", "SystemSettings", "User", "Vehicle", "AuditLog" }).Contains(currentController ?? "");
+            var navAdministrationActive = (new List<string> { "Access", "Agent", "Area", "BarcotechSync", "Brand", "Category", "Currency", "Driver", "Forwarder", "HomeImage", "ItemClass", "ItemType", "LocationCode", "ReasonOfReturn", "Region", "ServiceLevelAgreement", "Supplier", "SystemSetting", "User", "Vehicle", "AuditLog" }).Contains(currentController ?? "");
             var navAdministrationActiveCount = (navPages.Contains(PageNames.Accesses.ToEnumString()) ? 1 : 0) +
                                                (navPages.Contains(PageNames.Agents.ToEnumString()) ? 1 : 0) +
                                                (navPages.Contains(PageNames.Areas.ToEnumString()) ? 1 : 0) +
@@ -693,9 +731,9 @@ else
                 <div aria-labelledby="menuAdministration" class="dropdown-menu mt-lg-3 border-0 shadow" style="@widthForMoreActive">
                     <div class="container">
                         <div class="row" style="width:100%">
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Accesses.ToEnumString()))
-                                {
+                            @if (navPages.Contains(PageNames.Accesses.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Access" ? "active" : "")"
                                            asp-area="" asp-controller="Access" asp-action="Index">
                                         @if (newIcon)
@@ -709,11 +747,11 @@ else
                                         }
                                         Access
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Agents.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Agents.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Agent" ? "active" : "")"
                                            asp-area="" asp-controller="Agent" asp-action="Index">
                                         @if (newIcon)
@@ -727,11 +765,11 @@ else
                                         }
                                         Agents
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Areas.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Areas.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Area" ? "active" : "")"
                                            asp-area="" asp-controller="Area" asp-action="Index">
                                         @if (newIcon)
@@ -745,11 +783,11 @@ else
                                         }
                                         Areas
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.BarcotechSync.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.BarcotechSync.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "BarcotechSync" ? "active" : "")"
                                            asp-area="" asp-controller="BarcotechSync" asp-action="Index">
                                         @if (newIcon)
@@ -763,11 +801,11 @@ else
                                         }
                                         Barcotech Sync Status
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Brands.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Brands.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Brand" ? "active" : "")"
                                            asp-area="" asp-controller="Brand" asp-action="Index">
                                         @if (newIcon)
@@ -781,11 +819,11 @@ else
                                         }
                                         Brands
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Categories.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Categories.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Category" ? "active" : "")"
                                            asp-area="" asp-controller="Category" asp-action="Index">
                                         @if (newIcon)
@@ -799,11 +837,11 @@ else
                                         }
                                         Categories
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Currency.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Currency.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Currency" ? "active" : "")"
                                            asp-area="" asp-controller="Currency" asp-action="Index">
                                         @if (newIcon)
@@ -817,11 +855,11 @@ else
                                         }
                                         Currencies
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Driver.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Driver.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Driver" ? "active" : "")"
                                            asp-area="" asp-controller="Driver" asp-action="Index">
                                         @if (newIcon)
@@ -835,11 +873,11 @@ else
                                         }
                                         Drivers
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Forwarders.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Forwarders.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Forwarder" ? "active" : "")"
                                            asp-area="" asp-controller="Forwarder" asp-action="Index">
                                         @if (newIcon)
@@ -853,11 +891,11 @@ else
                                         }
                                         Forwarders
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.HomeImage.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.HomeImage.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "HomeImage" ? "active" : "")"
                                            asp-area="" asp-controller="HomeImage" asp-action="Index">
                                         @if (newIcon)
@@ -871,11 +909,11 @@ else
                                         }
                                         Home Images
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.ItemClass.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.ItemClass.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "ItemClass" ? "active" : "")"
                                            asp-area="" asp-controller="ItemClass" asp-action="Index">
                                         @if (newIcon)
@@ -889,11 +927,11 @@ else
                                         }
                                         Item Classes
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.ItemTypes.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.ItemTypes.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "ItemType" ? "active" : "")"
                                            asp-area="" asp-controller="ItemType" asp-action="Index">
                                         @if (newIcon)
@@ -907,11 +945,11 @@ else
                                         }
                                         Item Types
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.LocationCodes.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.LocationCodes.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "LocationCode" ? "active" : "")"
                                            asp-area="" asp-controller="LocationCode" asp-action="Index">
                                         @if (newIcon)
@@ -925,11 +963,11 @@ else
                                         }
                                         Location Codes
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.ReasonsOfReturn.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "ReasonsOfReturn" ? "active" : "")"
                                            asp-area="" asp-controller="ReasonsOfReturn" asp-action="Index">
                                         @if (newIcon)
@@ -943,11 +981,11 @@ else
                                         }
                                         Reasons of Return
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Regions.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Regions.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Region" ? "active" : "")"
                                            asp-area="" asp-controller="Region" asp-action="Index">
                                         @if (newIcon)
@@ -961,11 +999,11 @@ else
                                         }
                                         Regions
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.ServiceLevelAgreement.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "ServiceLevelAgreement" ? "active" : "")"
                                            asp-area="" asp-controller="ServiceLevelAgreement" asp-action="Index">
                                         @if (newIcon)
@@ -979,11 +1017,11 @@ else
                                         }
                                         Service Level Agreements
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Suppliers.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Suppliers.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Supplier" ? "active" : "")"
                                            asp-area="" asp-controller="Supplier" asp-action="Index">
                                         @if (newIcon)
@@ -997,13 +1035,13 @@ else
                                         }
                                         Suppliers
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.SystemSettings.ToEnumString()))
-                                {
-                                    <a class="dropdown-item @(currentController == "SystemSettings" ? "active" : "")"
-                                           asp-area="" asp-controller="SystemSettings" asp-action="Index">
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.SystemSettings.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
+                                    <a class="dropdown-item @(currentController == "SystemSetting" ? "active" : "")"
+                                           asp-area="" asp-controller="SystemSetting" asp-action="Index">
                                         @if (newIcon)
                                         {
                                             <span class="emoji">🛠️</span>
@@ -1011,15 +1049,15 @@ else
                                         else
                                         {
 
-                                            <span class="nav-icon fas fa-sliders"></span>
+                                            <span class="nav-icon fas fa-cog"></span>
                                         }
                                         System Settings
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Users.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Users.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "User" ? "active" : "")"
                                            asp-area="" asp-controller="User" asp-action="Index">
                                         @if (newIcon)
@@ -1033,11 +1071,11 @@ else
                                         }
                                         Users
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.Vehicle.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.Vehicle.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "Vehicle" ? "active" : "")"
                                            asp-area="" asp-controller="Vehicle" asp-action="Index">
                                         @if (newIcon)
@@ -1051,11 +1089,11 @@ else
                                         }
                                         Vehicles
                                     </a>
-                                }
-                            </div>
-                            <div class="@colForMoreActive">
-                                @if (navPages.Contains(PageNames.AuditLogs.ToEnumString()))
-                                {
+                                </div>
+                            }
+                            @if (navPages.Contains(PageNames.AuditLogs.ToEnumString()))
+                            {
+                                <div class="@colForMoreActive">
                                     <a class="dropdown-item @(currentController == "AuditLog" ? "active" : "")"
                                            asp-area="" asp-controller="AuditLog" asp-action="Index">
                                         @if (newIcon)
@@ -1069,8 +1107,8 @@ else
                                         }
                                         Audit Logs
                                     </a>
-                                }
-                            </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

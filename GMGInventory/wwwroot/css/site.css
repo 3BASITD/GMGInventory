@@ -869,6 +869,10 @@ body.dark-mode .bg-invert {
     white-space: pre-line;
 }
 
+.dark-mode .swal-content {
+    color: black;
+}
+
 .swal-content__div {
     text-align: left;
 }
@@ -1045,4 +1049,72 @@ a[target="_blank"] {
 a[target="_blank"]:hover::after {
     /*display: inline-block;*/
     opacity: 1;
+}
+
+.bg-reverse {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+.dark-mode .bg-reverse {
+    background-color: #f8f9fa !important;
+    color: #1f2d3d !important;
+}
+
+/**pang fullscreen, warehouse dashboard**/
+.card-body:fullscreen,
+.card-body:-webkit-full-screen {
+    height: 100vh;
+    padding: 20px;
+    background: #f8f9fa;
+    overflow-x: auto;
+}
+
+.dark-mode .card-body:fullscreen,
+.dark-mode .card-body:-webkit-full-screen {
+    background: #343a40;
+}
+
+.card-body:fullscreen .card-title,
+.card-body:-webkit-full-screen .card-title {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.card-body:fullscreen a,
+.card-body:-webkit-full-screen a {
+    pointer-events: none;
+    cursor: not-allowed;
+    color: black !important;
+}
+
+.dark-mode .card-body:fullscreen a,
+.dark-mode .card-body:-webkit-full-screen a {
+    color: #f5f5f5 !important;
+}
+
+    .dark-mode .card-body:fullscreen a[target="_blank"],
+    .dark-mode .card-body:-webkit-full-screen a[target="_blank"] {
+        white-space: normal;
+    }
+
+.card-body:fullscreen p,
+.card-body:fullscreen span,
+.card-body:fullscreen div,
+.card-body:-webkit-full-screen p,
+.card-body:-webkit-full-screen span,
+.card-body:-webkit-full-screen div {
+    font-size: 1.25rem;
+}
+
+.card-body:fullscreen .badge,
+.card-body:fullscreen .btn-group span,
+.card-body:-webkit-full-screen .badge,
+.card-body:-webkit-full-screen .btn-group span {
+    font-size: 1.0rem;
+}
+
+.card-body:fullscreen .btn-group .btn,
+.card-body:-webkit-full-screen .btn-group .btn {
+    padding: 5px 20px;
 }

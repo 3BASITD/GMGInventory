@@ -242,7 +242,7 @@
                                             else
                                             {
                                                 var checkRowGroup = item.ItemClass == null ? "null" : item.ItemClass.Replace(" ", "").ToLower();
-                                                <input type="checkbox" class="checkrow checkrowgroup-@checkRowGroup" data-row-id="@item.Id" />
+                                                <input type="checkbox" class="checkrow checkrowgroup-@checkRowGroup" data-row-id="@item.Id" data-row-item-class="@item.ItemClass" />
                                             }
                                         </td>
                                         <td>@item.Code</td>
@@ -435,6 +435,20 @@
             } else {
                 $(".checkall").prop("checked", false);
                 $(".checkall").prop("indeterminate", true);
+            }
+
+            const class_types = [...new Set(
+                $(".checkrow:checked").map(function () {
+                    return $(this).data("row-item-class");
+                }).get()
+            )];
+            if (class_types.length > 1) {
+                swal({
+                    icon: 'warning',
+                    title: 'v4 Enhancement',
+                    text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgcGFpZCB2ZXJzaW9uLg=="),
+                    button: 'Continue'
+                });
             }
         }
 

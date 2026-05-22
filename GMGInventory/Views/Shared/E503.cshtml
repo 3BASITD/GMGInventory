@@ -1,13 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Service Unavailable";
+﻿@model IList<SystemSettingVM>
+@{
+    var errorTitle = Model.FirstOrDefault(s => s.Name == "Error503Title")?.Value ?? "Service Unavailable";
+    var errorDescription = Model.FirstOrDefault(s => s.Name == "Error503Description")?.Value ?? "Our service is temporarily unavailable due to maintenance or high traffic.";
+    var errorSolution = Model.FirstOrDefault(s => s.Name == "Error503Solution")?.Value ?? "We’re working to resolve the issue as quickly as possible. Please check back soon.";
+
+    ViewData["Title"] = @errorTitle;
 }
 
 <div class="container full-height d-flex align-items-center justify-content-center">
     <div class="text-center">
         <h1 class="display-1 text-danger">503</h1>
-        <h2 class="display-4">Service Unavailable</h2>
-        <p class="lead">Our service is temporarily unavailable due to maintenance or high traffic.</p>
-        <p>We’re working to resolve the issue as quickly as possible. Please check back soon.</p>
+        <h2 class="display-4">@errorTitle</h2>
+        <p class="lead">@errorDescription</p>
+        <p>@errorSolution</p>
         <a href="/" class="btn btn-primary">Return to Homepage</a>
+        <p class="text-muted text-xs mt-5">Error message can be modified by the system administrator.</p>
     </div>
 </div>

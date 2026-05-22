@@ -11,6 +11,7 @@
         <div class="card-header text-center">
             @* <a class="h1" asp-area="" asp-controller="Home" asp-action="Index"><b>3BAS</b>Tiger Inc</a> *@
             <a class="h1" asp-area="" asp-controller="Home" asp-action="Index">
+                @await Component.InvokeAsync("LayoutData", new { viewType = "LoginImage" })
                 @await Component.InvokeAsync("LayoutData", new { viewType = "CompanyLogin" })
             </a>
         </div>

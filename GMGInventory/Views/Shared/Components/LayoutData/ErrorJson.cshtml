@@ -1,0 +1,86 @@
+﻿@using static GMGInventory.ViewComponents.LayoutDataViewComponent
+@using System.Web
+
+@model IList<SystemSettingVM>
+
+@{
+    string GetSetting(string name, string fallback)
+    {
+        return Model.FirstOrDefault(s => s.Name == name)?.Value ?? fallback;
+    }
+
+    var errorMessages = new Dictionary<string, (string Title, string Message)>
+    {
+        ["400"] = (
+            GetSetting("Error400Title", "400 Bad Request"),
+            GetSetting("Error400Popup", "The request was invalid. Please try again.")
+        ),
+
+        ["401"] = (
+            GetSetting("Error401Title", "401 Unauthorized"),
+            GetSetting("Error401Popup", "Please log in to access this action.")
+        ),
+
+        ["403"] = (
+            GetSetting("Error403Title", "403 Forbidden"),
+            GetSetting("Error403Popup", "You don't have permission to do this action.")
+        ),
+
+        ["404"] = (
+            GetSetting("Error404Title", "404 Not Found"),
+            GetSetting("Error404Popup", "Function could not be found.")
+        ),
+
+        ["500"] = (
+            GetSetting("Error500Title", "500 Internal Server Error"),
+            GetSetting("Error500Popup", "Something went wrong on our end. Please try again later.")
+        ),
+
+        ["502"] = (
+            GetSetting("Error502Title", "502 Bad Gateway"),
+            GetSetting("Error502Popup", "We’re having trouble connecting to the server. Please try again soon.")
+        ),
+
+        ["503"] = (
+            GetSetting("Error503Title", "503 Service Unavailable"),
+            GetSetting("Error503Popup", "The service is temporarily unavailable. Please check back shortly.")
+        ),
+
+        ["default"] = (
+            GetSetting("ErrorXXXTitle", "Unknown Error"),
+            GetSetting("ErrorXXXPopup", "There seems to be a problem loading some data. Please reload the page and try again.")
+        )
+    };
+}
+
+<script>
+    const ajaxErrors = {
+        @foreach (var err in errorMessages)
+        {
+                <text>
+                    "@err.Key": {
+                        title: "@Html.Raw(HttpUtility.JavaScriptStringEncode(err.Value.Title))",
+                        message: "@Html.Raw(HttpUtility.JavaScriptStringEncode(err.Value.Message))"
+                    },
+                </text>
+        }
+    };
+
+    $.ajaxSetup({
+        error: function (xhr, status, error) {
+            if (xhr.status === 0 || status === "abort")
+                return;
+
+            const err = ajaxErrors[xhr.status.toString()] || ajaxErrors["default"];
+
+            toastr.error(err.message, err.title);
+
+            if (!ajaxErrors[xhr.status.toString()]) {
+                console.error("Unknown AJAX error");
+                console.log({ xhr, status, error });
+            }
+
+            hideLoader();
+        }
+    });
+</script>

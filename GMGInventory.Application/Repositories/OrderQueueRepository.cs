@@ -78,8 +78,8 @@ namespace GMGInventory.Application.Repositories
                 var order = ordersList[i];
                 if (sourceLookup.TryGetValue(order.OrderNumber, out var ord))
                 {
-                    order.AddedCount = ord.CountAdded;
-                    order.IgnoredCount = ord.CountIgnored;
+                    order.AddedCount = Math.Min(ord.CountAdded, order.ItemCount);
+                    order.IgnoredCount = Math.Min(ord.CountIgnored, order.ItemCount);
                     order.Status = order.ItemCount == ord.CountIgnored ? "Fully Ignored" :
                                    order.ItemCount == ord.CountAdded ? "Fully Added" :
                                    (ord.CountAdded > 0 && ord.CountIgnored > 0) ? "Partial Added & Partial Ignored" :
@@ -146,7 +146,7 @@ namespace GMGInventory.Application.Repositories
             {
                 list.IsValidAgent = list.AgentId > 0 && context.Agents.Any(s => s.Id == list.AgentId);
                 list.IsValidCustomer = list.CustomerId > 0 && context.Customers.Any(s => s.Id == list.CustomerId);
-                var soConverts = context.SalesOrderSources
+                var soConverts = context.SalesOrderItemSources
                                         .Where(s => s.SourceOrderNumber == list.OrderNumber
                                                  && (s.Status == null || s.Status.ToLower() == "added")
                                                  && s.SalesOrder != null)
@@ -199,7 +199,7 @@ namespace GMGInventory.Application.Repositories
 
             order.IsValidAgent = order.AgentId > 0 && context.Agents.Any(s => s.Id == order.AgentId);
             order.IsValidCustomer = order.CustomerId > 0 && context.Customers.Any(s => s.Id == order.CustomerId);
-            var soConverts = context.SalesOrderSources
+            var soConverts = context.SalesOrderItemSources
                                     .Where(s => s.SourceOrderNumber == order.OrderNumber)
                                     .OrderBy(s => s.DateCreated)
                                     .Select(s => s.SalesOrder.SalesOrderNumber)

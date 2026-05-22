@@ -1,8 +1,9 @@
 ﻿@using static GMGInventory.ViewComponents.LayoutDataViewComponent
-@model ConfigurationModel
+@model IList<SystemSettingVM>
 
 @{
-    var temp = (Model?.Value ?? "").Split('|');
+    var value = Model.FirstOrDefault(s => s.Name == "CompanyLogin")?.Value ?? "";
+    var temp = (value ?? "").Split('|');
     
     var part1 = temp.Length > 0 ? temp[0] : "";
     var part2 = temp.Length > 1 ? temp[1] : "";

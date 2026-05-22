@@ -35,9 +35,10 @@
 
 .fa-address-card::before { content: "🆔"; }
 .fa-angle-left::before { content: "◀️"; }
-.fa-arrow-down::before { content: "⬇️"; }
+.fa-angle-right::before { content: "▶"; }
+.fa-arrow-down::before { content: "▼"; }
 .fa-arrow-left::before { content: "⬅️"; }
-.fa-arrow-up::before { content: "⬆️"; }
+.fa-arrow-up::before { content: "▲"; }
 .fa-ban::before { content: "🛑"; }
 .fa-bars::before { content: "📊"; }
 .fa-battery-empty::before { content: "🪫"; }
@@ -69,6 +70,7 @@
 .fa-exchange-alt::before { content: "🔁"; }
 .fa-exclamation::before { content: "❗"; }
 .fa-exclamation-triangle::before { content: "⚠️"; }
+.fa-expand::before { content: "⛶"; }
 .fa-expand-arrows-alt::before { content: "↔️"; }
 .fa-eye::before { content: "👁️"; }
 .fa-file::before { content: "📄"; }

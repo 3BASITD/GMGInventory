@@ -76,10 +76,12 @@ namespace GMGInventory.Application.Repositories
             return await returnVM.FirstOrDefaultAsync();
         }
 
-        private async Task<IList<SalesReturnVM>> GetListAsync()
+        private async Task<IList<SalesReturnVM>> GetListAsync(DateTime dtFrom, DateTime dtTo)
         {
             var returns = from ret in context.SalesReturns
                           join user in userManager.Users on ret.UserCreated equals user.Id
+                          where dtFrom.Date <= ret.ReturnDate.Date
+                          && ret.ReturnDate.Date <= dtTo.Date
                           select new SalesReturnVM
                           {
                               BIRInvoiceNumber = string.Join(", ", ret.SalesReturnLineItems.Select(s => s.InvoiceLineItem == null ? "" : "<a href='/SalesInvoice/Details/" + s.InvoiceLineItem.Invoice.Id + "' class='link-info' target='_blank'>" + s.InvoiceLineItem.Invoice.ControlNumber + "</a>")),
@@ -102,11 +104,11 @@ namespace GMGInventory.Application.Repositories
             return await returns.ToListAsync();
         }
 
-        public async Task<ForDataTables<SalesReturnVM>> GetListDTAsync(DataTablesRequestForm form)
+        public async Task<ForDataTables<SalesReturnVM>> GetListDTAsync(DataTablesRequestForm form, DateTime dtFrom, DateTime dtTo)
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetListAsync()).AsQueryable();
+            var data = (await GetListAsync(dtFrom, dtTo)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found

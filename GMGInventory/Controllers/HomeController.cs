@@ -8,7 +8,8 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class HomeController(IAccessRepository accessRepository
-                              , IHomeImageRepository homeImageRepository) : BaseController(accessRepository)
+                              , IHomeImageRepository homeImageRepository
+                              , ISystemSettingRepository settingRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {
@@ -35,18 +36,19 @@ namespace GMGInventory.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(int statuscode)
+        public async Task<IActionResult> Error(int statuscode)
         {
+            var errorList = await settingRepository.GetSystemSettings();
             Response.StatusCode = statuscode;
             return statuscode switch
             {
-                400 => View("~/Views/Shared/E400.cshtml"),
-                403 => View("~/Views/Shared/E403.cshtml"),
-                404 => View("~/Views/Shared/E404.cshtml"),
-                500 => View("~/Views/Shared/E500.cshtml"),
-                502 => View("~/Views/Shared/E502.cshtml"),
-                503 => View("~/Views/Shared/E503.cshtml"),
-                _ => View("~/Views/Shared/Error.cshtml")
+                400 => View("~/Views/Shared/E400.cshtml", errorList),
+                403 => View("~/Views/Shared/E403.cshtml", errorList),
+                404 => View("~/Views/Shared/E404.cshtml", errorList),
+                500 => View("~/Views/Shared/E500.cshtml", errorList),
+                502 => View("~/Views/Shared/E502.cshtml", errorList),
+                503 => View("~/Views/Shared/E503.cshtml", errorList),
+                _ => View("~/Views/Shared/Error.cshtml", errorList)
             };
         }
     }

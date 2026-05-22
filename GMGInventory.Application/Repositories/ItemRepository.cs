@@ -583,7 +583,7 @@ namespace GMGInventory.Application.Repositories
                             CategoryCode = item.Category.Code,
                             ItemTypeCode = item.ItemType.Code,
                             BrandCode = item.Brand.Code,
-                            LocationCodes = item.ItemLocations.Select(a => a.LocationCode.Code.Trim())
+                            LocationCodes = item.ItemInventories.Select(a => a.LocationCode.Code.Trim())
                         };
 
             return await items.ToListAsync();
@@ -594,15 +594,6 @@ namespace GMGInventory.Application.Repositories
             var itemVM = (from item in context.Items
                           from price in context.ItemPrices.Where(s => s.ItemId == item.Id && s.DateCreated <= DateTime.Now).OrderByDescending(s => s.DateCreated).Take(1).DefaultIfEmpty()
                           join inventory in context.ItemInventories on item.Id equals inventory.ItemId
-
-                          let locationCodes = context.ItemLocations
-                                    .Where(s => s.ItemId == item.Id)
-                                    .GroupBy(s => s.LocationCode.Code)
-                                    .Select(x => new
-                                    {
-                                        Id = x.Key
-                                    }).ToList()
-
                           where item.Id == id
                           select new ItemViewVM
                           {
@@ -624,7 +615,7 @@ namespace GMGInventory.Application.Repositories
                               Size = item.Size,
                               UnitCode = item.Unit.Name,
                               Warehouse = inventory.Warehouse.Name,
-                              LocationCodes = string.Join(",", locationCodes.Select(s => s.Id)),
+                              LocationCodes = inventory.LocationCode.Name,
                               OldCode = item.OldCode,
                               Image = item.Image
                           }).FirstOrDefault();
@@ -813,12 +804,13 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task UpdateQuantityAsync(int id, int quantity, string remarks)
+        public async Task UpdateQuantityAsync(int id, int quantity, int? locationCode, string remarks)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var inventory = context.ItemInventories.Where(s => s.Id == id).First();
             var oldQuantity = inventory.Quantity;
             inventory.Quantity = quantity;
+            inventory.LocationCodeId = locationCode;
             //context.ItemInventories.Update(inventory);
             await context.SaveChangesAsync(currentUserId);
 
@@ -1054,7 +1046,9 @@ namespace GMGInventory.Application.Repositories
                                   Id = inv.Id,
                                   Name = inv.Warehouse.Name,
                                   QuantityD = inv.Quantity,
-                                  WarehouseId = inv.Warehouse.Id
+                                  WarehouseId = inv.Warehouse.Id,
+                                  LocationCodeId = inv.LocationCode == null ? null : inv.LocationCode.Id,
+                                  LocationCode = inv.LocationCode == null ? null : inv.LocationCode.Name
                               };
             return await inventoryVM.ToListAsync();
         }
@@ -1659,7 +1653,15 @@ namespace GMGInventory.Application.Repositories
             try
             {
                 if (file == null || file.Length == 0)
-                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Invalid file" };
+                    return new ResponseModelData<FileVM> {
+                        Status = "Error", 
+                        Message = "Invalid file",
+                        Data = new FileVM
+                        {
+                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Item Upload Processed --- {file.FileName}",
+                            Content = []
+                        }
+                    };
 
                 using var stream = new MemoryStream();
                 await file.CopyToAsync(stream);
@@ -1678,7 +1680,15 @@ namespace GMGInventory.Application.Repositories
                         missingColumns.Add(col);
                 }
                 if (missingColumns.Count > 0)
-                    return new ResponseModelData<FileVM> { Status = "Error", Message = "Missing column(s): " + string.Join(", ", missingColumns) };
+                    return new ResponseModelData<FileVM> { 
+                        Status = "Error", 
+                        Message = "Missing column(s): " + string.Join(", ", missingColumns),
+                        Data = new FileVM
+                        {
+                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Item Upload Processed --- {file.FileName}",
+                            Content = []
+                        }
+                    };
 
                 int codeCol = headers.IndexOf("Code") + 1;
                 int nameCol = headers.IndexOf("Name") + 1;

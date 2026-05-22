@@ -15,7 +15,6 @@ namespace GMGInventory.Controllers
     public class ItemController(IAccessRepository accessRepository
                               , IItemRepository itemRepository
                               , IItemConversionRepository itemConversionRepository
-                              , IItemLocationRepository itemLocationRepository
                               , IAPIBCT_Service apiBCTService
                               , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
     {
@@ -170,15 +169,15 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditDetailQuantity(int id, int quantity, string remarks)
+        public async Task<IActionResult> EditDetailQuantity(int id, int quantity, int? locationCode, string remarks)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
             ResponseModel responseModel = new();
-            await itemRepository.UpdateQuantityAsync(id, quantity, remarks);
+            await itemRepository.UpdateQuantityAsync(id, quantity, locationCode, remarks);
             responseModel.Status = "Success";
-            responseModel.Message = "Item quantity successfully updated";
+            responseModel.Message = "Warehouse details successfully updated";
             return Json(responseModel);
         }
 
@@ -606,49 +605,6 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetLocationListJson(int id)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.View);
-            var redirectResultBasic = await CheckAccessAndRedirectAsync(PageNames.ItemBasic, AccessTypes.View);
-            if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
-
-            DataTablesRequestForm form = new(Request.Form);
-            return Json(await itemLocationRepository.GetAllForDataTablesAsync(form, id));
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteItemLocation(int id)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Delete);
-            if (redirectResult != null) return redirectResult;
-
-            var location = await itemLocationRepository.GetAsync(id);
-            if (location == null)
-            {
-                return NotFound();
-            }
-
-            await itemLocationRepository.DeleteAsync(id);
-            TempData["SuccessMessage"] = "Item location successfully deleted";
-            return RedirectToAction("Details", new { Id = location.ItemId });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateItemLocationJson(ItemDetailLocationVM itemLocationVM)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Add);
-            if (redirectResult != null) return redirectResult;
-
-            ResponseModel responseModel = new();
-
-            await itemLocationRepository.AddAsync(itemLocationVM);
-            responseModel.Status = "Success";
-            responseModel.Message = "Item location successfully added";
-            return Json(responseModel);
-        }
-
-        [HttpPost]
         public async Task<IActionResult> SaveImageAsync(ItemImageFormVM form)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.UploadDownload);
@@ -662,6 +618,7 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechStock, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
+
             var response = await apiBCTService.SyncStock(apiBCTOptions.Value.URLStock, ItemId);
             return Json(response);
         }

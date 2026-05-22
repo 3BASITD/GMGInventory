@@ -163,7 +163,6 @@ namespace GMGInventory.Data
         public DbSet<ChequeStatus> ChequeStatuses { get; set; }
         //public DbSet<CreditDebitMemo> CreditDebitMemos { get; set; }
         //public DbSet<CreditDebitMemoType> CreditDebitMemoTypes { get; set; }
-        public DbSet<Configuration> Configurations { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<CreditTerm> CreditTerms { get; set; }
         public DbSet<Currency> Currencies { get; set; }
@@ -186,7 +185,6 @@ namespace GMGInventory.Data
         public DbSet<ItemClass> ItemClasses { get; set; }
         public DbSet<ItemConversion> ItemConversions { get; set; }
         public DbSet<ItemInventory> ItemInventories { get; set; }
-        public DbSet<ItemLocation> ItemLocations { get; set; }
         public DbSet<ItemPrice> ItemPrices { get; set; }
         public DbSet<ItemPromo> ItemPromo { get; set; }
         public DbSet<ItemType> ItemTypes { get; set; }
@@ -243,6 +241,7 @@ namespace GMGInventory.Data
         public DbSet<Status> Statuses { get; set; }
         //public DbSet<StockCard> StockCards { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<SystemSetting> SystemSettings { get; set; }
         public DbSet<Tracker_Comment> TrackerComments { get; set; }
         public DbSet<Tracker_Issue> TrackerIssues { get; set; }
         public DbSet<Tracker_Task> TrackerTasks { get; set; }

@@ -214,11 +214,9 @@
             $("#filter-customer-name").val("");
         });
 
-        var date_today = new Date();
-        var first_day_month = new Date(date_today.getFullYear(), date_today.getMonth(), 1);
-
-        $("#filter-from").val(DateForInput(first_day_month));
-        $("#filter-to").val(DateForInput(date_today));
+        $("#filter-preset").val("L7D");
+        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
+        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
 
         $("#filter-to").on("focusout", function () {
             var from = $("#filter-from").val();
@@ -236,39 +234,8 @@
                 $("#filter-from").val(to);
         });
 
-        $("#filter-preset").on("change", function () {
-            var selected = $(this).val();
-
-            var from = null;
-            var to = new Date(date_today);
-
-            if (selected === "") {
-                $("#filter-from").prop("readonly", false);
-                $("#filter-to").prop("readonly", false);
-                return;
-            }
-
-            $("#filter-from").prop("readonly", true);
-            $("#filter-to").prop("readonly", true);
-
-            if (selected === "TD") { // Today
-                from = new Date(date_today);
-                to = new Date(date_today);
-            } else if (selected === "L7D") { // Last 7 Days
-                from = new Date(date_today);
-                from.setDate(date_today.getDate() - 6);
-            } else if (selected === "MTD") { // Month to Date
-                from = first_day_month;
-            } else if (selected === "LM") { // Last Month
-                from = new Date(date_today.getFullYear(), date_today.getMonth() - 1, 1);
-                to = new Date(date_today.getFullYear(), date_today.getMonth(), 0);
-            } else if (selected === "YTD") { // Year to Date
-                from = new Date(date_today.getFullYear(), 0, 1);
-            }
-            
-            $("#filter-preset").val("MTD");
-            $("#filter-from").val(DateForInput(from));
-            $("#filter-to").val(DateForInput(to));
+        $("#filter-preset").on("change", function() {
+            applyFilterPreset($(this).val());
         });
 
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
@@ -308,9 +275,9 @@
             Customer: "",
             Status: "",
             Region: "",
-            Preset: "MTD",
-            DateFrom: DateForInput(first_day_month),
-            DateTo: DateForInput(date_today),
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
         };
 
         function checkDTChanged() {
@@ -335,20 +302,17 @@
         }
 
         function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
             $('#filter-agent').val(defaultDTState.AgentId).trigger('change');
             $("#filter-agent-name").val(defaultDTState.Agent);
             $('#filter-customer').val(defaultDTState.CustomerId).trigger('change');
             $("#filter-customer-name").val(defaultDTState.Customer);
             $('#filter-status').val(defaultDTState.Status).trigger('change');
             $('#filter-region').val(defaultDTState.Region).trigger('change');
-            $('#filter-preset').val(defaultDTState.Preset).trigger('change');
-            $('#filter-from').prop("readonly", true);
-            $('#filter-from').val(defaultDTState.DateFrom);
-            $('#filter-to').prop("readonly", true);
-            $('#filter-to').val(defaultDTState.DateTo);
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
             
-            localStorage.removeItem(dt_storage);
-
             if (salesDT) {
                 salesDT.state.clear();
                 salesDT.order(defaultDTState.order);
@@ -360,9 +324,7 @@
         }
 
         // Load List on DataTable
-        var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var salesDT = $('.table-sales').DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
                 var now = new Date().getTime();

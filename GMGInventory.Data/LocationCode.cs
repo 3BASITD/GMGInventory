@@ -6,7 +6,7 @@ namespace GMGInventory.Data
     {
         public LocationCode()
         {
-            ItemLocations = new HashSet<ItemLocation>();
+            ItemInventories = new HashSet<ItemInventory>();
         }
 
         [Column(TypeName = "nvarchar(50)")]
@@ -16,6 +16,6 @@ namespace GMGInventory.Data
         public string Name { get; set; }
         public bool IsActive { get; set; }
 
-        public ICollection<ItemLocation> ItemLocations { get; set; }
+        public ICollection<ItemInventory> ItemInventories { get; set; }
     }
 }

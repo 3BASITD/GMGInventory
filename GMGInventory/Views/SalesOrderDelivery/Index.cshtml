@@ -9,7 +9,7 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
             @if (userAccess.CanUploadDownload)
@@ -143,6 +143,19 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-6">
@@ -159,8 +172,12 @@
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -354,120 +371,111 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
         
+        $("#filter-preset").val("L7D");
+        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
+        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
+
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
+        });
+
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function() {
+            applyFilterPreset($(this).val());
+        });
         
-
-
-
-        var loadfilterloaded = false;
-        function LoadFilterSelect2() {
-            if (loadfilterloaded) return;
-            loadfilterloaded = true;
-
-            // Load Select2 for Agent
-            $("#filter-agent").select2({
-                allowClear: true,
-                placeholder: '<empty>',
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
-                    }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                },
-                ajax: {
-                    url: "@Url.Action("GetOptions2", "Agent")"
-                },
-                dropdownParent: $("#filterModal")
-            });
-
-            $("#filter-agent").on("select2:select", function () {
-                $("#filter-agent-name").val($(this).select2("data")[0].name);
-            });
-
-            $("#filter-agent").on("select2:unselecting", function (e) {
-                $("#filter-agent-name").val("");
-            });
-
-            // Load Select2 for Customer
-            $("#filter-customer").select2({
-                allowClear: true,
-                placeholder: '<empty>',
-                templateResult: function (repo) {
-                    if (repo.loading) {
-                        return repo.text;
-                    }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
-                },
-                ajax: {
-                    url: "@Url.Action("GetOptions", "Customer")"
-                },
-                dropdownParent: $("#filterModal")
-            });
-
-            $("#filter-customer").on("select2:select", function () {
-                $("#filter-customer-name").val($(this).select2("data")[0].name);
-            });
-
-            $("#filter-customer").on("select2:unselecting", function (e) {
-                $("#filter-customer-name").val("");
-            });
-
-            // Load region data for select2
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Region")",
-                success: function (data, status, xhr) {
-                    $("#filter-region").select2({
-                        ajax: null, //already fetched outside
-                        allowClear: true,
-                        placeholder: '<empty>',
-                        data: data,
-                        minimumResultsForSearch: Infinity
-                    });
+        // Load Select2 for Agent
+        $("#filter-agent").select2({
+            allowClear: true,
+            placeholder: 'ALL',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
                 }
-            });
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Agent")"
+            },
+            dropdownParent: $("#filterModal")
+        });
 
-            // Load forwarder data for select2 on edit
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "Forwarder")",
-                success: function (data, status, xhr) {
-                    $("#delivery-forwarder").select2({
-                        ajax: null, //already fetched outside
-                        data: data,
-                        allowClear: true,
-                        placeholder: {
-                            id: "",
-                            text: "<empty>"
-                        },
-                        dropdownParent: $("#editModal")
-                    });
+        $("#filter-agent").on("select2:select", function () {
+            $("#filter-agent-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-agent").on("select2:unselecting", function (e) {
+            $("#filter-agent-name").val("");
+        });
+
+        // Load Select2 for Customer
+        $("#filter-customer").select2({
+            allowClear: true,
+            placeholder: 'ALL',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
                 }
-            });
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")"
+            },
+            dropdownParent: $("#filterModal")
+        });
 
-            
-        }
+        $("#filter-customer").on("select2:select", function () {
+            $("#filter-customer-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-customer").on("select2:unselecting", function (e) {
+            $("#filter-customer-name").val("");
+        });
+
+        // Load region data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#filter-region").select2({
+                    ajax: null, //already fetched outside
+                    allowClear: true,
+                    placeholder: 'ALL',
+                    data: data,
+                    minimumResultsForSearch: Infinity
+                });
+            }
+        });
+
+        // Load forwarder data for select2 on edit
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Forwarder")",
+            success: function (data, status, xhr) {
+                $("#delivery-forwarder").select2({
+                    ajax: null, //already fetched outside
+                    data: data,
+                    allowClear: true,
+                    placeholder: {
+                        id: "",
+                        text: "<empty>"
+                    },
+                    dropdownParent: $("#editModal")
+                });
+            }
+        });
 
         // Load vehicle for select2
         $("#delivery-vehicle").select2({
@@ -481,11 +489,6 @@
             }
         });
 
-
-
-
-       
-
         // Load driver for select2
         $("#delivery-driver").select2({
            // minimumInputLength: 1,
@@ -498,14 +501,10 @@
             }
         });
 
-
         $("#delivery-driver").on("select2:select",function (e){
             var data = e.params.data
 
              $("#delivery-representative").val(data.text);
-
-        
-        
         });
 
 
@@ -514,10 +513,161 @@
             $("#filterModal").modal("hide");
         });
 
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            deliveryDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            deliveryDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Agent: "",
+            AgentName: "",
+            AgentId: "",
+            Customer: "",
+            CustomerId: "",
+            Category: "",
+            CategoryId: "",
+            Region: "",
+            RegionId: "",
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
+        };
+
+        function checkDTChanged() {
+            if(!deliveryDT) return false;
+            
+            return JSON.stringify(deliveryDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   deliveryDT.page.info().start != defaultDTState.page ||
+                   deliveryDT.page.len() != defaultDTState.length ||
+                   (deliveryDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-agent").val() != defaultDTState.AgentId ||
+                   $("#filter-customer").val() != defaultDTState.CustomerId ||
+                   $("#filter-region").val() != defaultDTState.RegionId ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-agent').val(defaultDTState.AgentId).trigger('change');
+            $('#filter-agent-name').val(defaultDTState.AgentName);
+            $('#filter-customer').val(defaultDTState.CustomerId).trigger('change');
+            $('#filter-customer-name').val(defaultDTState.CustomerName);
+            $('#filter-region').val(defaultDTState.RegionId).trigger('change');
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+            
+            if (deliveryDT) {
+                deliveryDT.state.clear();
+                deliveryDT.order(defaultDTState.order);
+                deliveryDT.page(defaultDTState.page);
+                deliveryDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
+
         // Load List on DataTable
-        var deliveryDT = $('.table-delivery').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var deliveryDT = $('.table-delivery').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.Agent = $('#filter-agent option:selected').text();
+                data.AgentId = $('#filter-agent').val();
+                data.AgentName = $('#filter-agent-name').val();
+                data.Customer = $('#filter-customer option:selected').text();
+                data.CustomerId = $('#filter-customer').val();
+                data.CustomerName = $('#filter-customer-name').val();
+                data.Region = $('#filter-region option:selected').text();
+                data.RegionId = $('#filter-region').val();
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.AgentId) {
+                    var agentOption = new Option(data.Agent, data.AgentId, true, true);
+                    $(agentOption).data('data', {
+                        id: data.AgentId,
+                        text: data.Agent,
+                        name: data.AgentName
+                    });
+                    $("#filter-agent").append(agentOption).trigger('change');
+                    $("#filter-agent-name").val(data.AgentName);
+                }
+                if(data.CustomerId) {
+                    var customerOption = new Option(data.Customer, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.Customer,
+                        name: data.CustomerName
+                    });
+                    $("#filter-customer").append(customerOption).trigger('change');
+                    $("#filter-customer-name").val(data.CustomerName);
+                }
+                if(data.RegionId) {
+                    var regionOption = new Option(data.Region, data.RegionId, true, true);
+                    $(regionOption).data('data', {
+                        id: data.RegionId,
+                        text: data.Region
+                    });
+                    $("#filter-region").append(regionOption).trigger('change');
+                }
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 data: function (data) {
@@ -647,14 +797,13 @@
                     responsivePriority: 1
                 }
             ],
-            order: [[0, "desc"]]
+            order: defaultDTState.order
         });
 
         // Load functions upon DataTable load
         deliveryDT.on("draw", function () {
-            //hideLoader();
-
-            LoadFilterSelect2();
+            checkDefaultFilter();
+            //LoadFilterSelect2();
         });
 
         if (user_access.canEdit) {

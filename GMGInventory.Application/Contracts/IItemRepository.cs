@@ -32,7 +32,7 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id);
         Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);
-        Task UpdateQuantityAsync(int id, int quantity, string remarks);
+        Task UpdateQuantityAsync(int id, int quantity, int? locationCode, string remarks);
         Task DeleteWarehouse(int id);
         Task<bool> UpdateOrAddItemWarehouse(int itemId, int warehouseId, int quantity, string remarks);
         Task UpdateOrAddItemPrice(int itemId, decimal retailPrice, decimal netPrice);

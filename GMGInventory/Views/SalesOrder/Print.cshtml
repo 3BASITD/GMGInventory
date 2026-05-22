@@ -35,7 +35,7 @@
     <table class="formatted">
         <thead>
             <tr>
-                <td colspan="9" style="padding:0;">
+                <td colspan="10" style="padding:0;">
                     <div class="sub-header">
                         <div class="sub-col center w-150px">
                             @if (TempData["CompanyLogo"]?.ToString() == "BAS")
@@ -68,7 +68,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="9" style="padding:0;">
+                <td colspan="10" style="padding:0;">
                     <div class="sub-header">
                         <div class="sub-col w-50pc">
                             <div class="label">
@@ -150,7 +150,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="9">
+                <td colspan="10">
                     <dl>
                         <dt>Remarks:</dt>
                         <dd>@(string.IsNullOrWhiteSpace(Model.Details.Remarks) ? "N/A" : Model.Details.Remarks)</dd>
@@ -158,7 +158,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="9">
+                <td colspan="10">
                     <dl>
                         <dt>Special Instruction:</dt>
                         <dd>@(string.IsNullOrWhiteSpace(Model.Details.SpecialInstruction) ? "N/A" : Model.Details.SpecialInstruction)</dd>
@@ -175,6 +175,7 @@
                 <th style="min-width: 50px;">UNIT PRICE</th>
                 <th style="min-width: 50px;">DISCOUNT</th>
                 <th style="min-width: 50px;">TOTAL</th>
+                <th style="min-width: 50px;">UNSERVED</th>
             </tr>
         </thead>
         <tbody>
@@ -198,6 +199,7 @@
                     }
                     <td class="right-text">@string.Join("; ", discounts)</td>
                     <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
+                    <td class="right-text"><nobr>@item.UnservedQuantity</nobr></td>
                 </tr>
             }
             @{
@@ -214,6 +216,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
             </tr>
             @if (itemCount < 20)
             {
@@ -221,6 +224,7 @@
                 {
                     <tr>
                         <td class="center-text" style="min-width: 10px;">@(lastLineNumber + ctr)</td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -242,9 +246,10 @@
                 <th></th>
                 <th></th>
                 <th class="right-text"><nobr>@Model.TotalGrossPrice</nobr></th>
+                <th></th>
             </tr>
             <tr>
-                <td colspan="9">
+                <td colspan="10">
                     <br />
                     <br />
                     <div class="two-column">

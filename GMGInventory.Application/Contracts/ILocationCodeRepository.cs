@@ -6,7 +6,7 @@ namespace GMGInventory.Application.Contracts
     public interface ILocationCodeRepository : IGenericRepository<LocationCode>
     {
         Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId);
-        Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId, int itemId);
+        Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page);
         Task<IList<LocationCodeVM>> GetAllLocationCodeAsync();
         Task<ForDataTables<LocationCodeVM>> GetAllForDataTablesAsync(DataTablesRequestForm form);
         Task<IList<APIGeneric>> GetListAPI();

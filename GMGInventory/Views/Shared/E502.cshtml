@@ -1,13 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Bad Gateway";
+﻿@model IList<SystemSettingVM>
+@{
+    var errorTitle = Model.FirstOrDefault(s => s.Name == "Error502Title")?.Value ?? "Bad Gateway";
+    var errorDescription = Model.FirstOrDefault(s => s.Name == "Error502Description")?.Value ?? "We're having trouble reaching the server.";
+    var errorSolution = Model.FirstOrDefault(s => s.Name == "Error502Solution")?.Value ?? "One of the servers involved in processing your request is unavailable or returned an invalid response. This is usually temporary, so please try again in a few moments.";
+
+    ViewData["Title"] = @errorTitle;
 }
 
 <div class="container full-height d-flex align-items-center justify-content-center">
     <div class="text-center">
         <h1 class="display-1 text-danger">502</h1>
-        <h2 class="display-4">Bad Gateway</h2>
-        <p class="lead">We're having trouble reaching the server.</p>
-        <p>One of the servers involved in processing your request is unavailable or returned an invalid response. This is usually temporary, so please try again in a few moments.</p>
+        <h2 class="display-4">@errorTitle</h2>
+        <p class="lead">@errorDescription</p>
+        <p>@errorSolution</p>
         <a href="/" class="btn btn-primary">Return to Homepage</a>
+        <p class="text-muted text-xs mt-5">Error message can be modified by the system administrator.</p>
     </div>
 </div>

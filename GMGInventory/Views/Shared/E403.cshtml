@@ -1,13 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Forbidden";
+﻿@model IList<SystemSettingVM>
+@{
+    var errorTitle = Model.FirstOrDefault(s => s.Name == "Error403Title")?.Value ?? "Forbidden";
+    var errorDescription = Model.FirstOrDefault(s => s.Name == "Error403Description")?.Value ?? "You don’t have permission to view this page or perform this action.";
+    var errorSolution = Model.FirstOrDefault(s => s.Name == "Error403Solution")?.Value ?? "If you believe you should have access, please contact administrator.";
+
+    ViewData["Title"] = @errorTitle;
 }
 
 <div class="container full-height d-flex align-items-center justify-content-center">
     <div class="text-center">
         <h1 class="display-1 text-danger">403</h1>
-        <h2 class="display-4">Forbidden</h2>
-        <p class="lead">You don’t have permission to view this page or perform this action.</p>
-        <p>If you believe you should have access, please contact administrator.</p>
+        <h2 class="display-4">@errorTitle</h2>
+        <p class="lead">@errorDescription</p>
+        <p>@errorSolution</p>
         <a href="/" class="btn btn-primary">Return to Homepage</a>
+        <p class="text-muted text-xs mt-5">Error message can be modified by the system administrator.</p>
     </div>
 </div>

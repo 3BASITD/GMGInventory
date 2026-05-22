@@ -49,6 +49,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Status Name")]
         public string StatusName { get; set; }
+
+        public string ActionStatus { get; set; }
     }
 
     public class ChequePVM

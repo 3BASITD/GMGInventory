@@ -278,7 +278,7 @@ namespace GMGInventory.Common.Models
         public string TotalQuantity => string.Format(SystemFormat.StringIntegerComma, TotalQuantityD);
         public int TotalQuantityD => Items.Sum(s => s.QuantityD);
         public string TotalGrossPrice => string.Format(SystemFormat.StringDecimalComma, TotalGrossPriceD);
-        public decimal TotalGrossPriceD => Items.Sum(s => s.GrossPriceD);
+        public decimal TotalGrossPriceD => Items.Sum(s => s.GrossPriceD) - Details.OverallDiscountD;
     }
 
     public class SalesOrderItemVM

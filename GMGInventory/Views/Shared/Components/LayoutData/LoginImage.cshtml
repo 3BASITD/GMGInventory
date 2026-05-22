@@ -1,0 +1,12 @@
+﻿@using static GMGInventory.ViewComponents.LayoutDataViewComponent
+@model IList<SystemSettingVM>
+
+@{
+    var value = Model.FirstOrDefault(s => s.Name == "LoginImage")?.Value ?? "";
+}
+
+@if (!string.IsNullOrWhiteSpace(value))
+{
+    <img src="/images/Logo/@value" class="img-fluid rounded mb-3 clickable login-image" style="max-height:140px; object-fit:contain;" />
+    <br />
+}

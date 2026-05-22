@@ -289,8 +289,8 @@ namespace GMGInventory.Application.Repositories
                                AgentCode = order.Agent.Code,
                                AgentId = order.Agent.Id,
                                AgentName = order.Agent.FirstName + " " + order.Agent.LastName,
-                               AppOrderSource = order.SalesOrderSources.Count() > 0
-                                              ? order.SalesOrderSources.First().SourceOrderNumber
+                               AppOrderSource = order.SalesOrderItemSources.Count() > 0
+                                              ? order.SalesOrderItemSources.First().SourceOrderNumber
                                               : null,
                                ApprovedBy = approve.FirstName + " " + approve.LastName,
                                ApprovedDateD = order.ApprovedDate,
@@ -417,14 +417,14 @@ namespace GMGInventory.Application.Repositories
                                SONumber = order.SalesOrderNumber,
                                Status = order.Status.Code,
                                TotalAmountD = order.SalesOrderLineItems.Sum(s => 
-                                   s.Quantity
-                                   * s.SellingPrice
-                                   * (100 - s.Discount1) / 100
-                                   * (100 - s.Discount2) / 100
-                                   * (100 - (s.Discount3 == null ? 0 : s.Discount3.Value)) / 100
-                                   * (100 - (s.Discount4 == null ? 0 : s.Discount4.Value)) / 100
-                                   * (100 - (s.Discount5 == null ? 0 : s.Discount5.Value)) / 100
-                               ),
+                                                s.Quantity
+                                                * s.SellingPrice
+                                                * (100 - s.Discount1) / 100
+                                                * (100 - s.Discount2) / 100
+                                                * (100 - (s.Discount3 == null ? 0 : s.Discount3.Value)) / 100
+                                                * (100 - (s.Discount4 == null ? 0 : s.Discount4.Value)) / 100
+                                                * (100 - (s.Discount5 == null ? 0 : s.Discount5.Value)) / 100
+                                            ) - order.OverallDiscount,
                                CustomerAddress = order.Customer
                                                       .ShippingAddresses
                                                       .Where(s => s.IsDefault == true)
@@ -460,7 +460,7 @@ namespace GMGInventory.Application.Repositories
                                WithREYCOJITLPDelivery = order.WithREYCOJITLPDelivery.Name,
                                SpecialInstruction = order.SpecialInstruction,
                                Remarks = order.Remarks,
-                               OrderQueueNumber = order.SalesOrderSources
+                               OrderQueueNumber = order.SalesOrderItemSources
                                                        .Select(s => s.SourceOrderNumber)
                                                        .FirstOrDefault()
                            });
@@ -801,17 +801,17 @@ namespace GMGInventory.Application.Repositories
                                              .Select(s => s.SalesOrderNumber)
                                              .FirstOrDefault();
 
-                    if (latestOrder != null && latestOrder.Contains("-D"))
-                    {
-                        var splitLatestOrder = latestOrder.Split("-D");
-                        latestOrder = splitLatestOrder[0];
-                    }
-
                     if (latestOrder != null && latestOrder.Contains('.'))
                     {
                         var splitLatestOrder = latestOrder.Split('.');
                         latestOrder = splitLatestOrder[0];
                     }
+
+                    if (latestOrder != null && latestOrder.Contains('-'))
+                    {
+                        var splitLatestOrder = latestOrder.Split("-");
+                        latestOrder = splitLatestOrder[0];
+                    }   
 
                     var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
                     soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
@@ -1041,11 +1041,11 @@ namespace GMGInventory.Application.Repositories
 
             context.SalesOrderLineItems.RemoveRange(items);
 
-            var source = await context.SalesOrderSources
+            var source = await context.SalesOrderItemSources
                                       .Where(s => s.SalesOrderId == Id)
                                       .FirstOrDefaultAsync();
             if (source != null)
-                context.SalesOrderSources.Remove(source);
+                context.SalesOrderItemSources.Remove(source);
 
             context.SalesOrders.Remove(order);
 

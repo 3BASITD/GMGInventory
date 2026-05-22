@@ -31,7 +31,7 @@
             </button>
             @if (userAccess.CanUploadDownload)
             {
-                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 downloadBtn">
                     <span class="fas fa-download"></span> Download
                 </button>
             }
@@ -165,6 +165,29 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
+                            <label for="filter-status" class="control-label mb-0">Status</label>
+                            <select id="filter-status" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
                             <label for="filter-from" class="form-label mb-0">Order Date From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
@@ -173,16 +196,6 @@
                         <div class="form-group">
                             <label for="filter-to" class="control-label mb-0">Order Date To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="form-group">
-                            <label for="filter-status" class="control-label mb-0">Status</label>
-                            <select id="filter-status" style="width:100%">
-                                <option></option>
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -202,30 +215,29 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        var date_today = new Date();
-        var date_month_ago = new Date();
-        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
+        $("#filter-preset").val("L7D");
+        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
+        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
 
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(date_today));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
+        $("#filter-to").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
 
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-to").val(from);
+        });
 
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
+        $("#filter-from").on("focusout", function () {
+            var from = $("#filter-from").val();
+            var to = $("#filter-to").val();
+
+            if (from && to && new Date(from) > new Date(to))
+                $("#filter-from").val(to);
+        });
+
+        $("#filter-preset").on("change", function() {
+            applyFilterPreset($(this).val());
+        });
 
         // Load Select2 for Agent
         $("#filter-agent").select2({
@@ -342,7 +354,7 @@
         });
 
         var defaultDTState = {
-            order: [[0, "asc"]],
+            order: [[0, "desc"]],
             page: 0,
             length: 10,
             search: { search: "" },
@@ -355,8 +367,9 @@
             RegionId: "",
             Region: "",
             FiledBy: "everyone",
-            DateFrom: DateForInput(date_month_ago),
-            DateTo: DateForInput(date_today),
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo()),
             StatusId: "",
             Status: ""
         };
@@ -372,6 +385,7 @@
                    $("#filter-customer").val() != defaultDTState.CustomerId ||
                    $('#filter-region').val() != defaultDTState.RegionId ||
                    $('#filter-filedby').val() != defaultDTState.FiledBy ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
                    $('#filter-from').val() != defaultDTState.DateFrom ||
                    $('#filter-to').val() != defaultDTState.DateTo ||
                    $('#filter-status').val() != defaultDTState.StatusId;
@@ -383,18 +397,18 @@
         }
 
         function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
             $("#filter-agent").val(defaultDTState.AgentId).trigger('change');
             $("#filter-agent-name").val(defaultDTState.AgentName);
             $("#filter-customer").val(defaultDTState.CustomerId).trigger('change');
             $("#filter-customer-name").val(defaultDTState.CustomerName);
             $('#filter-region').val(defaultDTState.RegionId).trigger('change');
             $('#filter-filedby').val(defaultDTState.FiledBy);
-            $('#filter-to').val(defaultDTState.DateTo);
-            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
             $('#filter-status').val(defaultDTState.StatusId).trigger('change');
             
-            localStorage.removeItem(dt_storage);
-
             if (orderDT) {
                 orderDT.state.clear();
                 orderDT.order(defaultDTState.order);
@@ -437,6 +451,7 @@
                 data.RegionId = $('#filter-region').val();
                 data.Region = $('#filter-region option:selected').text();
                 data.FiledBy = $('#filter-filedby').val();
+                data.Preset = $('#filter-preset').val();
                 data.DateFrom = $("#filter-from").val();
                 data.DateTo = $("#filter-to").val();
                 data.StatusId = $("#filter-status").val();
@@ -473,7 +488,10 @@
                 }
                 if(data.FiledBy != "me") data.FiledBy = "everyone";
                 $('#filter-filedby').val(data.FiledBy);
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
                 $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
                 $('#filter-to').val(data.DateTo);
                 if(data.StatusId) {
                     var statusOption = new Option(data.Status, data.StatusId, true, true);

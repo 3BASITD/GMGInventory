@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -6,6 +7,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Humanizer.On;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -42,21 +44,28 @@ namespace GMGInventory.Application.Repositories
                                 .ToListAsync();
         }
 
-        public async Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId, int itemId)
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
         {
-            var itemLocationIds = context.ItemLocations.Where(x => x.ItemId == itemId).Select(x => x.LocationCodeId).ToList();
-
-            return await context.LocationCodes
-
-                .Where(s => !itemLocationIds.Contains(s.Id) && s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
-                {
-                    Id = s.Id.ToString(),
-                    Text = (s.Code == s.Name ? "" : "(" + s.Code + ") ") + s.Name,
-                    Selected = IncludeId != null && IncludeId == s.Id
-                })
-                .OrderBy(s => s.Text)
-                .ToListAsync();
+            var locationCode = await context.LocationCodes
+                                            .Where(s => s.IsActive
+                                                     && (string.IsNullOrWhiteSpace(search)
+                                                     || (s.Code.ToLower().Contains(search.ToLower()))
+                                                     || (s.Name.ToLower().Contains(search.ToLower()))))
+                                            .Select(s => new JsonNameOptionsModel
+                                            {
+                                                Id = s.Id.ToString(),
+                                                Text = s.Code,
+                                                Name = s.Name
+                                            })
+                                            .OrderBy(s => s.Text)
+                                            .ToListAsync();
+            var locationCodeFiltered = locationCode.Skip((page - 1) * 50).Take(50).ToList();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = locationCodeFiltered,
+                total_count = locationCode.Count
+            };
         }
 
         public async Task<ForDataTables<LocationCodeVM>> GetAllForDataTablesAsync(DataTablesRequestForm form)
