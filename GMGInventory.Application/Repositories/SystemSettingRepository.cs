@@ -59,6 +59,20 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
+        public async Task<ResponseModel> UpdateSetting(string Name, string Value)
+        {
+            try
+            {
+                await SaveSettings(Name, Value);
+
+                return new ResponseModel { Status = "Success", Message = "Successfully saved " + Name.ToLower() };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
         public async Task<string?> GetValue(string? name)
         {
             var setting = await context.SystemSettings

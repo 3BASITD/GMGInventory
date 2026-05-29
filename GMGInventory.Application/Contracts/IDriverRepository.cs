@@ -4,6 +4,8 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IDriverRepository
     {
+        Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId);
+        Task<Select2Model<JsonOptionsModel>> GetOptions2(string search, int page);
         Task<IList<DriverVM>> GetDrivers();
         Task<ForDataTables<DriverVM>> GetDriversDT(DataTablesRequestForm form);
         Task<IList<APIDriver>> GetListAPI();
@@ -11,6 +13,5 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> UpdateDriver(DriverVM driver);
         Task<ResponseModel> DeleteOrDeactivateDriver(int? Id);
         Task<ResponseModel> ReactivateDriver(int? Id);
-        Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page);
     }
 }

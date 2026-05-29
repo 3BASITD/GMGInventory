@@ -16,9 +16,9 @@ namespace GMGInventory.Application.Repositories
     public class ItemRepository : IItemRepository
     {
         private readonly ApplicationDbContext context;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
         private readonly IHostingEnvironment hostingEnvironment;
+        private readonly string currentUserId;
 
         public ItemRepository(ApplicationDbContext context
                             , IHttpContextAccessor httpContextAccessor
@@ -26,9 +26,9 @@ namespace GMGInventory.Application.Repositories
                             , IHostingEnvironment hostingEnvironment)
         {
             this.context = context;
-            this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
             this.hostingEnvironment = hostingEnvironment;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
         public async Task<Select2Model<JsonItemOptionsModel>> GetOptions(string search, int page)
@@ -680,7 +680,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task DeactivateAsync(int id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var itemType = await context.Items.FirstAsync(s => s.Id == id);
             itemType.IsActive = false;
             await context.SaveChangesAsync(currentUserId);
@@ -688,7 +687,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task ReactivateAsync(int id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var itemType = await context.Items.FirstAsync(s => s.Id == id);
             itemType.IsActive = true;
             await context.SaveChangesAsync(currentUserId);
@@ -696,7 +694,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task AddAsync(ItemCommonVM itemVM)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var item = new GMGInventory.Data.Item
             {
                 BrandId = itemVM.BrandId,
@@ -756,7 +753,6 @@ namespace GMGInventory.Application.Repositories
                 throw new DbUpdateConcurrencyException();
             }
 
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             item.BrandId = itemVM.BrandId;
             item.CategoryId = itemVM.CategoryId;
             item.InterchangeNumber = itemVM.InterchangeNumber + "";
@@ -804,11 +800,12 @@ namespace GMGInventory.Application.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task UpdateQuantityAsync(int id, int quantity, int? locationCode, string remarks)
+        public async Task UpdateQuantityAsync(int id, int quantity, int allocatedQuantity, int? locationCode, string remarks)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var inventory = context.ItemInventories.Where(s => s.Id == id).First();
             var oldQuantity = inventory.Quantity;
+
+            inventory.AllocatedQuantity = allocatedQuantity;
             inventory.Quantity = quantity;
             inventory.LocationCodeId = locationCode;
             //context.ItemInventories.Update(inventory);
@@ -828,7 +825,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task DeleteWarehouse(int id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var inventory = await context.ItemInventories.Where(s => s.Id == id).FirstAsync();
             context.ItemInventories.Remove(inventory);
             await context.SaveChangesAsync(currentUserId);
@@ -841,7 +837,6 @@ namespace GMGInventory.Application.Repositories
 
             if (item != null && warehouse != null)
             {
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 var inventory = await context.ItemInventories.Where(s => s.ItemId == itemId && s.WarehouseId == warehouseId).FirstOrDefaultAsync();
 
 
@@ -879,7 +874,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task UpdateOrAddItemPrice(int itemId, decimal retailPrice, decimal netPrice)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var latestPrice = await context.ItemPrices
                                            .Where(s => s.ItemId == itemId)
                                            .OrderByDescending(s => s.DateCreated)
@@ -903,8 +897,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> ItemPromoAddAsync(ItemPromoVM itemPromoVM)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
             ResponseModel response = new();
 
             var itemPromo = await context.ItemPromo.Where(s => s.Id == itemPromoVM.Id).FirstOrDefaultAsync();
@@ -964,7 +956,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> ReactivateItemPromoAsync(int Id, int itemId, DateTime Start, DateTime End)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
 
             if (await CheckItemPromoDuration(Id, itemId, Start, End))
@@ -997,7 +988,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
             var itemPromo = await context.ItemPromo.Where(s => s.Id == Id).FirstOrDefaultAsync();
             var isItemPromoUsed = await context.SalesOrderLineItems.Where(i => i.ItemPromoId == Id).AnyAsync()
@@ -1046,6 +1036,7 @@ namespace GMGInventory.Application.Repositories
                                   Id = inv.Id,
                                   Name = inv.Warehouse.Name,
                                   QuantityD = inv.Quantity,
+                                  AllocatedQuantityD = inv.AllocatedQuantity,
                                   WarehouseId = inv.Warehouse.Id,
                                   LocationCodeId = inv.LocationCode == null ? null : inv.LocationCode.Id,
                                   LocationCode = inv.LocationCode == null ? null : inv.LocationCode.Name
@@ -1067,7 +1058,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     s.Code,
                     s.Name,
-                    s.QuantityD.ToString()
+                    s.QuantityD.ToString(),
+                    s.AllocatedQuantityD.ToString()
                 }.Any(a => a != null && a.ToLower().Contains(form.SearchValue.ToLower())));
             }
             // get total count of records after search
@@ -1079,6 +1071,7 @@ namespace GMGInventory.Application.Repositories
                 data = form.SortColumn switch
                 {
                     "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "AllocatedQuantity" => isAsc ? data.OrderBy(s => s.AllocatedQuantityD) : data.OrderByDescending(s => s.AllocatedQuantityD),
                     _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
                 };
             }
@@ -1634,8 +1627,6 @@ namespace GMGInventory.Application.Repositories
 
                 var savedFile = Path.Combine("images\\Items", uniqueFileName);
 
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
                 item.Image = uniqueFileName;
                 context.Items.Update(item);
                 await context.SaveChangesAsync(currentUserId);
@@ -1859,7 +1850,6 @@ namespace GMGInventory.Application.Repositories
                                              .FirstOrDefaultAsync();
                 if (warehouse == null) return $"Invalid Warehouse: {itemFile.Warehouse} not found";
 
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 var msg = new List<string>();
 
                 var oldCode = SaveItemFromFileTruncate(itemFile.OldCode, 50, msg, "Old Code");

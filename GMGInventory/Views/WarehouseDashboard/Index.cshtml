@@ -2,10 +2,6 @@
     ViewData["Title"] = "Warehouse Dashboard";
 }
 
-<div class="alert alert-warning" role="alert">
-    <span class="fas fa-exclamation-triangle mr-3"></span>We’re currently working on this page to bring you new features and improvements. Please check back again soon.
-</div>
-
 <div class="card" id="ordersCard">
     <div class="card-header">
         <h3 class="card-title">@ViewData["Title"]</h3>
@@ -18,7 +14,7 @@
     </div>
     <div class="card-body">
         <div class="alert alert-info" role="alert">
-            <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a paid version.
+            <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
         </div>
         <div class="row">
             <div class="col-lg-5">
@@ -46,6 +42,11 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="card-footer">
+                        <div class="text-end">
+                            <span class="text-muted text-xs">Auto-refresh runs every 5 seconds.</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -78,8 +79,8 @@
                                 <tr>
                                     <th>SO Number</th>
                                     <th>Customer</th>
-                                    <th>Picking</th>
-                                    <th>Packing</th>
+                                    <th>Picking <span class="picking-count" data-microtip-title="NOT STARTED / ONGOING / DONE" data-microtip-position="bottom" role="tooltip"></span></th>
+                                    <th>Packing <span class="packing-count" data-microtip-title="NOT STARTED / ONGOING / DONE" data-microtip-position="bottom" role="tooltip"></span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -91,13 +92,13 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="card-footer">
+                        <div class="text-end">
+                            <span class="text-muted text-xs">Auto-refresh runs every 5 seconds for today’s records only. Data from previous dates will not refresh automatically.</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="card-footer">
-        <div class="text-end">
-            <span class="text-muted text-xs">Live feeds loaded every 5 seconds</span>
         </div>
     </div>
 </div>
@@ -107,31 +108,31 @@
         $(document).ready(function() {
             $(".btn-fullscreen").on("click", function () {
                 var target = $(this).closest(".card").find(".card-body")[0];
-
+                
                 if (!document.fullscreenElement)
                     target.requestFullscreen().catch(err => { console.log(err); });
                 else
                     document.exitFullscreen();
             });
-
-            var today = new Date().toISOString().split('T')[0];
+            
             $(".fulfillment-date").text("TODAY");
-            $(".fulfillment-date").data("date", today);
+            $(".fulfillment-date").data("date", DateForInput(new Date()));
                 
             $(".fulfillment-next").addClass("ui-state-disabled");
             $(".fulfillment-date").addClass("ui-state-disabled");
             
-            LoadDetails();
+            LoadIncomingOrders();
+            LoadOrderFulfillments();
 
             $(".fulfillment-date").on("click", function() {
-                var today = new Date().toISOString().split('T')[0];
                 $(".fulfillment-date").text("TODAY");
-                $(".fulfillment-date").data("date", today);
+                $(".fulfillment-date").data("date", DateForInput(new Date()));
                 
                 $(".fulfillment-next").addClass("ui-state-disabled");
                 $(".fulfillment-date").addClass("ui-state-disabled");
-
-                LoadDetails();
+                
+                LoadIncomingOrders();
+                LoadOrderFulfillments();
             });
             
             $(".fulfillment-next, .fulfillment-previous").on("click", function() {
@@ -149,8 +150,8 @@
                     date.setDate(date.getDate() - 1);
                 }
 
-                var newDate = date.toISOString().split("T")[0];
-                var today = new Date().toISOString().split('T')[0];
+                var newDate = formatDateEn(date);
+                var today = formatDateEn(new Date());
 
                 if (newDate == today) {
                     $(".fulfillment-date").text("TODAY");
@@ -161,9 +162,10 @@
                     $(".fulfillment-next").removeClass("ui-state-disabled");
                     $(".fulfillment-date").removeClass("ui-state-disabled");
                 }
-                $(".fulfillment-date").data("date", newDate);
-
-                LoadDetails();
+                $(".fulfillment-date").data("date", DateForInput(date));
+                
+                LoadIncomingOrders();
+                LoadOrderFulfillments();
             });
 
             $(".fulfillment-all").on("click", function() {
@@ -180,13 +182,21 @@
                     $(this).removeClass("btn-secondary");
                 }
                 
-                LoadDetails();
+            LoadIncomingOrders();
+            LoadOrderFulfillments();
             });
         });
         
-        //setInterval(LoadDetails, 5000);
+        setInterval(function() {
+            LoadIncomingOrders();
+            
+            var current = $(".fulfillment-date").data("date");
+            var today = DateForInput(new Date());
+            if (current == today) 
+                LoadOrderFulfillments();
+        }, 5000);
 
-        function LoadDetails() {
+        function LoadIncomingOrders() {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetIncomingOrders")",
@@ -214,7 +224,7 @@
                             const rowClass = index % 2 === 0 ? "even" : "odd";
                             rows += `
                                 <tr class="${rowClass}">
-                                    <td><a href="/SalesOrder/Details/${order.salesOrderId}" class="link-info" target="_blank">${order.salesOrderNumber}</a></td>
+                                    <td><a href="/SalesOrder/Details/${order.salesOrderId}" class="link-info" target="_blank" style="white-space:nowrap;">${order.salesOrderNumber}</a></td>
                                     <td><a href="/Customer/Details/${order.customerId}" class="link-info" target="_blank">${order.customer}</a></td>
                                 </tr>
                             `;
@@ -230,10 +240,35 @@
                     }
 
                     $(".table-incomming tbody").html(rows);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (xhr.status === 0) {
+                        var msg = "";
+                        if (!navigator.onLine) {
+                            msg = "You are currently offline. Please check your network connection.";
+                        } else {
+                            switch (textStatus) {
+                                case "timeout": msg = "The request timed out. Auto-reloading… or please reload the page manually."; break;
+                                case "error": msg = "An error occurred while processing the request. Auto-reloading… or please reload the page manually."; break;
+                                case "abort": msg = "The request was aborted. Auto-reloading… or please reload the page manually."; break;
+                                default: msg = "Encountered an unknown error. Auto-reloading… or please reload the page manually.";
+                            }
+                        }
+                        
+                        $(".table-incomming tbody").html(`
+                            <tr>
+                                <td colspan="2" class="text-center">
+                                    <strong class="text-danger">${msg}</strong>
+                                </td>
+                            </tr>
+                        `);
+                        return;
+                    }
                 }
             });
+        }
 
-            
+        function LoadOrderFulfillments() {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("GetOrderFulfillments")",
@@ -248,17 +283,20 @@
                 },
                 success: function (data) {
                     var rows = "";
-                    if (data && data.length > 0) {
-                        data.forEach((order, index) => {
+                    if (data.orders && data.orders.length > 0) {
+                        data.orders.forEach((order, index) => {
                             var rowClass = index % 2 === 0 ? "even" : "odd";
                             var pickingStatus = order.pickingStatus == "NOT STARTED" ? "<span class='badge badge-secondary'>NOT STARTED</span>"
+                                              : order.pickingStatus == "PENDING" ? "<span class='badge badge-secondary'>PENDING</span>"
                                               : order.pickingStatus == "ONGOING" ? "<span class='badge badge-warning'>ONGOING</span>"
                                               : order.pickingStatus == "DONE" ? "<span class='badge badge-success'>DONE</span>"
-                                              : "<span class='badge badge-danger'>UNKNOWN</span>";
+                                              : order.pickingStatus == "POSTED" ? "<span class='badge badge-success'>POSTED</span>"
+                                              : "<span class='badge badge-danger'>MISSING</span>";
                             var packingStatus = order.packingStatus == "NOT STARTED" ? "<span class='badge badge-secondary'>NOT STARTED</span>"
                                               : order.packingStatus == "ONGOING" ? "<span class='badge badge-warning'>ONGOING</span>"
                                               : order.packingStatus == "DONE" ? "<span class='badge badge-success'>DONE</span>"
-                                              : "<span class='badge badge-danger'>UNKNOWN</span>";
+                                              : "<span class='badge badge-danger'>MISSING</span>";
+                            //pickingStatus = "<span class='badge badge-danger'>COMING SOON</span>";
                             rows += `
                                 <tr class="${rowClass}">
                                     <td><a href="/SalesOrder/Details/${order.salesOrderId}" class="link-info" target="_blank" style="white-space:nowrap;">${order.salesOrderNumber}</a></td>
@@ -268,6 +306,8 @@
                                 </tr>
                             `;
                         });
+                        $(".picking-count").text(`(${data.pickingNotStartedCount}/${data.pickingOngoingCount}/${data.pickingDoneCount})`);
+                        $(".packing-count").text(`(${data.packingNotStartedCount}/${data.packingOngoingCount}/${data.packingDoneCount})`);
                     } else {
                         var selected_date = $(".fulfillment-date").data("date");
                         rows = `
@@ -277,9 +317,35 @@
                                 </td>
                             </tr>
                         `;
+                        $(".picking-count").text("0/0/0");
+                        $(".packing-count").text("0/0/0");
                     }
 
                     $(".table-fulfillment tbody").html(rows);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (xhr.status === 0) {
+                        var msg = "";
+                        if (!navigator.onLine) {
+                            msg = "You are currently offline. Please check your network connection.";
+                        } else {
+                            switch (textStatus) {
+                                case "timeout": msg = "The request timed out. Auto-reloading… or please reload the page manually."; break;
+                                case "error": msg = "An error occurred while processing the request. Auto-reloading… or please reload the page manually."; break;
+                                case "abort": msg = "The request was aborted. Auto-reloading… or please reload the page manually."; break;
+                                default: msg = "Encountered an unknown error. Auto-reloading… or please reload the page manually.";
+                            }
+                        }
+                        
+                        $(".table-fulfillment tbody").html(`
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    <strong class="text-danger">${msg}</strong>
+                                </td>
+                            </tr>
+                        `);
+                        return;
+                    }
                 },
                 complete: function () {
                     $(".fulfillment-btns").removeClass("ui-state-disabled");

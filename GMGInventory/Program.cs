@@ -93,6 +93,7 @@ builder.Services.AddScoped(typeof(ILocationCodeRepository), typeof(LocationCodeR
 builder.Services.AddScoped(typeof(IOrderQueueRepository), typeof(OrderQueueRepository));
 builder.Services.AddScoped(typeof(IPackRepository), typeof(PackRepository));
 builder.Services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
+builder.Services.AddScoped(typeof(IPickRepository), typeof(PickRepository));
 builder.Services.AddScoped(typeof(IPurchaseOrderNewRepository), typeof(PurchaseOrderNewReporitory));
 builder.Services.AddScoped(typeof(IPurchaseOrderRepository), typeof(PurchaseOrderReporitory));
 builder.Services.AddScoped(typeof(IPurchaseReceiveRepository), typeof(PurchaseReceiveReporitory));
@@ -115,6 +116,7 @@ builder.Services.AddScoped(typeof(IServiceLevelAgreementRepository), typeof(Serv
 builder.Services.AddScoped(typeof(IShippingRepository), typeof(ShippingRepository));
 builder.Services.AddScoped(typeof(ISoacrLineItemRepository), typeof(SoacrLineItemRepository));
 builder.Services.AddScoped(typeof(ISoacrRepository), typeof(SoacrRepository));
+builder.Services.AddScoped(typeof(IStockRepository), typeof(StockRepository));
 builder.Services.AddScoped(typeof(ISupplierRepository), typeof(SupplierRepository));
 builder.Services.AddScoped(typeof(ISystemSettingRepository), typeof(SystemSettingRepository));
 builder.Services.AddScoped(typeof(IUnitRepository), typeof(UnitRepository));

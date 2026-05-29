@@ -13,6 +13,16 @@ namespace GMGInventory.Controllers
     public class VehicleController(IAccessRepository accessRepository
                                  , IVehicleRepository vehicleRepository) : BaseController(accessRepository)
     {
+        public async Task<IActionResult> GetOptions(int? IncludeId)
+        {
+            return Json(await vehicleRepository.GetOptions(IncludeId));
+        }
+
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await vehicleRepository.GetOptions2(search, page));
+        }
+
         public async Task<IActionResult> Index()
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Vehicle, AccessTypes.View);
@@ -21,11 +31,6 @@ namespace GMGInventory.Controllers
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Vehicle)).Convert();
 
             return View();
-        }
-
-        public async Task<IActionResult> GetOptions(string search, int page)
-        {
-            return Json(await vehicleRepository.GetOptions(search, page));
         }
 
         [HttpPost]

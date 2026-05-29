@@ -1,16 +1,11 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Spreadsheet;
-using GMGInventory.Application.Contracts;
-using GMGInventory.Common.Constants;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using GMGInventory.Data.OrderAppDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
-using System.Security.Cryptography;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -18,8 +13,6 @@ namespace GMGInventory.Application.Repositories
     {
         private readonly ApplicationDbContext context;
         private readonly AppOrderDbContext app_context;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly UserManager<User> userManager;
         private readonly string currentUser;
 
         public OrderQueueRepository(ApplicationDbContext context
@@ -29,8 +22,6 @@ namespace GMGInventory.Application.Repositories
         {
             this.context = context;
             this.app_context = app_context;
-            this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 

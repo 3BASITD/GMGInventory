@@ -41,6 +41,15 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> UpdateSetting(string Name, string Value)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SystemSettings, AccessTypes.Edit);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await settingRepository.UpdateSetting(Name, Value));
+        }
+
+        [HttpPost]
         public async Task<IActionResult> SaveImageAsync(PageImageFormVM form)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SystemSettings, AccessTypes.UploadDownload);

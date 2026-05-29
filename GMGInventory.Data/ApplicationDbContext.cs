@@ -33,6 +33,9 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new AccessSeedConfiguration());
             builder.ApplyConfiguration(new UserRoleSeedConfiguration());
 
+            builder.ApplyConfiguration(new SODeliveryStatusSeedConfiguration());
+            builder.ApplyConfiguration(new SODeliveryMethodSeedConfiguration());
+
             builder.ApplyConfiguration(new PurchaseOrderDeliveryModeSeedConfiguration());
             builder.ApplyConfiguration(new PurchaseOrderTypeSeedConfiguration());
             builder.ApplyConfiguration(new PurchaseRequestTypeSeedConfiguration());
@@ -199,6 +202,7 @@ namespace GMGInventory.Data
         //public DbSet<Payment> Payments { get; set; }
         //public DbSet<PaymentDetail> PaymentDetails { get; set; }
         public DbSet<PhysicalCountHistory> PhysicalCountHistories { get; set; }
+        public DbSet<Pick> Picks { get; set; }
         //public DbSet<PriceType> PriceTypes { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<PurchaseOrderDeliveryMode> PurchaseOrderDeliveryModes { get; set; }
@@ -223,6 +227,9 @@ namespace GMGInventory.Data
         public DbSet<ReceptaclePrintHistory> ReceptaclePrintHistories { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
+        public DbSet<SalesOrderDelivery> SalesOrderDeliveries { get; set; }
+        public DbSet<SalesOrderDeliveryStatus> SalesOrderDeliveryStatuses { get; set; }
+        public DbSet<SalesOrderDeliveryMethod> SalesOrderDeliveryMethods { get; set; }
         public DbSet<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
         public DbSet<SalesOrderLineItem> SalesOrderLineItems { get; set; }
         public DbSet<SalesOrderItemSource> SalesOrderItemSources { get; set; }

@@ -48,6 +48,7 @@
 .fa-border-all::before { content: "📅"; }
 .fa-box::before { content: "📦"; }
 .fa-box-open::before { content: "📭"; }
+.fa-boxes::before { content: "📦"; }
 .fa-broom::before { content: "🧹"; }
 .fa-calendar-day::before { content: "📅"; }
 .fa-cart-arrow-down::before { content: "🛒"; }
@@ -99,6 +100,8 @@
 .fa-network-wired::before { content: "🌐"; }
 .fa-not-equal::before { content: "≠"; }
 .fa-paper-plane::before { content: "📨"; }
+.fa-pause::before { content: "⏸️"; }
+.fa-play::before { content: "▶️"; }
 .fa-plus::before { content: "➕"; }
 .fa-power-off::before { content: "⚡"; }
 .fa-print::before { content: "🖨️"; }

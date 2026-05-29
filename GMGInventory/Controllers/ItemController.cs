@@ -15,8 +15,7 @@ namespace GMGInventory.Controllers
     public class ItemController(IAccessRepository accessRepository
                               , IItemRepository itemRepository
                               , IItemConversionRepository itemConversionRepository
-                              , IAPIBCT_Service apiBCTService
-                              , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
+                              , ISystemSettingRepository settingRepository) : BaseController(accessRepository)
     {
         public async Task<IActionResult> GetOptions(string search, int page)
         {
@@ -145,7 +144,9 @@ namespace GMGInventory.Controllers
             if (redirectResult != null && redirectResultBasic != null) return redirectResultBasic;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
-            ViewData["BarcotechUserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BarcotechStock)).Convert();
+
+            var stockAutoSynching = await settingRepository.GetValue("StockAutoSynching");
+            ViewData["AutoSynching"] = stockAutoSynching == null ? false : stockAutoSynching == "true";
 
             var item = itemRepository.GetItemViewVM(id);
             if (item == null)
@@ -169,13 +170,13 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditDetailQuantity(int id, int quantity, int? locationCode, string remarks)
+        public async Task<IActionResult> EditDetailQuantity(int id, int quantity, int allocatedQuantity, int? locationCode, string remarks)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Item, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
             ResponseModel responseModel = new();
-            await itemRepository.UpdateQuantityAsync(id, quantity, locationCode, remarks);
+            await itemRepository.UpdateQuantityAsync(id, quantity, allocatedQuantity, locationCode, remarks);
             responseModel.Status = "Success";
             responseModel.Message = "Warehouse details successfully updated";
             return Json(responseModel);
@@ -611,15 +612,6 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             var response = await itemRepository.SaveImageAsync(form);
-            return Json(response);
-        }
-
-        public async Task<IActionResult> SyncStock(int? ItemId)
-        {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechStock, AccessTypes.UploadDownload);
-            if (redirectResult != null) return redirectResult;
-
-            var response = await apiBCTService.SyncStock(apiBCTOptions.Value.URLStock, ItemId);
             return Json(response);
         }
     }

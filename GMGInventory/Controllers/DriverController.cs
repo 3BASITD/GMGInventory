@@ -23,9 +23,14 @@ namespace GMGInventory.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetOptions(string search, int page)
+        public async Task<IActionResult> GetOptions(int? IncludeId)
         {
-            return Json(await driverRepository.GetOptions(search, page));
+            return Json(await driverRepository.GetOptions(IncludeId));
+        }
+
+        public async Task<IActionResult> GetOptions2(string search, int page)
+        {
+            return Json(await driverRepository.GetOptions2(search, page));
         }
 
         [HttpPost]

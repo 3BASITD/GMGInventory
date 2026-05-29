@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public Driver()
         {
+            this.SalesOrderDeliveries = new HashSet<SalesOrderDelivery>();
         }
 
         [Column(TypeName = "nvarchar(100)")]
@@ -24,5 +25,7 @@ namespace GMGInventory.Data
         public string? Restriction { get; set; }
         public DateTime? LicenseDateExpiration { get; set; }
         public bool IsActive { get; set; }
+
+        public ICollection<SalesOrderDelivery> SalesOrderDeliveries { get; set; }
     }
 }

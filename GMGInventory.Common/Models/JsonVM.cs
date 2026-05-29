@@ -19,7 +19,7 @@ namespace GMGInventory.Common.Models
         public int TotalQuantity3 { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalAmount2 { get; set; }
-        public IList<T> AdditionalData { get; set; }
+        public string? AdditionalData { get; set; }
     }
     public class ForDataTables<TData, TAdditional>
     {

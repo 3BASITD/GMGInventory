@@ -6,6 +6,7 @@ namespace GMGInventory.Data
     {
         public Forwarder()
         {
+            this.SalesOrderDeliveries = new HashSet<SalesOrderDelivery>();
             this.SalesOrderDeliveryMonitorings = new HashSet<SalesOrderDeliveryMonitoring>();
         }
 
@@ -27,6 +28,7 @@ namespace GMGInventory.Data
 
         public bool IsActive { get; set; }
 
+        public ICollection<SalesOrderDelivery> SalesOrderDeliveries { get; set; }
         public ICollection<SalesOrderDeliveryMonitoring> SalesOrderDeliveryMonitorings { get; set; }
     }
 }

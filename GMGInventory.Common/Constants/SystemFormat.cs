@@ -6,6 +6,7 @@
         public const string StringDate = "MMMM dd, yyyy";
         public const string StringDate2 = "MM/dd/yyyy";
         public const string StringDate3 = "yyyy-MM-dd";
+        public const string StringDateTime3 = "yyyy-MM-ddTHH:mm";
         public const string StringDate4 = "MM/dd/yy";
         public const string StringDecimalComma = "{0:#,##0.00}";
         public const string StringIntegerComma = "{0:#,##0}";

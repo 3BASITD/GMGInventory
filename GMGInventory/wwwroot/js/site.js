@@ -634,46 +634,76 @@ $(document).on("input", "textarea.auto-adjust-row", function () {
     this.style.overflowY = (maxHeight > maxAllowedHeight) ? "scroll" : "hidden";
 });
 
-function getFilterDefaultDateTo() {
-    return new Date();
-}
 
-function getFilterDefaultDateFrom() {
-    var date_before = new Date();
-    date_before.setDate(date_before.getDate() - 6);
+//FOR FILTER WITH PRESET
+var $preset = $("#filter-preset");
+if ($preset.length) {
+    var $from = $("#filter-from");
+    var $to = $("#filter-to");
 
-    return date_before;
-}
+    $preset.val("L7D");
 
-function applyFilterPreset(selected) {
-    var date_to = getFilterDefaultDateTo();
+    $from.val(DateForInput(getFilterDefaultDateFrom()))
+         .prop("readonly", true);
 
-    var from = null;
-    var to = date_to;
+    $to.val(DateForInput(getFilterDefaultDateTo()))
+       .prop("readonly", true);
 
-    if (selected === "") {
-        $("#filter-from").prop("readonly", false);
-        $("#filter-to").prop("readonly", false);
-        return;
+    $to.on("focusout", function () {
+        if ($from.val() && $to.val() && new Date($from.val()) > new Date($to.val()))
+            $to.val($from.val());
+    });
+
+    $from.on("focusout", function () {
+        if ($from.val() && $to.val() && new Date($from.val()) > new Date($to.val()))
+            $from.val($to.val());
+    });
+
+    $preset.on("change", function () {
+        applyFilterPreset($(this).val());
+    });
+
+    function getFilterDefaultDateTo() {
+        return new Date();
     }
 
-    $("#filter-from").prop("readonly", true);
-    $("#filter-to").prop("readonly", true);
+    function getFilterDefaultDateFrom() {
+        var date_before = new Date();
+        date_before.setDate(date_before.getDate() - 6);
 
-    if (selected === "TD") { // Today
-        from = new Date(date_to);
-    } else if (selected === "L7D") { // Last 7 Days
-        from = new Date(date_to);
-        from.setDate(date_to.getDate() - 6);
-    } else if (selected === "MTD") { // Month to Date
-        from = new Date(date_to.getFullYear(), date_to.getMonth(), 1);
-    } else if (selected === "LM") { // Last Month
-        from = new Date(date_to.getFullYear(), date_to.getMonth() - 1, 1);
-        to = new Date(date_to.getFullYear(), date_to.getMonth(), 0);
-    } else if (selected === "YTD") { // Year to Date
-        from = new Date(date_to.getFullYear(), 0, 1);
+        return date_before;
     }
 
-    $("#filter-from").val(DateForInput(from));
-    $("#filter-to").val(DateForInput(to));
+    function applyFilterPreset(selected) {
+        var date_to = getFilterDefaultDateTo();
+
+        var from = null;
+        var to = date_to;
+
+        if (selected === "") {
+            $from.prop("readonly", false);
+            $to.prop("readonly", false);
+            return;
+        }
+
+        $from.prop("readonly", true);
+        $to.prop("readonly", true);
+
+        if (selected === "TD") { // Today
+            from = new Date(date_to);
+        } else if (selected === "L7D") { // Last 7 Days
+            from = new Date(date_to);
+            from.setDate(date_to.getDate() - 6);
+        } else if (selected === "MTD") { // Month to Date
+            from = new Date(date_to.getFullYear(), date_to.getMonth(), 1);
+        } else if (selected === "LM") { // Last Month
+            from = new Date(date_to.getFullYear(), date_to.getMonth() - 1, 1);
+            to = new Date(date_to.getFullYear(), date_to.getMonth(), 0);
+        } else if (selected === "YTD") { // Year to Date
+            from = new Date(date_to.getFullYear(), 0, 1);
+        }
+
+        $from.val(DateForInput(from));
+        $to.val(DateForInput(to));
+    }
 }

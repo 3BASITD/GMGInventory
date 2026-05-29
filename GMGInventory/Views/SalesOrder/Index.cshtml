@@ -215,30 +215,6 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
-        $("#filter-preset").val("L7D");
-        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
-        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
-
-        $("#filter-to").on("focusout", function () {
-            var from = $("#filter-from").val();
-            var to = $("#filter-to").val();
-
-            if (from && to && new Date(from) > new Date(to))
-                $("#filter-to").val(from);
-        });
-
-        $("#filter-from").on("focusout", function () {
-            var from = $("#filter-from").val();
-            var to = $("#filter-to").val();
-
-            if (from && to && new Date(from) > new Date(to))
-                $("#filter-from").val(to);
-        });
-
-        $("#filter-preset").on("change", function() {
-            applyFilterPreset($(this).val());
-        });
-
         // Load Select2 for Agent
         $("#filter-agent").select2({
             allowClear: true,
@@ -394,6 +370,9 @@
         function checkDefaultFilter() {
             $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
             $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
         }
 
         function resetToDefaultDTFilter() {
@@ -415,8 +394,6 @@
                 orderDT.page(defaultDTState.page);
                 orderDT.search(defaultDTState.search.search);
             }
-            
-            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
 
         var orderDT = $('.table-order').DataTable({

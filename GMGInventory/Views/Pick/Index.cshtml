@@ -1,0 +1,250 @@
+﻿@{
+    ViewData["Title"] = "Barcotech Picking Status";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var autoSynching = (bool)ViewData["AutoSynching"]!;
+}
+
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v5 enhancement feature. This message will be removed once v5 is completed and made available as a fully paid version.
+</div>
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanUploadDownload)
+            {
+                <button class="btn btn-light text-dark btn-sm float-right ml-2 btn-manual-sync"
+                        data-microtip-title="Manual Fetch Pick(s) from Barcotech"
+                        data-microtip-position="bottom-left"
+                        role="tooltip"
+                        onclick="FetchPickBarcotech()">
+                    <span class="fas fa-download"></span>Fetch from Barcotech
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-light text-dark btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Fetch from Barcotech&#10;Download Barcotech (Picking) access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-download mr-0"></span>
+                </button>
+            }
+            @if (autoSynching)
+            {
+                <button class="btn btn-primary btn-sm float-right ml-2 btn-sync-auto"
+                        data-microtip-title="Currently Auto Fetching is Started. Click this to Pause"
+                        data-microtip-position="bottom-left"
+                        role="tooltip"
+                        onclick="PauseStockBarcotech()">
+                    <span class="fas fa-pause"></span>Pause Auto Fetch from Barcotech
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-primary btn-sm float-right ml-2 btn-sync-auto"
+                        data-microtip-title="Currently Auto Fetching is Paused. Click this to Start"
+                        data-microtip-position="bottom-left"
+                        role="tooltip"
+                        onclick="StartStockBarcotech()">
+                    <span class="fas fa-play"></span>Start Auto Fetch from Barcotech
+                </button>
+            }
+            <em class="ml-2 text-small text-muted last-sync-date"></em>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-pickings">
+            <thead>
+                <tr>
+                    <th>Sales Order Number</th>
+                    <th>Status</th>
+                    <th>Date Picked</th>
+                    <th>Date Synced</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="viewStockBTModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Fetched Stock(s) from Barcotech Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2"><em class="text-xs text-muted">The details below are shown only once and are not saved. After closing this page, you won’t be able to view them again. Here’s what happens to the fetched stock records.</em></div>
+                <table class="table table-head-fixed table-striped table-hover table-fetch-bt">
+                    <thead>
+                        <tr>
+                            <th>Sales Order Number</th>
+                            <th>Status</th>
+                            <th>Date Picked</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var auto_synching = "@autoSynching" == "True";
+        
+        LoadDisplayManualSync();
+
+        var pickDT = $('.table-pickings').DataTable({
+            ajax: {
+                url: "@Url.Action("GetPickingsDT")",
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.salesOrderNumber + "</a>";
+                    },
+                    name: "SalesOrderNumber"
+                },
+                { data: "status", name: "Status" },
+                { data: "pickedDate", name: "PickedDate" },
+                { data: "syncDate", name: "SyncDate" }
+            ],
+            order: [[3, "asc"]]
+        });
+
+        pickDT.on("draw", function () {
+            //hideLoader();
+            var json = pickDT.ajax.json();
+            $(".last-sync-date").text(json.additionalData);
+        
+            LoadDisplayManualSync();
+        });
+
+        if(user_access.canUploadDownload) {
+            var fetchDT = $('.table-fetch-bt').DataTable({
+                data: [],
+                filter: true,
+                responsive: true,
+                autoWidth: false,
+                searching: false,
+                //paging: false,
+                columns: [
+                    { data: "salesOrderNumber", name: "SalesOrderNumber" },
+                    { data: "status", name: "Status" },
+                    { data: "pickDate", name: "PickDate" },
+                    { data: "remarks", name: "Remarks" }
+                ],
+                order: [[0, "asc"]]
+            });
+
+            function PauseStockBarcotech() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateAutoSync")",
+                    data: {
+                        AutoEnabled: false
+                    },
+                    success: function (data) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            var btnAuto = $(".btn-sync-auto");
+
+                            btnAuto.attr("data-microtip-title", "Currently Auto Fetching is Paused. Click this to Start");
+                            btnAuto.attr("onclick", "StartStockBarcotech()");
+                            btnAuto.html("<span class='fas fa-play'></span>Start Auto Fetch from Barcotech");
+        
+                            auto_synching = false;
+                            LoadDisplayManualSync();
+                        }
+                    }
+                });
+            }
+
+            function StartStockBarcotech() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateAutoSync")",
+                    data: {
+                        AutoEnabled: true
+                    },
+                    success: function (data) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            var btnAuto = $(".btn-sync-auto");
+
+                            btnAuto.attr("data-microtip-title", "Currently Auto Fetching is Started. Click this to Pause");
+                            btnAuto.attr("onclick", "PauseStockBarcotech()");
+                            btnAuto.html("<span class='fas fa-pause'></span>Pause Auto Fetch from Barcotech");
+        
+                            auto_synching = true;
+                            LoadDisplayManualSync();
+                        }
+                    }
+                });
+            }
+
+            function FetchPickBarcotech(itemId) {
+                swal({
+                    title: "Fetch Pick Record(s) from Barcotech",
+                    text: "This action will get all pick records from Barcotech and save it here. The process may take some time, depending on the number of records fetched. Are you sure you want to proceed?",
+                    icon: "warning",
+                    buttons: true,
+                    infoMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            url: "@Url.Action("SyncPick")",
+                            type: "POST",
+                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the process, so some records may be saved while others are not.</small>",
+                            success: function (data, status, xhr) {
+                                fetchDT.clear().draw();
+                                $.each(data, function (i, v) {
+                                    fetchDT.row.add(v).draw();
+                                });
+                                $("#viewStockBTModal").modal("show");
+                                pickDT.ajax.reload();
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function LoadDisplayManualSync() {
+            if (auto_synching)
+                $(".btn-manual-sync").addClass("ui-state-disabled");
+            else
+                $(".btn-manual-sync").removeClass("ui-state-disabled");
+        }
+    </script>
+}

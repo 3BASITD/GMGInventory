@@ -3,11 +3,8 @@
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
-<div class="alert alert-warning" role="alert">
-    <span class="fas fa-exclamation-triangle mr-3"></span>We’re currently working on this page to bring you new features and improvements. Please check back again soon.
-</div>
 <div class="alert alert-info" role="alert">
-    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a paid version.
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
 </div>
 
 <div class="card card-default">
@@ -29,9 +26,9 @@
                     <th>Service Level Agreement</th>
                     <th>Customer</th>
                     <th>Sales Order Prepared By</th>
+                    <th>Sales Order Approved By</th>
                     <th>Special Instruction</th>
                     <th>Forwarder</th>
-                    <th>Sales Order Approved By</th>
                     <th>Status 1</th>
                     <th>Status 2</th>
                     <th>Status 3</th>
@@ -94,33 +91,166 @@
     </div>
 </div>
 
+@if (userAccess.CanEdit)
+{
+    <div class="modal fade" id="deliveryModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sales Order Delivery</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="deliveryForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group">
+                                    <label for="delivery-so-number" class="form-label mb-0">Sales Order Number</label>
+                                    <input type="text" id="delivery-so-number" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group">
+                                    <label for="delivery-pack-number" class="form-label mb-0">Pack Number</label>
+                                    <input type="text" id="delivery-pack-number" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <hr class="flex-grow-1">
+                            <span class="px-2 text-muted">Shipping Information</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group">
+                                    <label for="delivery-status" class="form-label mb-0">Status</label>
+                                    <select id="delivery-status" name="DeliveryStatus" class="form-control form-control-sm" style="width: 100%;">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4 delivery-pickup-date-container">
+                                <div class="form-group">
+                                    <label for="delivery-pickup-date" class="form-label mb-0">Pick-up Date</label>
+                                    <input type="datetime-local" id="delivery-pickup-date" name="PickupDate" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4 delivery-delivery-date-container">
+                                <div class="form-group">
+                                    <label for="delivery-delivery-date" class="form-label mb-0">Delivery Date</label>
+                                    <input type="datetime-local" id="delivery-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group">
+                                    <label for="delivery-receive-date" class="form-label mb-0">Receive Date</label>
+                                    <input type="datetime-local" id="delivery-receive-date" name="ReceiveDate" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <hr class="flex-grow-1">
+                            <span class="px-2 text-muted">Delivery Method</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group">
+                                    <label for="delivery-method" class="form-label mb-0">Method</label>
+                                    <select id="delivery-method" class="form-control form-control-sm" style="width: 100%;">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4 forwarder-container">
+                                <div class="form-group">
+                                    <label for="delivery-forwarder" class="form-label mb-0">Forwarder</label>
+                                    <select id="delivery-forwarder" name="Forwarder" class="form-control form-control-sm" style="width: 100%;">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4 waybill-container">
+                                <div class="form-group">
+                                    <label for="delivery-waybill" class="form-label mb-0">Waybill Number</label>
+                                    <input type="text" id="delivery-waybill" name="Waybill" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vehicle-container">
+                            <div class="d-flex align-items-center mt-1">
+                                <hr class="flex-grow-1">
+                                <span class="px-2 text-muted">Vehicle & Personnel</span>
+                                <hr class="flex-grow-1">
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="form-group">
+                                        <label for="delivery-driver" class="form-label mb-0">Driver</label>
+                                        <select id="delivery-driver" name="Driver" class="form-control form-control-sm" style="width: 100%;">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="form-group">
+                                        <label for="delivery-vehicle" class="form-label mb-0">Vehicle</label>
+                                        <select id="delivery-vehicle" name="Vehicle" class="form-control form-control-sm" style="width: 100%;">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <hr class="flex-grow-1">
+                            <span class="px-2 text-muted">Receiver Information</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group">
+                                    <label for="delivery-receiver-name" class="form-label mb-0">Received By</label>
+                                    <input type="text" id="delivery-receiver-name" name="ReceiverName" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group">
+                                    <label for="delivery-receiver-contact" class="form-label mb-0">Receiver Contact</label>
+                                    <input type="text" id="delivery-receiver-contact" name="ReceiverContact" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <hr class="flex-grow-1">
+                            <span class="px-2 text-muted">Remarks</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="delivery-remarks" class="form-label mb-0">Remarks</label>
+                                    <textarea id="delivery-remarks" name="Remarks" class="form-control form-control-sm" rows="1">
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fas fa-edit"></span> Update
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <span class="fas fa-times"></span> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>            
+}
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-
-        $("#filter-preset").val("L7D");
-        $("#filter-from").val(DateForInput(getFilterDefaultDateFrom()));
-        $("#filter-to").val(DateForInput(getFilterDefaultDateTo()));
-
-        $("#filter-to").on("focusout", function () {
-            var from = $("#filter-from").val();
-            var to = $("#filter-to").val();
-
-            if (from && to && new Date(from) > new Date(to))
-                $("#filter-to").val(from);
-        });
-
-        $("#filter-from").on("focusout", function () {
-            var from = $("#filter-from").val();
-            var to = $("#filter-to").val();
-
-            if (from && to && new Date(from) > new Date(to))
-                $("#filter-from").val(to);
-        });
-
-        $("#filter-preset").on("change", function() {
-            applyFilterPreset($(this).val());
-        });
 
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
         var dt_duration = 3600000; // 1 hour
@@ -147,7 +277,7 @@
         }
 
         var defaultDTState = {
-            order: [[1, "desc"]],
+            order: [[0, "desc"]],
             page: 0,
             length: 10,
             search: { search: "" },
@@ -170,6 +300,9 @@
         function checkDefaultFilter() {
             $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
             $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
         }
 
         function resetToDefaultDTFilter() {
@@ -259,12 +392,22 @@
                         else
                             return '<span class="text-muted">N/A</span>';
                     },
-                    name: "OrderQueueNumber",
-                    responsivePriority: 11
+                    name: "OrderQueueNumber"
                 },
                 { data: "serviceLevelAgreement", name: "ServiceLevelAgreement" },
-                { data: "customer", name: "Customer" }, 
+                {
+                    data: function (data, type, dataToSet) {
+                        return `<a href="/Customer/Details/${data.customerId}" class="link-info with-wrap" target="_blank">${data.customer}</a>`;
+                    },
+                    name: "Customer"
+                },
                 { data: "soPreparedBy", name: "SOPreparedBy" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.soApprovedBy || '<em class="text-muted">N/A</em>';
+                    },
+                    name: "SOApprovedBy"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         return data.specialInstruction || '<em class="text-muted">N/A</em>';
@@ -277,11 +420,11 @@
                     },
                     name: "Forwarder"
                 },
-                { data: "soApprovedBy", name: "SOApprovedBy" },
                 { data: "status1", name: "Status1", orderable: false },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
+                        //return "<span class='badge badge-danger'>COMING SOON</span>";
                         return data.status2 || '<em class="text-muted">N/A</em>';
                     },
                     name: "Status2"
@@ -311,17 +454,16 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        if (user_access.canEdit) {
-                            actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Item Class" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
-                        }
-
-                        if (user_access.canDelete) {
-                            actions += '<button type="button" class="btn btn-danger btn-xs btn-delete" data-microtip-title="Delete Item Class" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
+                        if (user_access.canEdit == false) {
+                            actions += '<button type="button" class="btn btn-warning btn-xs ui-state-disabled" data-microtip-title="Edit Sales Order Delivery&#10;Edit access is required" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                        } else if (data.packId == null) {
+                            actions += '<button type="button" class="btn btn-warning btn-xs ui-state-disabled" data-microtip-title="Edit Sales Order Delivery&#10;Should have been Packed to proceed Delivery" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                        } else {
+                            actions += '<button type="button" class="btn btn-warning btn-xs btn-edit" data-microtip-title="Edit Sales Order Delivery" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
                         }
                         actions += '</div>';
                         return actions;
-                    },
-                    responsivePriority: 1
+                    }
                 }
             ],
             order: defaultDTState.order
@@ -331,10 +473,257 @@
             // swal({
             //     icon: 'warning',
             //     title: 'Payment Pending',
-            //     text: atob("WW91IGFyZSBhYm91dCB0byB1c2UgYW4g") + atob("dW5wYWlkIHY0IGVuaGFuY2VtZW50IA==") + atob("ZmVhdHVyZS4="),
+            //     text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgZnVsbHkgcGFpZCB2ZXJzaW9uLg=="),
             //     button: 'Continue'
             // });
             checkDefaultFilter();
         });
+
+        if (user_access.canEdit) {
+            // Actions upon Display Edit Modal
+            $(document).on("click", ".btn-edit", function (e) {
+                var data = deliveryDT.row($(this).parents('tr')).data();
+
+                $("#delivery-so-number").data("Id", data.salesOrderId);
+                $("#delivery-so-number").val(data.salesOrderNumber);
+                $("#delivery-pack-number").val(data.packId);
+                $("#delivery-pickup-date").val(data.pickupDateTime3);
+                $("#delivery-delivery-date").val(data.deliveryDateTime3);
+                $("#delivery-receive-date").val(data.receiveDateTime3);
+                $("#delivery-waybill").val(data.waybill);
+                $("#delivery-receiver-name").val(data.receiveBy);
+                $("#delivery-receiver-contact").val(data.receiveContact);
+                $("#delivery-remarks").val(data.remarks);
+ 
+                loadSelect2({
+                    selector: "#delivery-status",
+                    url: "@Url.Action("GetStatusOptions")",
+                    selected: data.deliveryStatusId,
+                    allowClear: false,
+                    allowSearch: false,
+                    functionOnComplete: DisplayStatusFields
+                });
+                
+                $("#delivery-status").off("select2:select").on("select2:select", DisplayStatusFields);
+
+                loadSelect2({
+                    selector: "#delivery-method",
+                    url: "@Url.Action("GetMethodOptions")",
+                    selected: data.deliveryMethodId,
+                    allowClear: false,
+                    allowSearch: false,
+                    functionOnComplete: DisplayMethodFields
+                });
+
+                $("#delivery-method").off("select2:select").on("select2:select", DisplayMethodFields);
+
+                loadSelect2({
+                    selector: "#delivery-forwarder",
+                    url: "@Url.Action("GetOptions", "Forwarder")",
+                    selected: data.forwarderId,
+                    allowClear: true,
+                    allowSearch: true
+                });
+
+                loadSelect2({
+                    selector: "#delivery-driver",
+                    url: "@Url.Action("GetOptions", "Driver")",
+                    selected: data.driverId,
+                    allowClear: true,
+                    allowSearch: true
+                });
+
+                loadSelect2({
+                    selector: "#delivery-vehicle",
+                    url: "@Url.Action("GetOptions", "Vehicle")",
+                    selected: data.vehicleId,
+                    allowClear: true,
+                    allowSearch: true
+                });
+                
+                $("#deliveryModal").modal("show");
+            });
+
+            // Validation for Delivery Modal
+            var validateDelivery = $("#deliveryForm").validate({
+                rules: {
+                    PickupDate: {
+                        required: function () {
+                            return $("#delivery-status").select2("data")[0].name.trim().toLowerCase() == "picked up";
+                        }
+                    },
+                    DeliveryDate: {
+                        required: function () {
+                            return $("#delivery-status").select2("data")[0].name.trim().toLowerCase() == "delivered";
+                        }
+                    },
+                    ReceiveDate: {
+                        required: function () {
+                            return $("#delivery-method").select2("data")[0].name.trim().toLowerCase() == "customer pickup";
+                        }
+                    },
+                    Forwarder: {
+                        required: function () {
+                            var selected = $("#delivery-method").select2("data")[0].name.trim().toLowerCase();
+                            return selected == "forwarder" || selected == "courier";
+                        }
+                    },
+                    Waybill: {
+                        required: function () {
+                            var selected = $("#delivery-method").select2("data")[0].name.trim().toLowerCase();
+                            return selected == "forwarder" || selected == "courier";
+                        },
+                        maxlength: 150
+                    },
+                    Driver: {
+                        required: function () {
+                            return $("#delivery-method").select2("data")[0].name.trim().toLowerCase() == "company truck";
+                        }
+                    },
+                    Vehicle: {
+                        required: function () {
+                            return $("#delivery-method").select2("data")[0].name.trim().toLowerCase() == "company truck";
+                        }
+                    },
+                    ReceiverName: {
+                        required: function () {
+                            return $("#delivery-method").select2("data")[0].name.trim().toLowerCase() == "customer pickup";
+                        },
+                        maxlength: 500
+                    },
+                    ReceiverContact: {
+                        required: function () {
+                            return $("#delivery-method").select2("data")[0].name.trim().toLowerCase() == "customer pickup";
+                        },
+                        maxlength: 500
+                    },
+                    Remarks: { maxlength: 500 }
+                },
+                messages: {
+                    PickupDate: { required: "Please select pickup date" },
+                    DeliveryDate: { required: "Please select delivery date" },
+                    ReceiveDate: { required: "Please select receive date" },
+                    Forwarder: { required: "Please select forwarder" },
+                    Waybill: { required: "Please enter waybill" },
+                    Driver: { required: "Please select driver" },
+                    Vehicle: { required: "Please select vehicle" },
+                    ReceiverName: { required: "Please enter name of receiver" , maxlength: "Name must not exceed 500 characters" },
+                    ReceiverContact: { required: "Please enter contact of receiver" , maxlength: "Contact must not exceed 500 characters" },
+                    Remarks: { maxlength: "Remarks must not exceed 500 characters" }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    DoSave();
+                }
+            });
+
+            // Send Delivery to Controller
+            function DoSave() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveDelivery")",
+                    data: {
+                        SalesOrderId: $("#delivery-so-number").data("Id"),
+                        PackId: $("#delivery-pack-number").val(),
+                        DeliveryStatusId: $("#delivery-status").val(),
+                        PickupDate: $("#delivery-pickup-date").val(),
+                        DeliveryDate: $("#delivery-delivery-date").val(),
+                        ReceiveDate: $("#delivery-receive-date").val(),
+                        DeliveryMethodId: $("#delivery-method").val(),
+                        ForwarderId: $("#delivery-forwarder").val(),
+                        Waybill: $("#delivery-waybill").val(),
+                        ReceiverName: $("#delivery-receiver-name").val(),
+                        ReceiverContact: $("#delivery-receiver-contact").val(),
+                        Remarks: $("#delivery-remarks").val()
+                    },  
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            //toastr.error(data.message, data.status);
+                            ToastrAndConsoleError(data.status, data.message);
+                        } else {
+                            toastr.success(data.message, "Success");
+                            $("#deliveryModal").modal("hide");
+                            deliveryDT.ajax.reload();
+                            hideLoader()
+                        }
+                    }
+                });
+            }
+        }
+
+        function loadSelect2({
+            selector,
+            url,
+            selected,
+            allowClear,
+            allowSearch,
+            functionOnComplete
+        }) {
+            var $el = $(selector);
+
+            if ($el.hasClass("select2-hidden-accessible")) {
+                $el.select2("destroy");
+            }
+            $el.empty();
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { includeId: selected },
+                success: function (response) {
+                    $el.select2({
+                        ajax: null, // already fetched outside
+                        data: response,
+                        allowClear: allowClear,
+                        minimumResultsForSearch: allowSearch ? 0 : -1,
+                        placeholder: {
+                            id: "",
+                            text: "<empty>"
+                        },
+                        dropdownParent: $("#deliveryModal")
+                    });
+                },
+                complete: function () {
+                    if (!selected && allowClear)
+                        $el.val(null).trigger("change");
+                    functionOnComplete?.();
+                }
+            });
+        }
+
+        function DisplayStatusFields() {
+            $(".delivery-pickup-date-container").hide();
+            $(".delivery-delivery-date-container").hide();
+            var selected = $("#delivery-status").select2("data")[0].name.trim().toLowerCase();
+            if (selected == "picked up") {
+                $(".delivery-pickup-date-container").show();
+                $("#delivery-delivery-date").val(null);
+            } else if(selected == "delivered") {
+                $(".delivery-delivery-date-container").show();
+                $("#delivery-pickup-date").val(null);
+            }
+        }
+        
+        function DisplayMethodFields() {
+            $(".forwarder-container").hide();
+            $(".waybill-container").hide();
+            $(".vehicle-container").hide();
+            var selected = $("#delivery-method").select2("data")[0].name.trim().toLowerCase();
+            if (selected == "company truck") {
+                $(".vehicle-container").show();
+                $("#delivery-forwarder").val(null).trigger("change");
+                $("#delivery-waybill").val("");
+            } else if (selected == "forwarder" || selected == "courier") {
+                $(".forwarder-container").show();
+                $(".waybill-container").show();
+                $("#delivery-driver").val(null).trigger("change");
+                $("#delivery-vehicle").val(null).trigger("change");
+            } else if (selected == "customer pickup") {
+                $("#delivery-forwarder").val(null).trigger("change");
+                $("#delivery-waybill").val("");
+                $("#delivery-driver").val(null).trigger("change");
+                $("#delivery-vehicle").val(null).trigger("change");
+            }
+        }
     </script>
 }

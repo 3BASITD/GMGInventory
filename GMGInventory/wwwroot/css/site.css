@@ -1026,6 +1026,10 @@ a[target="_blank"] {
     white-space: nowrap;
 }
 
+a[target="_blank"].with-wrap {
+    white-space: wrap;
+}
+
     a[target="_blank"]::after {
         content: '';
         display: inline-block;

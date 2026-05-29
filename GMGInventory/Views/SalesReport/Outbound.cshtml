@@ -321,6 +321,9 @@
         function checkDefaultFilter() {
             $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
             $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
         }
 
         function resetToDefaultDTFilter() {

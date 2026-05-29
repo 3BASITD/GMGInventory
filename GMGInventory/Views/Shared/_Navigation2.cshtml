@@ -32,6 +32,7 @@ else
         @if (navPages.Contains(PageNames.CustomerPurchaseHistory.ToEnumString())
             || navPages.Contains(PageNames.OrderQueue.ToEnumString())
             || navPages.Contains(PageNames.SalesOrder.ToEnumString())
+            || navPages.Contains(PageNames.BarcotechPicking.ToEnumString())
             || navPages.Contains(PageNames.PackingListing.ToEnumString())
             || navPages.Contains(PageNames.Receptacle.ToEnumString())
             || navPages.Contains(PageNames.SalesInvoice.ToEnumString())
@@ -108,6 +109,24 @@ else
                                     <span class="nav-icon fas fa-file-invoice"></span>
                                 }
                                 Sales Order
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.BarcotechPicking.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Pick" ? "active" : "")"
+                                   asp-area="" asp-controller="Pick" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">📦</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-cubes"></span>
+                                }
+                                Picking Status
                             </a>
                         </li>
                     }
@@ -261,6 +280,7 @@ else
 
         @if (navPages.Contains(PageNames.ItemBasic.ToEnumString())
             || navPages.Contains(PageNames.Item.ToEnumString())
+            || navPages.Contains(PageNames.BarcotechStock.ToEnumString())
             || navPages.Contains(PageNames.PriceList.ToEnumString())
             || navPages.Contains(PageNames.PriceUpdate.ToEnumString())
             || navPages.Contains(PageNames.PurchaseReturn.ToEnumString())
@@ -300,6 +320,24 @@ else
                                     <span class="nav-icon fas fa-shapes"></span>
                                 }
                                 Item
+                            </a>
+                        </li>
+                    }
+                    @if (navPages.Contains(PageNames.BarcotechStock.ToEnumString()))
+                    {
+                        <li>
+                            <a class="dropdown-item @(currentController == "Stock" ? "active" : "")"
+                                   asp-area="" asp-controller="Stock" asp-action="Index">
+                                @if (newIcon)
+                                {
+                                    <span class="emoji">📦</span>
+                                }
+                                else
+                                {
+
+                                    <span class="nav-icon fas fa-boxes"></span>
+                                }
+                                Barcotech Stock
                             </a>
                         </li>
                     }

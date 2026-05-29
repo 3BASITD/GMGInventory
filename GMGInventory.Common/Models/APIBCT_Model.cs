@@ -10,6 +10,7 @@ namespace GMGInventory.Common.Models
         public string URLReturn { get; set; }
         public string URLTransfer { get; set; }
         public string URLStock { get; set; }
+        public string URLPicking { get; set; }
     }
     public class APIBCT_Receiving
     {
@@ -89,16 +90,17 @@ namespace GMGInventory.Common.Models
 
     public class APIBCT_Stock
     {
-        public string status { get; set; }
-        public int total_rows { get; set; }
-        public IList<APIBCT_Stock_Items> data { get; set; }
-    }
-
-    public class APIBCT_Stock_Items
-    {
         public string item_code { get; set; }
         public string warehouse_id { get; set; }
         public int stock { get; set; }
+        public int total_allocated_qty { get; set; }
+    }
+
+    public class APIBCT_Pick
+    {
+        public string outbound_code { get; set; }
+        public string status { get; set; }
+        public string pick_date { get; set; }
     }
 
     public class BarcotechSyncVM
@@ -118,6 +120,16 @@ namespace GMGInventory.Common.Models
         public string Warehouse { get; set; }
         public int OldQuantity { get; set; }
         public int NewQuantity { get; set; }
+        public int OldAllocatedQuantity { get; set; }
+        public int NewAllocatedQuantity { get; set; }
+        public string Remarks { get; set; }
+    }
+
+    public class BarcotechPickSyncVM
+    {
+        public string SalesOrderNumber { get; set; }
+        public string Status { get; set; }
+        public string PickDate { get; set; }
         public string Remarks { get; set; }
     }
 

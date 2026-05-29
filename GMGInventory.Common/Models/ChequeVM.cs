@@ -13,7 +13,7 @@ namespace GMGInventory.Common.Models
         [Required]
         [StringLength(10)]
         [Display(Name = "Ref No")]
-        public string RefNo { get; set; }
+        public string       RefNo { get; set; }
 
         [Required]
         public int CustomerId { get; set; }

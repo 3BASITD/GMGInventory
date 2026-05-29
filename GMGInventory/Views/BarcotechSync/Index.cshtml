@@ -147,6 +147,9 @@
         function checkDefaultFilter() {
             $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
             $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
         }
 
         function resetToDefaultDTFilter() {
@@ -163,9 +166,8 @@
                 dtLogs.page(defaultDTState.page);
                 dtLogs.search(defaultDTState.search.search);
             }
-            
-            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
         }
+
         // Load List on DataTable
         var dtLogs = $('.table-logs').DataTable({
             stateSave: true,

@@ -104,6 +104,50 @@ namespace GMGInventory.Sync
                         await SaveBarcotechSyncLatestLog(context, "Transfer", "E1", "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
                     }
                     #endregion
+
+                    #region STOCK
+                    try
+                    {
+                        var autoSync = await context.SystemSettings.Where(s => s.Name == "StockAutoSynching").Select(s => s.Value).FirstOrDefaultAsync();
+                        if (autoSync != null && autoSync.ToLower() == "true")
+                        {
+                            var urlStock = await context.SystemSettings.Where(s => s.Name == "StockAutoUrl").Select(s => s.Value).FirstOrDefaultAsync();
+                            if (urlStock == null) urlStock = settings.URLStock;
+                            if (urlStock == null) throw new Exception("URL for Auto synching not set");
+                            var stocks = await GetData<APIBCT_Stock>(context, urlStock, "Stock", stoppingToken);
+                            foreach (var stock in stocks)
+                            {
+                                await SaveStock(context, stock);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        await SaveBarcotechSyncLatestLog(context, "Stock", "E1", "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+                    }
+                    #endregion
+
+                    #region PICKING
+                    try
+                    {
+                        var autoSync = await context.SystemSettings.Where(s => s.Name == "PickAutoSynching").Select(s => s.Value).FirstOrDefaultAsync();
+                        if (autoSync != null && autoSync.ToLower() == "true")
+                        {
+                            var urlPicking = await context.SystemSettings.Where(s => s.Name == "PickAutoUrl").Select(s => s.Value).FirstOrDefaultAsync();
+                            if (urlPicking == null) urlPicking = settings.URLPicking;
+                            if (urlPicking == null) throw new Exception("URL for Auto synching not set");
+                            var picks = await GetData<APIBCT_Pick>(context, urlPicking, "Pick", stoppingToken);
+                            foreach (var pick in picks)
+                            {
+                                await SavePick(context, pick);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        await SaveBarcotechSyncLatestLog(context, "Pick", "E1", "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+                    }
+                    #endregion
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {
@@ -817,6 +861,165 @@ namespace GMGInventory.Sync
                 await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_transfer.id) ? "Not Provided" : api_transfer.id, "Fail", string.Join("||", errors));
             if (success.Count() > 0)
                 await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_transfer.id) ? "Not Provided" : api_transfer.id, "Success", string.Join("||", success));
+        }
+
+        private async Task SaveStock(ApplicationDbContext context, APIBCT_Stock api_stock)
+        {
+            var moduleName = "Stock";
+            var errors = new List<string>();
+            var success = new List<string>();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(api_stock.warehouse_id))
+                    errors.Add($"Invalid Warehouse Id: not provided");
+
+                if (string.IsNullOrWhiteSpace(api_stock.item_code))
+                    errors.Add($"Invalid Item Code: not provided");
+
+                var warehouse = await context.Warehouses
+                                             .Where(s => api_stock.warehouse_id != null
+                                                      && s.Code.Trim().ToLower() == api_stock.warehouse_id.Trim().ToLower())
+                                             .FirstOrDefaultAsync();
+                if (warehouse == null) errors.Add($"Invalid Warehouse: {api_stock.warehouse_id} not found");
+
+                var item = await context.Items
+                                        .Where(s => api_stock.item_code != null
+                                                 && s.Code.Trim().ToLower() == api_stock.item_code.Trim().ToLower())
+                                        .FirstOrDefaultAsync();
+                if (item == null) errors.Add($"Invalid Item: {api_stock.item_code} not found");
+
+                if (errors.Count() == 0)
+                {
+                    var itemInventory = await context.ItemInventories
+                                                     .Where(s => s.WarehouseId == warehouse.Id
+                                                              && s.ItemId == item.Id)
+                                                     .FirstOrDefaultAsync();
+
+                    if (itemInventory == null)
+                    {
+                        itemInventory = new ItemInventory
+                        {
+                            ItemId = item.Id,
+                            WarehouseId = warehouse.Id,
+                            Quantity = api_stock.stock,
+                            AllocatedQuantity = api_stock.total_allocated_qty
+                        };
+                        await context.ItemInventories.AddAsync(itemInventory);
+                        await context.SaveChangesAsync(userId);
+
+                        var countHistory = new PhysicalCountHistory
+                        {
+                            ItemId = item.Id,
+                            QuantityFrom = 0,
+                            QuantityTo = api_stock.stock,
+                            Remarks = "Copied from WMS",
+                            WarehouseId = warehouse.Id
+                        };
+                        context.PhysicalCountHistories.Add(countHistory);
+                        await context.SaveChangesAsync(userId);
+
+                        success.Add($"Added  New Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                    }
+                    else if(itemInventory.Quantity != api_stock.stock || itemInventory.AllocatedQuantity != api_stock.total_allocated_qty)
+                    {
+                        var oldQuantity = itemInventory.Quantity;
+                        var oldAllocatedQuantity = itemInventory.AllocatedQuantity;
+
+                        itemInventory.Quantity = api_stock.stock;
+                        itemInventory.AllocatedQuantity = api_stock.total_allocated_qty;
+                        context.ItemInventories.Update(itemInventory);
+                        await context.SaveChangesAsync(userId);
+
+                        var countHistory = new PhysicalCountHistory
+                        {
+                            ItemId = item.Id,
+                            QuantityFrom = oldQuantity,
+                            QuantityTo = api_stock.stock,
+                            Remarks = "Copied from WMS",
+                            WarehouseId = warehouse.Id
+                        };
+                        context.PhysicalCountHistories.Add(countHistory);
+                        await context.SaveChangesAsync(userId);
+
+                        success.Add($"Updated Old Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await SaveBarcotechSyncLatestLog(context, moduleName, "Not Provided", "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+            }
+
+            if (errors.Count() > 0)
+                await SaveBarcotechSyncLatestLog(context, moduleName, "Not Provided", "Fail", string.Join("||", errors));
+            if (success.Count() > 0)
+                await SaveBarcotechSyncLatestLog(context, moduleName, "Not Provided", "Success", string.Join("||", success));
+        }
+
+        private async Task SavePick(ApplicationDbContext context, APIBCT_Pick api_pick)
+        {
+            var moduleName = "Pick";
+            var errors = new List<string>();
+            var success = new List<string>();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(api_pick.outbound_code))
+                    errors.Add($"Invalid Outbound Code: not provided");
+
+                if (string.IsNullOrWhiteSpace(api_pick.status))
+                    errors.Add($"Invalid Status: not provided");
+
+                var order = await context.SalesOrders
+                                         .Where(s => api_pick.outbound_code != null
+                                                 && s.SalesOrderNumber.Trim().ToLower() == api_pick.outbound_code.Trim().ToLower())
+                                         .FirstOrDefaultAsync();
+                if (order == null) errors.Add($"Invalid Sales Order: {api_pick.outbound_code} not found");
+
+                if (errors.Count() == 0)
+                {
+                    var pickDate = DateTime.MinValue;
+                    if (DateTime.TryParse(api_pick.pick_date, out var d))
+                        pickDate = d;
+
+                    var pick = await context.Picks
+                                            .Where(s => s.SalesOrderId == order.Id)
+                                            .FirstOrDefaultAsync();
+
+                    if (pick == null)
+                    {
+                        pick = new Pick
+                        {
+                            SalesOrderId = order.Id,
+                            Status = api_pick.status,
+                            PickDate = pickDate
+                        };
+                        await context.Picks.AddAsync(pick);
+                        await context.SaveChangesAsync(userId);
+
+                        success.Add($"Added New Pick Status");
+                    }
+                    else if (pick.Status != api_pick.status || pick.PickDate != pickDate)
+                    {
+                        pick.Status = api_pick.status;
+                        pick.PickDate = pickDate;
+                        context.Picks.Update(pick);
+                        await context.SaveChangesAsync(userId);
+
+                        success.Add($"Updated Old Pick Status");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await SaveBarcotechSyncLatestLog(context, moduleName, "Not Provided", "Exception", string.Join("||", SystemFormat.GetInnermostExceptionMessage(ex)), ex.ToString());
+            }
+
+            if (errors.Count() > 0)
+                await SaveBarcotechSyncLatestLog(context, moduleName, "Not Provided", "Fail", string.Join("||", errors));
+            if (success.Count() > 0)
+                await SaveBarcotechSyncLatestLog(context, moduleName, "Not Provided", "Success", string.Join("||", success));
         }
 
         private async Task SaveBarcotechSyncLatestLog(ApplicationDbContext context, string module, string pk, string status, string remarks, string? trace = null)

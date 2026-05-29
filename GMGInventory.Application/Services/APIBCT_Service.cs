@@ -8,15 +8,9 @@ using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System.Net.Http.Headers;
-using System.Text;
+using System.Linq.Dynamic.Core;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-using static Humanizer.On;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GMGInventory.Application.Services
 {
@@ -42,7 +36,6 @@ namespace GMGInventory.Application.Services
 
         public async Task<IList<BarcotechStockSyncVM>> SyncStock(string UrlStock, int? ItemId)
         {
-
             var url = UrlStock;
             if (ItemId != null)
             {
@@ -53,172 +46,355 @@ namespace GMGInventory.Application.Services
                 if (item == null)
                 {
                     var msg = "Invalid item, record cannot be found";
-                    await SaveSyncStatus((ItemId ?? int.MinValue).ToString(), "Error", msg);
+                    await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
                     return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
-                        Item = ItemId + "",
-                        Warehouse = "",
+                        Item = "ERR",
+                        Warehouse = "ERR",
                         OldQuantity = 0,
                         NewQuantity = 0,
+                        OldAllocatedQuantity = 0,
+                        NewAllocatedQuantity = 0,
                         Remarks = msg
                     } };
                 }
                 url = UrlStock + "?item_code=" + item.Code;
             }
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
 
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-
-            var jsonr = JsonSerializer.Deserialize<APIBCT_Stock>(json)!;
-
-            if (ItemId != null && jsonr.data.Count == 0)
+            try
             {
-                var msg = "Invalid item, no stock record from WMS";
-                await SaveSyncStatus((ItemId ?? int.MinValue).ToString(), "Error", msg);
-                return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
-                        Item = ItemId + "",
-                        Warehouse = "",
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                var response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+
+                //var jsonr = JsonSerializer.Deserialize<APIBCT_Stock>(json)!;
+
+                var root = JsonNode.Parse(json);
+                var dataNode = root?["data"];
+
+                var stocks = new List<APIBCT_Stock>();
+
+                if (dataNode is JsonObject dataObj)
+                    stocks = dataObj.SelectMany(kvp => kvp.Value?["items"]?.Deserialize<List<APIBCT_Stock>>() ?? new List<APIBCT_Stock>()).ToList();
+
+
+                if (ItemId != null && stocks.Count == 0)
+                {
+                    var msg = "Invalid item, no stock record from WMS";
+                    await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+                    return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
+                        Item = "ERR",
+                        Warehouse = "ERR",
                         OldQuantity = 0,
                         NewQuantity = 0,
+                        OldAllocatedQuantity = 0,
+                        NewAllocatedQuantity = 0,
                         Remarks = msg
                     } };
-            }
-
-            var stockChanges = new List<BarcotechStockSyncVM>();
-            foreach (var stock in jsonr.data)
-            {
-
-                var item = await context.Items.Where(s => s.Code.Trim().ToLower() == stock.item_code.ToLower()).FirstOrDefaultAsync();
-                if (item == null)
-                {
-                    var msg = $"Invalid Item: {stock.item_code} not found";
-                    await SaveSyncStatus((ItemId ?? int.MinValue).ToString(), "Error", msg);
-                    stockChanges.Add(new BarcotechStockSyncVM
-                    {
-                        Item = stock.item_code,
-                        Warehouse = stock.warehouse_id,
-                        OldQuantity = 0,
-                        NewQuantity = 0,
-                        Remarks = msg
-                    });
                 }
-                else
+
+                var stockChanges = new List<BarcotechStockSyncVM>();
+                foreach (var stock in stocks)
                 {
 
-                    var warehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == stock.warehouse_id.ToLower()).FirstOrDefaultAsync();
-                    if (warehouse == null)
+                    var item = await context.Items.Where(s => s.Code.Trim().ToLower() == stock.item_code.ToLower()).FirstOrDefaultAsync();
+                    if (item == null)
                     {
-                        var msg = $"Invalid Warehouse: {stock.warehouse_id} not found";
-                        await SaveSyncStatus((ItemId ?? int.MinValue).ToString(), "Error", msg);
+                        var msg = $"Invalid Item: {stock.item_code} not found";
+                        await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
                         stockChanges.Add(new BarcotechStockSyncVM
                         {
                             Item = stock.item_code,
                             Warehouse = stock.warehouse_id,
                             OldQuantity = 0,
                             NewQuantity = 0,
+                            OldAllocatedQuantity = 0,
+                            NewAllocatedQuantity = 0,
                             Remarks = msg
                         });
                     }
                     else
                     {
-
-                        //var quantity = 0;
-                        //if (int.TryParse(stock.stock.Replace(".00", ""), out var q))
-                        //    quantity = q;
-                        //if (quantity <= 0)
-                        //{
-                        //    var msg = $"Invalid Quantity: {stock.stock}";
-                        //    await SaveSyncStatus((ItemId ?? int.MinValue).ToString(), "Error", msg);
-                        //    stockChanges.Add(new BarcotechStockSyncVM
-                        //    {
-                        //        Item = stock.item_code,
-                        //        Warehouse = stock.warehouse_id,
-                        //        OldQuantity = 0,
-                        //        NewQuantity = 0,
-                        //        Remarks = msg
-                        //    });
-                        //}
-                        var quantity = stock.stock;
-
-                        var itemInventory = await context.ItemInventories
-                                                         .Where(s => s.ItemId == item.Id
-                                                                  && s.WarehouseId == warehouse.Id)
-                                                         .FirstOrDefaultAsync();
-                        if (itemInventory == null)
+                        var warehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == stock.warehouse_id.ToLower()).FirstOrDefaultAsync();
+                        if (warehouse == null)
                         {
-                            itemInventory = new ItemInventory
-                            {
-                                ItemId = item.Id,
-                                WarehouseId = warehouse.Id,
-                                Quantity = quantity
-                            };
-                            await context.ItemInventories.AddAsync(itemInventory);
-                            await context.SaveChangesAsync(currentUserId);
-
-                            var countHistory = new PhysicalCountHistory
-                            {
-                                ItemId = item.Id,
-                                QuantityFrom = 0,
-                                QuantityTo = quantity,
-                                Remarks = "Copied from WMS",
-                                WarehouseId = warehouse.Id
-                            };
-                            context.PhysicalCountHistories.Add(countHistory);
-                            await context.SaveChangesAsync(currentUserId);
-
-                            await SaveSyncStatus(itemInventory.Id.ToString(), "Success", $"Added New Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                            var msg = $"Invalid Warehouse: {stock.warehouse_id} not found";
+                            await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
                             stockChanges.Add(new BarcotechStockSyncVM
                             {
                                 Item = stock.item_code,
                                 Warehouse = stock.warehouse_id,
                                 OldQuantity = 0,
-                                NewQuantity = quantity,
+                                NewQuantity = 0,
+                                OldAllocatedQuantity = 0,
+                                NewAllocatedQuantity = 0,
+                                Remarks = msg
+                            });
+                        }
+                        else
+                        {
+                            var quantity = stock.stock;
+                            var allocatedQuantity = stock.total_allocated_qty;
+
+                            var itemInventory = await context.ItemInventories
+                                                             .Where(s => s.ItemId == item.Id
+                                                                      && s.WarehouseId == warehouse.Id)
+                                                             .FirstOrDefaultAsync();
+                            if (itemInventory == null)
+                            {
+                                itemInventory = new ItemInventory
+                                {
+                                    ItemId = item.Id,
+                                    WarehouseId = warehouse.Id,
+                                    Quantity = quantity,
+                                    AllocatedQuantity = allocatedQuantity
+                                };
+                                await context.ItemInventories.AddAsync(itemInventory);
+                                await context.SaveChangesAsync(currentUserId);
+
+                                var countHistory = new PhysicalCountHistory
+                                {
+                                    ItemId = item.Id,
+                                    QuantityFrom = 0,
+                                    QuantityTo = quantity,
+                                    Remarks = "Copied from WMS",
+                                    WarehouseId = warehouse.Id
+                                };
+                                context.PhysicalCountHistories.Add(countHistory);
+                                await context.SaveChangesAsync(currentUserId);
+
+                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Added New Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                                stockChanges.Add(new BarcotechStockSyncVM
+                                {
+                                    Item = stock.item_code,
+                                    Warehouse = stock.warehouse_id,
+                                    OldQuantity = 0,
+                                    NewQuantity = quantity,
+                                    OldAllocatedQuantity = 0,
+                                    NewAllocatedQuantity = allocatedQuantity,
+                                    Remarks = "Added new stock"
+                                });
+                            }
+                            else if (itemInventory.Quantity != quantity || itemInventory.AllocatedQuantity != allocatedQuantity)
+                            {
+                                var oldQuantity = itemInventory.Quantity;
+                                var oldAllocatedQuantity = itemInventory.AllocatedQuantity;
+
+                                itemInventory.Quantity = quantity;
+                                itemInventory.AllocatedQuantity = allocatedQuantity;
+                                context.ItemInventories.Update(itemInventory);
+                                await context.SaveChangesAsync(currentUserId);
+
+                                var countHistory = new PhysicalCountHistory
+                                {
+                                    ItemId = item.Id,
+                                    QuantityFrom = oldQuantity,
+                                    QuantityTo = quantity,
+                                    Remarks = "Copied from WMS",
+                                    WarehouseId = warehouse.Id
+                                };
+                                context.PhysicalCountHistories.Add(countHistory);
+                                await context.SaveChangesAsync(currentUserId);
+
+                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Updated Old Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                                stockChanges.Add(new BarcotechStockSyncVM
+                                {
+                                    Item = stock.item_code,
+                                    Warehouse = stock.warehouse_id,
+                                    OldQuantity = oldQuantity,
+                                    NewQuantity = quantity,
+                                    OldAllocatedQuantity = oldAllocatedQuantity,
+                                    NewAllocatedQuantity = allocatedQuantity,
+                                    Remarks = "Updated old stock"
+                                });
+                            }
+                        }
+                    }
+                }
+
+                return stockChanges;
+            }
+            catch (HttpRequestException ex)
+            {
+                var msg = "Unable to connect to Barcotech server";
+
+                await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+
+                return new List<BarcotechStockSyncVM>
+                {
+                    new BarcotechStockSyncVM
+                    {
+                        Item = "ERR",
+                        Warehouse = "ERR",
+                        OldQuantity = 0,
+                        NewQuantity = 0,
+                        Remarks = msg + ": " + ex.Message
+                    }
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                var msg = "Connection timeout while connecting to Barcotech server";
+
+                await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+
+                return new List<BarcotechStockSyncVM>
+                {
+                    new BarcotechStockSyncVM
+                    {
+                        Item = "ERR",
+                        Warehouse = "ERR",
+                        OldQuantity = 0,
+                        NewQuantity = 0,
+                        Remarks = msg
+                    }
+                };
+            }
+        }
+
+        public async Task<IList<BarcotechPickSyncVM>> SyncPick(string UrlPicking)
+        {
+            var url = UrlPicking;
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                var response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+
+                //var jsonr = JsonSerializer.Deserialize<APIBCT_Pick>(json)!;
+
+                var root = JsonNode.Parse(json);
+                var dataNode = root?["data"];
+
+                var pickings = new List<APIBCT_Pick>();
+
+                if (dataNode is JsonObject dataObj)
+                    pickings = dataObj.SelectMany(kvp => kvp.Value?["items"]?.Deserialize<List<APIBCT_Pick>>() ?? new List<APIBCT_Pick>()).ToList();
+
+                if (pickings.Count == 0)
+                {
+                    var msg = "No picking status from Barcotech";
+                    await SaveSyncStatus("Pick", int.MinValue.ToString(), "Error", msg);
+                    return new List<BarcotechPickSyncVM> { new BarcotechPickSyncVM {
+                        SalesOrderNumber = "ERR",
+                        Status = "ERR",
+                        PickDate = "ERR",
+                        Remarks = msg
+                    } };
+                }
+
+                var pickChanges = new List<BarcotechPickSyncVM>();
+                foreach (var picking in pickings)
+                {
+                    var order = await context.SalesOrders.Where(s => s.SalesOrderNumber == picking.outbound_code).FirstOrDefaultAsync();
+                    if (order == null)
+                    {
+                        var msg = $"Invalid Sales Order: {picking.outbound_code} not found";
+                        await SaveSyncStatus("Pick", int.MinValue.ToString(), "Error", msg);
+                        pickChanges.Add(new BarcotechPickSyncVM
+                        {
+                            SalesOrderNumber = picking.outbound_code,
+                            Status = "ERR",
+                            PickDate = "ERR",
+                            Remarks = msg
+                        });
+                    }
+                    else
+                    {
+                        var pickDate = DateTime.MinValue;
+                        if (DateTime.TryParse(picking.pick_date, out var d))
+                            pickDate = d;
+
+                        var pick = await context.Picks
+                                                .Where(s => s.SalesOrderId == order.Id)
+                                                .FirstOrDefaultAsync();
+                        if (pick == null)
+                        {
+                            pick = new Pick
+                            {
+                                SalesOrderId = order.Id,
+                                Status = picking.status,
+                                PickDate = pickDate
+                            };
+                            await context.Picks.AddAsync(pick);
+                            await context.SaveChangesAsync(currentUserId);
+
+                            await SaveSyncStatus("Pick", pick.Id.ToString(), "Success", $"Added New Pick Status");
+                            pickChanges.Add(new BarcotechPickSyncVM
+                            {
+                                SalesOrderNumber = order.SalesOrderNumber,
+                                Status = picking.status,
+                                PickDate = pickDate.ToString(SystemFormat.StringDateTime),
                                 Remarks = "Added new stock"
                             });
                         }
-                        else if (itemInventory.Quantity != quantity)
+                        else if (pick.Status != picking.status || pick.PickDate != pickDate)
                         {
-                            var oldQuantity = itemInventory.Quantity;
-
-                            itemInventory.Quantity = quantity;
-                            context.ItemInventories.Update(itemInventory);
+                            pick.Status = picking.status;
+                            pick.PickDate = pickDate;
+                            context.Picks.Update(pick);
                             await context.SaveChangesAsync(currentUserId);
 
-                            var countHistory = new PhysicalCountHistory
+                            await SaveSyncStatus("Pick", pick.Id.ToString(), "Success", $"Updated Old Pick Status");
+                            pickChanges.Add(new BarcotechPickSyncVM
                             {
-                                ItemId = item.Id,
-                                QuantityFrom = oldQuantity,
-                                QuantityTo = quantity,
-                                Remarks = "Copied from WMS",
-                                WarehouseId = warehouse.Id
-                            };
-                            context.PhysicalCountHistories.Add(countHistory);
-                            await context.SaveChangesAsync(currentUserId);
-
-                            await SaveSyncStatus(itemInventory.Id.ToString(), "Success", $"Updated Old Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
-                            stockChanges.Add(new BarcotechStockSyncVM
-                            {
-                                Item = stock.item_code,
-                                Warehouse = stock.warehouse_id,
-                                OldQuantity = oldQuantity,
-                                NewQuantity = quantity,
-                                Remarks = "Added new stock"
+                                SalesOrderNumber = order.SalesOrderNumber,
+                                Status = picking.status,
+                                PickDate = pickDate.ToString(SystemFormat.StringDateTime),
+                                Remarks = "Updated old pick"
                             });
                         }
                     }
                 }
-            }
 
-            return stockChanges;
+                return pickChanges;
+            }
+            catch (HttpRequestException ex)
+            {
+                var msg = "Unable to connect to Barcotech server";
+
+                await SaveSyncStatus("Pick", int.MinValue.ToString(), "Error", msg);
+
+                return new List<BarcotechPickSyncVM>
+                {
+                    new BarcotechPickSyncVM
+                    {
+                        SalesOrderNumber ="ERR",
+                        Status = "ERR",
+                        PickDate = "ERR",
+                        Remarks = msg + ": " + ex.Message
+                    }
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                var msg = "Connection timeout while connecting to Barcotech server";
+
+                await SaveSyncStatus("Pick", int.MinValue.ToString(), "Error", msg);
+
+                return new List<BarcotechPickSyncVM>
+                {
+                    new BarcotechPickSyncVM
+                    {
+                        SalesOrderNumber ="ERR",
+                        Status = "ERR",
+                        PickDate = "ERR",
+                        Remarks = msg
+                    }
+                };
+            }
         }
 
-        private async Task SaveSyncStatus(string pk, string status, string remarks)
+
+        private async Task SaveSyncStatus(string module, string pk, string status, string remarks)
         {
             var dtNow = DateTime.Now;
             await context.BarcotechSyncs.AddAsync(new BarcotechSync
             {
-                ModuleName = "Stock",
+                ModuleName = module,
                 PrimaryKey = pk,
                 SyncStatus = status,
                 Remarks = remarks,

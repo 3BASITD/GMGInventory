@@ -5,7 +5,9 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Linq.Dynamic.Core;
+using static Humanizer.On;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -22,6 +24,44 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+        }
+
+        public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
+        {
+            var dateNow = DateTime.Now.Date;
+
+            var vehicles = from vehicle in context.Vehicles
+                           where vehicle.IsActive == true
+                           && vehicle.DateRegistered <= dateNow 
+                           && vehicle.DateExpiration >= dateNow
+                           select new JsonOptionsModel
+                           {
+                               Id = vehicle.Id.ToString(),
+                               Text = vehicle.FleetPlateNumber
+                           };
+            return await vehicles.ToListAsync();
+        }
+
+        public async Task<Select2Model<JsonOptionsModel>> GetOptions2(string search, int page)
+        {
+            var dateNow = DateTime.Now.Date;
+
+            var vehicles = from vehicle in context.Vehicles
+                           where vehicle.IsActive == true
+                           && (vehicle.DateRegistered <= dateNow && vehicle.DateExpiration >= dateNow)
+                           && (string.IsNullOrWhiteSpace(search) || vehicle.FleetPlateNumber.ToLower().Contains(search.ToLower()) || vehicle.VehicleType.ToLower().Contains(search.ToLower()))
+                           select new JsonOptionsModel
+                           {
+                               Id = vehicle.Id.ToString(),
+                               Text = vehicle.FleetPlateNumber
+                           };
+            var filteredVehicles = await vehicles.Skip((page - 1) * 50).Take(50).ToListAsync();
+
+            return new Select2Model<JsonOptionsModel>
+            {
+                items = filteredVehicles,
+                total_count = filteredVehicles.Count()
+            };
         }
 
         public async Task<IList<VehicleVM>> GetVehicles()
@@ -44,28 +84,6 @@ namespace GMGInventory.Application.Repositories
                                DateModifiedD = vehicle.DateModified
                            };
             return await vehicles.ToListAsync();
-        }
-
-        public async Task<Select2Model<JsonOptionsModel>> GetOptions(string search, int page)
-        {
-            var dateNow = DateTime.Now.Date;
-            
-            var vehicles = from vehicle in context.Vehicles
-                       where vehicle.IsActive == true
-                       && (vehicle.DateRegistered <= dateNow && vehicle.DateExpiration >= dateNow)
-                       && (string.IsNullOrWhiteSpace(search) || vehicle.FleetPlateNumber.ToLower().Contains(search.ToLower()) || vehicle.VehicleType.ToLower().Contains(search.ToLower()))
-                       select new JsonOptionsModel
-                       {
-                           Id = vehicle.Id.ToString(),
-                           Text = vehicle.FleetPlateNumber //+" - "+ vehicle.VehicleType
-                       };
-            var filteredVehicles = await vehicles.Skip((page - 1) * 50).Take(50).ToListAsync();
-
-            return new Select2Model<JsonOptionsModel>
-            {
-                items = filteredVehicles,
-                total_count = filteredVehicles.Count()
-            };
         }
 
         public async Task<ForDataTables<VehicleVM>> GetVehiclesDT(DataTablesRequestForm form)

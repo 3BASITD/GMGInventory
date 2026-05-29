@@ -10,6 +10,7 @@ namespace GMGInventory.Data
             PackLineItems = new HashSet<PackLineItem>();
             PackReturns = new HashSet<PackReturn>();
             ReceptaclePrintHistories = new HashSet<ReceptaclePrintHistory>();
+            SalesOrderDeliveries = new HashSet<SalesOrderDelivery>();
         }
 
         [ForeignKey("SalesOrderId")]
@@ -44,6 +45,7 @@ namespace GMGInventory.Data
         public ICollection<PackLineItem> PackLineItems { get; set; }
         public ICollection<PackReturn> PackReturns { get; set; }
         public ICollection<ReceptaclePrintHistory> ReceptaclePrintHistories { get; set; }
+        public ICollection<SalesOrderDelivery> SalesOrderDeliveries { get; set; }
 
     }
 }

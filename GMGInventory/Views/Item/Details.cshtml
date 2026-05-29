@@ -4,7 +4,7 @@
     ViewData["Title"] = "Item Details";
     ViewData["TitleDetails"] = $"[{Model.Code}]";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
-    var barcotechUserAccess = (ViewsAccessVM)ViewData["BarcotechUserAccess"]!;
+    var autoSynching = (bool)ViewData["AutoSynching"]!;
 }
 
 @section Breadcrumb {
@@ -163,11 +163,11 @@
             <div class="col-3">
                 @if (string.IsNullOrWhiteSpace(Model.Image))
                 {
-                    <img src="/images/no_image.png" alt="Cannot load image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
+                    <img src="/images/no_image.png" alt="No Image" class="item-image clickable w-100 mb-3 rounded" onerror="this.onerror=null; this.src='/images/file_missing.png'; this.title='Cannot load image';" onclick="DisplayImage()" />
                 }
                 else
                 {
-                    <img src="/images/Items/@Model.Image" alt="Cannot load image" class="item-image clickable w-100 mb-3 rounded" onclick="DisplayImage()" />
+                    <img src="/images/Items/@Model.Image" alt="Item Image" class="item-image clickable w-100 mb-3 rounded" onerror="this.onerror=null; this.src='/images/file_missing.png'; this.title='Cannot load image';" onclick="DisplayImage()" />
                 }
             </div>
         </div>
@@ -251,18 +251,13 @@
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="nav-warehouse" role="tabpanel"
                                  aria-labelledby="nav-warehouse-tab">
-                                @if (barcotechUserAccess.CanUploadDownload)
-                                {
-                                    <a class="btn btn-secondary btn-sm float-right ml-2" onclick="FetchStockBarcotech()" data-microtip-title="Fetch Stock Record(s) from Barcotech" data-microtip-position="bottom-left" role="tooltip">
-                                        <span class="fas fa-download"></span> Fetch Stock
-                                    </a>
-                                }
                                 <table class="table table-head-fixed table-striped table-hover table-warehouse">
                                     <thead>
                                         <tr>
                                             <th>Code</th>
                                             <th>Name</th>
                                             <th>Location Code</th>
+                                            <th>Allocated Quantity</th>
                                             <th>Quantity</th>
                                             <th></th>
                                         </tr>
@@ -599,7 +594,7 @@
 
 <!-- Edit Quantity Modal -->
 <div class="modal fade" id="quantityModal" role="dialog" aria-labelledby="quantityModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Update Warehouse Details</h5>
@@ -615,18 +610,46 @@
                                 <label for="quantity-warehouse" class="control-label mb-0 d-block">Warehouse</label>
                                 <input type="text" name="Warehouse" id="quantity-warehouse" class="form-control form-control-sm" readonly="readonly" />
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="quantity-allocated-current" class="control-label mb-0 d-block">Current Allocated Quantity</label>
+                                <input type="number" step="1" max="1999999" name="Current" id="quantity-allocated-current" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="quantity-allocated-new" class="control-label mb-0 d-block">New Allocated Quantity</label>
+                                <input type="number" step="1" max="1999999" name="New" id="quantity-allocated-new" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="quantity-current" class="control-label mb-0 d-block">Current Quantity</label>
                                 <input type="number" step="1" max="1999999" name="Current" id="quantity-current" class="form-control form-control-sm" readonly="readonly" />
                             </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="quantity-new" class="control-label mb-0 d-block">New Quantity</label>
                                 <input type="number" step="1" max="1999999" name="New" id="quantity-new" class="form-control form-control-sm" />
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label for="quantity-location" class="control-label mb-0 d-block">Location Code</label>
                                 <select name="Location" id="quantity-location" class="form-control form-control-sm" style="width: 100%;"></select>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label for="quantity-remarks" class="control-label mb-0 d-block">Remarks</label>
                                 <textarea rows="2" name="Remarks" id="quantity-remarks" class="form-control form-control-sm">
@@ -680,38 +703,6 @@
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="Close"><span class="fas fa-times mr-2"></span>Cancel</button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="viewStockBTModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Fetched Stock(s) from Barcotech Details</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-2"><em class="text-xs text-muted">The details below are shown only once and are not saved. After closing this page, you won’t be able to view them again. Here’s what happens to the fetched stock records.</em></div>
-                <table class="table table-head-fixed table-striped table-hover table-fetch-bt">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Warehouse</th>
-                            <th>Old Quantity</th>
-                            <th>New Quantity</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
         </div>
     </div>
 </div>
@@ -800,8 +791,8 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var barcotech_user_access = @Html.Raw(Json.Serialize(barcotechUserAccess));
         var item_details = @Html.Raw(Json.Serialize(Model));
+        var auto_synching = "@autoSynching" == "True";
 
         if (user_access.canAdd) {
             loadSelect2("#add-unit", "#addModal", "@Url.Action("GetOptions2", "Unit")");
@@ -1290,13 +1281,18 @@
                     },
                     name: "LocationCode"
                 },
+                { data: "allocatedQuantity", name: "AllocatedQuantity", className: "text-end" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '';
                             if (user_access.canEdit) {
-                                actions += '<div data-microtip-title="Edit Details" data-microtip-position="bottom-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><span class="fas fa-pencil-alt"></span></button></div>';
+                                if (auto_synching) {
+                                    actions += '<button type="button" class="btn btn-warning btn-xs ui-state-disabled" data-microtip-title="Edit Stocks&#10;Disabled because Auto fetching from Barcotech is Enabled" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-pencil-alt"></span></button>';
+                                } else {
+                                    actions += '<div data-microtip-title="Edit Stocks" data-microtip-position="bottom-left" role="tooltip" class="d-inline-block"><button class="btn btn-warning btn-xs quantityBtn" data-bs-toggle="modal" data-bs-target="#quantityModal"><span class="fas fa-pencil-alt"></span></button></div>';
+                                }
                             }
                         return actions;
                     },
@@ -1314,8 +1310,10 @@
                     var data = warehouseDT.row($(this).parents('tr')).data();
                     validateEdit.hideThese(validateEdit.errors());
                     $("#quantity-warehouse").val(data.name);
-                    $("#quantity-current").val(data.quantity);
-                    $("#quantity-new").val(data.quantity);
+                    $("#quantity-allocated-current").val(data.allocatedQuantityD);
+                    $("#quantity-allocated-new").val(data.allocatedQuantityD);
+                    $("#quantity-current").val(data.quantityD);
+                    $("#quantity-new").val(data.quantityD);
                     $("#quantity-remarks").val("");
                     $("#quantity-id").val(data.id);
                     if(data.locationCode){
@@ -1356,6 +1354,7 @@
                         data: {
                             Id: $("#quantity-id").val(),
                             Quantity: $("#quantity-new").val(),
+                            AllocatedQuantity: $("#quantity-allocated-new").val(),
                             LocationCode: $("#quantity-location").val(),
                             Remarks: $("#quantity-remarks").val()
                         },
@@ -1363,9 +1362,10 @@
                             if (data.status == "Error") {
                                 toastr.error(data.message, "Error");
                             } else {
-                                if($("#quantity-new").val() < 0) {
-                                    toastr.info("New quantity saved was below 0", "Information");
-                                }
+                                var below = [];
+                                if ($("#quantity-new").val() < 0) below.push("New quantity saved was below 0");
+                                if ($("#quantity-allocated-new").val() < 0) below.push("New allocated quantity saved was below 0");
+                                if (below.length > 0) toastr.info(below.join("<br />"), "Information");
                                 toastr.success(data.message, "Success");
                                 $("#quantityModal").modal("hide");
                                 warehouseDT.ajax.reload();
@@ -1539,54 +1539,6 @@
         }).on("draw.dt", function () {
             //hideBatchLoader("count");
         });
-
-        if (barcotech_user_access.canUploadDownload) {
-            var stockDT = $('.table-fetch-bt').DataTable({
-                data: [],
-                filter: true,
-                responsive: true,
-                autoWidth: false,
-                searching: false,
-                //paging: false,
-                columns: [
-                    { data: "item", name: "Item" },
-                    { data: "warehouse", name: "Warehouse" },
-                    { data: "oldQuantity", name: "OldQuantity" },
-                    { data: "newQuantity", name: "NewQuantity" },
-                    { data: "remarks", name: "Remarks" }
-                ],
-                order: [[0, "asc"]]
-            });
-
-            function FetchStockBarcotech() {
-                swal({
-                    title: "Fetch Stock Record(s) from Barcotech",
-                    text: "This action will get all stock records from Barcotech and save it here. The process may take some time, depending on the number of records fetched. Are you sure you want to proceed?",
-                    icon: "warning",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $.ajax({
-                            url: "@Url.Action("SyncStock")",
-                            type: "POST",
-                            data: {
-                                ItemId: item_details.id,
-                            },
-                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the process, so some records may be saved while others are not.</small>",
-                            success: function (data, status, xhr) {
-                                stockDT.clear().draw();
-                                $.each(data, function (i, v) {
-                                    stockDT.row.add(v).draw();
-                                });
-                                $("#viewStockBTModal").modal("show");
-                                countDT.ajax.reload();
-                            }
-                        });
-                    }
-                });
-            }
-        }
 
         if (user_access.canView) {
             // Price History

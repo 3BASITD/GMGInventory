@@ -1167,17 +1167,16 @@
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
-                if (data.itemDescription == $("#add-name").val() && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text) {
+                if (data.itemCode == $("#add-code").select2("data")[0].text && data.itemDescription == $("#add-name").val() && data.salesOrderNumber == $("#add-so-number").select2("data")[0].text) {
                     rowIndexes.push(idx);
                 }
                 return false;
             });
             if (rowIndexes.length > 0) {
                 var soMatch = $("#add-so-number").select2("data")[0].text != "" ? " of " + $("#add-so-number").select2("data")[0].text : "";
-                toastr.error($("#add-name").val() + soMatch +" has already been added", "Duplicate");
+                var itemMatch = $("#add-code").select2("data")[0].text != "" ? " of " + $("#add-code").select2("data")[0].text  + " " : "";
+                toastr.error(itemMatch + $("#add-name").val() + soMatch +" has already been added", "Duplicate");
             } else {
-                var is_for_na_one_time = $("#request-purpose").select2("data")[0]?.text.toLowerCase() == "one-time purchase";
-                var is_for_maintenance_repair = $("#request-type").select2("data")[0]?.text.toLowerCase() == "maintenance & repair";
                 itemDT.row.add({
                     customer: $("#add-so-customer").val(),
                     haveStock: $("#add-have-stock").prop("checked"),

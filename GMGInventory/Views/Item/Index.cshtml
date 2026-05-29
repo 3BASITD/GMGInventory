@@ -3,33 +3,12 @@
 @{
     ViewData["Title"] = "Items";
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
-    var barcotechUserAccess = (ViewsAccessVM)ViewData["BarcotechUserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            @if (barcotechUserAccess.CanUploadDownload)
-            {
-                <button class="btn btn-light text-dark btn-sm float-right ml-2"
-                        data-microtip-title="Fetch Stock Record(s) from Barcotech"
-                        data-microtip-position="bottom-left"
-                        role="tooltip" 
-                        onclick="FetchStockBarcotech()">
-                    <span class="fas fa-download"></span> Fetch Stock
-                </button>
-            }
-            else
-            {
-                <button type="button"
-                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
-                        data-microtip-title="Fetch Stock Record(s) from Barcotech&#10;Download Barcotech (Stock) access is required"
-                        data-microtip-position="bottom-left"
-                        role="tooltip">
-                    <span class="fas fa-download mr-0"></span>
-                </button>
-            }
             <button type="button" id="toggleView" class="btn btn-primary btn-sm float-right ml-2"><span class="fas fa-border-all"></span> Card View</button>
 
             @* @await Html.PartialAsync("ItemFilter", ViewData["ItemFilter"]) *@
@@ -555,42 +534,9 @@
     </div>
 </div>
 
-<div class="modal fade" id="viewStockBTModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Fetched Stock(s) from Barcotech Details</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-2"><em class="text-xs text-muted">The details below are shown only once and are not saved. After closing this page, you won’t be able to view them again. Here’s what happens to the fetched stock records.</em></div>
-                <table class="table table-head-fixed table-striped table-hover table-fetch-bt">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Warehouse</th>
-                            <th>Old Quantity</th>
-                            <th>New Quantity</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        var barcotech_user_access = @Html.Raw(Json.Serialize(barcotechUserAccess));
 
         // Load Select2 for Item Class
         $("#filter-item-class").select2({
@@ -786,6 +732,9 @@
         function checkDefaultFilter() {
             $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
             $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
         }
 
         function resetToDefaultDTFilter() {
@@ -1045,9 +994,6 @@
                                 }
                                 if (user_access.canDelete) {
                                     actions += '<button data-id="' + data.id + '" class="btn btn-danger btn-xs deleteBtn" type="button" data-microtip-title="Delete / Deactivate Item" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-trash-alt"></span></button>';
-                                }
-                                if (barcotech_user_access.canUploadDownload) {
-                                    actions += '<button class="btn btn-light text-dark btn-xs" type="button" onclick="FetchStockBarcotech(' + data.id + ')" data-microtip-title="Fetch Stock(s) from Barcotech" data-microtip-position="bottom-left" role="tooltip"><span class="far fa-download"></span></button>';
                                 }
                             } else {
                                 if (user_access.canAdd || user_access.canEdit) {
@@ -1663,61 +1609,13 @@
             }
         }
 
-        if(barcotech_user_access.canUploadDownload) {
-            var stockDT = $('.table-fetch-bt').DataTable({
-                data: [],
-                filter: true,
-                responsive: true,
-                autoWidth: false,
-                searching: false,
-                //paging: false,
-                columns: [
-                    { data: "item", name: "Item" },
-                    { data: "warehouse", name: "Warehouse" },
-                    { data: "oldQuantity", name: "OldQuantity" },
-                    { data: "newQuantity", name: "NewQuantity" },
-                    { data: "remarks", name: "Remarks" }
-                ],
-                order: [[0, "asc"]]
-            });
-
-            function FetchStockBarcotech(itemId) {
-                swal({
-                    title: "Fetch Stock Record(s) from Barcotech",
-                    text: "This action will get all stock records from Barcotech and save it here. The process may take some time, depending on the number of records fetched. Are you sure you want to proceed?",
-                    icon: "warning",
-                    buttons: true,
-                    infoMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $.ajax({
-                            url: "@Url.Action("SyncStock")",
-                            type: "POST",
-                            data: {
-                                ItemId: itemId,
-                            },
-                            loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the process, so some records may be saved while others are not.</small>",
-                            success: function (data, status, xhr) {
-                                stockDT.clear().draw();
-                                $.each(data, function (i, v) {
-                                    stockDT.row.add(v).draw();
-                                });
-                                $("#viewStockBTModal").modal("show");
-                                itemDT.ajax.reload();
-                            }
-                        });
-                    }
-                });
-            }
-        }
-
         $(document).on("change", "#filter-item-class, #create-item-class, #edit-item-class", function() {
             var value = $(this).val();
             if (value !== undefined && value !== null && value !== "") {
                 swal({
                     icon: 'warning',
-                title: 'v4 Enhancement',
-                text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgcGFpZCB2ZXJzaW9uLg=="),
+                    title: 'v4 Enhancement',
+                    text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgZnVsbHkgcGFpZCB2ZXJzaW9uLg=="),
                     button: 'Continue'
                 });
             }
@@ -1727,7 +1625,7 @@
             swal({
                 icon: 'warning',
                 title: 'v4 Enhancement',
-                text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgcGFpZCB2ZXJzaW9uLg=="),
+                text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgZnVsbHkgcGFpZCB2ZXJzaW9uLg=="),
                 button: 'Continue'
             });
         });
