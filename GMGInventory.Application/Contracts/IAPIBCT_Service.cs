@@ -4,7 +4,7 @@ namespace GMGInventory.Application.Contracts
 {
     public interface IAPIBCT_Service
     {
-        Task<IList<BarcotechStockSyncVM>> SyncStock(string UrlStock, int? ItemId);
-        Task<IList<BarcotechPickSyncVM>> SyncPick(string UrlPicking);
+        Task<IList<BarcotechStockSyncVM>> SyncStock(int? ItemId);
+        Task<IList<BarcotechPickSyncVM>> SyncPick();
     }
 }

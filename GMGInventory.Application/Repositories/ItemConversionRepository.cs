@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -11,19 +10,14 @@ namespace GMGInventory.Application.Repositories
     public class ItemConversionRepository : GenericRepository<ItemConversion>, IItemConversionRepository
     {
         private readonly ApplicationDbContext context;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
+        private readonly string currentUserId;
 
         public ItemConversionRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper) : base(context, httpContextAccessor, userManager)
+            , UserManager<User> userManager) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
-            this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
-            this.mapper = mapper;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
         
@@ -36,7 +30,6 @@ namespace GMGInventory.Application.Repositories
         }
         public async Task AddAsync(ItemDetailConversionVM ItemDetailConversionVM)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var hasConversion = await context.ItemConversions.AnyAsync(s => s.ItemId == ItemDetailConversionVM.ItemId);
 
             if (!hasConversion)
@@ -113,7 +106,7 @@ namespace GMGInventory.Application.Repositories
             {
                 throw new DbUpdateConcurrencyException();
             }
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
             conversion.Id = itemDetailConversionVM.Id;
             conversion.Quantity = itemDetailConversionVM.Quantity;
             conversion.UnitId = itemDetailConversionVM.UnitId;

@@ -259,7 +259,7 @@
                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                class="form-control form-control-sm" />
                     </div>
-                    <table class="table table-striped" id="upload-table">
+                    <table class="table table-striped table-responsive" id="upload-table">
                         <thead>
                             <tr>
                                 <th>Row #</th>
@@ -980,15 +980,25 @@
                             row$.append($('<td/>').html(cellValue));
                         }
                         if (columns.includes("CollectDate") == false
-                            || columns.includes("RefNo") == false
-                            || columns.includes("CustomerName") == false
-                            || columns.includes("CheckDate") == false
-                            || columns.includes("Check") == false
-                            || columns.includes("Branch") == false
-                            || columns.includes("CheckNo") == false
-                            || columns.includes("Amount") == false
-                            || columns.includes("Status") == false) {
-                            row$.append($('<td/>').html("Unexpected columns"));
+                        || columns.includes("RefNo") == false
+                        || columns.includes("CustomerName") == false
+                        || columns.includes("CheckDate") == false
+                        || columns.includes("Check") == false
+                        || columns.includes("Branch") == false
+                        || columns.includes("CheckNo") == false
+                        || columns.includes("Amount") == false
+                        || columns.includes("Status") == false) {
+                            var missing = [];
+                            if(columns.includes("CollectDate") == false) { missing.push("CollectDate"); }
+                            if(columns.includes("RefNo") == false) { missing.push("RefNo"); }
+                            if(columns.includes("CustomerName") == false) { missing.push("CustomerName"); }
+                            if(columns.includes("CheckDate") == false) { missing.push("CheckDate"); }
+                            if(columns.includes("Check") == false) { missing.push("Check"); }
+                            if(columns.includes("Branch") == false) { missing.push("Branch"); }
+                            if(columns.includes("CheckNo") == false) { missing.push("CheckNo"); }
+                            if(columns.includes("Amount") == false) { missing.push("Amount"); }
+                            if(columns.includes("Status") == false) { missing.push("Status"); }
+                            row$.append($('<td/>').html("Expected columns missing: " + missing.join(", ")));
                             UploadRowDone();
                         } else {
                             SaveXLSX(json_of_excel[i]["CollectDate"], json_of_excel[i]["RefNo"], json_of_excel[i]["CustomerName"], json_of_excel[i]["CheckDate"], json_of_excel[i]["Check"], json_of_excel[i]["Branch"], json_of_excel[i]["CheckNo"], json_of_excel[i]["Amount"], json_of_excel[i]["Status"], rowNum);

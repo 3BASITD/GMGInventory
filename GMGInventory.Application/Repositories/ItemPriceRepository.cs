@@ -114,8 +114,9 @@ namespace GMGInventory.Application.Repositories
                                                           .Where(s => s.ItemId == item.Id)
                                                           .Sum(s => (int?)s.Quantity) ?? 0
                             where (filter.StatusId == null || (filter.StatusId == 1 && item.IsActive == true) || (filter.StatusId == 0 && item.IsActive == false))
-                                && (filter.BrandId == null || filter.BrandId == item.BrandId || (filter.BrandId == 0 && item.Brand.Code.ToLower().Contains((filter.BrandKeyword + "").ToLower())))
-                                && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId || (filter.ItemTypeId == 0 && item.ItemType.Code.ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
+                                && (filter.BrandId == null || filter.BrandId == item.BrandId || (filter.BrandId == 0 && (item.Brand.Code.ToLower().Contains((filter.BrandKeyword + "").ToLower()) || item.Brand.Name.ToLower().Contains((filter.BrandKeyword + "").ToLower()))))
+                                && (filter.CategoryId == null || filter.CategoryId == item.CategoryId || (filter.CategoryId == 0 && (item.Category.Code.ToLower().Contains((filter.CategoryKeyword + "").ToLower()) || item.Category.Name.ToLower().Contains((filter.CategoryKeyword + "").ToLower()))))
+                                && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId || (filter.ItemTypeId == 0 && (item.ItemType.Code.ToLower().Contains((filter.ItemTypeKeyword + "").ToLower()) || item.ItemType.Name.ToLower().Contains((filter.ItemTypeKeyword + "").ToLower()))))
                                 && (filter.ItemId == null || filter.ItemId == 0 || filter.ItemId == item.Id)
                                 && (filter.ItemKeyword == null || item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower()))
                                 && (filter.ItemNameKeyword == null || item.Name.ToLower().Contains((filter.ItemNameKeyword + "").ToLower()))

@@ -433,7 +433,7 @@
                         <div class="col-3">Done upload attempt</div>
                         <div class="col-9 upload-done-count"></div>
                     </div>
-                    <table class="table table-striped" id="upload-table">
+                    <table class="table table-striped table-responsive" id="upload-table">
                         <thead>
                             <tr><th>Row #</th><th>Code</th><th>Name</th><th>Status</th></tr>
                         </thead>
@@ -584,6 +584,14 @@
             dropdownParent: $('#filterModal')
         });
 
+        $("#filter-category").on("select2:select", function () {
+            $("#filter-item-type").val(null).trigger("change");
+        });
+
+        $("#filter-category").on("select2:unselecting", function (e) {
+            $("#filter-item-type").val(null).trigger("change");
+        });
+
         // Load Select2 for Item Type
         $("#filter-item-type").select2({
             tags: true,
@@ -602,7 +610,12 @@
                 return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions2", "ItemType")"
+                url: "@Url.Action("GetOptions2", "ItemType")",
+                data: {
+                    CategoryId: function() {
+                        return $("#filter-category").val()
+                    }
+                }
             },
             dropdownParent: $('#filterModal')
         });
@@ -654,8 +667,16 @@
             loadSelect2("#create-unit", "#createModal", "@Url.Action("GetOptions2", "Unit")");
             loadSelect2("#create-brand", "#createModal", "@Url.Action("GetOptions2", "Brand")");
             loadSelect2("#create-item-class", "#createModal", "@Url.Action("GetOptions2", "ItemClass")", true);
-            loadSelect2("#create-item-type", "#createModal", "@Url.Action("GetOptions2", "ItemType")");
-            loadSelect2("#create-category", "#createModal", "@Url.Action("GetOptions2", "Category")");
+            loadSelect2("#create-category", "#createModal", "@Url.Action("GetOptions2", "Category")", false, null, function() {
+                $("#create-item-type").val(null).trigger("change");
+            }, function() {
+                $("#create-item-type").val(null).trigger("change");
+            });
+            loadSelect2("#create-item-type", "#createModal", "@Url.Action("GetOptions2", "ItemType")", false, {
+                CategoryId: function() {
+                    return $("#edit-category").val()
+                }
+            });
             loadSelect2("#create-warehouse", "#createModal", "@Url.Action("GetOptions2", "Warehouse")");
         }
 
@@ -663,8 +684,16 @@
             loadSelect2("#edit-unit", "#editModal", "@Url.Action("GetOptions2", "Unit")");
             loadSelect2("#edit-brand", "#editModal", "@Url.Action("GetOptions2", "Brand")");
             loadSelect2("#edit-item-class", "#editModal", "@Url.Action("GetOptions2", "ItemClass")", true);
-            loadSelect2("#edit-item-type", "#editModal", "@Url.Action("GetOptions2", "ItemType")");
-            loadSelect2("#edit-category", "#editModal", "@Url.Action("GetOptions2", "Category")");
+            loadSelect2("#edit-category", "#editModal", "@Url.Action("GetOptions2", "Category")", false, null, function() {
+                $("#edit-item-type").val(null).trigger("change");
+            }, function() {
+                $("#edit-item-type").val(null).trigger("change");
+            });
+            loadSelect2("#edit-item-type", "#editModal", "@Url.Action("GetOptions2", "ItemType")", false, {
+                CategoryId: function() {
+                    return $("#edit-category").val()
+                }
+            });
             loadSelect2("#edit-warehouse", "#editModal", "@Url.Action("GetOptions2", "Warehouse")");
         }
 
@@ -1159,6 +1188,9 @@
                         InterchangeNumber: { maxlength: 200 },
                         ModelNumber: { maxlength: 200 },
                         Size: { required: true, maxlength: 50 },
+                        Category: { required: true },
+                        ItemType: { required: true },
+                        Brand: { required: true },
                         BeginningCost: { required: true, range: [0, 1999999.99] }
                     },
                     messages: {
@@ -1169,6 +1201,9 @@
                         InterchangeNumber: { maxlength: "Interchange number must not exceed 200 characters." },
                         ModelNumber: { maxlength: "Model number must not exceed 200 characters." },
                         Size: { required: "Please enter size.", maxlength: "Size must not exceed 50 characters." },
+                        Category: { required: "Please select a category." },
+                        ItemType: { required: "Please select a item type." },
+                        Brand: { required: "Please select a brand." },
                         BeginningCost: { required: "Please enter new Beginning Cost.", range: "Cost must be between 0-1999999.99." }
                     },
                     submitHandler: function (form, event) {

@@ -325,7 +325,7 @@
                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                class="form-control form-control-sm" />
                     </div>
-                    <table class="table table-striped" id="upload-table">
+                    <table class="table table-striped table-responsive" id="upload-table">
                         <thead>
                             <tr><th>Row #</th><th>Code</th><th>Name</th><th>Address Line 1</th><th>Address Line 2</th><th>Region</th><th>Contact Person</th><th>Office Tel No</th><th>Mobile No</th><th>Term</th><th>Currency</th><th>Business Style</th><th>VAT</th><th>TIN</th><th>Is Active</th></tr>
                         </thead>
@@ -914,21 +914,37 @@
                         debugger;
 
                         if (columns.includes("Code") == false
-                            || columns.includes("Name") == false
-                            || columns.includes("Address Line 1") == false
-                            || columns.includes("Address Line 2") == false
-                            || columns.includes("Country") == false
-                            || columns.includes("Region") == false
-                            || columns.includes("Contact Person") == false
-                            || columns.includes("Office Tel No") == false
-                            || columns.includes("Mobile No") == false
-                            || columns.includes("Term") == false
-                            || columns.includes("Currency") == false
-                            || columns.includes("Business Style") == false
-                            || columns.includes("VAT") == false
-                            || columns.includes("TIN") == false
-                            || columns.includes("Is Active") == false) {
-                            row$.append($('<td/>').html("Unexpected columns"));
+                        || columns.includes("Name") == false
+                        || columns.includes("Address Line 1") == false
+                        || columns.includes("Address Line 2") == false
+                        || columns.includes("Country") == false
+                        || columns.includes("Region") == false
+                        || columns.includes("Contact Person") == false
+                        || columns.includes("Office Tel No") == false
+                        || columns.includes("Mobile No") == false
+                        || columns.includes("Term") == false
+                        || columns.includes("Currency") == false
+                        || columns.includes("Business Style") == false
+                        || columns.includes("VAT") == false
+                        || columns.includes("TIN") == false
+                        || columns.includes("Is Active") == false) {
+                            var missing = [];
+                            if(columns.includes("Code") == false) { missing.push("Code"); }
+                            if(columns.includes("Name") == false) { missing.push("Name"); }
+                            if(columns.includes("Address Line 1") == false) { missing.push("Address Line 1"); }
+                            if(columns.includes("Address Line 2") == false) { missing.push("Address Line 2"); }
+                            if(columns.includes("Country") == false) { missing.push("Country"); }
+                            if(columns.includes("Region") == false) { missing.push("Region"); }
+                            if(columns.includes("Contact Person") == false) { missing.push("Contact Person"); }
+                            if(columns.includes("Office Tel No") == false) { missing.push("Office Tel No"); }
+                            if(columns.includes("Mobile No") == false) { missing.push("Mobile No"); }
+                            if(columns.includes("Term") == false) { missing.push("Term"); }
+                            if(columns.includes("Currency") == false) { missing.push("Currency"); }
+                            if(columns.includes("Business Style") == false) { missing.push("Business Style"); }
+                            if(columns.includes("VAT") == false) { missing.push("VAT"); }
+                            if(columns.includes("TIN") == false) { missing.push("TIN"); }
+                            if(columns.includes("Is Active") == false) { missing.push("Is Active"); }
+                            row$.append($('<td/>').html("Expected columns missing: " + missing.join(", ")));
                             UploadRowDone();
                         } else {
                             SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Address Line 1"], json_of_excel[i]["Address Line 2"], json_of_excel[i]["Country"], json_of_excel[i]["Region"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Office Tel No"], json_of_excel[i]["Mobile No"], json_of_excel[i]["Term"], json_of_excel[i]["Currency"], json_of_excel[i]["Business Style"], json_of_excel[i]["VAT"], json_of_excel[i]["TIN"], json_of_excel[i]["Is Active"], rowNum);

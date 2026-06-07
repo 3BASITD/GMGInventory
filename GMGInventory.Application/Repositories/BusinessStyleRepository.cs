@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -11,19 +10,12 @@ namespace GMGInventory.Application.Repositories
     public class BusinessStyleRepository : GenericRepository<BusinessStyle>, IBusinessStyleRepository
     {
         private readonly ApplicationDbContext context;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
 
         public BusinessStyleRepository(ApplicationDbContext context
-            , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper) : base(context, httpContextAccessor, userManager)
+             , IHttpContextAccessor httpContextAccessor
+             , UserManager<User> userManager) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
-            this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
-            this.mapper = mapper;
         }
         public async Task<IList<JsonOptionsModel>> GetOptions(int? IncludeId)
         {

@@ -105,6 +105,19 @@
                             <select id="filter-supplier" style="width:100%"></select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-6">
@@ -143,33 +156,6 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-        
-        var date_today = new Date();
-        var date_month_ago = new Date();
-        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
         
         // Load Select2 for Supplier
         $("#filter-supplier").select2({
@@ -236,8 +222,9 @@
             search: { search: "" },
             SupplierId: "",
             Supplier: "",
-            DateFrom: DateForInput(date_month_ago),
-            DateTo: DateForInput(date_today),
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo()),
             StatusId: "",
             Status: ""
         };
@@ -250,6 +237,7 @@
                    returnDT.page.len() != defaultDTState.length ||
                    (returnDT.search() || "") != defaultDTState.search.search ||
                    ($('#filter-supplier').val() ?? "") != defaultDTState.SupplierId ||
+                   ($("#filter-preset").val() ?? "") != defaultDTState.Preset ||
                    ($("#filter-from").val() ?? "") != defaultDTState.DateFrom ||
                    ($("#filter-to").val() ?? "") != defaultDTState.DateTo ||
                    ($("#filter-status").val() ?? "") != defaultDTState.StatusId;
@@ -265,8 +253,8 @@
 
         function resetToDefaultDTFilter() {
             $("#filter-supplier").val(defaultDTState.SupplierId).trigger('change');
-            $("#filter-from").val(defaultDTState.DateFrom);
-            $("#filter-to").val(defaultDTState.DateTo);
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
             $("#filter-status").val(defaultDTState.StatusId).trigger('change');
             
             localStorage.removeItem(dt_storage);
@@ -306,6 +294,7 @@
             stateSaveParams: function (settings, data) {
                 data.SupplierId = $('#filter-supplier').val();
                 data.Supplier = $('#filter-supplier option:selected').text();
+                data.Preset = $('#filter-preset').val();
                 data.DateFrom = $("#filter-from").val();
                 data.DateTo = $("#filter-to").val();
                 data.StatusId = $("#filter-status").val();
@@ -320,8 +309,11 @@
                     });
                     $("#filter-supplier").append(supplierOption).trigger('change');
                 }
-                $("#filter-from").val(data.DateFrom);
-                $("#filter-to").val(data.DateTo);
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
                 if (data.StatusId) {
                     var statusOption = new Option(data.Status, data.StatusId, true, true);
                     $(statusOption).data('data', {

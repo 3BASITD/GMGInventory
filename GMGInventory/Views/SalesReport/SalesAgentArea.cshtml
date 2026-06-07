@@ -97,15 +97,28 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-4">
                         <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Invoice Date From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-4">
                         <div class="form-group">
-                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <label for="filter-to" class="control-label mb-0">Invoice Date To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
@@ -124,7 +137,7 @@
 
 <!-- Chart Modal -->
 <div class="modal fade" id="chartModal" role="dialog" aria-labelledby="chartModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title chart-title">Sales Chart</h5>
@@ -132,11 +145,8 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div style="position: relative; height:500px; width:1000px">
-                    @* <canvas id="salesChart" class="zoom-ignore-modal"></canvas> *@
-                    <canvas id="salesChart"></canvas>
-                </div>
+            <div class="modal-body d-flex justify-content-center">
+                <canvas id="salesChart"></canvas>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -149,34 +159,6 @@
 
 @section Scripts {
     <script>
-
-        var date_today = new Date();
-        var date_year_ago = new Date();
-        date_year_ago.setYear(date_year_ago.getFullYear() - 1);
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    //dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
-                //dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-
         // Load Select2 for Agent
         $("#filter-agent").select2({
             allowClear: true,
@@ -263,8 +245,9 @@
             AreaId: "",
             AreaCode: "",
             Area: "",
-            DateFrom: DateForInput(date_year_ago),
-            DateTo: DateForInput(date_today),
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
         };
 
         function checkDTChanged() {
@@ -276,6 +259,7 @@
                    (salesDT.search() || "") != defaultDTState.search.search ||
                    $("#filter-agent").val() != defaultDTState.AgentId ||
                    $("#filter-area").val() != defaultDTState.AreaId ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
                    $('#filter-from').val() != defaultDTState.DateFrom ||
                    $('#filter-to').val() != defaultDTState.DateTo;
         }
@@ -293,8 +277,8 @@
             $("#filter-agent-name").val(defaultDTState.Agent);
             $('#filter-area').val(defaultDTState.AreaId).trigger('change');
             $("#filter-area-name").val(defaultDTState.Area);
-            $('#filter-from').val(defaultDTState.DateFrom);
-            $('#filter-to').val(defaultDTState.DateTo);
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
             
             localStorage.removeItem(dt_storage);
 
@@ -309,9 +293,7 @@
         }
 
         // Load List on DataTable
-        var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var salesDT = $('.table-sales').DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
                 var now = new Date().getTime();
@@ -340,6 +322,7 @@
                 data.AreaId = $('#filter-area').val();
                 data.AreaCode = $('#filter-area option:selected').text();
                 data.Area = $('#filter-area-name').val();
+                data.Preset = $('#filter-preset').val();
                 data.DateFrom = $('#filter-from').val();
                 data.DateTo = $('#filter-to').val();
             },
@@ -363,7 +346,10 @@
                     $("#filter-area").append(areaOption).trigger('change');
                     $("#filter-area-name").val(data.Area);
                 }
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
                 $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
                 $('#filter-to').val(data.DateTo);
             },
             ajax: {
@@ -430,11 +416,7 @@
                     }
                 }
             }
-        });
-
-        // Load functions upon DataTable load
-        salesDT.on("draw", function () {
-            //hideLoader();
+        }).on("draw", function () {
             checkDefaultFilter();
 
             $(".table-sales thead th").removeClass("text-end");
@@ -467,7 +449,7 @@
                     legend: {
                         display: true,
                         position: 'left'
-                    }, 
+                    },
                     tooltips: {
                         callbacks: {
                             label: function (tooltipItem, data) {
@@ -562,4 +544,4 @@
             }, 500);
         });
     </script>
-    }
+}

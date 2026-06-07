@@ -145,7 +145,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Item)).Convert();
 
-            var stockAutoSynching = await settingRepository.GetValue("StockAutoSynching");
+            var stockAutoSynching = await settingRepository.GetValue("BarcotechAutoStock");
             ViewData["AutoSynching"] = stockAutoSynching == null ? false : stockAutoSynching == "true";
 
             var item = itemRepository.GetItemViewVM(id);

@@ -18,7 +18,7 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.InvoiceDate)
+                        @Html.DisplayNameFor(model => model.SalesOrderDate)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.SONumber)
@@ -51,10 +51,7 @@
                         @Html.DisplayNameFor(model => model.SellingPrice)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Discount1)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Discount2)
+                        Discounts
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.ExtendedPrice)
@@ -262,6 +259,14 @@
             dropdownParent: $('#filterModal')
         });
 
+        $("#filter-category").on("select2:select", function () {
+            $("#filter-item-type").val(null).trigger("change");
+        });
+
+        $("#filter-category").on("select2:unselecting", function (e) {
+            $("#filter-item-type").val(null).trigger("change");
+        });
+
         // Load Select2 for Item Type
         $("#filter-item-type").select2({
             tags: true,
@@ -280,7 +285,12 @@
                 return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions2", "ItemType")"
+                url: "@Url.Action("GetOptions2", "ItemType")",
+                data: {
+                    CategoryId: function() {
+                        return $("#filter-category").val()
+                    }
+                }
             },
             dropdownParent: $('#filterModal')
         });
@@ -553,7 +563,7 @@
                 return: true,
             },
             columns: [
-                { data: "invoiceDate", name: "InvoiceDate" },
+                { data: "salesOrderDate", name: "SalesOrderDate" },
                 {
                     data: function (data, type, dataToSet) {
                         return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.soNumber + "</a>";
@@ -562,11 +572,16 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return "<a href='/SalesInvoice/Details/" + data.invoiceId + "' class='link-info' target='_blank'>" + data.invoiceNumber + "</a>";
+                        return data.invoiceId ? "<a href='/SalesInvoice/Details/" + data.invoiceId + "' class='link-info' target='_blank'>" + data.invoiceNumber + "</a>" : "<span class='text-muted'>N/A</span>";
                     },
                     name: "InvoiceNumber"
                 },
-                { data: "controlNumber", name: "ControlNumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.controlNumber || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "ControlNumber"
+                },
                 { data: "brand", name: "Brand" },
                 {
                     data: function (data, type, dataToSet) {
@@ -575,12 +590,28 @@
                     name: "ItemCode"
                 },
                 { data: "itemName", name: "ItemName" },
-                { data: "partNumber", name: "PartNumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.partNumber || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "PartNumber"
+                },
                 { data: "unit", name: "Unit" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "sellingPrice", name: "SellingPrice", className: "text-end" },
-                { data: "discount1", name: "Discount1", className: "text-end" },
-                { data: "discount2", name: "Discount2", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        var discounts = [];
+                        if (data.discount1D > 0) discounts.push('<span data-microtip-title="Discount #1" data-microtip-position="right" role="tooltip">' + data.discount1 + '</span>');
+                        if (data.discount2D > 0) discounts.push('<span data-microtip-title="Discount #2" data-microtip-position="right" role="tooltip">' + data.discount2 + '</span>');
+                        if (data.discount3D > 0) discounts.push('<span data-microtip-title="Discount #3" data-microtip-position="right" role="tooltip">' + data.discount3 + '</span>');
+                        if (data.discount4D > 0) discounts.push('<span data-microtip-title="Discount #4" data-microtip-position="right" role="tooltip">' + data.discount4 + '</span>');
+                        if (data.discount5D > 0) discounts.push('<span data-microtip-title="Discount #5" data-microtip-position="right" role="tooltip">' + data.discount5 + '</span>');
+                        return discounts.length == 0 ? "<span class='text-muted' data-microtip-title='No Discount' data-microtip-position='right' role='tooltip'>0%</span>" : discounts.join("; ");
+                    },
+                    name: "Discount1",
+                    className: "text-end"
+                },
                 { data: "extendedPrice", name: "ExtendedPrice", className: "text-end" }
             ],
             order: defaultDTState.order

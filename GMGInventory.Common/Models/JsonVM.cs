@@ -354,6 +354,7 @@ namespace GMGInventory.Common.Models
         public string? UserCreated { get; set; }
 
     }
+
     public class ListFilterCommonModel
     {
         DateTime? _DateFrom = null, _DateTo = null;

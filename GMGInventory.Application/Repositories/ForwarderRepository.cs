@@ -213,7 +213,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<bool> IsForwarderInUse(int id)
         {
-            return await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.ForwarderId == id);
+            return await context.SalesOrders.AnyAsync(s => s.ForwarderId == id);
         }
 
         public async Task<bool> IsForwarderIdExistAsync(int id)

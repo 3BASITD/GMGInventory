@@ -322,8 +322,9 @@ namespace GMGInventory.Controllers
             var titleCell = headerRow.Cells[0];
             titleCell.MergeRight = 2;
 
-            //var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS
-            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY INC." : "GMG AUTO PARTS TRADING";
+            var comp = Company == "3BAS" ? "3BAS TIGER INC."
+                     : Company == "GMG" ? "GMG AUTO PARTS TRADING"
+                     : "BINA'S AUTO SUPPLY INC.";
             var titleParagraph = titleCell.AddParagraph(comp);
             titleParagraph.Format = new ParagraphFormat
             {
@@ -540,8 +541,9 @@ namespace GMGInventory.Controllers
             var titleCell = headerRow.Cells[0];
             titleCell.MergeRight = 2;
             
-            //var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY" : "GMG AUTO PARTS EXPRESS";
-            var comp = Company == "BAS" ? "BINA'S AUTO SUPPLY INC." : "GMG AUTO PARTS TRADING";
+            var comp = Company == "3BAS" ? "3BAS TIGER INC."
+                     : Company == "GMG" ? "GMG AUTO PARTS TRADING"
+                     : "BINA'S AUTO SUPPLY INC.";
             var titleParagraph = titleCell.AddParagraph(comp);
             titleParagraph.Format = new ParagraphFormat
             {

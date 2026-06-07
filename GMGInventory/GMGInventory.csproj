@@ -30,6 +30,7 @@
   <ItemGroup>
     <Folder Include="Views\Payment\" />
     <Folder Include="wwwroot\lib\summernote\" />
+    <Folder Include="wwwroot\lib\chart.js4\" />
   </ItemGroup>
 
   <ItemGroup>

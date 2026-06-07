@@ -17,10 +17,18 @@ namespace GMGInventory.Common.Models
         [MinLength(5)]
         [Display(Name = "Name")]
         public string Name { get; set; }
+
+        public int? CategoryId { get; set; }
+        public string Category { get; set; }
     }
 
     public class ItemTypeViewVM : GenericAuditVM
     {
+        [Display(Name = "Category")]
+        public string? Category { get; set; }
+        [Display(Name = "Category Code")]
+        public string? CategoryCode { get; set; }
+        public int? CategoryId { get; set; }
     }
 
     public class ItemTypeFileVM : ItemTypeVM

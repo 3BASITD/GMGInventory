@@ -78,7 +78,7 @@ namespace GMGInventory.Controllers
             return Json(await invoiceRepository.GetItemsDTAsync(form, invoiceId));
         }
 
-        public async Task<IActionResult> PrintReceipt(int Id, string? Company)
+        public async Task<IActionResult> PrintReceipt(int Id, string Company = "BAS", string MarginTop = "24")
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesInvoice, AccessTypes.Print);
             if (redirectResult != null) return redirectResult;
@@ -88,6 +88,7 @@ namespace GMGInventory.Controllers
             if (invoice == null) return NotFound();
 
             TempData["CompanyTemplate"] = Company;
+            TempData["MarginTop"] = MarginTop;
             return View(invoice);
         }
 

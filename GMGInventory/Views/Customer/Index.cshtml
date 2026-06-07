@@ -16,7 +16,10 @@
         }
         @if (userAccess.CanUploadDownload)
         {
-            <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            @* <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <span class="fas fa-upload"></span> Upload
+            </button> *@
+            <button type="button" class="btn btn-secondary btn-sm float-right uploadFileBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadFileModal">
                 <span class="fas fa-upload"></span> Upload
             </button>
             <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
@@ -421,7 +424,7 @@
                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                class="form-control form-control-sm" />
                     </div>
-                    <table class="table table-striped" id="upload-table">
+                    <table class="table table-striped table-responsive" id="upload-table">
                         <thead>
                             <tr><th>Row #</th><th>Code</th><th>Name</th><th>Commission Rate</th><th>Region</th><th>Area</th><th>Customer Type</th><th>Contact Person</th><th>Contact Number</th><th>Address</th><th>Email</th><th>Agent</th><th>Fax Number</th><th>TIN</th><th>VAT</th><th>Credit Term</th><th>Credit Limit</th><th>Remarks</th><th>Status</th></tr>
                         </thead>
@@ -430,6 +433,36 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="DoUpload()">
+                        <span class="fas fa-upload"></span> Upload
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadFileModal" role="dialog" aria-labelledby="uploadFileModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload File</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label mb-0" for="upload-excel-file">Excel File</label>
+                        <input type="file" id="upload-excel-file" name="file"
+                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                               class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="DoFileUpload()">
                         <span class="fas fa-upload"></span> Upload
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -927,104 +960,174 @@
                 $("#upload-table tbody").html("");
                 $("#upload-table").hide();
             });
-        }
 
-        function DoUpload() {
-            if (!$("#upload-file").val()) {
-                toastr.warning("Please select a file first", "Warning");
-            } if (json_of_excel.length == 0) {
-                toastr.warning("The excel file is empty", "Warning");
-            } else {
-                var columns = Object.keys(json_of_excel[0]);
-                $("#upload-table tbody").html("");
-                $("#upload-table").show();
-                duplicate_upload = 0;
-                for (var i = 0; i < json_of_excel.length; i++) {
-                    var rowNum = json_of_excel[i].__rowNum__;
-                    var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
-                    row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
-                    for (var colIndex = 0; colIndex < colnumber; colIndex++) {
-                        var cellValue = json_of_excel[i][columns[colIndex]];
-                        if (cellValue == null)
-                            cellValue = "";
-                        row$.append($('<td/>').html(cellValue));
-                    }
-                    if (columns.includes("Code") == false
+            function DoUpload() {
+                if (!$("#upload-file").val()) {
+                    toastr.warning("Please select a file first", "Warning");
+                } if (json_of_excel.length == 0) {
+                    toastr.warning("The excel file is empty", "Warning");
+                } else {
+                    var columns = Object.keys(json_of_excel[0]);
+                    $("#upload-table tbody").html("");
+                    $("#upload-table").show();
+                    duplicate_upload = 0;
+                    for (var i = 0; i < json_of_excel.length; i++) {
+                        var rowNum = json_of_excel[i].__rowNum__;
+                        var row$ = $('<tr/>').attr("id", "upload-row" + rowNum + "tr");
+                        row$.append($('<td/>').html(json_of_excel[i].__rowNum__));
+                        for (var colIndex = 0; colIndex < colnumber; colIndex++) {
+                            var cellValue = json_of_excel[i][columns[colIndex]];
+                            if (cellValue == null)
+                                cellValue = "";
+                            row$.append($('<td/>').html(cellValue));
+                        }
+                        if (columns.includes("Code") == false
                         || columns.includes("Name") == false
                         || columns.includes("Commission Rate") == false
                         || columns.includes("Region") == false
                         || columns.includes("Area") == false
                         || columns.includes("Customer Type") == false
-                        || columns.includes("Contact Person") == false
-                        || columns.includes("Contact Number") == false
-                        || columns.includes("Address") == false
+                        // || columns.includes("Contact Person") == false //
+                        // || columns.includes("Contact Number") == false //
+                        //|| columns.includes("Address") == false //
                         || columns.includes("Email") == false
                         || columns.includes("Agent") == false
-                        || columns.includes("Fax Number") == false
+                        // || columns.includes("Fax Number") == false //
                         || columns.includes("TIN") == false
                         || columns.includes("VAT") == false
                         || columns.includes("Credit Term") == false
                         || columns.includes("Credit Limit") == false
-                        || columns.includes("Customer Account Status") == false
+                        // || columns.includes("Customer Account Status") == false //
                         || columns.includes("Remarks") == false) {
-                        row$.append($('<td/>').html("Unexpected columns"));
+                            var missing = [];
+                            if(columns.includes("Code") == false) { missing.push("Code"); }
+                            if(columns.includes("Name") == false) { missing.push("Name"); }
+                            if(columns.includes("Commission Rate") == false) { missing.push("Commission Rate"); }
+                            if(columns.includes("Region") == false) { missing.push("Region"); }
+                            if(columns.includes("Area") == false) { missing.push("Area"); }
+                            if(columns.includes("Customer Type") == false) { missing.push("Customer Type"); }
+                            if(columns.includes("Email") == false) { missing.push("Email"); }
+                            if(columns.includes("Agent") == false) { missing.push("Agent"); }
+                            if(columns.includes("TIN") == false) { missing.push("TIN"); }
+                            if(columns.includes("VAT") == false) { missing.push("VAT"); }
+                            if(columns.includes("Credit Term") == false) { missing.push("Credit Term"); }
+                            if(columns.includes("Credit Limit") == false) { missing.push("Credit Limit"); }
+                            if(columns.includes("Remarks") == false) { missing.push("Remarks"); }
+                            row$.append($('<td/>').html("Expected columns missing: " + missing.join(", ")));
+                            UploadRowDone();
+                        } else {
+                            SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Commission Rate"], json_of_excel[i]["Region"], json_of_excel[i]["Area"], json_of_excel[i]["Customer Type"], /*json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Address"],*/ json_of_excel[i]["Email"], json_of_excel[i]["Agent"], /*json_of_excel[i]["Fax Number"], */json_of_excel[i]["TIN"], json_of_excel[i]["VAT"], json_of_excel[i]["Credit Term"], json_of_excel[i]["Credit Limit"], /*json_of_excel[i]["Customer Account Status"], */json_of_excel[i]["Remarks"], rowNum);
+                            row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
+                        }
+                        $("#upload-table").append(row$);
+                    }
+                }
+            }
+
+            function SaveXLSX(code, name, commissionRateD, regionName, areaName, customerTypeName, /*contactPerson, contactNumber, address,*/ email, agentName, /*faxNumber,*/ tIN, vAT, creditTermName, creditLimitD, /*customerAccountStatus,*/ remarks, rownum) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadJson")",
+                    data: {
+                        Code: code,
+                        Name: name,
+                        CommissionRateD: commissionRateD,
+                        RegionName: regionName,
+                        AreaName: areaName,
+                        CustomerTypeName: customerTypeName,
+                        //ContactPerson: contactPerson,
+                        //ContactNumber: contactNumber,
+                        //Address: address,
+                        Email: email,
+                        AgentName: agentName,
+                        //FaxNumber: faxNumber,
+                        TIN: tIN,
+                        VAT: vAT,
+                        CreditTermName: creditTermName,
+                        CreditLimitD: creditLimitD,
+                        //CustomerAccountStatusName: customerAccountStatus,
+                        Remarks: remarks
+
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.message == "Already exist") {
+                            $("#upload-row" + rownum + "tr").remove();
+                            duplicate_upload++;
+                        } else {
+                            $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                        }
+                    },
+                    complete: function (xhr, status) {
                         UploadRowDone();
-                    } else {
-                        SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["Name"], json_of_excel[i]["Commission Rate"], json_of_excel[i]["Region"], json_of_excel[i]["Area"], json_of_excel[i]["Customer Type"], json_of_excel[i]["Contact Person"], json_of_excel[i]["Contact Number"], json_of_excel[i]["Address"], json_of_excel[i]["Email"], json_of_excel[i]["Agent"], json_of_excel[i]["Fax Number"], json_of_excel[i]["TIN"], json_of_excel[i]["VAT"], json_of_excel[i]["Credit Term"], json_of_excel[i]["Credit Limit"], json_of_excel[i]["Customer Account Status"], json_of_excel[i]["Remarks"], rowNum);
-                        row$.append($('<td/>').attr("id", "upload-row" + rowNum + "td"));
                     }
-                    $("#upload-table").append(row$);
+                });
+            }
+
+            function UploadRowDone() {
+                done_upload_excel++;
+                if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
+                    $("#upload-table").append('<tr><td>*</td><td colspan="17">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
+                    $("#upload-file").val("");
                 }
             }
-        }
 
-        function SaveXLSX(code, name, commissionRateD, regionName, areaName, customerTypeName, contactPerson, contactNumber, address, email, agentName, faxNumber, tIN, vAT, creditTermName, creditLimitD, customerAccountStatus, remarks, rownum) {
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("UploadJson")",
-                data: {
-                    Code: code,
-                    Name: name,
-                    CommissionRateD: commissionRateD,
-                    RegionName: regionName,
-                    AreaName: areaName,
-                    CustomerTypeName: customerTypeName,
-                    ContactPerson: contactPerson,
-                    ContactNumber: contactNumber,
-                    Address: address,
-                    Email: email,
-                    AgentName: agentName,
-                    FaxNumber: faxNumber,
-                    TIN: tIN,
-                    VAT: vAT,
-                    CreditTermName: creditTermName,
-                    CreditLimitD: creditLimitD,
-                    CustomerAccountStatusName: customerAccountStatus,
-                    Remarks: remarks
+            function DoFileUpload() {
+                var formData = new FormData();
+                formData.append("File", $("#upload-excel-file")[0].files[0]);
 
-                },
-                success: function (data, status, xhr) {
-                    if (data.message == "Already exist") {
-                        $("#upload-row" + rownum + "tr").remove();
-                        duplicate_upload++;
-                    } else {
-                        $("#upload-row" + rownum + "td").html(data.status + ": " + data.message);
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadFileJson")",
+                    data: formData,
+                    loaderMessage: "Please wait while this completes. Whole file is being processed on server.<br><small class=\"text-muted\">Reloading the page will stop the process, which may result in some excel rows to fail.</small>",
+                    //async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    xhrFields: {
+                        responseType: 'blob'  // important for file
+                    },
+                    //enctype: "multipart/form-data",
+                    success: function (data, status, xhr) {
+                        let statusHeader = xhr.getResponseHeader("X-Status");
+                        let messageHeader = xhr.getResponseHeader("X-Message");
+                        if (statusHeader == "Error") {
+                            toastr.error(messageHeader, "Error");
+                        } else {
+                            // Create a temporary download link
+                            let blob = new Blob([data]);
+                            let url = window.URL.createObjectURL(blob);
+
+                            let a = document.createElement("a");
+                            a.href = url;
+
+                            let disposition = xhr.getResponseHeader('Content-Disposition');
+                            let fileName = "Result.xlsx";
+                            if (disposition) {
+                                // try UTF-8 encoded filename first
+                                let utf8Match = disposition.match(/filename\*=UTF-8''(.+)/);
+                                if (utf8Match && utf8Match[1]) {
+                                    fileName = decodeURIComponent(utf8Match[1]);
+                                } else {
+                                    // fallback to normal filename
+                                    let normalMatch = disposition.match(/filename="?([^";]+)"?/);
+                                    if (normalMatch && normalMatch[1]) fileName = normalMatch[1];
+                                }
+                            }
+                            a.download = fileName;
+                            a.click();
+
+                            window.URL.revokeObjectURL(url);
+
+                            dataTable.ajax.reload();
+
+                            toastr.success(messageHeader, "Success");
+
+                            $("#uploadFileModal").modal("hide");
+                        }
                     }
-                },
-                complete: function (xhr, status) {
-                    UploadRowDone();
-                }
-            });
-        }
-
-        function UploadRowDone() {
-            done_upload_excel++;
-            if (done_upload_excel == json_of_excel.length && duplicate_upload > 0) {
-                $("#upload-table").append('<tr><td>*</td><td colspan="17">Excluded ' + duplicate_upload + ' row(s)</td><td>Already exist</td></tr>');
-                $("#upload-file").val("");
+                });
             }
         }
-
-
     </script>
 }

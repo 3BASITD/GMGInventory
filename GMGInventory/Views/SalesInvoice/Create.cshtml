@@ -261,7 +261,6 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
                         return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
@@ -326,7 +325,6 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        //return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                         return '<input type="number" min="0" max="' + data.quantity + '" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
                     },
                     name: "Quantity",
@@ -334,7 +332,6 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
                         return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode",

@@ -93,7 +93,6 @@ namespace GMGInventory.Common.Models
         public string NetPrice => string.Format(SystemFormat.StringDecimalComma, NetPriceD);
         public decimal NetPriceD => UnitPriceD * Quantity
                                   * (100 - Discount1D) / 100
-                                  * (100 - Discount2D) / 100
                                   * (100 - Discount2D) / 100;
     }
 

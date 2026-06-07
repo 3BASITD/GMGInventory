@@ -291,9 +291,7 @@ namespace GMGInventory.Application.Repositories
                                                     .FirstOrDefault(),
                              SalesOrderDateD = order.SalesOrderDate,
                              PurchaseOrder = order.PurchaseOrder,
-                             ForwarderName = order.SalesOrderDeliveryMonitorings
-                                                  .Select(s => s.Forwarder.Name)
-                                                  .FirstOrDefault(),
+                             ForwarderName = order.Forwarder != null ? order.Forwarder.Name : null,
                              RegionId = order.Customer.Area.RegionId
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();

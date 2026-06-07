@@ -48,7 +48,7 @@ namespace GMGInventory.Application.Repositories
                                              Text = s.Select(l => l.BoxNumber).Distinct().Count() + " " + s.Key.Code,
                                              PackageCount = s.Select(l => l.BoxNumber).Distinct().Count()
                                          }).ToList()
-                           let forwarder = so.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == so.Id).FirstOrDefault()!.Forwarder
+                           let forwarder = so.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == so.Id).Select(s=>s.Forwarder).FirstOrDefault()
                            where (sts.Code.Trim().ToLower() == "invoiced" || sts.Code.Trim().ToLower() == "draft")
                            && filter.DateFrom <= invs.SalesOrder.SalesOrderDate.Date
                            && invs.SalesOrder.SalesOrderDate.Date <= filter.DateTo
@@ -64,7 +64,9 @@ namespace GMGInventory.Application.Repositories
                                PackId = pack.Id,
                                SalesOrderDateD = invs.SalesOrder.SalesOrderDate,
                                TotalPackageCount = packaging.Sum(s => s.PackageCount),
-                               Forwarder = forwarder == null ? null : forwarder.Name
+                               Forwarder = forwarder != null ? forwarder.Name
+                                         : so.Forwarder != null ? so.Forwarder.Name
+                                         : null
                            };
 
             return await invoices.ToListAsync();
@@ -156,7 +158,7 @@ namespace GMGInventory.Application.Repositories
                                               PackageCount = s.Select(l => l.BoxNumber).Distinct().Count()
                                           }).ToList()
                            let shippingAddress = order.Customer.ShippingAddresses.Where(s => s.IsDefault == true).FirstOrDefault()
-                           let forwarder = order.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == order.Id).FirstOrDefault()!.Forwarder
+                           let forwarder = order.SalesOrderDeliveryMonitorings.Where(s => s.SalesOrderId == order.Id).Select(s=>s.Forwarder).FirstOrDefault()
 
 
                            where order.Id == Id
@@ -166,7 +168,9 @@ namespace GMGInventory.Application.Repositories
                                CustomerName = order.Customer.Name,
                                CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
                                CustomerContactNo = shippingAddress == null ? null : shippingAddress.PhoneNumber,
-                               Forwarder = forwarder == null ? null : forwarder.Name,
+                               Forwarder = forwarder != null ? forwarder.Name
+                                         : order.Forwarder != null ? order.Forwarder.Name
+                                         : null,
                                SalesOrderId = order.Id,
                                SalesOrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,

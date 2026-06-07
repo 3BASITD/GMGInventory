@@ -1,5 +1,6 @@
 ﻿using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace GMGInventory.Application.Contracts
 {
@@ -51,5 +52,6 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<CustomerVM>> GetCustomerPaymentDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerReceivableDTAsync(DataTablesRequestForm form, int id);
         Task<ForDataTables<CustomerVM>> GetCustomerDetailsDTAsync(DataTablesRequestForm form, int id);
+        Task<ResponseModelData<FileVM>> UploadFile(IFormFile file);
     }
 }

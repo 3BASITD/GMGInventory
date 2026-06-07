@@ -15,8 +15,7 @@ namespace GMGInventory.Controllers
     public class PickController(IAccessRepository accessRepository
                               , IPickRepository pickRepository
                               , ISystemSettingRepository settingRepository
-                              , IAPIBCT_Service apiBCTService
-                              , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
+                              , IAPIBCT_Service apiBCTService) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {
@@ -25,7 +24,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BarcotechPicking)).Convert();
 
-            var pickAutoSynching = await settingRepository.GetValue("PickAutoSynching");
+            var pickAutoSynching = await settingRepository.GetValue("BarcotechAutoPicking");
             ViewData["AutoSynching"] = pickAutoSynching == null ? false : pickAutoSynching == "true";
 
             return View();
@@ -47,7 +46,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechPicking, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await settingRepository.UpdateSetting("PickAutoSynching", AutoEnabled ? "true" : "false"));
+            return Json(await settingRepository.UpdateSetting("BarcotechAutoPicking", AutoEnabled ? "true" : "false"));
         }
 
         public async Task<IActionResult> SyncPick()
@@ -55,7 +54,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechPicking, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            var response = await apiBCTService.SyncPick(apiBCTOptions.Value.URLPicking);
+            var response = await apiBCTService.SyncPick();
             return Json(response);
         }
     }

@@ -15,30 +15,21 @@
                     <span class="fas fa-print"></span> Print
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterPriceModal">
-                <span class="fas fa-filter"></span> Filter
-            </button>
             @if (userAccess.CanUploadDownload)
             {
-                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 downloadBtn">
                     <span class="fas fa-download"></span> Download
                 </button>
             }
+            <button class="btn btn-secondary btn-sm float-right btn-filter ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
         <table class="table table-head-fixed table-striped table-hover table-price">
             <thead>
                 <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Brand)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.ModelNumber)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Size)
-                    </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Code)
                     </th>
@@ -47,6 +38,15 @@
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.PartNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ModelNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Size)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Unit)
@@ -66,7 +66,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="filterPriceModal" role="dialog" aria-labelledby="filterPriceModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -87,14 +87,22 @@
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-type" class="form-label mb-0">Item Type</label>
-                            <select id="filter-type" style="width:100%">
+                            <label for="filter-category" class="form-label mb-0">Category</label>
+                            <select id="filter-category" style="width:100%">
                                 <option></option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-type" class="form-label mb-0">Item Type</label>
+                            <select id="filter-type" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-item-code" class="form-label mb-0">Item Code</label>
@@ -103,17 +111,16 @@
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-item-name" class="form-label mb-0">Item Description</label>
-                            @*<input type="text" id="filter-item-name" class="form-control form-control-sm" readonly="readonly" />*@
                             <select id="filter-item-name" style="width:100%">
                                 <option></option>
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-model" class="form-label mb-0">Model Number</label>
@@ -122,6 +129,8 @@
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-size" class="form-label mb-0">Size</label>
@@ -132,7 +141,11 @@
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
@@ -144,53 +157,85 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         // Load Select2 for Brand
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Brand")",
-            success: function (data, status, xhr) {
-                $("#filter-brand").select2({
-                    ajax: null, //already fetched outside
-                    tags: true,
-                    data: data,
-                    allowClear: true,
-                    templateResult: function (repo) {
-                        if (repo.element) {
-                            return repo.text;
-                        }
-                        return $("<span>" + repo.text + "</span> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
-                    },
-                    placeholder: {
-                        id: "",
-                        text: "ALL"
-                    },
-                    dropdownParent: $('#filterPriceModal')
-                });
-            }
+        $("#filter-brand").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        // Load Select2 for Category
+        $("#filter-category").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Category")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        $("#filter-category").on("select2:select", function () {
+            $("#filter-type").val(null).trigger("change");
+        });
+
+        $("#filter-category").on("select2:unselecting", function (e) {
+            $("#filter-type").val(null).trigger("change");
         });
 
         // Load Select2 for Item Type
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "ItemType")",
-            success: function (data, status, xhr) {
-                $("#filter-type").select2({
-                    ajax: null, //already fetched outside
-                    tags: true,
-                    data: data,
-                    allowClear: true,
-                    templateResult: function (repo) {
-                        if (repo.element) {
-                            return repo.text;
-                        }
-                        return $("<span>" + repo.text + "</span> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
-                    },
-                    placeholder: {
-                        id: "",
-                        text: "ALL"
-                    },
-                    dropdownParent: $('#filterPriceModal')
-                });
-            }
+        $("#filter-type").select2({
+            tags: true,
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                if (repo.name) {
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                }
+                return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "ItemType")",
+                data: {
+                    CategoryId: function() {
+                        return $("#filter-category").val()
+                    }
+                }
+            },
+            dropdownParent: $('#filterModal')
         });
 
         // Load Select2 for Item Code
@@ -222,26 +267,21 @@
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")"
             },
-            dropdownParent: $("#filterPriceModal")
+            dropdownParent: $("#filterModal")
         });
 
         $("#filter-item-code").on("select2:select", function () {
-            if ($(this).select2("data")[0].name) {
-                //$("#filter-item-name").val($(this).select2("data")[0].name);
-                $("#filter-item-name").val(null).trigger("change");
-                $('#select2-filter-item-name-container').find('.select2-selection__placeholder').text($(this).select2("data")[0].name);
-                $('#select2-filter-item-name-container').attr("title", $(this).select2("data")[0].name);
-            } else if ($(this).val()) {
-                //$("#filter-item-name").val($("#filter-item").val());
-                $('#select2-filter-item-name-container').find('.select2-selection__placeholder').text("All");
-                $('#select2-filter-item-name-container').attr("title", "All");
+            var name = $(this).select2("data")[0].name;
+            if(name) {
+                var itemNameOption = new Option(name, $(this).val(), true, true);
+                $("#filter-item-name").append(itemNameOption).trigger('change');
+            } else {
+                $("#filter-item-name").val(null).trigger('change');
             }
         });
 
         $("#filter-item-code").on("select2:unselecting", function (e) {
-            //$("#filter-item-name").val("");
-            $('#select2-filter-item-name-container').find('.select2-selection__placeholder').text("All");
-            $('#select2-filter-item-name-container').attr("title", "All");
+            $("#filter-item-name").val(null).trigger('change');
         });
 
         // Load Select2 for Item Name
@@ -273,29 +313,21 @@
             ajax: {
                 url: "@Url.Action("GetOptions", "Item")"
             },
-            dropdownParent: $("#filterPriceModal")
+            dropdownParent: $("#filterModal")
         });
 
         $("#filter-item-name").on("select2:select", function () {
-            if ($(this).select2("data")[0].name) {
-                $("#filter-item-code").val(null).trigger("change");
-                $('#select2-filter-item-code-container').find('.select2-selection__placeholder').text($(this).select2("data")[0].text);
-                $('#select2-filter-item-code-container').attr("title", $(this).select2("data")[0].text);
-
-                var selected_name = $(this).select2("data")[0].name;
-                setTimeout(function () {
-                    $("#select2-filter-item-name-container").text(selected_name);
-                    $("#select2-filter-item-name-container").attr("title", selected_name);
-                }, 100);
-            } else if ($(this).val()) {
-                $('#select2-filter-item-code-container').find('.select2-selection__placeholder').text("All");
-                $('#select2-filter-item-code-container').attr("title", "All");
+            var name = $(this).select2("data")[0].name;
+            if(name) {
+                var itemCodeOption = new Option(name, $(this).val(), true, true);
+                $("#filter-item-code").append(itemCodeOption).trigger('change');
+            } else {
+                $("#filter-item-code").val(null).trigger('change');
             }
         });
 
         $("#filter-item-name").on("select2:unselecting", function (e) {
-            $('#select2-filter-item-code-container').find('.select2-selection__placeholder').text("All");
-            $('#select2-filter-item-code-container').attr("title", "All");
+            $("#filter-item-code").val(null).trigger('change');
         });
 
         // Load Select2 for Model Number
@@ -315,7 +347,7 @@
             ajax: {
                 url: "@Url.Action("GetModelNumberOptions", "Item")"
             },
-            dropdownParent: $("#filterPriceModal")
+            dropdownParent: $("#filterModal")
         });
 
         // Load Select2 for Size
@@ -335,12 +367,165 @@
             ajax: {
                 url: "@Url.Action("GetSizeOptions", "Item")"
             },
-            dropdownParent: $("#filterPriceModal")
+            dropdownParent: $("#filterModal")
         });
 
-        var priceDT = $('.table-price').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            priceDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            priceDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Brand: "",
+            BrandId: "",
+            Category: "",
+            CategoryId: "",
+            ItemType: "",
+            ItemTypeId: "",
+            ItemCodeId: "",
+            ItemCode: "",
+            ItemNameId: "",
+            ItemName: "",
+            ModelNumber: "",
+            ModelNumberId: "",
+            Size: "",
+            SizeId: ""
+        };
+
+        function checkDTChanged() {
+            if(!priceDT) return false;
+            
+            return JSON.stringify(priceDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   priceDT.page.info().start != defaultDTState.page ||
+                   priceDT.page.len() != defaultDTState.length ||
+                   (priceDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-brand").val() != defaultDTState.BrandId ||
+                   $("#filter-category").val() != defaultDTState.CategoryId ||
+                   $("#filter-type").val() != defaultDTState.ItemTypeId ||
+                   $("#filter-item-code").val() != defaultDTState.ItemCodeId ||
+                   $("#filter-item-name").val() != defaultDTState.ItemNameId ||
+                   $("#filter-model").val() != defaultDTState.ModelNumberId ||
+                   $("#filter-size").val() != defaultDTState.SizeId;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $('#filter-category').val(defaultDTState.CategoryId).trigger('change');
+            $('#filter-type').val(defaultDTState.ItemTypeId).trigger('change');
+            $('#filter-item-code').val(defaultDTState.ItemCodeId).trigger('change');
+            $('#filter-item-name').val(defaultDTState.ItemNameId).trigger('change');
+            $('#filter-model').val(defaultDTState.ModelId).trigger('change');
+            $('#filter-size').val(defaultDTState.SizeId).trigger('change');
+            
+            if (priceDT) {
+                priceDT.state.clear();
+                priceDT.order(defaultDTState.order);
+                priceDT.page(defaultDTState.page);
+                priceDT.search(defaultDTState.search.search);
+            }
+        }
+
+        var priceDT = $('.table-price').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.Brand = $('#filter-brand option:selected').text();
+                data.BrandId = $('#filter-brand').val();
+                data.Category = $('#filter-category option:selected').text();
+                data.CategoryId = $('#filter-category').val();
+                data.ItemType = $('#filter-type option:selected').text();
+                data.ItemTypeId = $('#filter-type').val();
+                data.ItemCode = $('#filter-item-code option:selected').text();
+                data.ItemCodeId = $('#filter-item-code').val();
+                data.ItemName = $('#filter-item-name option:selected').text();
+                data.ItemNameId = $('#filter-item-name').val();
+                data.Model = $('#filter-model option:selected').text();
+                data.ModelId = $('#filter-model').val();
+                data.Size = $('#filter-size option:selected').text();
+                data.SizeId = $('#filter-size').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.BrandId) {
+                    var brandOption = new Option(data.Brand, data.BrandId, true, true);
+                    $("#filter-brand").append(brandOption).trigger('change');
+                }
+                if(data.CategoryId) {
+                    var categoryOption = new Option(data.Category, data.CategoryId, true, true);
+                    $("#filter-category").append(categoryOption).trigger('change');
+                }
+                if(data.ItemTypeId) {
+                    var itemTypeOption = new Option(data.ItemType, data.ItemTypeId, true, true);
+                    $("#filter-type").append(itemTypeOption).trigger('change');
+                }
+                if(data.ItemCodeId) {
+                    var itemCodeOption = new Option(data.ItemCode, data.ItemCodeId, true, true);
+                    $("#filter-item-code").append(itemCodeOption).trigger('change');
+                }
+                if(data.ItemNameId) {
+                    var itemNameOption = new Option(data.ItemName, data.ItemNameId, true, true);
+                    $("#filter-item-name").append(itemNameOption).trigger('change');
+                }
+                if(data.ModelId) {
+                    var modelOption = new Option(data.Model, data.ModelId, true, true);
+                    $("#filter-model").append(modelOption).trigger('change');
+                }
+                if(data.SizeId) {
+                    var sizeOption = new Option(data.Size, data.SizeId, true, true);
+                    $("#filter-size").append(sizeOption).trigger('change');
+                }
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
@@ -352,6 +537,16 @@
                         } else {
                             data.BrandId = 0;
                             data.BrandKeyword = brandId;
+                        }
+                    }
+                    
+                    var categoryId = $("#filter-category").val();
+                    if (categoryId) {
+                        if ($("#filter-category").select2("data")[0].name) {
+                            data.CategoryId = categoryId;
+                        } else {
+                            data.CategoryId = 0;
+                            data.CategoryKeyword = categoryId;
                         }
                     }
 
@@ -414,12 +609,17 @@
                 return: true,
             },
             columns: [
-                { data: "brand", name: "Brand" },
-                { data: "modelNumber", name: "ModelNumber" },
-                { data: "size", name: "Size" },
-                { data: "code", name: "Code" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.id + "' class='link-info' target='_blank'>" + data.code + "</a>";
+                    },
+                    name: "Code"
+                },
                 { data: "name", name: "Name" },
                 { data: "partNumber", name: "PartNumber" },
+                { data: "modelNumber", name: "ModelNumber" },
+                { data: "brand", name: "Brand" },
+                { data: "size", name: "Size" },
                 { data: "unit", name: "Unit" },
                 {
                     data: function (data, type, dataToSet) { return data.retailPrice.toFixed(2); },
@@ -439,17 +639,10 @@
                     className: "text-end"
                 },
             ],
-            order: [[3, "asc"]]
+            order: defaultDTState.order
+        }).on("draw", function () {
+            checkDefaultFilter();
         });
-
-        priceDT.on("draw", function () {
-            //hideLoader();
-        });
-
-        function ApplyFilter() {
-            priceDT.ajax.reload();
-            $("#filterPriceModal").modal("hide");
-        }
 
         if (user_access.canPrint) {
             $(".printBtn").on("click", function () {
@@ -466,7 +659,7 @@
                         infoMode: true
                     }).then((value) => {
                         if (value == "filter") {
-                            $("#filterPriceModal").modal("show");
+                            $("#filterModal").modal("show");
                         } else if (value == "continue") {
                             DoPrint();
                         }
@@ -549,6 +742,16 @@
                     }
                 }
 
+                var itemCategoryId = $("#filter-category").val();
+                if (itemCategoryId) {
+                    if (isNaN(itemCategoryId)) {
+                        urlQuery.push("CategoryId=0");
+                        urlQuery.push("CategoryKeyword=" + itemCategoryId);
+                    } else {
+                        urlQuery.push("CategoryId=" + itemCategoryId);
+                    }
+                }
+
                 var itemTypeId = $("#filter-type").val();
                 if (itemTypeId) {
                     if (isNaN(itemTypeId)) {
@@ -563,9 +766,19 @@
                 if (itemId) {
                     if (isNaN(itemId)) {
                         urlQuery.push("ItemId=0");
-                        urlQuery.push("ItemCategory=" + itemId);
+                        urlQuery.push("ItemKeyword=" + itemId);
                     } else {
                         urlQuery.push("ItemId=" + itemId);
+                    }
+                }
+
+                var itemNameId = $("#filter-item-name").val();
+                if (itemNameId) {
+                    if (isNaN(itemNameId)) {
+                        urlQuery.push("ItemId=0");
+                        urlQuery.push("ItemNameKeyword=" + itemNameId);
+                    } else {
+                        urlQuery.push("ItemId=" + itemNameId);
                     }
                 }
 

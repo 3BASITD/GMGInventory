@@ -36,7 +36,6 @@ builder.Services.AddDataProtection()
     .SetApplicationName("GMGInventory");
 
 builder.Services.Configure<APIHMSettings>(builder.Configuration.GetSection("APIHMSettings"));
-builder.Services.Configure<APIBCTSettings>(builder.Configuration.GetSection("APIBCTSettings"));
 
 builder.Services.Configure<FormOptions>(options =>
 {

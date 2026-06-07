@@ -229,7 +229,13 @@
     //});
 });
 
-function loadSelect2(selector, modal, url, allowClear = false) {
+$(document).on('hide.bs.modal', '.modal', function () {
+    if (document.activeElement && $.contains(this, document.activeElement)) {
+        document.activeElement.blur();
+    }
+});
+
+function loadSelect2(selector, modal, url, allowClear = false, ajaxdata = null, onselect, onunselect) {
     $(selector).select2({
         allowClear: allowClear,
         placeholder: {
@@ -246,10 +252,15 @@ function loadSelect2(selector, modal, url, allowClear = false) {
             return repo.text;
         },
         ajax: {
-            url: url
+            url: url,
+            data: ajaxdata
         },
         dropdownParent: $(modal)
     });
+
+    $(selector).on("select2:select", onselect);
+
+    $(selector).on("select2:unselecting", onunselect);
 }
 
 function ToastrAndConsoleError(title, message) {

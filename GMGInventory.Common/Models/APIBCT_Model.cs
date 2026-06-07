@@ -3,15 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Common.Models
 {
-    public class APIBCTSettings
-    {
-        public string URLReceiving { get; set; }
-        public string URLOutbound { get; set; }
-        public string URLReturn { get; set; }
-        public string URLTransfer { get; set; }
-        public string URLStock { get; set; }
-        public string URLPicking { get; set; }
-    }
     public class APIBCT_Receiving
     {
         public string id { get; set; }

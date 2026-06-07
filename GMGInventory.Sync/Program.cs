@@ -1,8 +1,6 @@
-using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Sync;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -12,8 +10,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString, sqlOptions =>
         sqlOptions.EnableRetryOnFailure()
     ));
-
-builder.Services.Configure<APIBCTSettings>(builder.Configuration.GetSection("APIBCTSettings"));
 
 builder.Services.AddHttpClient();
 builder.Services.AddWindowsService();

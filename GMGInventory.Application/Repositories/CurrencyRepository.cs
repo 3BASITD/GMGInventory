@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
@@ -14,19 +13,14 @@ namespace GMGInventory.Application.Repositories
     public class CurrencyRepository : GenericRepository<Currency>, ICurrencyRepository
     {
         private readonly ApplicationDbContext context;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
+        private readonly string currentUserId;
 
         public CurrencyRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper) : base(context, httpContextAccessor, userManager)
+            , UserManager<User> userManager) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
-            this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
-            this.mapper = mapper;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
 
@@ -101,8 +95,6 @@ namespace GMGInventory.Application.Repositories
             {
                 if (currencies.Count == 0)
                     return new ResponseModel { Status = "Error", Message = "Nothing to update" };
-
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
                 var currentCurrencies = await context.Currencies
                                                      .Include(s => s.PurchaseOrderNews)

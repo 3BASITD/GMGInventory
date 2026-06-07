@@ -1,15 +1,12 @@
-using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.InkML;
 using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System.IO.Packaging;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using static Humanizer.On;
 
 namespace GMGInventory.Sync
 {
@@ -18,17 +15,14 @@ namespace GMGInventory.Sync
         private readonly ILogger<Worker> logger;
         private readonly IServiceScopeFactory scopeFactory;
         private readonly IHttpClientFactory httpClientFactory;
-        private readonly APIBCTSettings settings;
         private readonly string userId = "5F3A0923-894B-41F8-8C2B-9D0A1E3F6B7C";
         public Worker(ILogger<Worker> logger,
                       IServiceScopeFactory scopeFactory,
-                      IHttpClientFactory httpClientFactory,
-                      IOptions<APIBCTSettings> settings)
+                      IHttpClientFactory httpClientFactory)
         {
             this.logger = logger;
             this.scopeFactory = scopeFactory;
             this.httpClientFactory = httpClientFactory;
-            this.settings = settings.Value;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -48,7 +42,9 @@ namespace GMGInventory.Sync
                     #region RECEIVING
                     try
                     {
-                        var receivings = await GetData<APIBCT_Receiving>(context, settings.URLReceiving, "Receiving", stoppingToken);
+                        var urlReceiving = await context.SystemSettings.Where(s => s.Name == "BarcotechURLReceiving").Select(s => s.Value).FirstOrDefaultAsync();
+                        if (urlReceiving == null) throw new Exception("API URL for Receiving not set");
+                        var receivings = await GetData<APIBCT_Receiving>(context, urlReceiving, "Receiving", stoppingToken);
                         foreach (var receiving in receivings)
                         {
                             await SaveReceiving(context, receiving);
@@ -63,7 +59,9 @@ namespace GMGInventory.Sync
                     #region OUTBOUND
                     try
                     {
-                        var outbounds = await GetData<APIBCT_Outbound>(context, settings.URLOutbound, "Outbound", stoppingToken);
+                        var urlOutbound = await context.SystemSettings.Where(s => s.Name == "BarcotechURLOutbound").Select(s => s.Value).FirstOrDefaultAsync();
+                        if (urlOutbound == null) throw new Exception("API URL for Outbound not set");
+                        var outbounds = await GetData<APIBCT_Outbound>(context, urlOutbound, "Outbound", stoppingToken);
                         foreach (var outbound in outbounds)
                         {
                             await SaveOutbound(context, outbound);
@@ -78,7 +76,9 @@ namespace GMGInventory.Sync
                     #region RETURN
                     try
                     {
-                        var sreturns = await GetData<APIBCT_Return>(context, settings.URLReturn, "Return", stoppingToken);
+                        var urlReturn = await context.SystemSettings.Where(s => s.Name == "BarcotechURLReturn").Select(s => s.Value).FirstOrDefaultAsync();
+                        if (urlReturn == null) throw new Exception("API URL for Return not set");
+                        var sreturns = await GetData<APIBCT_Return>(context, urlReturn, "Return", stoppingToken);
                         foreach (var sreturn in sreturns)
                         {
                             await SaveReturn(context, sreturn);
@@ -93,7 +93,9 @@ namespace GMGInventory.Sync
                     #region TRANSFER
                     try
                     {
-                        var transfers = await GetData<APIBCT_Transfer>(context, settings.URLTransfer, "Transfer", stoppingToken);
+                        var urlTransfer = await context.SystemSettings.Where(s => s.Name == "BarcotechURLTransfer").Select(s => s.Value).FirstOrDefaultAsync();
+                        if (urlTransfer == null) throw new Exception("API URL for Transfer not set");
+                        var transfers = await GetData<APIBCT_Transfer>(context, urlTransfer, "Transfer", stoppingToken);
                         foreach (var transfer in transfers)
                         {
                             await SaveTransfer(context, transfer);
@@ -108,12 +110,11 @@ namespace GMGInventory.Sync
                     #region STOCK
                     try
                     {
-                        var autoSync = await context.SystemSettings.Where(s => s.Name == "StockAutoSynching").Select(s => s.Value).FirstOrDefaultAsync();
+                        var autoSync = await context.SystemSettings.Where(s => s.Name == "BarcotechAutoStock").Select(s => s.Value).FirstOrDefaultAsync();
                         if (autoSync != null && autoSync.ToLower() == "true")
                         {
-                            var urlStock = await context.SystemSettings.Where(s => s.Name == "StockAutoUrl").Select(s => s.Value).FirstOrDefaultAsync();
-                            if (urlStock == null) urlStock = settings.URLStock;
-                            if (urlStock == null) throw new Exception("URL for Auto synching not set");
+                            var urlStock = await context.SystemSettings.Where(s => s.Name == "BarcotechURLStock").Select(s => s.Value).FirstOrDefaultAsync();
+                            if (urlStock == null) throw new Exception("API URL for Stock not set");
                             var stocks = await GetData<APIBCT_Stock>(context, urlStock, "Stock", stoppingToken);
                             foreach (var stock in stocks)
                             {
@@ -130,12 +131,11 @@ namespace GMGInventory.Sync
                     #region PICKING
                     try
                     {
-                        var autoSync = await context.SystemSettings.Where(s => s.Name == "PickAutoSynching").Select(s => s.Value).FirstOrDefaultAsync();
+                        var autoSync = await context.SystemSettings.Where(s => s.Name == "BarcotechAutoPicking").Select(s => s.Value).FirstOrDefaultAsync();
                         if (autoSync != null && autoSync.ToLower() == "true")
                         {
-                            var urlPicking = await context.SystemSettings.Where(s => s.Name == "PickAutoUrl").Select(s => s.Value).FirstOrDefaultAsync();
-                            if (urlPicking == null) urlPicking = settings.URLPicking;
-                            if (urlPicking == null) throw new Exception("URL for Auto synching not set");
+                            var urlPicking = await context.SystemSettings.Where(s => s.Name == "BarcotechURLPicking").Select(s => s.Value).FirstOrDefaultAsync();
+                            if (urlPicking == null) throw new Exception("API URL for Pick not set");
                             var picks = await GetData<APIBCT_Pick>(context, urlPicking, "Pick", stoppingToken);
                             foreach (var pick in picks)
                             {
@@ -189,10 +189,10 @@ namespace GMGInventory.Sync
                 var dataNode = root?["data"];
 
                 if (dataNode is JsonObject dataObj)
-                    return dataObj.SelectMany(kvp => kvp.Value?["items"]?.Deserialize<List<T>>() ?? new List<T>()).ToList();
+                    return dataObj.SelectMany(kvp => kvp.Value?["items"]?.Deserialize<List<T>>() ?? Enumerable.Empty<T>()).ToList();
 
-                if (dataNode is JsonArray)
-                    return new List<T>();
+                if (dataNode is JsonArray dataArray)
+                    return dataArray.Deserialize<List<T>>() ?? new List<T>();
 
                 return new List<T>();
             }
@@ -303,16 +303,16 @@ namespace GMGInventory.Sync
                                 await context.PurchaseReceivings.AddAsync(receive);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Added Receive: <a href='PurchaseReceive/Details/{receive.Id}'>{receive.DocumentNumber}</a>");
+                                success.Add($"Auto Fetch for <a href='PurchaseReceive/Details/{receive.Id}'>{receive.DocumentNumber}</a>");
                             }
-                            else
+                            else if (receive.ReceiveDate != receivedDate || receive.Remarks != api_receiving.remarks)
                             {
                                 receive.ReceiveDate = receivedDate;
                                 receive.Remarks = api_receiving.remarks;
                                 context.PurchaseReceivings.Update(receive);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Updated Receive: <a href='PurchaseReceive/Details/{receive.Id}'>{receive.DocumentNumber}</a>");
+                                success.Add($"Auto Fetch for <a href='PurchaseReceive/Details/{receive.Id}'>{receive.DocumentNumber}</a>");
                             }
 
                             var receiveItem = await context.PurchaseReceivingLineItems
@@ -331,7 +331,7 @@ namespace GMGInventory.Sync
                                 await context.PurchaseReceivingLineItems.AddAsync(receiveItem);
                                 await context.SaveChangesAsync(userId);
                             }
-                            else
+                            else if (receiveItem.OrderItemId != orderItem!.Id || receiveItem.PurchaseReceivingId != receive.Id || receiveItem.Quantity != quantity)
                             {
                                 receiveItem.OrderItemId = orderItem!.Id;
                                 receiveItem.PurchaseReceivingId = receive.Id;
@@ -362,7 +362,6 @@ namespace GMGInventory.Sync
 
             try
             {
-
                 if (string.IsNullOrWhiteSpace(api_outbound.packing_number))
                     errors.Add($"Invalid Packing Number: not provided");
 
@@ -457,9 +456,9 @@ namespace GMGInventory.Sync
                                 await context.Packs.AddAsync(pack);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Added Order: <a href='Pack/Details/{pack.Id}'>{pack.Id}</a>");
+                                success.Add($"Auto Fetch for <a href='Pack/Details/{pack.Id}'>{pack.Id}</a>");
                             }
-                            else
+                            else if (pack.SalesOrderId != salesOrder!.Id || pack.PackDate != packDate || pack.WarehouseId != warehouse!.Id || pack.Remarks != api_outbound.remarks)
                             {
                                 pack.SalesOrderId = salesOrder!.Id;
                                 pack.PackDate = packDate;
@@ -468,13 +467,12 @@ namespace GMGInventory.Sync
                                 context.Packs.Update(pack);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Updated Order: <a href='Pack/Details/{pack.Id}'>{pack.Id}</a>");
+                                success.Add($"Auto Fetch for <a href='Pack/Details/{pack.Id}'>{pack.Id}</a>");
                             }
 
                             var packItem = await context.PackLineItems
                                                         .Where(s => s.BarcotechOutboundId == api_outbound.id)
                                                         .FirstOrDefaultAsync();
-
                             if (packItem == null)
                             {
                                 packItem = new PackLineItem
@@ -488,8 +486,10 @@ namespace GMGInventory.Sync
                                 };
                                 await context.PackLineItems.AddAsync(packItem);
                                 await context.SaveChangesAsync(userId);
+
+                                await AdjustingQuantity(context, item!.Id, warehouse!.Id, quantity * -1, "Fetched Outbound from Barcotech");
                             }
-                            else
+                            else if (packItem.ItemId != item!.Id || packItem.Quantity != quantity || packItem.BoxNumber != boxNumber || packItem.PackTypeId != packType!.Id)
                             {
                                 packItem.ItemId = item!.Id;
                                 packItem.Quantity = quantity;
@@ -497,6 +497,9 @@ namespace GMGInventory.Sync
                                 packItem.PackTypeId = packType!.Id;
                                 context.PackLineItems.Update(packItem);
                                 await context.SaveChangesAsync(userId);
+
+                                if (packItem.Quantity != quantity)
+                                    await AdjustingQuantity(context, item!.Id, warehouse!.Id, quantity * -1, "Fetched Outbound from Barcotech");
                             }
                         }
                     }
@@ -511,6 +514,65 @@ namespace GMGInventory.Sync
                 await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_outbound.id) ? "Not Provided" : api_outbound.id, "Fail", string.Join("||", errors));
             if (success.Count() > 0)
                 await SaveBarcotechSyncLatestLog(context, moduleName, string.IsNullOrWhiteSpace(api_outbound.id) ? "Not Provided" : api_outbound.id, "Success", string.Join("||", success));
+        }
+
+        private async Task AdjustingQuantity(ApplicationDbContext context, int ItemId, int WarehouseId, int Quantity, string Action)
+        {
+            var itemInventory = await context.ItemInventories
+                                             .Where(s => s.ItemId == ItemId && s.WarehouseId == WarehouseId)
+                                             .FirstOrDefaultAsync();
+
+            if (itemInventory != null)
+            {
+                var oldInventoryQuantity = itemInventory.Quantity;
+                if (itemInventory.Quantity >= Quantity)
+                {
+                    itemInventory.Quantity -= Quantity;
+                }
+                else if (itemInventory.Quantity < 0)
+                {
+                    itemInventory.Quantity += Quantity;
+                }
+                else
+                {
+                    itemInventory.Quantity = 0;
+                }
+                context.ItemInventories.Update(itemInventory);
+                await context.SaveChangesAsync(userId);
+
+                var countHistory = new PhysicalCountHistory
+                {
+                    ItemId = ItemId,
+                    QuantityFrom = oldInventoryQuantity,
+                    QuantityTo = itemInventory.Quantity,
+                    Remarks = Action,
+                    WarehouseId = WarehouseId
+                };
+                context.PhysicalCountHistories.Add(countHistory);
+                await context.SaveChangesAsync(userId);
+            }
+            else
+            {
+                itemInventory = new ItemInventory
+                {
+                    ItemId = ItemId,
+                    Quantity = Quantity,
+                    WarehouseId = WarehouseId
+                };
+                await context.ItemInventories.AddAsync(itemInventory);
+                await context.SaveChangesAsync(userId);
+
+                var countHistory = new PhysicalCountHistory
+                {
+                    ItemId = ItemId,
+                    QuantityFrom = 0,
+                    QuantityTo = Quantity,
+                    Remarks = Action,
+                    WarehouseId = WarehouseId
+                };
+                context.PhysicalCountHistories.Add(countHistory);
+                await context.SaveChangesAsync(userId);
+            }
         }
 
         private async Task SaveReturn(ApplicationDbContext context, APIBCT_Return api_return)
@@ -608,9 +670,12 @@ namespace GMGInventory.Sync
                                 await context.SalesReturns.AddAsync(sreturn);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Added Return: <a href='SalesReturn/Details/{sreturn.Id}'>{sreturn.SalesReturnNumber}</a>");
+                                success.Add($"Auto Fetch for <a href='SalesReturn/Details/{sreturn.Id}'>{sreturn.SalesReturnNumber}</a>");
                             }
-                            else
+                            else if (sreturn.SalesOrderId != (salesOrder == null ? null : salesOrder.Id) ||
+                                     sreturn.CustomerId != customer!.Id ||
+                                     sreturn.ReturnDate != returnDate ||
+                                     sreturn.Remarks != (reason == null ? api_return.remarks : ""))
                             {
                                 sreturn.SalesOrderId = salesOrder == null ? null : salesOrder.Id;
                                 sreturn.CustomerId = customer!.Id;
@@ -619,7 +684,7 @@ namespace GMGInventory.Sync
                                 context.SalesReturns.Update(sreturn);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Updated Return: <a href='SalesReturn/Details/{sreturn.Id}'>{sreturn.SalesReturnNumber}</a>");
+                                success.Add($"Auto Fetch for <a href='SalesReturn/Details/{sreturn.Id}'>{sreturn.SalesReturnNumber}</a>");
                             }
 
                             var returnItem = await context.SalesReturnLineItems
@@ -808,9 +873,9 @@ namespace GMGInventory.Sync
                                 await context.TransferItems.AddAsync(transfer);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Added Transfer: <a href='Transfer/Details/{transfer.Id}'>View</a>");
+                                success.Add($"Auto Fetch for <a href='Transfer/Details/{transfer.Id}'>Transfer</a>");
                             }
-                            else
+                            else if (transfer.SourceId != swarehouse!.Id || transfer.DestinationId != dwarehouse!.Id || transfer.TransferDate != transferDate)
                             {
                                 transfer.SourceId = swarehouse!.Id;
                                 transfer.DestinationId = dwarehouse!.Id;
@@ -819,7 +884,7 @@ namespace GMGInventory.Sync
                                 context.TransferItems.Update(transfer);
                                 await context.SaveChangesAsync(userId);
 
-                                success.Add($"Updated Transfer: <a href='Transfer/Details/{transfer.Id}'>View</a>");
+                                success.Add($"Auto Fetch for <a href='Transfer/Details/{transfer.Id}'>Transfer</a>");
                             }
 
                             var transferItem = await context.TransferItemDetails
@@ -839,7 +904,7 @@ namespace GMGInventory.Sync
                                 await context.TransferItemDetails.AddAsync(transferItem);
                                 await context.SaveChangesAsync(userId);
                             }
-                            else
+                            else if (transferItem.TransferItemId != transfer.Id ||transferItem.ItemId != item!.Id || transferItem.LocationCodeId != locationId || transferItem.Quantity != quantity)
                             {
                                 transferItem.TransferItemId = transfer.Id;
                                 transferItem.ItemId = item!.Id;
@@ -913,15 +978,15 @@ namespace GMGInventory.Sync
                             ItemId = item.Id,
                             QuantityFrom = 0,
                             QuantityTo = api_stock.stock,
-                            Remarks = "Copied from WMS",
+                            Remarks = "Fetched Stocks from Barcotech",
                             WarehouseId = warehouse.Id
                         };
                         context.PhysicalCountHistories.Add(countHistory);
                         await context.SaveChangesAsync(userId);
 
-                        success.Add($"Added  New Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                        success.Add($"Auto Fetch for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
                     }
-                    else if(itemInventory.Quantity != api_stock.stock || itemInventory.AllocatedQuantity != api_stock.total_allocated_qty)
+                    else if (itemInventory.Quantity != api_stock.stock || itemInventory.AllocatedQuantity != api_stock.total_allocated_qty)
                     {
                         var oldQuantity = itemInventory.Quantity;
                         var oldAllocatedQuantity = itemInventory.AllocatedQuantity;
@@ -936,13 +1001,13 @@ namespace GMGInventory.Sync
                             ItemId = item.Id,
                             QuantityFrom = oldQuantity,
                             QuantityTo = api_stock.stock,
-                            Remarks = "Copied from WMS",
+                            Remarks = "Fetched Stocks from Barcotech",
                             WarehouseId = warehouse.Id
                         };
                         context.PhysicalCountHistories.Add(countHistory);
                         await context.SaveChangesAsync(userId);
 
-                        success.Add($"Updated Old Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                        success.Add($"Auto Fetch for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
                     }
                 }
             }
@@ -998,7 +1063,7 @@ namespace GMGInventory.Sync
                         await context.Picks.AddAsync(pick);
                         await context.SaveChangesAsync(userId);
 
-                        success.Add($"Added New Pick Status");
+                        success.Add($"Auto Fetch");
                     }
                     else if (pick.Status != api_pick.status || pick.PickDate != pickDate)
                     {
@@ -1007,7 +1072,7 @@ namespace GMGInventory.Sync
                         context.Picks.Update(pick);
                         await context.SaveChangesAsync(userId);
 
-                        success.Add($"Updated Old Pick Status");
+                        success.Add($"Auto Fetch");
                     }
                 }
             }

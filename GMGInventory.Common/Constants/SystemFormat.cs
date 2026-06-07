@@ -8,6 +8,7 @@
         public const string StringDate3 = "yyyy-MM-dd";
         public const string StringDateTime3 = "yyyy-MM-ddTHH:mm";
         public const string StringDate4 = "MM/dd/yy";
+        public const string StringDate5 = "ddd (MM/dd/yy)";
         public const string StringDecimalComma = "{0:#,##0.00}";
         public const string StringIntegerComma = "{0:#,##0}";
 
@@ -66,6 +67,7 @@
         public string Format2 => _date.ToString(SystemFormat.StringDate2);
         public string Format3 => _date.ToString(SystemFormat.StringDate3);
         public string Format4 => _date.ToString(SystemFormat.StringDate4);
+        public string Format5 => _date.ToString(SystemFormat.StringDate5);
 
         // Optional: default string output
         public override string ToString()

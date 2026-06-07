@@ -17,36 +17,43 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<CustomerPurchaseVM>> GetListAsync(CustomerPurchaseFilterVM filter)
         {
-            var salesOrder = from ili in context.InvoiceLineItems
-                             join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId} equals new { soli.SalesOrderId, soli.ItemId }
-                             where (filter.CategoryId == null || filter.CategoryId == ili.Item.Category.Id || (filter.CategoryId == 0 && (ili.Item.Category.Code + " " + ili.Item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
-                                && (filter.BrandId == null || filter.BrandId == ili.Item.Brand.Id || (filter.BrandId == 0 && (ili.Item.Brand.Code + " " + ili.Item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
-                                && (filter.ItemTypeId == null || filter.ItemTypeId == ili.Item.ItemType.Id || (filter.ItemTypeId == 0 && (ili.Item.ItemType.Code + " " + ili.Item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
-                                && (filter.CustomerId == null || filter.CustomerId == ili.Invoice.SalesOrder.Customer.Id || (filter.CustomerId == 0 && (ili.Invoice.SalesOrder.Customer.Code + " " + ili.Invoice.SalesOrder.Customer.Name).ToLower().Contains((filter.CustomerKeyword + "").ToLower())))
-                                && (filter.ItemId == null || filter.ItemId == 0 || filter.ItemId == ili.Item.Id)
-                                && (filter.ItemKeyword == null || ili.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower()))
-                                && (filter.ItemNameKeyword == null || ili.Item.Name.ToLower().Contains((filter.ItemNameKeyword + "").ToLower()))
-                                && filter.DateFrom <= ili.Invoice.InvoiceDate.Date
-                                && ili.Invoice.InvoiceDate.Date <= filter.DateTo
-                                && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
+            var salesOrder = from soli in context.SalesOrderLineItems
+                             join so in context.SalesOrders on soli.SalesOrderId equals so.Id
+                             join inv in context.Invoices on so.Id equals inv.SalesOrderId into ginv
+                             from inv in ginv.DefaultIfEmpty()
+                             join ili in context.InvoiceLineItems on new { InvoiceId = inv.Id, soli.ItemId } equals new { ili.InvoiceId, ili.ItemId } into gili
+                             from ili in gili.DefaultIfEmpty()
+                             where (filter.CategoryId == null || filter.CategoryId == soli.Item.Category.Id || (filter.CategoryId == 0 && (soli.Item.Category.Code + " " + soli.Item.Category.Name).ToLower().Contains((filter.CategoryKeyword + "").ToLower())))
+                                && (filter.BrandId == null || filter.BrandId == soli.Item.Brand.Id || (filter.BrandId == 0 && (soli.Item.Brand.Code + " " + soli.Item.Brand.Name).ToLower().Contains((filter.BrandKeyword + "").ToLower())))
+                                && (filter.ItemTypeId == null || filter.ItemTypeId == soli.Item.ItemType.Id || (filter.ItemTypeId == 0 && (soli.Item.ItemType.Code + " " + soli.Item.ItemType.Name).ToLower().Contains((filter.ItemTypeKeyword + "").ToLower())))
+                                && (filter.CustomerId == null || filter.CustomerId == soli.SalesOrder.Customer.Id || (filter.CustomerId == 0 && (soli.SalesOrder.Customer.Code + " " + soli.SalesOrder.Customer.Name).ToLower().Contains((filter.CustomerKeyword + "").ToLower())))
+                                && (filter.ItemId == null || filter.ItemId == 0 || filter.ItemId == soli.Item.Id)
+                                && (filter.ItemKeyword == null || soli.Item.Code.ToLower().Contains((filter.ItemKeyword + "").ToLower()))
+                                && (filter.ItemNameKeyword == null || soli.Item.Name.ToLower().Contains((filter.ItemNameKeyword + "").ToLower()))
+                                && filter.DateFrom <= soli.SalesOrder.SalesOrderDate.Date
+                                && soli.SalesOrder.SalesOrderDate.Date <= filter.DateTo
+                             && (ili == null || ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                              select new CustomerPurchaseVM
                              {
-                                 Brand = ili.Item.Brand.Code,
-                                 ControlNumber = ili.Invoice.ControlNumber,
+                                 Brand = soli.Item.Brand.Code,
+                                 ControlNumber =  ili == null ? null : ili.Invoice.ControlNumber,
                                  Discount1D = soli.Discount1,
                                  Discount2D = soli.Discount2,
-                                 InvoiceDateD = ili.Invoice.InvoiceDate,
-                                 InvoiceId = ili.Invoice.Id,
-                                 InvoiceNumber = ili.Invoice.InvoiceNumber,
-                                 ItemCode = ili.Item.Code,
-                                 ItemId = ili.Item.Id,
-                                 ItemName = ili.Item.Name + (soli.ItemPromo == null ? "" : " (" + soli.ItemPromo.Name + ")"),
-                                 PartNumber = ili.Item.PartNumber,
-                                 QuantityD = ili.Quantity,
-                                 SellingPriceD = ili.UnitPrice,
-                                 SalesOrderId = ili.Invoice.SalesOrder.Id,
-                                 SONumber = ili.Invoice.SalesOrder.SalesOrderNumber,
-                                 Unit = ili.Item.Unit.Code
+                                 Discount3D = soli.Discount3 != null ? 0 : soli.Discount3.Value,
+                                 Discount4D = soli.Discount4 == null ? 0 : soli.Discount4.Value,
+                                 Discount5D = soli.Discount5 == null ? 0 : soli.Discount5.Value,
+                                 InvoiceId = ili == null ? null : ili.Invoice.Id,
+                                 InvoiceNumber = ili == null ? null : ili.Invoice.InvoiceNumber,
+                                 ItemCode = soli.Item.Code,
+                                 ItemId = soli.Item.Id,
+                                 ItemName = soli.Item.Name + (soli.ItemPromo == null ? "" : " (" + soli.ItemPromo.Name + ")"),
+                                 PartNumber = soli.Item.PartNumber,
+                                 QuantityD = soli.Quantity,
+                                 SellingPriceD = soli.SellingPrice,
+                                 SalesOrderDateD = soli.SalesOrder.SalesOrderDate,
+                                 SalesOrderId = soli.SalesOrder.Id,
+                                 SONumber = soli.SalesOrder.SalesOrderNumber,
+                                 Unit = soli.Item.Unit.Code
                              };
 
             return await salesOrder.ToListAsync();
@@ -68,12 +75,12 @@ namespace GMGInventory.Application.Repositories
                     s.ControlNumber,
                     s.Discount1D.ToString(),
                     s.Discount2D.ToString(),
-                    s.InvoiceDate,
                     s.InvoiceNumber,
                     s.ItemCode,
                     s.ItemName,
                     s.PartNumber,
                     s.QuantityD.ToString(),
+                    s.SalesOrderDate,
                     s.SellingPriceD.ToString(),
                     s.Unit
                 }.Any(a => a != null && a.Trim().ToLower().Contains((form.SearchValue + "").Trim().ToLower())));
@@ -87,9 +94,8 @@ namespace GMGInventory.Application.Repositories
                 data = form.SortColumn switch
                 {
                     "Discount1" => isAsc ? data.OrderBy(s => s.Discount1D) : data.OrderByDescending(s => s.Discount1D),
-                    "Discount2" => isAsc ? data.OrderBy(s => s.Discount2D) : data.OrderByDescending(s => s.Discount2D),
-                    "InvoiceDate" => isAsc ? data.OrderBy(s => s.InvoiceDateD) : data.OrderByDescending(s => s.InvoiceDateD),
                     "Quantity" => isAsc ? data.OrderBy(s => s.QuantityD) : data.OrderByDescending(s => s.QuantityD),
+                    "SalesOrderDate" => isAsc ? data.OrderBy(s => s.SalesOrderDateD).ThenBy(s => s.SONumber) : data.OrderByDescending(s => s.SalesOrderDateD).ThenByDescending(s => s.SONumber),
                     "SellingPrice" => isAsc ? data.OrderBy(s => s.SellingPriceD) : data.OrderByDescending(s => s.SellingPriceD),
                     _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
                 };

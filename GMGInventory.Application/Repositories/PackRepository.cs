@@ -78,10 +78,7 @@ namespace GMGInventory.Application.Repositories
                             CustomerrId = pack.SalesOrder.Customer.Id,
                             CustomerCode = pack.SalesOrder.Customer.Code,
                             CustomerName = pack.SalesOrder.Customer.Name,
-                            Forwarder = pack.SalesOrder
-                                            .SalesOrderDeliveryMonitorings
-                                            .Select(s => s.Forwarder.Name)
-                                            .FirstOrDefault(),
+                            Forwarder = pack.SalesOrder.Forwarder != null ? pack.SalesOrder.Forwarder.Name : null,
                             Id = pack.Id,
                             PackBy = user.FirstName + " " + user.LastName,
                             PackDateD = pack.DateCreated,

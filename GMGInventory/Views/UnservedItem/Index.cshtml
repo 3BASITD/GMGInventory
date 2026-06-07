@@ -138,7 +138,7 @@
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-preset" class="form-label mb-0">Sales Order Date Range</label>
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
                             <select id="filter-preset" class="form-control form-control-sm">
                                 <option value="TD">Today</option>
                                 <option value="L7D">Last 7 Days</option>
@@ -153,13 +153,13 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">From</label>
+                            <label for="filter-from" class="form-label mb-0">Sales Order Date From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
                     </div>
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-to" class="control-label mb-0">To</label>
+                            <label for="filter-to" class="control-label mb-0">Sales Order Date To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
@@ -287,9 +287,7 @@
         }
 
         // Load List on DataTable
-        var dataTable = $('.table-unserved').on('preXhr.dt', function(e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var dataTable = $('.table-unserved').DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
                 var now = new Date().getTime();

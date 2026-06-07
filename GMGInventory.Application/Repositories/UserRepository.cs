@@ -209,7 +209,7 @@ namespace GMGInventory.Application.Repositories
             if (await context.ReasonOfReturns.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Reason of Returns"); }
             if (await context.ReceptaclePrintHistories.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Receptacle Print Histories"); }
             if (await context.Regions.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Regions"); }
-            if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Delivery Monitorings"); }
+            if (await context.SalesOrderDeliveries.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Delivery Monitorings"); }
             if (await context.SalesOrderItemSources.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Item Sources"); }
             if (await context.SalesOrderLineItems.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Order Line Items"); }
             if (await context.SalesOrders.AnyAsync(s => s.UserCreated == id || s.UserModified == id)) { tables.Add("Sales Orders"); }

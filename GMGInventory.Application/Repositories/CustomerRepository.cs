@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Drawing;
+﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
@@ -1516,6 +1517,255 @@ namespace GMGInventory.Application.Repositories
                                                        && s.CreditTermName == customerVM.CreditTermName
                                                        && s.CreditLimit == customerVM.CreditLimit
                                                        && s.Remarks == customerVM.Remarks);
+        }
+
+        public async Task<ResponseModelData<FileVM>> UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return new ResponseModelData<FileVM>
+                    {
+                        Status = "Error",
+                        Message = "Invalid file",
+                        Data = new FileVM
+                        {
+                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Customer Upload Processed --- {file.FileName}",
+                            Content = []
+                        }
+                    };
+
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+                stream.Position = 0;
+
+                using var workbook = new XLWorkbook(stream);
+                var worksheet = workbook.Worksheets.First();
+
+                var headers = worksheet.Row(1).Cells().Select(c => c.GetString().Trim()).ToList();
+                var requiredHeaders = new[] { "Code", "Name", "Commission Rate", "Region", "Area", "Customer Type", "Email", "Agent", "TIN", "VAT", "Credit Term", "Credit Limit", "Remarks" };
+
+                var missingColumns = new List<string>();
+                foreach (var col in requiredHeaders)
+                {
+                    if (!headers.Contains(col))
+                        missingColumns.Add(col);
+                }
+                if (missingColumns.Count > 0)
+                    return new ResponseModelData<FileVM>
+                    {
+                        Status = "Error",
+                        Message = "Missing column(s): " + string.Join(", ", missingColumns),
+                        Data = new FileVM
+                        {
+                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Customer Upload Processed --- {file.FileName}",
+                            Content = []
+                        }
+                    };
+
+                int codeCol = headers.IndexOf("Code") + 1;
+                int nameCol = headers.IndexOf("Name") + 1;
+                int commissionRateCol = headers.IndexOf("Commission Rate") + 1;
+                int regionCol = headers.IndexOf("Region") + 1;
+                int areaCol = headers.IndexOf("Area") + 1;
+                int customerTypeCol = headers.IndexOf("Customer Type") + 1;
+                int emailCol = headers.IndexOf("Email") + 1;
+                int agentCol = headers.IndexOf("Agent") + 1;
+                int tinCol = headers.IndexOf("TIN") + 1;
+                int vatCol = headers.IndexOf("VAT") + 1;
+                int creditTermCol = headers.IndexOf("Credit Term") + 1;
+                int creditLimitCol = headers.IndexOf("Credit Limit") + 1;
+                int remarksCol = headers.IndexOf("Remarks") + 1;
+
+                var xclitems = new List<CustomerVM>();
+                foreach (var row in worksheet.RowsUsed().Skip(1))
+                {
+                    var xclitem = new CustomerVM
+                    {
+                        Code = row.Cell(codeCol).GetString(),
+                        Name = row.Cell(nameCol).GetString(),
+                        CommissionRateD = decimal.TryParse(row.Cell(commissionRateCol).GetString().Replace(",", ""), out decimal commissionRate) ? commissionRate : -999999,
+                        RegionName = row.Cell(regionCol).GetString(),
+                        AreaName = row.Cell(areaCol).GetString(),
+                        CustomerTypeName = row.Cell(customerTypeCol).GetString(),
+                        Email = row.Cell(emailCol).GetString(),
+                        AgentName = row.Cell(agentCol).GetString(),
+                        TIN = row.Cell(tinCol).GetString(),
+                        VAT = row.Cell(vatCol).GetString(),
+                        CreditTermName = row.Cell(creditTermCol).GetString(),
+                        CreditLimitD = decimal.TryParse(row.Cell(creditLimitCol).GetString().Replace(",", ""), out decimal creditLimit) ? creditLimit : -999999,
+                        Remarks = row.Cell(remarksCol).GetString()
+                    };
+
+                    xclitem.ActionStatus = await SaveCustomerFromFile(xclitem);
+
+                    xclitems.Add(xclitem);
+                }
+
+                using var newWorkbook = new XLWorkbook();
+                var newSheet = newWorkbook.AddWorksheet("Result");
+
+                newSheet.Range("A1:N1").Merge();
+                newSheet.Cell(1, 1).MergedRange().Value = "This file is a result of item upload. Don't use this file for uploading";
+
+                newSheet.Cell(2, 1).Value = "Code";
+                newSheet.Cell(2, 2).Value = "Name";
+                newSheet.Cell(2, 3).Value = "Commission Rate";
+                newSheet.Cell(2, 4).Value = "Region";
+                newSheet.Cell(2, 5).Value = "Area";
+                newSheet.Cell(2, 6).Value = "Customer Type";
+                newSheet.Cell(2, 7).Value = "Email";
+                newSheet.Cell(2, 8).Value = "Agent";
+                newSheet.Cell(2, 9).Value = "TIN";
+                newSheet.Cell(2, 10).Value = "VAT";
+                newSheet.Cell(2, 11).Value = "Credit Term";
+                newSheet.Cell(2, 12).Value = "Credit Limit";
+                newSheet.Cell(2, 13).Value = "Remarks";
+                newSheet.Cell(2, 14).Value = "Status for Uploading";
+
+                for (int i = 0; i < xclitems.Count; i++)
+                {
+                    var p = xclitems[i];
+                    newSheet.Cell(i + 3, 1).Value = p.Code;
+                    newSheet.Cell(i + 3, 2).Value = p.Name;
+                    newSheet.Cell(i + 3, 3).Value = p.CommissionRateD;
+                    newSheet.Cell(i + 3, 4).Value = p.RegionName;
+                    newSheet.Cell(i + 3, 5).Value = p.AreaName;
+                    newSheet.Cell(i + 3, 6).Value = p.CustomerTypeName;
+                    newSheet.Cell(i + 3, 7).Value = p.Email;
+                    newSheet.Cell(i + 3, 8).Value = p.AgentName;
+                    newSheet.Cell(i + 3, 9).Value = p.TIN;
+                    newSheet.Cell(i + 3, 10).Value = p.VAT;
+                    newSheet.Cell(i + 3, 11).Value = p.CreditTermName;
+                    newSheet.Cell(i + 3, 12).Value = p.CreditLimitD;
+                    newSheet.Cell(i + 3, 13).Value = p.Remarks;
+                    newSheet.Cell(i + 3, 14).Value = p.ActionStatus;
+                }
+
+                using var outStream = new MemoryStream();
+                newWorkbook.SaveAs(outStream);
+                outStream.Position = 0;
+
+                return new ResponseModelData<FileVM>
+                {
+                    Status = "Success",
+                    Message = "The Excel file has been processed. Please check the downloaded file to see the status of the results.",
+                    Data = new FileVM
+                    {
+                        FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Cheque Upload Processed --- {file.FileName}",
+                        Content = outStream.ToArray()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModelData<FileVM> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+            }
+        }
+
+        public async Task<string> SaveCustomerFromFile(CustomerVM customer)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(customer.Code)) return "Code is required";
+                if (string.IsNullOrWhiteSpace(customer.Name)) return "Name is required";
+
+                var region = await context.Regions
+                                          .Where(s => s.Code.Trim().ToLower() == customer.RegionName.Trim().ToLower()
+                                                   || s.Name.Trim().ToLower() == customer.RegionName.Trim().ToLower())
+                                          .FirstOrDefaultAsync();
+                if (region == null) return $"Invalid Region: {customer.RegionName} not found";
+
+                var area = await context.Areas
+                                        .Where(s => s.Code.Trim().ToLower() == customer.AreaName.Trim().ToLower()
+                                                 || s.Name.Trim().ToLower() == customer.AreaName.Trim().ToLower())
+                                        .FirstOrDefaultAsync();
+                if (area == null) return $"Invalid Area: {customer.AreaName} not found";
+
+                var customerType = await context.CustomerTypes
+                                                .Where(s => s.Code.Trim().ToLower() == customer.CustomerTypeName.Trim().ToLower()
+                                                         || s.Name.Trim().ToLower() == customer.CustomerTypeName.Trim().ToLower())
+                                                .FirstOrDefaultAsync();
+                if (customerType == null) return $"Invalid Customer Type: {customer.CustomerTypeName} not found";
+
+                var agent = await context.Agents
+                                         .Where(s => s.Code.Trim().ToLower() == customer.AgentName.Trim().ToLower()
+                                                  || (s.FirstName + " " + s.LastName).Replace(" ", "").ToLower() == customer.AgentName.Replace(" ", "").ToLower())
+                                         .FirstOrDefaultAsync();
+                if (agent == null) return $"Invalid Agent: {customer.AgentName} not found";
+
+                var creditTerm = await context.CreditTerms
+                                              .Where(s => s.Name.Trim().ToLower() == customer.CreditTermName.Trim().ToLower())
+                                              .FirstOrDefaultAsync();
+                if (creditTerm == null) return $"Invalid Credit Term: {customer.CreditTermName} not found";
+
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                var msg = new List<string>();
+
+                var code = SaveCustomerFromFileTruncate(customer.Code, 50, msg, "Code", false);
+                var name = SaveCustomerFromFileTruncate(customer.Name, 100, msg, "Name");
+                var email = SaveCustomerFromFileTruncate(customer.Email, 100, msg, "Email");
+                var tin = SaveCustomerFromFileTruncate(customer.TIN, 50, msg, "TIN", false);
+                var vat = SaveCustomerFromFileTruncate(customer.VAT, 50, msg, "VAT", false);
+                var remarks = SaveCustomerFromFileTruncate(customer.Remarks, 500, msg, "Remarks", false);
+
+                var customerRecord = await context.Customers
+                                                  .Where(s => s.Code == customer.Code)
+                                                  .FirstOrDefaultAsync();
+                if (customerRecord != null)
+                {
+                    customerRecord.Name = name;
+                    customerRecord.CommissionRate = customer.CommissionRateD;
+                    customerRecord.AreaId = area.Id;
+                    customerRecord.CustomerTypeId = customerType.Id;
+                    customerRecord.Email = email;
+                    customerRecord.AgentId = agent.Id;
+                    customerRecord.TIN = tin;
+                    customerRecord.VAT = vat;
+                    customerRecord.CreditTermId = creditTerm.Id;
+                    customerRecord.CreditLimit = customer.CreditLimitD;
+                    customerRecord.Remarks = remarks;
+
+                    context.Customers.Update(customerRecord);
+                    msg.Add("Customer updated");
+                    await context.SaveChangesAsync(currentUserId);
+                }
+                else
+                {
+                    customerRecord = new GMGInventory.Data.Customer
+                    {
+                        Code = code,
+                        Name = name,
+                        CommissionRate = customer.CommissionRateD,
+                        AreaId = area.Id,
+                        CustomerTypeId = customerType.Id,
+                        Email = email,
+                        AgentId = agent.Id,
+                        TIN = tin,
+                        VAT = vat,
+                        CreditTermId = creditTerm.Id,
+                        CreditLimit = customer.CreditLimitD,
+                        Remarks = remarks,
+                    };
+
+                    await context.Customers.AddAsync(customerRecord);
+                    msg.Add("Customer added");
+                    await context.SaveChangesAsync(currentUserId);
+                }
+                return string.Join("; ", msg);
+            }
+            catch (Exception ex)
+            {
+                return SystemFormat.GetInnermostExceptionMessage(ex);
+            }
+        }
+
+        private string SaveCustomerFromFileTruncate(string? value, int maxLength, List<string> messages, string fieldName, bool allowNull = true)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return allowNull ? null! : "";
+            if (value.Length <= maxLength) return value;
+            messages?.Add($"{fieldName ?? "Field"} truncated");
+            return value.Substring(0, maxLength);
         }
     }
 }

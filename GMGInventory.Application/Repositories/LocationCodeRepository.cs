@@ -1,13 +1,10 @@
-﻿using AutoMapper;
-using DocumentFormat.OpenXml.Spreadsheet;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using static Humanizer.On;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -16,17 +13,14 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
 
         public LocationCodeRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager
-            , IMapper mapper) : base(context, httpContextAccessor, userManager)
+            , UserManager<User> userManager) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
-            this.mapper = mapper;
         }
 
         public async Task<IList<JsonNameOptionsModel>> GetOptions(int? IncludeId)

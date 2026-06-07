@@ -60,7 +60,10 @@ namespace GMGInventory.Common.Models
         public IEnumerable<string> LocationCodes { get; set; }
     }
 
-    public class APIItemType : APIGeneric { }
+    public class APIItemType : APIGeneric 
+    {
+        public string Category { get; set; }
+    }
 
     public class APIBrand : APIGeneric { }
 

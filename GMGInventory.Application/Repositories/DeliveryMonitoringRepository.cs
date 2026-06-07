@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -95,7 +96,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        private async Task<IList<DeliveryMonitoringVM>> GetListAsync(DeliveryMonitoringFilterVM filter)
+        public async Task<IList<DeliveryMonitoringVM>> GetListAsync(DeliveryMonitoringFilterVM filter)
         {
             var deliveries = from order in context.SalesOrders
                              join pick in context.Picks on order.Id equals pick.SalesOrderId into opick
@@ -110,10 +111,12 @@ namespace GMGInventory.Application.Repositories
                              join approve in userManager.Users on order.ApprovedBy equals approve.Id into auser
                              from approve in auser.DefaultIfEmpty()
                              where order.Status.Code != "DRAFT"
-                             && order.Status.Code != "SUBMITTED"
                              && order.Status.Code != "DISAPPROVED"
-                             && filter.DateFrom.Date <= order.SalesOrderDate.Date
-                             && order.SalesOrderDate.Date <= filter.DateTo.Date
+                             && (filter.AgentId == null || filter.AgentId == order.AgentId)
+                             && (filter.CustomerId == null || filter.CustomerId == order.CustomerId)
+                             && (filter.RegionId == null || filter.RegionId == order.Customer.Area.RegionId)
+                             && filter.DateFrom <= order.SalesOrderDate.Date
+                             && order.SalesOrderDate.Date <= filter.DateTo
                              select new DeliveryMonitoringVM
                              {
                                  SalesOrderId = order.Id,
@@ -128,8 +131,10 @@ namespace GMGInventory.Application.Repositories
                                  Customer = order.Customer.Name,
                                  SOPreparedBy = userc.FirstName + " " + userc.LastName,
                                  SpecialInstruction = order.SpecialInstruction,
-                                 ForwarderId = delivery.Forwarder.Id,
-                                 Forwarder = delivery.Forwarder.Name,
+                                 ForwarderId = delivery.Forwarder == null ? order.Forwarder.Id : delivery.Forwarder.Id,
+                                 Forwarder = delivery.Forwarder == null || order.Forwarder.Id == delivery.Forwarder.Id
+                                           ? order.Forwarder.Name
+                                           : (delivery.Forwarder.Name + " (SO Forwarder: " + order.Forwarder.Name + ")"),
                                  SOApprovedBy = approve == null ? null : approve.FirstName + " " + approve.LastName,
                                  Status1D = order.Status.Name,
                                  Status1Date = order.DateModified != null ? order.DateModified.Value
@@ -140,8 +145,7 @@ namespace GMGInventory.Application.Repositories
                                  Status3Date = pack.DateModified != null ? pack.DateModified.Value
                                              : pack.DateCreated,
                                  Status4D = invoice.Status.Name,
-                                 Status4Date = invoice.DateModified != null ? invoice.DateModified.Value
-                                             : invoice.DateCreated,
+                                 Status4Date = invoice.InvoiceDate,
                                  Status5D = delivery.SalesOrderDeliveryStatus.Name,
                                  Status5Date = delivery.DeliveryDate != null ? delivery.DeliveryDate
                                              : delivery.PickupDate != null ? delivery.PickupDate
@@ -201,6 +205,11 @@ namespace GMGInventory.Application.Repositories
                 data = form.SortColumn switch
                 {
                     "DateOrder" => isAsc ? data.OrderBy(s => s.DateOrderD).ThenBy(s => s.Status1Date) : data.OrderByDescending(s => s.DateOrderD).ThenByDescending(s => s.Status1Date),
+                    "Status1" => isAsc ? data.OrderBy(s => s.Status1Date) : data.OrderByDescending(s => s.Status1Date),
+                    "Status2" => isAsc ? data.OrderBy(s => s.Status2Date == null).ThenBy(s => s.Status2Date) : data.OrderByDescending(s => s.Status2Date != null).ThenByDescending(s => s.Status2Date),
+                    "Status3" => isAsc ? data.OrderBy(s => s.Status3Date == null).ThenBy(s => s.Status3Date) : data.OrderByDescending(s => s.Status3Date != null).ThenByDescending(s => s.Status3Date),
+                    "Status4" => isAsc ? data.OrderBy(s => s.Status4Date == null).ThenBy(s => s.Status4Date) : data.OrderByDescending(s => s.Status4Date != null).ThenByDescending(s => s.Status4Date),
+                    "Status5" => isAsc ? data.OrderBy(s => s.Status5Date == null).ThenBy(s => s.Status5Date) : data.OrderByDescending(s => s.Status5Date != null).ThenByDescending(s => s.Status5Date),
                     _ => data.OrderBy(form.SortColumn + " " + form.SortColumnDirection)
                 };
             }
@@ -299,6 +308,108 @@ namespace GMGInventory.Application.Repositories
 
                 return new ResponseModel { Status = "Success", Message = "Successfully updated sales order delivery" };
             }
+        }
+        public async Task<IList<DeliveryMonitoringChartVM>> GetLatestCounts()
+        {
+            var dtFrom = DateTime.Today.AddDays(-10);
+            var dtTo = DateTime.Today;
+
+            var orders = await context.SalesOrders
+                                      .Where(s => dtFrom <= s.SalesOrderDate.Date
+                                               && s.SalesOrderDate.Date <= dtTo
+                                               && s.Status.Code != "DRAFT"
+                                               && s.Status.Code != "DISAPPROVED")
+                                      .GroupBy(s => s.SalesOrderDate.Date)
+                                      .Select(g => new
+                                      {
+                                          Date = g.Key,
+                                          Count = g.Count()
+                                      })
+                                      .ToDictionaryAsync(s => s.Date, s => s.Count);
+
+            var picks = await context.Picks
+                                     .Where(s => dtFrom <= s.PickDate
+                                              && s.PickDate <= dtTo
+                                              && s.SalesOrder.Status.Code != "DRAFT"
+                                              && s.SalesOrder.Status.Code != "DISAPPROVED")
+                                     .GroupBy(s => s.PickDate.Date)
+                                     .Select(g => new
+                                     {
+                                         Date = g.Key,
+                                         Count = g.Count()
+                                     })
+                                     .ToDictionaryAsync(s => s.Date, s => s.Count);
+
+            var packs = await context.Packs
+                                     .Where(s => ((s.DateModified == null && dtFrom <= s.DateCreated.Date && s.DateCreated.Date <= dtTo)
+                                              || (s.DateModified != null && dtFrom <= s.DateModified.Value.Date && s.DateModified.Value.Date <= dtTo))
+                                              //&& s.SalesOrder.Status.Code != "DRAFT"
+                                              //&& s.SalesOrder.Status.Code != "DISAPPROVED"
+                                              && s.Status.Code != "DRAFT")
+                                     .GroupBy(s => s.DateModified != null ? s.DateModified.Value.Date : s.DateCreated)
+                                     .Select(g => new
+                                     {
+                                         Date = g.Key,
+                                         Count = g.Count()
+                                     })
+                                     .ToDictionaryAsync(s => s.Date, s => s.Count);
+
+
+            var invoices = await context.Invoices
+                                        .Where(s => ((s.DateModified == null && dtFrom <= s.DateCreated.Date && s.DateCreated.Date <= dtTo)
+                                                 || (s.DateModified != null && dtFrom <= s.DateModified.Value.Date && s.DateModified.Value.Date <= dtTo))
+                                                 /*&& s.SalesOrder.Status.Code != "DRAFT"
+                                                 && s.SalesOrder.Status.Code != "DISAPPROVED"*/)
+                                        .GroupBy(s => s.DateModified != null ? s.DateModified.Value.Date : s.DateCreated)
+                                        .Select(g => new
+                                        {
+                                            Date = g.Key,
+                                            Count = g.Count()
+                                        })
+                                        .ToDictionaryAsync(s => s.Date, s => s.Count);
+
+
+            var deliveries = await context.SalesOrderDeliveries
+                                          .Where(s => ((s.DeliveryDate != null && dtFrom <= s.DeliveryDate.Value.Date && s.DeliveryDate.Value.Date <= dtTo)
+                                                   || (s.PickupDate != null && dtFrom <= s.PickupDate.Value.Date && s.PickupDate.Value.Date <= dtTo)
+                                                   || (s.ReceiveDate != null && dtFrom <= s.ReceiveDate.Value.Date && s.ReceiveDate.Value.Date <= dtTo)
+                                                   || (s.DateModified != null && dtFrom <= s.DateModified.Value.Date && s.DateModified.Value.Date <= dtTo)
+                                                   /*|| (s.DeliveryDate == null && s.PickupDate == null && s.ReceiveDate == null && s.DateModified == null && dtFrom <= s.DateCreated.Date && s.DateCreated.Date <= dtTo)*/)
+                                                   /*&& s.SalesOrder.Status.Code != "DRAFT"
+                                                   && s.SalesOrder.Status.Code != "DISAPPROVED"*/)
+                                          .GroupBy(s => s.DeliveryDate != null ? s.DeliveryDate.Value.Date
+                                                      : s.PickupDate != null ? s.PickupDate.Value.Date
+                                                      : s.ReceiveDate != null ? s.ReceiveDate.Value.Date
+                                                      : s.DateModified != null ? s.DateModified.Value.Date
+                                                      : s.DateCreated)
+                                          .Select(g => new
+                                          {
+                                              Date = g.Key,
+                                              Count = g.Count()
+                                          })
+                                          .ToDictionaryAsync(s => s.Date, s => s.Count);
+
+            var result = Enumerable.Range(0, 11)
+                                   .Select(i =>
+                                   {
+                                       var date = dtFrom.AddDays(i).Date;
+
+                                       return new DeliveryMonitoringChartVM
+                                       {
+                                           DateD = date,
+                                           OrderCount = orders.GetValueOrDefault(date),
+                                           PickCount = picks.GetValueOrDefault(date),
+                                           PackCount = packs.GetValueOrDefault(date),
+                                           InvoiceCount = invoices.GetValueOrDefault(date),
+                                           DeliveredCount = deliveries.GetValueOrDefault(date)
+                                       };
+                                   })
+                                   .Where(s => s.OrderCount + s.PickCount + s.PackCount + s.InvoiceCount + s.DeliveredCount > 0
+                                            || s.DateD == dtTo)
+                                   .TakeLast(7)
+                                   .ToList();
+
+            return result;
         }
     }
 }

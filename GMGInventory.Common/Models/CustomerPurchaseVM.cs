@@ -7,20 +7,20 @@ namespace GMGInventory.Common.Models
     {
         public int Id { get; set; }
 
-        [Display(Name = "Invoice Date")]
-        public string InvoiceDate => InvoiceDateD.ToString(SystemFormat.StringDate);
-        public DateTime InvoiceDateD { get; set; }
+        [Display(Name = "Sales Order Date")]
+        public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDate);
+        public DateTime SalesOrderDateD { get; set; }
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
         public int SalesOrderId { get; set; }
 
         [Display(Name = "Invoice Number")]
-        public string InvoiceNumber { get; set; }
-        public int InvoiceId { get; set; }
+        public string? InvoiceNumber { get; set; }
+        public int? InvoiceId { get; set; }
 
         [Display(Name = "Control Number")]
-        public string ControlNumber { get; set; }
+        public string? ControlNumber { get; set; }
 
         [Display(Name = "Brand")]
         public string Brand { get; set; }
@@ -47,19 +47,34 @@ namespace GMGInventory.Common.Models
         public decimal SellingPriceD { get; set; }
 
         [Display(Name = "Discount 1")]
-        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D);
+        public string Discount1 => string.Format(SystemFormat.StringDecimalComma, Discount1D) + "%";
         public decimal Discount1D { get; set; }
 
         [Display(Name = "Discount 2")]
-        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D);
+        public string Discount2 => string.Format(SystemFormat.StringDecimalComma, Discount2D) + "%";
         public decimal Discount2D { get; set; }
+
+        [Display(Name = "Discount 3")]
+        public string Discount3 => string.Format(SystemFormat.StringDecimalComma, Discount3D) + "%";
+        public decimal Discount3D { get; set; }
+
+        [Display(Name = "Discount 4")]
+        public string Discount4 => string.Format(SystemFormat.StringDecimalComma, Discount4D) + "%";
+        public decimal Discount4D { get; set; }
+
+        [Display(Name = "Discount 5")]
+        public string Discount5 => string.Format(SystemFormat.StringDecimalComma, Discount5D) + "%";
+        public decimal Discount5D { get; set; }
 
         [Display(Name = "Extended Price")]
         public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
-        public decimal ExtendedPriceD => Math.Round(QuantityD * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
-
-
-
+        public decimal ExtendedPriceD => QuantityD
+                                       * SellingPriceD
+                                       * (100 - Discount1D) / 100
+                                       * (100 - Discount2D) / 100
+                                       * (100 - Discount3D) / 100
+                                       * (100 - Discount4D) / 100
+                                       * (100 - Discount5D) / 100;
     }
 
     public class CustomerPurchaseFilterVM : ListFilterCommonModel

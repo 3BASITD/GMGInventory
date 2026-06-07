@@ -25,12 +25,9 @@
                     <span class="fas fa-plus mr-0"></span>
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <span class="fas fa-filter"></span> Filter
-            </button>
             @if (userAccess.CanUploadDownload)
             {
-                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 downloadBtn">
                     <span class="fas fa-download"></span> Download
                 </button>
             }
@@ -44,6 +41,9 @@
                     <span class="fas fa-download mr-0"></span>
                 </button>
             }
+            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
@@ -104,10 +104,23 @@
                             <select id="filter-purpose" style="width:100%"></select>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-6 filter-region-container">
                         <div class="form-group">
                             <label for="filter-region" class="form-label mb-0">Region</label>
                             <select id="filter-region" style="width:100%"></select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -158,33 +171,6 @@
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
         
-        var date_today = new Date();
-        var date_month_ago = new Date();
-        date_month_ago.setMonth(date_month_ago.getMonth() - 1);
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-        
         // Load Select2 for Type
         $("#filter-type").select2({
             allowClear: true,
@@ -207,10 +193,22 @@
 
         $("#filter-type").on("select2:select", function () {
             $("#filter-purpose").val(null).trigger("change");
+            if ($(this).find('option:selected').text() == "MAINTENANCE & REPAIR")
+                $(".filter-purpose-container").hide();
+            else
+                $(".filter-purpose-container").show();
+            $("#filter-region").val(null).trigger("change");
+            if ($(this).find('option:selected').text() == "AUTOMOTIVE")
+                $(".filter-region-container").show();
+            else
+                $(".filter-region-container").hide();
         });
 
         $("#filter-type").on("select2:unselecting", function (e) {
             $("#filter-purpose").val(null).trigger("change");
+            $(".filter-purpose-container").show();
+            $("#filter-region").val(null).trigger("change");
+            $(".filter-region-container").show();
         });
         
         // Load Select2 for Purpose
@@ -237,6 +235,19 @@
             },
             dropdownParent: $("#filterModal"),
             minimumResultsForSearch: -1
+        });
+
+        $("#filter-purpose").on("select2:select", function () {
+            $("#filter-region").val(null).trigger("change");
+            if ($(this).find('option:selected').text() == "RUSH ORDER")
+                $(".filter-region-container").show();
+            else
+                $(".filter-region-container").hide();
+        });
+
+        $("#filter-purpose").on("select2:unselecting", function (e) {
+            $("#filter-region").val(null).trigger("change");
+            $(".filter-region-container").show();
         });
         
         // Load Select2 for Region
@@ -314,8 +325,9 @@
             Purpose: "",
             RegionId: "",
             Region: "",
-            DateFrom: DateForInput(date_month_ago),
-            DateTo: DateForInput(date_today),
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo()),
             FiledBy: "everyone",
             StatusId: "",
             Status: ""
@@ -331,6 +343,7 @@
                    ($('#filter-type').val() ?? "") != defaultDTState.TypeId ||
                    ($('#filter-purpose').val() ?? "") != defaultDTState.PurposeId ||
                    ($('#filter-region').val() ?? "") != defaultDTState.RegionId ||
+                   ($("#filter-preset").val() ?? "") != defaultDTState.Preset ||
                    ($("#filter-from").val() ?? "") != defaultDTState.DateFrom ||
                    ($("#filter-to").val() ?? "") != defaultDTState.DateTo ||
                    ($('#filter-filedby').val() ?? "") != defaultDTState.FiledBy ||
@@ -348,9 +361,11 @@
         function resetToDefaultDTFilter() {
             $("#filter-type").val(defaultDTState.TypeId).trigger('change');
             $("#filter-purpose").val(defaultDTState.PurposeId).trigger('change');
+            $(".filter-purpose-container").show();
             $("#filter-region").val(defaultDTState.RegionId).trigger('change');
-            $("#filter-from").val(defaultDTState.DateFrom);
-            $("#filter-to").val(defaultDTState.DateTo);
+            $(".filter-region-container").show();
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
             $("#filter-filedby").val(defaultDTState.FiledBy);
             $("#filter-status").val(defaultDTState.StatusId).trigger('change');
             
@@ -396,8 +411,9 @@
                 data.RegionId = $('#filter-region').val();
                 data.Region = $('#filter-region option:selected').text();
                 data.FiledBy = $('#filter-filedby').val();
-                data.DateFrom = $("#filter-from").val();
-                data.DateTo = $("#filter-to").val();
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
                 data.StatusId = $("#filter-status").val();
                 data.Status = $('#filter-status option:selected').text();
             },
@@ -410,6 +426,12 @@
                     });
                     $("#filter-type").append(typeOption).trigger('change');
                 }
+                    
+                if (data.Type == "MAINTENANCE & REPAIR")
+                    $(".filter-purpose-container").hide();
+                else
+                    $(".filter-purpose-container").show();
+
                 if (data.PurposeId) {
                     var purposeOption = new Option(data.Purpose, data.PurposeId, true, true);
                     $(purposeOption).data('data', {
@@ -418,6 +440,12 @@
                     });
                     $("#filter-purpose").append(purposeOption).trigger('change');
                 }
+
+                if ((data.Type == "" || data.Type == "AUTOMOTIVE") && (data.Purpose == "" || data.Purpose == "RUSH"))
+                    $(".filter-region-container").show();
+                else
+                    $(".filter-region-container").hide();
+
                 if (data.RegionId) {
                     var regionOption = new Option(data.Region, data.RegionId, true, true);
                     $(regionOption).data('data', {
@@ -426,8 +454,12 @@
                     });
                     $("#filter-region").append(regionOption).trigger('change');
                 }
-                $("#filter-from").val(data.DateFrom);
-                $("#filter-to").val(data.DateTo);
+                $('#filter-region').val(data.Region).trigger('change');
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
                 $("#filter-filedby").val(data.FiledBy).trigger('change');
                 if (data.StatusId) {
                     var statusOption = new Option(data.Status, data.StatusId, true, true);
@@ -509,9 +541,7 @@
                     $(row).find('td:eq(4)').addClass('text-success');
                 }
             }
-        });
-
-        requestDT.on("draw", function () {
+        }).on("draw", function () {
             checkDefaultFilter();
         });
 

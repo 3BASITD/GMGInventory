@@ -98,8 +98,8 @@ namespace GMGInventory.Application.Repositories
                                  IsActive = category.IsActive,
                                  DateCreatedD = category.DateCreated,
                                  DateModifiedD = category.DateModified == null ? null : category.DateModified.Value,
-                                 UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
-                                 UserModified = userm == null ? "-" : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname)
+                                 UserCreated = userc.FirstName + " " + userc.LastName,
+                                 UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName
                              };
             return await categories.ToListAsync();
         }

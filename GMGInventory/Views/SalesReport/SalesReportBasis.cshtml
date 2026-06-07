@@ -66,6 +66,19 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-6">
@@ -95,34 +108,6 @@
 
 @section Scripts {
     <script>
-
-        var date_today = new Date();
-        var date_year_ago = new Date();
-        date_year_ago.setYear(date_year_ago.getFullYear() - 1);
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    //dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
-                //dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
         var dt_duration = 3600000; // 1 hour
 
@@ -153,8 +138,9 @@
             length: 10,
             search: { search: "" },
             Basis: "Brand",
-            DateFrom: DateForInput(date_year_ago),
-            DateTo: DateForInput(date_today),
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
         };
 
         function checkDTChanged() {
@@ -165,6 +151,7 @@
                    salesDT.page.len() != defaultDTState.length ||
                    (salesDT.search() || "") != defaultDTState.search.search ||
                    $("#filter-basis").val() != defaultDTState.Basis ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
                    $('#filter-from').val() != defaultDTState.DateFrom ||
                    $('#filter-to').val() != defaultDTState.DateTo;
         }
@@ -179,8 +166,8 @@
 
         function resetToDefaultDTFilter() {
             $('#filter-basis').val(defaultDTState.Basis).trigger('change');
-            $('#filter-from').val(defaultDTState.DateFrom);
-            $('#filter-to').val(defaultDTState.DateTo);
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
             
             localStorage.removeItem(dt_storage);
 
@@ -195,9 +182,7 @@
         }
 
         // Load List on DataTable
-        var salesDT = $('.table-sales').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var salesDT = $('.table-sales').DataTable({
             stateSave: true,
             stateSaveCallback: function(settings, data) {
                 var now = new Date().getTime();
@@ -221,12 +206,16 @@
             },
             stateSaveParams: function (settings, data) {
                 data.Basis = $('#filter-basis').val();
+                data.Preset = $('#filter-preset').val();
                 data.DateFrom = $('#filter-from').val();
                 data.DateTo = $('#filter-to').val();
             },
             stateLoadParams: function (settings, data) {
                 $('#filter-basis').val(data.Basis).trigger('change');
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
                 $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
                 $('#filter-to').val(data.DateTo);
             },
             ajax: {
@@ -259,26 +248,17 @@
                 { data: "name", name: "Name" },
                 { data: "amount", name: "Amount", className: "text-end" }
             ],
+            order: defaultDTState.order,
             footerCallback: function (row, data, start, end, display) {
                 var json = salesDT.ajax.json();
                 var api = this.api(), data;
 
                 $(api.column(2).footer()).html(FormatStringDecimal(json.totalAmount));
-            },
-            order: defaultDTState.order
-        });
-
-        // Load functions upon DataTable load
-        salesDT.on("draw", function () {
-            //hideLoader();
+            }
+        }).on("draw", function () {
             checkDefaultFilter();
 
             $(".table-sales thead th").removeClass("text-end");
-        });
-
-        $(".btnFilter").on("click", function () {
-            salesDT.ajax.reload();
-            $("#filterModal").modal("hide");
         });
 
         $(".downloadBtn").click(function (e) {

@@ -113,15 +113,28 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-4">
                         <div class="form-group">
-                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Invoice Date From</label>
                             <input type="date" id="filter-from" class="form-control form-control-sm" />
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-sm-4">
                         <div class="form-group">
-                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <label for="filter-to" class="control-label mb-0">Invoice Date To</label>
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
@@ -140,34 +153,6 @@
 
 @section Scripts {
     <script>
-
-        var date_today = new Date();
-        var date_year_ago = new Date();
-        date_year_ago.setFullYear(date_year_ago.getFullYear() - 1);
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(date_today));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    //dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                dt_to.setFullYear(dt_to.getFullYear() - 1);
-                //dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
-
         // Load Select2 for Agent
         $("#filter-agent").select2({
             allowClear: true,
@@ -278,8 +263,9 @@
             ItemId: "",
             Item: "",
             ItemName: "",
-            DateFrom: DateForInput(date_year_ago),
-            DateTo: DateForInput(date_today),
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
         };
 
         function checkDTChanged() {
@@ -292,6 +278,7 @@
                    $('#filter-agent').val() != defaultDTState.Agent ||
                    $('#filter-brand').val() != defaultDTState.Brand ||
                    $('#filter-item').val() != defaultDTState.Item ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
                    $('#filter-from').val() != defaultDTState.DateFrom ||
                    $('#filter-to').val() != defaultDTState.DateTo;
         }
@@ -308,8 +295,8 @@
             $('#filter-agent').val(defaultDTState.AgentId).trigger('change');
             $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
             $('#filter-item').val(defaultDTState.ItemId);
-            $('#filter-to').val(defaultDTState.DateTo);
-            $('#filter-from').val(defaultDTState.DateFrom);
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
             
             localStorage.removeItem(dt_storage);
 
@@ -354,6 +341,7 @@
                 data.ItemId = $("#filter-item").val();
                 data.Item = $('#filter-item option:selected').text();
                 data.ItemName = $('#filter-item-name').val();
+                data.Preset = $('#filter-preset').val();
                 data.DateFrom = $("#filter-from").val();
                 data.DateTo = $("#filter-to").val();
             },
@@ -385,10 +373,11 @@
                     $("#filter-item").append(itemOption).trigger('change');
                     $("#filter-item-name").val(data.ItemName);
                 }
-
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
                 $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
                 $('#filter-to').val(data.DateTo);
-
             },
             ajax: {
                 url: "@Url.Action("GetAgentSalesPerItemDT")",
@@ -441,10 +430,7 @@
                 $(api.column(9).footer()).html(FormatStringDecimal(json.totalAmount));
             },
             order: defaultDTState.order
-        });
-
-        // Load functions upon DataTable load
-        salesDT.on("draw", function () {
+        }).on("draw", function () {
             checkDefaultFilter();
             $(".table-sales thead th").removeClass("text-end");
         });

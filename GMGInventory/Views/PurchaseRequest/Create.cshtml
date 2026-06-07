@@ -386,9 +386,8 @@
                 {
                     data: function (data, type, dataToSet) {
                         if (data.itemId == null || data.itemCode == null) {
-                            return "-";
+                            return "<span class='text-muted'>N/A</span>";
                         } else {
-                            //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>';
                             return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                         }
                     },
@@ -1177,6 +1176,8 @@
                 var itemMatch = $("#add-code").select2("data")[0].text != "" ? " of " + $("#add-code").select2("data")[0].text  + " " : "";
                 toastr.error(itemMatch + $("#add-name").val() + soMatch +" has already been added", "Duplicate");
             } else {
+                var is_for_na_one_time = $("#request-purpose").select2("data")[0]?.text.toLowerCase() == "one-time purchase";
+                var is_for_maintenance_repair = $("#request-type").select2("data")[0]?.text.toLowerCase() == "maintenance & repair";
                 itemDT.row.add({
                     customer: $("#add-so-customer").val(),
                     haveStock: $("#add-have-stock").prop("checked"),

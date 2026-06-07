@@ -210,7 +210,7 @@
                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                class="form-control form-control-sm" />
                     </div>
-                    <table class="table table-striped" id="upload-table">
+                    <table class="table table-striped table-responsive" id="upload-table">
                         <thead>
                             <tr><th>Row #</th><th>Code</th><th>First Name</th><th>Middle Name</th><th>Last Name</th><th>Area</th><th>Status</th></tr>
                         </thead>
@@ -376,7 +376,7 @@
                 $(".modal-detail-middlename").html(data.middleName);
                 $(".modal-detail-lastname").html(data.lastName);
                 $(".modal-detail-area").html(data.area);
-                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span class="fas fa-question-circle text-primary" data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="bottom-left" role="tooltip"></span>'));
+                $(".modal-detail-isactive").html(data.isActive + (data.isActive ? '' : ' <span data-microtip-title="This was deleted but instead marked as Inactive because it was used in other records." data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-question-circle text-primary"></span></span>'));
                 $(".modal-detail-usercreated").html(data.userCreated);
                 $(".modal-detail-datecreated").html(data.dateCreated);
                 $(".modal-detail-usermodified").html(data.userModified);
@@ -618,7 +618,13 @@
                             || columns.includes("Middle Name") == false
                             || columns.includes("Last Name") == false
                             || columns.includes("Area") == false) {
-                            row$.append($('<td/>').html("Unexpected columns"));
+                            var missing = [];
+                            if(columns.includes("Code") == false) { missing.push("Code"); }
+                            if(columns.includes("First Name") == false) { missing.push("First Name"); }
+                            if(columns.includes("Middle Name") == false) { missing.push("Middle Name"); }
+                            if(columns.includes("Last Name") == false) { missing.push("Last Name"); }
+                            if(columns.includes("Area") == false) { missing.push("Area"); }
+                            row$.append($('<td/>').html("Expected columns missing: " + missing.join(", ")));
                             UploadRowDone();
                         } else {
                             SaveXLSX(json_of_excel[i]["Code"], json_of_excel[i]["First Name"], json_of_excel[i]["Middle Name"], json_of_excel[i]["Last Name"], json_of_excel[i]["Area"], rowNum);

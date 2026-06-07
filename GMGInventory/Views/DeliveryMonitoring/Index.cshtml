@@ -11,9 +11,15 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -39,6 +45,11 @@
             </thead>
         </table>
     </div>
+    <div class="card-footer">
+        <button class="btn btn-secondary btn-sm float-right btn-chart ml-2" data-bs-toggle="modal" data-bs-target="#chartModal">
+            <span class="fas fa-chart-pie mr-0"></span>
+        </button>
+    </div>
 </div>
 
 <!-- Filter Modal -->
@@ -53,7 +64,47 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-agent" class="form-label mb-0">Agent Code</label>
+                            <select id="filter-agent" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-agent-name" class="form-label mb-0">Agent Name</label>
+                            <input type="text" id="filter-agent-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-customer" class="form-label mb-0">Customer Code</label>
+                            <select id="filter-customer" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
+                            <input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-region" class="form-label mb-0">Region</label>
+                            <select id="filter-region" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-preset" class="form-label mb-0">Date Range</label>
                             <select id="filter-preset" class="form-control form-control-sm">
@@ -66,6 +117,8 @@
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-from" class="form-label mb-0">Sales Order Date From</label>
@@ -245,12 +298,97 @@
                 </form>
             </div>
         </div>
-    </div>            
+    </div>
 }
+
+<!-- Chart Modal -->
+<div class="modal fade" id="chartModal" role="dialog" aria-labelledby="chartModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title chart-title">Last 7 Days Count Chart</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body d-flex justify-content-center">
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <span class="fas fa-times"></span> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        // Load Select2 for Agent
+        $("#filter-agent").select2({
+            allowClear: true,
+            placeholder: 'ALL',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Agent")"
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter-agent").on("select2:select", function () {
+            $("#filter-agent-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-agent").on("select2:unselecting", function (e) {
+            $("#filter-agent-name").val("");
+        });
+
+        // Load Select2 for Customer
+        $("#filter-customer").select2({
+            allowClear: true,
+            placeholder: 'ALL',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions", "Customer")"
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter-customer").on("select2:select", function () {
+            $("#filter-customer-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-customer").on("select2:unselecting", function (e) {
+            $("#filter-customer-name").val("");
+        });
+
+        // Load region data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#filter-region").select2({
+                    ajax: null, //already fetched outside
+                    allowClear: true,
+                    placeholder: 'ALL',
+                    data: data,
+                    minimumResultsForSearch: Infinity
+                });
+            }
+        });
 
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
         var dt_duration = 3600000; // 1 hour
@@ -281,6 +419,13 @@
             page: 0,
             length: 10,
             search: { search: "" },
+            Agent: "",
+            AgentName: "",
+            AgentId: "",
+            Customer: "",
+            CustomerId: "",
+            Region: "",
+            RegionId: "",
             Preset: "L7D",
             DateFrom: DateForInput(getFilterDefaultDateFrom()),
             DateTo: DateForInput(getFilterDefaultDateTo())
@@ -292,6 +437,9 @@
             return JSON.stringify(deliveryDT.order()) != JSON.stringify(defaultDTState.order) ||
                    deliveryDT.page.info().start != defaultDTState.page ||
                    deliveryDT.page.len() != defaultDTState.length ||
+                   $("#filter-agent").val() != defaultDTState.AgentId ||
+                   $("#filter-customer").val() != defaultDTState.CustomerId ||
+                   $("#filter-region").val() != defaultDTState.RegionId ||
                    $("#filter-preset").val() != defaultDTState.Preset ||
                    $('#filter-from').val() != defaultDTState.DateFrom ||
                    $('#filter-to').val() != defaultDTState.DateTo;
@@ -307,7 +455,12 @@
 
         function resetToDefaultDTFilter() {
             localStorage.removeItem(dt_storage);
-
+            
+            $('#filter-agent').val(defaultDTState.AgentId).trigger('change');
+            $('#filter-agent-name').val(defaultDTState.AgentName);
+            $('#filter-customer').val(defaultDTState.CustomerId).trigger('change');
+            $('#filter-customer-name').val(defaultDTState.CustomerName);
+            $('#filter-region').val(defaultDTState.RegionId).trigger('change');
             $('#filter-preset').val(defaultDTState.Preset);
             applyFilterPreset(defaultDTState.Preset);
             
@@ -344,11 +497,47 @@
                 return null;
             },
             stateSaveParams: function (settings, data) {
+                data.Agent = $('#filter-agent option:selected').text();
+                data.AgentId = $('#filter-agent').val();
+                data.AgentName = $('#filter-agent-name').val();
+                data.Customer = $('#filter-customer option:selected').text();
+                data.CustomerId = $('#filter-customer').val();
+                data.CustomerName = $('#filter-customer-name').val();
+                data.Region = $('#filter-region option:selected').text();
+                data.RegionId = $('#filter-region').val();
                 data.Preset = $('#filter-preset').val();
                 data.DateFrom = $('#filter-from').val();
                 data.DateTo = $('#filter-to').val();
             },
             stateLoadParams: function (settings, data) {
+                if(data.AgentId) {
+                    var agentOption = new Option(data.Agent, data.AgentId, true, true);
+                    $(agentOption).data('data', {
+                        id: data.AgentId,
+                        text: data.Agent,
+                        name: data.AgentName
+                    });
+                    $("#filter-agent").append(agentOption).trigger('change');
+                    $("#filter-agent-name").val(data.AgentName);
+                }
+                if(data.CustomerId) {
+                    var customerOption = new Option(data.Customer, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.Customer,
+                        name: data.CustomerName
+                    });
+                    $("#filter-customer").append(customerOption).trigger('change');
+                    $("#filter-customer-name").val(data.CustomerName);
+                }
+                if(data.RegionId) {
+                    var regionOption = new Option(data.Region, data.RegionId, true, true);
+                    $(regionOption).data('data', {
+                        id: data.RegionId,
+                        text: data.Region
+                    });
+                    $("#filter-region").append(regionOption).trigger('change');
+                }
                 $('#filter-preset').val(data.Preset).trigger('change');
                 $('#filter-from').prop('readonly', data.Preset != "");
                 $('#filter-from').val(data.DateFrom);
@@ -358,6 +547,15 @@
             ajax: {
                 url: "@Url.Action("GetListDT")",
                 data: function (data) {
+                    var agentId = $("#filter-agent").val();
+                    if (agentId) data.AgentId = agentId;
+
+                    var customerId = $("#filter-customer").val();
+                    if (customerId) data.CustomerId = customerId;
+
+                    var regionId = $("#filter-region").val();
+                    if (regionId) data.RegionId = regionId;
+
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
                 },
@@ -420,9 +618,9 @@
                     },
                     name: "Forwarder"
                 },
-                { data: "status1", name: "Status1", orderable: false },
+                { data: "status1", name: "Status1" },
                 {
-                    orderable: false,
+                    //orderable: false,
                     data: function (data, type, dataToSet) {
                         //return "<span class='badge badge-danger'>COMING SOON</span>";
                         return data.status2 || '<em class="text-muted">N/A</em>';
@@ -430,21 +628,21 @@
                     name: "Status2"
                 },
                 {
-                    orderable: false,
+                    //orderable: false,
                     data: function (data, type, dataToSet) {
                         return data.status3 || '<em class="text-muted">N/A</em>';
                     },
                     name: "Status3"
                 },
                 {
-                    orderable: false,
+                    //orderable: false,
                     data: function (data, type, dataToSet) {
                         return data.status4 || '<em class="text-muted">N/A</em>';
                     },
                     name: "Status4"
                 },
                 {
-                    orderable: false,
+                    //orderable: false,
                     data: function (data, type, dataToSet) {
                         return data.status5 || '<em class="text-muted">N/A</em>';
                     },
@@ -635,7 +833,7 @@
                         ReceiverName: $("#delivery-receiver-name").val(),
                         ReceiverContact: $("#delivery-receiver-contact").val(),
                         Remarks: $("#delivery-remarks").val()
-                    },  
+                    },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
                             //toastr.error(data.message, data.status);
@@ -724,6 +922,101 @@
                 $("#delivery-driver").val(null).trigger("change");
                 $("#delivery-vehicle").val(null).trigger("change");
             }
+        }
+
+        if (user_access.canUploadDownload) {
+            $(".downloadBtn").click(function (e) {
+                var urlQuery = [];
+                if ($("#filter-agent").val()) { urlQuery.push("AgentId=" + $("#filter-agent").val()); }
+                if ($("#filter-customer").val()) { urlQuery.push("CustomerId=" + $("#filter-customer").val()); }
+                if ($("#filter-region").val()) { urlQuery.push("RegionId=" + $("#filter-region").val()); }
+
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            });
+        }
+
+        var salesChart = null;
+
+        $(document).on("click", ".btn-chart", function () {
+            $.post("@Url.Action("GetLatestCount")", function (data) {
+                if (!salesChart)
+                    createSalesChart(data);
+                else
+                    updateSalesChart(data);
+            });
+        });
+
+        function createSalesChart(data) {
+            var ctx = document.getElementById("salesChart");
+
+            salesChart = new Chart(ctx, {
+                type: "bar",
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                },
+                data: {
+                    labels: data.map(x => x.date),
+                    datasets: [
+                        {
+                            label: "Orders",
+                            fill: true,
+                            backgroundColor: "blue",
+                            data: data.map(x => x.orderCount)
+                        },
+                        {
+                            label: "Picked",
+                            fill: true,
+                            backgroundColor: "orange",
+                            data: data.map(x => x.pickCount)
+                        },
+                        {
+                            label: "Packed",
+                            fill: true,
+                            backgroundColor: "purple",
+                            data: data.map(x => x.packCount)
+                        },
+                        {
+                            label: "Invoiced",
+                            fill: true,
+                            backgroundColor: "teal",
+                            data: data.map(x => x.invoiceCount)
+                        },
+                        {
+                            label: "Delivered",
+                            fill: true,
+                            backgroundColor: "green",
+                            data: data.map(x => x.deliveredCount)
+                        }
+                    ]
+                }
+            });
+        }
+
+        function updateSalesChart(data) {
+            salesChart.data.labels = data.map(x => x.date);
+
+            salesChart.data.datasets[0].data = data.map(x => x.orderCount);
+            salesChart.data.datasets[1].data = data.map(x => x.pickCount);
+            salesChart.data.datasets[2].data = data.map(x => x.packCount);
+            salesChart.data.datasets[3].data = data.map(x => x.invoiceCount);
+            salesChart.data.datasets[4].data = data.map(x => x.deliveredCount);
+
+            salesChart.update();
         }
     </script>
 }

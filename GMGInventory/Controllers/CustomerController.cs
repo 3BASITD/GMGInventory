@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Helpers;
@@ -491,12 +492,13 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ResponseModel responseModel = new();
-            if (await customerRepository.UploadCombinationExistAsync(customerVM))
-            {
-                responseModel.Status = "Error";
-                responseModel.Message = "Already exist";
-            }
-            else if (await customerRepository.IsCodeExistAsync(customerVM.Code))
+            //if (await customerRepository.UploadCombinationExistAsync(customerVM))
+            //{
+            //    responseModel.Status = "Error";
+            //    responseModel.Message = "Already exist";
+            //}
+            //else
+            if (await customerRepository.IsCodeExistAsync(customerVM.Code))
             {
                 responseModel.Status = "Error";
                 responseModel.Message = "Code already in use";
@@ -547,6 +549,28 @@ namespace GMGInventory.Controllers
                 }
             }
             return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFileJson(IFormFile file)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.Customer, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await customerRepository.UploadFile(file);
+
+            if (response.Data == null)
+            {
+                return Json(response);
+            }
+            else
+            {
+                Response.Headers["X-Status"] = response.Status;
+                Response.Headers["X-Message"] = response.Message;
+                return File(response.Data.Content,
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            response.Data.FileName);
+            }
         }
     }
 }

@@ -50,6 +50,11 @@ namespace GMGInventory.Data
         public int? ServiceLevelAgreementId { get; set; }
         public ServiceLevelAgreement ServiceLevelAgreement { get; set; }
 
+
+        [ForeignKey("ForwarderId")]
+        public int? ForwarderId { get; set; }
+        public Forwarder Forwarder { get; set; }
+
         public bool WithLP { get; set; }
         public bool WithREYCONonDefective { get; set; }
 

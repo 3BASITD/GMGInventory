@@ -416,7 +416,6 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        //return data.code + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.id + ')"><span class="fas fa-info-circle text-info"></span></span>'
                         return "<a href='/Item/Details/" + data.id + "' class='link-info' target='_blank'>" + data.code + "</a>";
                     },
                     name: "Code",

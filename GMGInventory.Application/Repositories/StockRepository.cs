@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using GMGInventory.Application.Contracts;
+﻿using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +13,6 @@ namespace GMGInventory.Application.Repositories
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
-        private readonly string currentUserId;
 
         public StockRepository(ApplicationDbContext context
                              , IHttpContextAccessor httpContextAccessor
@@ -24,7 +20,6 @@ namespace GMGInventory.Application.Repositories
         {
             this.context = context;
             this.userManager = userManager;
-            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
         private async Task<IList<StockVM>> GetStocks()

@@ -14,8 +14,7 @@ namespace GMGInventory.Controllers
     public class StockController(IAccessRepository accessRepository
                                , IStockRepository stockRepository
                                , ISystemSettingRepository settingRepository
-                               , IAPIBCT_Service apiBCTService
-                               , IOptions<APIBCTSettings> apiBCTOptions) : BaseController(accessRepository)
+                               , IAPIBCT_Service apiBCTService) : BaseController(accessRepository)
     {
         public async Task<IActionResult> Index()
         {
@@ -24,7 +23,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.BarcotechStock)).Convert();
 
-            var stockAutoSynching = await settingRepository.GetValue("StockAutoSynching");
+            var stockAutoSynching = await settingRepository.GetValue("BarcotechAutoStock");
             ViewData["AutoSynching"] = stockAutoSynching == null ? false : stockAutoSynching == "true";
 
             return View();
@@ -46,7 +45,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechStock, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await settingRepository.UpdateSetting("StockAutoSynching", AutoEnabled ? "true" : "false"));
+            return Json(await settingRepository.UpdateSetting("BarcotechAutoStock", AutoEnabled ? "true" : "false"));
         }
 
         public async Task<IActionResult> SyncStock(int? ItemId)
@@ -54,7 +53,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.BarcotechStock, AccessTypes.UploadDownload);
             if (redirectResult != null) return redirectResult;
 
-            var response = await apiBCTService.SyncStock(apiBCTOptions.Value.URLStock, ItemId);
+            var response = await apiBCTService.SyncStock(ItemId);
             return Json(response);
         }
     }

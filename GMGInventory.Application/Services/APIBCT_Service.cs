@@ -4,7 +4,6 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,34 +33,52 @@ namespace GMGInventory.Application.Services
             this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
-        public async Task<IList<BarcotechStockSyncVM>> SyncStock(string UrlStock, int? ItemId)
+        public async Task<IList<BarcotechStockSyncVM>> SyncStock(int? ItemId)
         {
-            var url = UrlStock;
-            if (ItemId != null)
-            {
-                var item = await context.Items
-                                        .Where(s => s.Id == ItemId)
-                                        .FirstOrDefaultAsync();
-
-                if (item == null)
-                {
-                    var msg = "Invalid item, record cannot be found";
-                    await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
-                    return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
-                        Item = "ERR",
-                        Warehouse = "ERR",
-                        OldQuantity = 0,
-                        NewQuantity = 0,
-                        OldAllocatedQuantity = 0,
-                        NewAllocatedQuantity = 0,
-                        Remarks = msg
-                    } };
-                }
-                url = UrlStock + "?item_code=" + item.Code;
-            }
-
             try
             {
+                var url = await context.SystemSettings.Where(s => s.Name == "BarcotechURLStock").Select(s => s.Value).FirstOrDefaultAsync();
+                if (url == null)
+                {
+                    var msg = "API URL for Stock not set";
+                    await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+                    return new List<BarcotechStockSyncVM> {
+                        new BarcotechStockSyncVM {
+                            Item = "ERR",
+                            Warehouse = "ERR",
+                            OldQuantity = 0,
+                            NewQuantity = 0,
+                            OldAllocatedQuantity = 0,
+                            NewAllocatedQuantity = 0,
+                            Remarks = msg
+                        }
+                    };
+                }
+
+                if (ItemId != null)
+                {
+                    var item = await context.Items
+                                            .Where(s => s.Id == ItemId)
+                                            .FirstOrDefaultAsync();
+                    if (item == null)
+                    {
+                        var msg = "Invalid item, record cannot be found";
+                        await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+                        return new List<BarcotechStockSyncVM> { 
+                            new BarcotechStockSyncVM {
+                                Item = "ERR",
+                                Warehouse = "ERR",
+                                OldQuantity = 0,
+                                NewQuantity = 0,
+                                OldAllocatedQuantity = 0,
+                                NewAllocatedQuantity = 0,
+                                Remarks = msg
+                            } 
+                        };
+                    }
+                    url += "?item_code=" + item.Code;
+                }
+
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
 
                 var response = await client.SendAsync(request);
@@ -74,10 +91,16 @@ namespace GMGInventory.Application.Services
                 var dataNode = root?["data"];
 
                 var stocks = new List<APIBCT_Stock>();
+                switch (dataNode)
+                {
+                    case JsonObject dataObj:
+                        stocks = dataObj.SelectMany(x => x.Value?["items"]?.Deserialize<List<APIBCT_Stock>>() ?? Enumerable.Empty<APIBCT_Stock>()).ToList();
+                        break;
 
-                if (dataNode is JsonObject dataObj)
-                    stocks = dataObj.SelectMany(kvp => kvp.Value?["items"]?.Deserialize<List<APIBCT_Stock>>() ?? new List<APIBCT_Stock>()).ToList();
-
+                    case JsonArray dataArray:
+                        stocks = dataArray.Deserialize<List<APIBCT_Stock>>() ?? new List<APIBCT_Stock>();
+                        break;
+                }
 
                 if (ItemId != null && stocks.Count == 0)
                 {
@@ -86,6 +109,20 @@ namespace GMGInventory.Application.Services
                     return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
                         Item = "ERR",
                         Warehouse = "ERR",
+                        OldQuantity = 0,
+                        NewQuantity = 0,
+                        OldAllocatedQuantity = 0,
+                        NewAllocatedQuantity = 0,
+                        Remarks = msg
+                    } };
+                }
+
+                if (stocks.Count == 0)
+                {
+                    var msg = "No new stock update";
+                    return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
+                        Item = "NUL",
+                        Warehouse = "NUL",
                         OldQuantity = 0,
                         NewQuantity = 0,
                         OldAllocatedQuantity = 0,
@@ -158,13 +195,13 @@ namespace GMGInventory.Application.Services
                                     ItemId = item.Id,
                                     QuantityFrom = 0,
                                     QuantityTo = quantity,
-                                    Remarks = "Copied from WMS",
+                                    Remarks = "Fetched from Barcotech",
                                     WarehouseId = warehouse.Id
                                 };
                                 context.PhysicalCountHistories.Add(countHistory);
                                 await context.SaveChangesAsync(currentUserId);
 
-                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Added New Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Manual Fetched for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
                                 stockChanges.Add(new BarcotechStockSyncVM
                                 {
                                     Item = stock.item_code,
@@ -191,13 +228,13 @@ namespace GMGInventory.Application.Services
                                     ItemId = item.Id,
                                     QuantityFrom = oldQuantity,
                                     QuantityTo = quantity,
-                                    Remarks = "Copied from WMS",
+                                    Remarks = "Fetched Stock from Barcotech",
                                     WarehouseId = warehouse.Id
                                 };
                                 context.PhysicalCountHistories.Add(countHistory);
                                 await context.SaveChangesAsync(currentUserId);
 
-                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Updated Old Stock for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Manual Fetch for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
                                 stockChanges.Add(new BarcotechStockSyncVM
                                 {
                                     Item = stock.item_code,
@@ -253,37 +290,59 @@ namespace GMGInventory.Application.Services
             }
         }
 
-        public async Task<IList<BarcotechPickSyncVM>> SyncPick(string UrlPicking)
+        public async Task<IList<BarcotechPickSyncVM>> SyncPick()
         {
-            var url = UrlPicking;
             try
             {
+                var url = await context.SystemSettings.Where(s => s.Name == "BarcotechURLPicking").Select(s => s.Value).FirstOrDefaultAsync();
+                if (url == null)
+                {
+                    var msg = "API URL for Picking not set";
+                    await SaveSyncStatus("Pick", int.MinValue.ToString(), "Error", msg);
+                    return new List<BarcotechPickSyncVM> {
+                        new BarcotechPickSyncVM {
+                            SalesOrderNumber = "NUL",
+                            Status = "NUL",
+                            PickDate = "NUL",
+                            Remarks = msg
+                        }
+                    };
+                }
+
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
 
                 var response = await client.SendAsync(request);
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync();
 
-                //var jsonr = JsonSerializer.Deserialize<APIBCT_Pick>(json)!;
-
                 var root = JsonNode.Parse(json);
                 var dataNode = root?["data"];
 
                 var pickings = new List<APIBCT_Pick>();
 
-                if (dataNode is JsonObject dataObj)
-                    pickings = dataObj.SelectMany(kvp => kvp.Value?["items"]?.Deserialize<List<APIBCT_Pick>>() ?? new List<APIBCT_Pick>()).ToList();
+                switch (dataNode)
+                {
+                    case JsonObject dataObj:
+                        pickings = dataObj.SelectMany(x => x.Value?["items"]?.Deserialize<List<APIBCT_Pick>>() ?? Enumerable.Empty<APIBCT_Pick>()).ToList();
+                        break;
+
+                    case JsonArray dataArray:
+                        pickings = dataArray.Deserialize<List<APIBCT_Pick>>() ?? new List<APIBCT_Pick>();
+                        break;
+                }
 
                 if (pickings.Count == 0)
                 {
-                    var msg = "No picking status from Barcotech";
+                    var msg = "No new picking update";
                     await SaveSyncStatus("Pick", int.MinValue.ToString(), "Error", msg);
-                    return new List<BarcotechPickSyncVM> { new BarcotechPickSyncVM {
-                        SalesOrderNumber = "ERR",
-                        Status = "ERR",
-                        PickDate = "ERR",
-                        Remarks = msg
-                    } };
+                    return new List<BarcotechPickSyncVM> {
+                        new BarcotechPickSyncVM {
+                            SalesOrderNumber = "NUL",
+                            Status = "NUL",
+                            PickDate = "NUL",
+                            Remarks = msg
+                        }
+                    };
                 }
 
                 var pickChanges = new List<BarcotechPickSyncVM>();
@@ -322,7 +381,7 @@ namespace GMGInventory.Application.Services
                             await context.Picks.AddAsync(pick);
                             await context.SaveChangesAsync(currentUserId);
 
-                            await SaveSyncStatus("Pick", pick.Id.ToString(), "Success", $"Added New Pick Status");
+                            await SaveSyncStatus("Pick", pick.Id.ToString(), "Success", "Manual Fetch");
                             pickChanges.Add(new BarcotechPickSyncVM
                             {
                                 SalesOrderNumber = order.SalesOrderNumber,
@@ -338,7 +397,7 @@ namespace GMGInventory.Application.Services
                             context.Picks.Update(pick);
                             await context.SaveChangesAsync(currentUserId);
 
-                            await SaveSyncStatus("Pick", pick.Id.ToString(), "Success", $"Updated Old Pick Status");
+                            await SaveSyncStatus("Pick", pick.Id.ToString(), "Success", "Manual Fetch");
                             pickChanges.Add(new BarcotechPickSyncVM
                             {
                                 SalesOrderNumber = order.SalesOrderNumber,

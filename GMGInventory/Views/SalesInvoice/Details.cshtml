@@ -44,6 +44,12 @@
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
                                     <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Template</a></li>
                                     <li><a class="dropdown-item btn-details-print" data-company="BAS">Use BAS Template</a></li>
+                                    <li><a class="dropdown-item btn-details-print" data-company="3BAS">Use 3BAS Template</a></li>
+                                    @* <li><a class="dropdown-item btn-details-print" data-margin-top="24">Margin Top Setting #1</a></li>
+                                    <li><a class="dropdown-item btn-details-print" data-margin-top="44">Margin Top Setting #2</a></li>
+                                    <li><a class="dropdown-item btn-details-print" data-margin-top="64">Margin Top Setting #3</a></li>
+                                    <li><a class="dropdown-item btn-details-print" data-margin-top="84">Margin Top Setting #4</a></li>
+                                    <li><a class="dropdown-item btn-details-print" data-margin-top="104">Margin Top Setting #5</a></li> *@
                                 </ul>
                             </div>
                         }
@@ -637,7 +643,6 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
                         return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
@@ -738,7 +743,6 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        //return data.itemCode + ' <span class="clickable" data-microtip-title="View Item Details" data-microtip-position="bottom-left" role="tooltip" onclick="LoadItemDetailsModal(' + data.itemId + ')"><span class="fas fa-info-circle text-info"></span></span>'
                         return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode",
@@ -943,6 +947,7 @@
         if (user_access.canPrint) {
             $(".btn-details-print").on("click", function () {
                 var print_company = $(this).data("company");
+                //var print_margin_top = $(this).data("margin-top");
                 var invoice_type_changed = $("#invoice-invoice-type").val() != $("#invoice-invoice-type").data("current-invoice-type");
                 var control_number_changed = $("#invoice-control-number").val() != $("#invoice-control-number").data("current-control-number");
                 var remarks_on_data = $("#invoice-remarks").data("current-remarks") == null ? "" : $("#invoice-remarks").data("current-remarks");
@@ -963,6 +968,7 @@
                     });
                     setTimeout(function () {
                         let win = window.open('@Url.Action("PrintReceipt")/' + invoice_data.id + (print_company ? '?Company=' + print_company : ''), '');
+                        //let win = window.open('@Url.Action("PrintReceipt")/' + invoice_data.id + (print_margin_top ? '?MarginTop=' + print_margin_top : ''), '');
                         var wintimer = setInterval(function () {
                             if (win.closed) {
                                 clearInterval(wintimer);

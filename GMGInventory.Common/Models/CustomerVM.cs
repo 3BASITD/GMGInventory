@@ -202,6 +202,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Modified By")]
         public string? ModifiedBy { get; set; }
+
+        public string ActionStatus { get; set; }
     }
 
     public class CustomerShippingVM

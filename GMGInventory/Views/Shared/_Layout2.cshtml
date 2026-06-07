@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="~/lib/jquery-ui/jquery-ui.min.css" />
     <link rel="stylesheet" href="~/lib/select2/css/select2.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-toggle/css/bootstrap2-toggle.min.css" />
-    <link rel="stylesheet" href="~/lib/chart.js/Chart.min.css" />
+    @* <link rel="stylesheet" href="~/lib/chart.js/Chart.min.css" /> *@
     <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
     <link rel="stylesheet" href="~/lib/microtip/microtip.css" />
     <link rel="stylesheet" href="~/lib/swiper-11.1.14/package/swiper-bundle.min.css" />
@@ -198,7 +198,7 @@
         If the problem persists, consult IT.
     </div>
 
-    <partial name="_ItemDetailsPartial" />
+    @* <partial name="_ItemDetailsPartial" /> *@
 
     <form id="logoutForm" class="form-inline d-none" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
         <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
@@ -225,7 +225,8 @@
     <script src="~/lib/popper.js/umd/popper.min.js"></script>
     <script src="~/lib/select2/js/select2.js"></script>
     <script src="~/lib/bootstrap-toggle/js/bootstrap2-toggle.min.js"></script>
-    <script src="~/lib/chart.js/Chart.min.js"></script>
+    @* <script src="~/lib/chart.js/Chart.min.js"></script> *@
+    <script src="~/lib/chart.js4/chart.umd.min.js"></script>
     <script src="~/lib/loadingoverlay/loadingoverlay.min.js"></script>
     <script src="~/lib/toastr/toastr.min.js"></script>
     <script src="~/lib/sheetjs/dist/xlsx.core.min.js"></script>

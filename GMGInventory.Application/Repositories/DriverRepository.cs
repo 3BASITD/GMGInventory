@@ -246,7 +246,7 @@ namespace GMGInventory.Application.Repositories
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
 
-                if (await context.SalesOrderDeliveryMonitorings.AnyAsync(s => s.DriverId == Id))
+                if (await context.SalesOrderDeliveries.AnyAsync(s => s.DriverId == Id))
                 {
                     oldDriver.IsActive = false;
                     context.Drivers.Update(oldDriver);

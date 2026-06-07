@@ -4,6 +4,7 @@
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 
     string GetValue(string name) => Model.FirstOrDefault(s => s.Name == name)?.Value;
+    string currentIP = Context.Connection.RemoteIpAddress?.ToString() ?? "192.168.0.36";
 }
 
 <div class="alert alert-info" role="alert">
@@ -27,6 +28,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" id="errors-tab" data-bs-toggle="tab" href="#errors" role="tab">
                                     Error Pages / Popups
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="barcotech-tab" data-bs-toggle="tab" href="#barcotech" role="tab">
+                                    Barcotech API URL
                                 </a>
                             </li>
                         </ul>
@@ -112,22 +118,28 @@
                                     </button>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">
+                                    <label class="form-label" for="login-title">
                                         Login Page Title
                                     </label>
                                     <input type="text" id="login-title" class="form-control" placeholder="3BAS|Tigers Inc" value="@GetValue("CompanyLogin")">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">
+                                    <label class="form-label" for="navigation-title">
                                         Navbar / Topbar Title
                                     </label>
                                     <input type="text" id="navigation-title" class="form-control" placeholder="3BAS Tigers Inc" value="@GetValue("CompanyNavbar")">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">
+                                    <label class="form-label" for="browser-title">
                                         Browser Tab Title
                                     </label>
                                     <input type="text" id="browser-title" class="form-control" placeholder="3BAS Tigers Inc." value="@GetValue("CompanyTitle")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="cr-print-title">
+                                        Browser Tab Title
+                                    </label>
+                                    <input type="text" id="cr-print-title" class="form-control" placeholder="3BAS Tigers Inc." value="@GetValue("CompanyCRPrint")">
                                 </div>
                             </div>
                         </div>
@@ -452,6 +464,55 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="tab-pane fade" id="barcotech" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-primary" onclick="SaveBarcotech()">
+                                        <i class="fas fa-save mr-1"></i>
+                                        Save URLs
+                                    </button>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="barcotech-receiving">
+                                        API URL Receiving
+                                    </label>
+                                    <input type="text" id="barcotech-receiving" class="form-control" placeholder="@(currentIP):8080/wms_v1.8.21.25/binas/api/post_receiving.php" value="@GetValue("BarcotechURLReceiving")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="barcotech-outbound">
+                                        API URL Outbound
+                                    </label>
+                                    <input type="text" id="barcotech-outbound" class="form-control" placeholder="@(currentIP):8080/wms_v1.8.21.25/binas/api/post_outbound.php" value="@GetValue("BarcotechURLOutbound")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="barcotech-return">
+                                        API URL Return
+                                    </label>
+                                    <input type="text" id="barcotech-return" class="form-control" placeholder="@(currentIP):8080/wms_v1.8.21.25/binas/api/post_return.php" value="@GetValue("BarcotechURLReturn")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="barcotech-transfer">
+                                        API URL Transfer
+                                    </label>
+                                    <input type="text" id="barcotech-transfer" class="form-control" placeholder="@(currentIP):8080/wms_v1.8.21.25/binas/api/post_wh_item_transfer.php" value="@GetValue("BarcotechURLTransfer")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="barcotech-stock">
+                                        API URL Stock
+                                    </label>
+                                    <input type="text" id="barcotech-stock" class="form-control" placeholder="@(currentIP):8080/wms_v1.8.21.25/binas/api/post_stock.php" value="@GetValue("BarcotechURLStock")">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="barcotech-picking">
+                                        API URL Picking
+                                    </label>
+                                    <input type="text" id="barcotech-picking" class="form-control" placeholder="@(currentIP):8080/wms_v1.8.21.25/binas/api/post_outbound_status.php" value="@GetValue("BarcotechURLPicking")">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -461,13 +522,17 @@
 
 @section Scripts {
     <script>
-        document.getElementById("navigation-title").addEventListener("input", function () {
-          this.value = this.value.toUpperCase();
-        });
+        //document.querySelectorAll("#navigation-title, #cr-print-title")
+        document.querySelectorAll("#navigation-title")
+                .forEach(el => {
+                    el.addEventListener("input", function () {
+                        this.value = this.value.toUpperCase();
+                    });
+                });
 
         $(document).on("blur", "input[placeholder], textarea[placeholder]", function () {
-            if ($(this).val().trim() === "") {
-                $(this).val($(this).attr("placeholder"));
+            if (!this.value.trim()) {
+                this.value = this.placeholder;
             }
         });
 
@@ -559,7 +624,8 @@
             var settings = [
                     { name: "CompanyLogin", value: $("#login-title").val() || $("#login-title").attr("placeholder") },
                     { name: "CompanyNavbar", value: ($("#navigation-title").val() || $("#navigation-title").attr("placeholder")).toUpperCase() },
-                    { name: "CompanyTitle", value: $("#browser-title").val() || $("#browser-title").attr("placeholder") }
+                    { name: "CompanyTitle", value: $("#browser-title").val() || $("#browser-title").attr("placeholder") //},
+                    //{ name: "CompanyCRPrint", value: $("#cr-print-title").val() || $("#cr-print-title").attr("placeholder") }
                 ];
             $.ajax({
                 type: "POST",
@@ -625,6 +691,32 @@
                 url: "@Url.Action("UpdateSettings")",
                 data: {
                     Name: "error settings",
+                    Settings: settings
+                },
+                success: function (data) {
+                    if (data.status == "Error") {
+                        toastr.error(data.message, "Error");
+                    } else {
+                        toastr.success(data.message, "Success");
+                    }
+                }
+            });
+        }
+
+        function SaveBarcotech() {
+            var settings = [
+                    { name: "BarcotechURLReceiving", value: $("#barcotech-receiving").val() || $("#barcotech-receiving").attr("placeholder") },
+                    { name: "BarcotechURLOutbound", value: $("#barcotech-outbound").val() || $("#barcotech-outbound").attr("placeholder") },
+                    { name: "BarcotechURLReturn", value: $("#barcotech-return").val() || $("#barcotech-return").attr("placeholder") },
+                    { name: "BarcotechURLTransfer", value: $("#barcotech-transfer").val() || $("#barcotech-transfer").attr("placeholder") },
+                    { name: "BarcotechURLStock", value: $("#barcotech-stock").val() || $("#barcotech-stock").attr("placeholder") },
+                    { name: "BarcotechURLPicking", value: $("#barcotech-picking").val() || $("#barcotech-picking").attr("placeholder") },
+                ];
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("UpdateSettings")",
+                data: {
+                    Name: "barcotech url",
                     Settings: settings
                 },
                 success: function (data) {

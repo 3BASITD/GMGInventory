@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -16,16 +15,13 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
-        private readonly IMapper mapper;
         public ChequeRepository(ApplicationDbContext context
                                  , IHttpContextAccessor httpContextAccessor
-                                 , UserManager<User> userManager
-                                 , IMapper mapper) : base(context, httpContextAccessor, userManager)
+                                 , UserManager<User> userManager) : base(context, httpContextAccessor, userManager)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
-            this.mapper = mapper;
         }
 
 
@@ -218,7 +214,7 @@ namespace GMGInventory.Application.Repositories
                         Message = "Invalid file",
                         Data = new FileVM
                         {
-                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Item Upload Processed --- {file.FileName}",
+                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Cheque Upload Processed --- {file.FileName}",
                             Content = []
                         }
                     };
@@ -246,7 +242,7 @@ namespace GMGInventory.Application.Repositories
                         Message = "Missing column(s): " + string.Join(", ", missingColumns),
                         Data = new FileVM
                         {
-                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Item Upload Processed --- {file.FileName}",
+                            FileName = $"{DateTime.Now.ToString("yyMMddHHmm")} Cheque Upload Processed --- {file.FileName}",
                             Content = []
                         }
                     };

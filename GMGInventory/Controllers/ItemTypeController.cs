@@ -19,9 +19,9 @@ namespace GMGInventory.Controllers
             return Json(await itemTypeRepository.GetOptions(CategoryId, IncludeId));
         }
 
-        public async Task<IActionResult> GetOptions2(string search, int page)
+        public async Task<IActionResult> GetOptions2(string search, int page, int? CategoryId)
         {
-            return Json(await itemTypeRepository.GetOptions2(search, page));
+            return Json(await itemTypeRepository.GetOptions2(search, page, CategoryId));
         }
 
         public async Task<IActionResult> Index()
@@ -130,12 +130,13 @@ namespace GMGInventory.Controllers
             DataTable dt = new DataTable("Item Types");
             dt.Columns.AddRange([
                 new DataColumn("Code"),
-                new DataColumn("Name")
+                new DataColumn("Name"),
+                new DataColumn("Category")
             ]);
             var itemTypes = (await itemTypeRepository.GetListAsync()).Where(s => s.IsActive == true).ToList();
             foreach (var itemType in itemTypes)
             {
-                dt.Rows.Add(itemType.Code, itemType.Name);
+                dt.Rows.Add(itemType.Code, itemType.Name, string.IsNullOrWhiteSpace(itemType.CategoryCode) ? "ALL" : itemType.CategoryCode);
             }
 
             using (XLWorkbook wb = new())
@@ -192,4 +193,4 @@ namespace GMGInventory.Controllers
             return RedirectToAction(nameof(Index));
         }
     }
-}
+}   

@@ -23,7 +23,15 @@
     @if (Model.InvoiceType == "Sales Invoice")
     {
         <!-- SALES INVOICE -->
-        var topMargin = 24;
+        @* var topMargin = 24; *@
+
+        var company = TempData["CompanyTemplate"]?.ToString() ?? "BAS";
+        var topMargin = TempData["MarginTop"]?.ToString() ?? "24";
+        var itemHeight = company == "3BAS" ? "310" : "380";//280
+        var headerItemSpace = company == "3BAS" ? "80" : "40";//50
+        var maxItems = company == "3BAS" ? 5 : 17;
+
+        if (company == "3BAS") topMargin = "94";//124
 
         @* if (TempData["CompanyTemplate"]?.ToString() == "BAS")
         {
@@ -72,8 +80,8 @@
                     </tr>
                 </tbody>
             </table>
-            <div style="height: 380px;">
-                <table style="margin-top: 40px;">
+            <div style="height: @(itemHeight)px;">
+                <table style="margin-top: @(headerItemSpace)px;">
                     <tbody>
                         <tr>
                             <td style="width: 90px;"></td>
@@ -88,7 +96,7 @@
                             @foreach (var item in Model.Items)
                             {
                                 rowctr++;
-                                if (rowctr < 17 || Model.Items.Count == 17)
+                                if (rowctr < maxItems || Model.Items.Count == maxItems)
                                 {
                                     <tr>
                                         <td class="auto-font-size" style="width: 90px; padding-right: 5px;">@item.PartNumber</td>
@@ -109,7 +117,7 @@
                             {
                                 <tr>
                                     <td style="width: 90px;"></td>
-                                    <td>+@(Model.Items.Count - 16) more item(s)</td>
+                                    <td>+@(Model.Items.Count - (maxItems - 1)) more item(s)</td>
                                     <td style="width: 75px;">@otherQuantity</td>
                                     <td style="width: 90px;"></td>
                                     <td style="width: 115px;" class="currency">@string.Format("{0:#,##0.00}", otherGrossPrice)</td>

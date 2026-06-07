@@ -9,18 +9,18 @@
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
         <div class="card-tools">
-            <button type="button" class="btn btn-secondary btn-sm float-right ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <span class="fas fa-filter"></span> Filter
-            </button>
             @if (userAccess.CanUploadDownload)
             {
                 <button type="button" class="btn btn-secondary btn-sm float-right uploadBtn ml-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
                     <span class="fas fa-upload"></span> Upload
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn">
+                <button type="button" class="btn btn-secondary btn-sm float-right downloadBtn ml-2">
                     <span class="fas fa-download"></span> Download
                 </button>
             }
+            <button class="btn btn-secondary btn-sm float-right btn-filter ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
         </div>
     </div>
     <div class="card-body">
@@ -115,6 +115,12 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
+                            <label for="filter-brand" class="control-label mb-0">Brand</label>
+                            <select id="filter-brand" name="BrandId" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="filter-category" class="control-label mb-0">Category</label>
                             <select id="filter-category" name="CategoryId" style="width:100%">
                                 <option></option>
@@ -126,16 +132,14 @@
                                 <option></option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="filter-brand" class="control-label mb-0">Brand</label>
-                            <select id="filter-brand" name="BrandId" style="width:100%">
-                                <option></option>
-                            </select>
-                        </div>
                     </div>
                 </div>
             </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
                 <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
@@ -161,7 +165,7 @@
                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                         class="form-control form-control-sm" />
                     </div>
-                    <table class="table table-striped" id="upload-table">
+                    <table class="table table-striped table-responsive" id="upload-table">
                         <thead>
                             <tr><th>Row #</th><th>Code</th><th>Gross Price</th><th>Net Price</th><th>Status</th></tr>
                         </thead>
@@ -185,73 +189,203 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         // Load Select2 for Category
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Category")",
-            success: function (data, status, xhr) {
-                $("#filter-category").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "ALL"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-category").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Category")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        $("#filter-category").on("select2:select", function () {
+            $("#filter-item-type").val(null).trigger("change");
+        });
+
+        $("#filter-category").on("select2:unselecting", function (e) {
+            $("#filter-item-type").val(null).trigger("change");
         });
 
         // Load Select2 for Item Type
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "ItemType")",
-            success: function (data, status, xhr) {
-                $("#filter-item-type").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "ALL"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-item-type").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "ItemType")",
+                data: {
+                    CategoryId: function() {
+                        return $("#filter-category").val()
+                    }
+                }
+            },
+            dropdownParent: $('#filterModal')
         });
 
         // Load Select2 for Brand
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions", "Brand")",
-            success: function (data, status, xhr) {
-                $("#filter-brand").select2({
-                    ajax: null, //already fetched outside
-                    data: data,
-                    allowClear: true,
-                    placeholder: {
-                        id: "",
-                        text: "ALL"
-                    },
-                    dropdownParent: $('#filterModal')
-                });
-            }
+        $("#filter-brand").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
         });
 
-        var dataTable = $('.table-update').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            dataTable.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            dataTable.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[5, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            Brand: "",
+            BrandId: "",
+            Category: "",
+            CategoryId: "",
+            ItemType: "",
+            ItemTypeId: ""
+        };
+
+        function checkDTChanged() {
+            if(!dataTable) return false;
+            
+            return JSON.stringify(dataTable.order()) != JSON.stringify(defaultDTState.order) ||
+                   dataTable.page.info().start != defaultDTState.page ||
+                   dataTable.page.len() != defaultDTState.length ||
+                   (dataTable.search() || "") != defaultDTState.search.search ||
+                   $("#filter-brand").val() != defaultDTState.BrandId ||
+                   $("#filter-category").val() != defaultDTState.CategoryId ||
+                   $("#filter-item-type").val() != defaultDTState.ItemTypeId;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $('#filter-category').val(defaultDTState.CategoryId).trigger('change');
+            $('#filter-item-type').val(defaultDTState.ItemTypeId).trigger('change');
+            
+            if (dataTable) {
+                dataTable.state.clear();
+                dataTable.order(defaultDTState.order);
+                dataTable.page(defaultDTState.page);
+                dataTable.search(defaultDTState.search.search);
+            }
+        }
+
+        var dataTable = $('.table-update').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.Brand = $('#filter-brand option:selected').text();
+                data.BrandId = $('#filter-brand').val();
+                data.Category = $('#filter-category option:selected').text();
+                data.CategoryId = $('#filter-category').val();
+                data.ItemType = $('#filter-type option:selected').text();
+                data.ItemTypeId = $('#filter-type').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if(data.BrandId) {
+                    var brandOption = new Option(data.Brand, data.BrandId, true, true);
+                    $("#filter-brand").append(brandOption).trigger('change');
+                }
+                if(data.CategoryId) {
+                    var categoryOption = new Option(data.Category, data.CategoryId, true, true);
+                    $("#filter-category").append(categoryOption).trigger('change');
+                }
+                if(data.ItemTypeId) {
+                    var itemTypeOption = new Option(data.ItemType, data.ItemTypeId, true, true);
+                    $("#filter-item-type").append(itemTypeOption).trigger('change');
+                }
+            },
             ajax: {
                 url: "@Url.Action("GetListJson")",
                 type: "POST",
                 data: function (data) {
-                    var categoryId = $("#filter-category").val();
-                    var itemTypeId = $("#filter-item-type").val();
                     var brandId = $("#filter-brand").val();
-
-                    if (categoryId) data.CategoryId = categoryId;
-                    if (itemTypeId) data.ItemTypeId = itemTypeId;
                     if (brandId) data.BrandId = brandId;
+
+                    var categoryId = $("#filter-category").val();
+                    if (categoryId) data.CategoryId = categoryId;
+
+                    var itemTypeId = $("#filter-item-type").val();
+                    if (itemTypeId) data.ItemTypeId = itemTypeId;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -269,7 +403,12 @@
                 return: true,
             },
             columns: [
-                { data: "code", name: "Code" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.id + "' class='link-info' target='_blank'>" + data.code + "</a>";
+                    },
+                    name: "Code"
+                },
                 { data: "name", name: "Name" },
                 { data: "retailPrice", name: "RetailPrice", className: "text-end" },
                 { data: "netPrice", name: "NetPrice", className: "text-end" },
@@ -290,10 +429,8 @@
                 }
             ],
             order: [[5, "desc"]]
-        });
-
-        dataTable.on("draw", function () {
-            //hideLoader();
+        }).on("draw", function () {
+            checkDefaultFilter();
 
             $(".table-update thead th").removeClass("text-end");
 
@@ -356,11 +493,6 @@
             }
         });
 
-        function ApplyFilter() {
-            dataTable.ajax.reload();
-            $("#filterModal").modal("hide");
-        }
-
         if (user_access.canUploadDownload) {
             var json_of_excel_headers;
             var json_of_excel;
@@ -417,10 +549,15 @@
                                 row$.append($('<td/>').html(cellValue));
                         }
                         if (columns.includes("Code") == false
-                            || columns.includes("Name") == false
-                            || columns.includes("Gross Price") == false
-                            || columns.includes("Net Price") == false) {
-                            row$.append($('<td/>').html("Unexpected columns"));
+                        || columns.includes("Name") == false
+                        || columns.includes("Gross Price") == false
+                        || columns.includes("Net Price") == false) {
+                            var missing = [];
+                            if(columns.includes("Code") == false) { missing.push("Code"); }
+                            if(columns.includes("Name") == false) { missing.push("Name"); }
+                            if(columns.includes("Gross Price") == false) { missing.push("Gross Price"); }
+                            if(columns.includes("Net Price") == false) { missing.push("Net Price"); }
+                            row$.append($('<td/>').html("Expected columns missing: " + missing.join(", ")));
                             UploadRowDone();
                         } else {
                             SaveXLSX(json_of_excel[i]["Code"],
