@@ -1,0 +1,729 @@
+﻿@{
+    ViewData["Title"] = "Order Recommendation";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+    var purchaseHistories = (List<OrderRecommendationHistoryVM>?)ViewData["PurchaseHistory"];
+    var issuanceHistories = (List<OrderRecommendationHistoryVM>?)ViewData["IssuanceHistory"];
+}
+
+<div class="alert alert-warning" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span><strong>COMMING SOON</strong> We’re currently working on this page to bring you new features and improvements. Please check back again soon.
+</div>
+
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
+</div>
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            <button class="btn btn-secondary btn-sm float-right btn-filter ml-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right btn-add ml-2">
+                    <span class="fas fa-plus"></span>Add
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Add&#10;Add access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-plus mr-0"></span>
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-recommendation">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Item Number</th>
+                    <th>Part Number</th>
+                    <th>Item Name</th>
+                    <th>Stock on Hand</th>
+                    <th>Location Code</th>
+                    <th>Warehouse</th>
+                    <th>Movement Category</th>
+                    <th>Item Class</th>
+                    <th>Suggested Order Quantity</th>
+                    <th>Order Quantity</th>
+                    <th>Unit Cost</th>
+                    <th>Total Cost</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@if (purchaseHistories != null)
+{
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title mr-2">Purchase History</h3>
+            <span data-microtip-title="Purchase Order Count by Order Date (Approved)" data-microtip-position="top" role="tooltip"><span class="fas fa-info-circle"></span></span>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover table-order">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Year</th>
+                        @for (var month = 1; month <= 12; month++)
+                        {
+                            var dt = new DateTime(2000, month, 1);
+                            <th>@dt.ToString("MMMM")</th>
+                        }
+                        <th>Average</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (purchaseHistories.Count == 0)
+                    {
+                        <tr>
+                            <td><em class="text-center">No records can be found.</em></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var purchaseHistory in purchaseHistories)
+                        {
+                            <tr>
+                                <td>@purchaseHistory.Year</td>
+
+                                <td class="text-end@(purchaseHistory.JanuaryD == 0 ? " text-muted" : "")">@purchaseHistory.January</td>
+                                <td class="text-end@(purchaseHistory.FebruaryD == 0 ? " text-muted" : "")">@purchaseHistory.February</td>
+                                <td class="text-end@(purchaseHistory.MarchD == 0 ? " text-muted" : "")">@purchaseHistory.March</td>
+                                <td class="text-end@(purchaseHistory.AprilD == 0 ? " text-muted" : "")">@purchaseHistory.April</td>
+                                <td class="text-end@(purchaseHistory.MayD == 0 ? " text-muted" : "")">@purchaseHistory.May</td>
+                                <td class="text-end@(purchaseHistory.JuneD == 0 ? " text-muted" : "")">@purchaseHistory.June</td>
+                                <td class="text-end@(purchaseHistory.JulyD == 0 ? " text-muted" : "")">@purchaseHistory.July</td>
+                                <td class="text-end@(purchaseHistory.AugustD == 0 ? " text-muted" : "")">@purchaseHistory.August</td>
+                                <td class="text-end@(purchaseHistory.SeptemberD == 0 ? " text-muted" : "")">@purchaseHistory.September</td>
+                                <td class="text-end@(purchaseHistory.OctoberD == 0 ? " text-muted" : "")">@purchaseHistory.October</td>
+                                <td class="text-end@(purchaseHistory.NovemberD == 0 ? " text-muted" : "")">@purchaseHistory.November</td>
+                                <td class="text-end@(purchaseHistory.DecemberD == 0 ? " text-muted" : "")">@purchaseHistory.December</td>
+
+                                <td class="text-end@(purchaseHistory.AverageD == 0 ? " text-muted" : "")">@purchaseHistory.Average</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (issuanceHistories != null)
+{
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title mr-2">Issuance History</h3>
+            <span data-microtip-title="Invoice Count by Invoice Date (Draft and Submitted)" data-microtip-position="top" role="tooltip"><span class="fas fa-info-circle"></span></span>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover table-issuance">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Year</th>
+                        @for (var month = 1; month <= 12; month++)
+                        {
+                            var dt = new DateTime(2000, month, 1);
+                            <th>@dt.ToString("MMMM")</th>
+                        }
+                        <th>Average</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (issuanceHistories.Count == 0)
+                    {
+                        <tr>
+                            <td><em class="text-center">No records can be found.</em></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var issuanceHistory in issuanceHistories)
+                        {
+                            <tr>
+                                <td>@issuanceHistory.Year</td>
+
+                                <td class="text-end@(issuanceHistory.JanuaryD == 0 ? " text-muted" : "")">@issuanceHistory.January</td>
+                                <td class="text-end@(issuanceHistory.FebruaryD == 0 ? " text-muted" : "")">@issuanceHistory.February</td>
+                                <td class="text-end@(issuanceHistory.MarchD == 0 ? " text-muted" : "")">@issuanceHistory.March</td>
+                                <td class="text-end@(issuanceHistory.AprilD == 0 ? " text-muted" : "")">@issuanceHistory.April</td>
+                                <td class="text-end@(issuanceHistory.MayD == 0 ? " text-muted" : "")">@issuanceHistory.May</td>
+                                <td class="text-end@(issuanceHistory.JuneD == 0 ? " text-muted" : "")">@issuanceHistory.June</td>
+                                <td class="text-end@(issuanceHistory.JulyD == 0 ? " text-muted" : "")">@issuanceHistory.July</td>
+                                <td class="text-end@(issuanceHistory.AugustD == 0 ? " text-muted" : "")">@issuanceHistory.August</td>
+                                <td class="text-end@(issuanceHistory.SeptemberD == 0 ? " text-muted" : "")">@issuanceHistory.September</td>
+                                <td class="text-end@(issuanceHistory.OctoberD == 0 ? " text-muted" : "")">@issuanceHistory.October</td>
+                                <td class="text-end@(issuanceHistory.NovemberD == 0 ? " text-muted" : "")">@issuanceHistory.November</td>
+                                <td class="text-end@(issuanceHistory.DecemberD == 0 ? " text-muted" : "")">@issuanceHistory.December</td>
+
+                                <td class="text-end@(issuanceHistory.AverageD == 0 ? " text-muted" : "")">@issuanceHistory.Average</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Table</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-movement" class="form-label mb-0">Movement Category</label>
+                            <select id="filter-movement" style="width:100%">
+                                <option value="">ALL</option>
+                                <option>Fast Moving</option>
+                                <option>Medium Moving</option>
+                                <option>Slow Moving</option>
+                                <option>Non-moving</option>
+                                <option>No sales history</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-class" class="form-label mb-0">Item Class</label>
+                            <select id="filter-class" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (userAccess.CanAdd)
+{
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Added to Purchase Request</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-3">Purchase Request</div>
+                        <div class="col-9 add-purchase-request"></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-3">Status</div>
+                        <div class="col-9 add-status"></div>
+                    </div>
+                    <table class="table table-head-fixed table-striped table-hover table-added">
+                        <thead>
+                            <tr>
+                                <th>Part Number</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        // Load Select2 for Item Class
+        $("#filter-class").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "ItemClass")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        // Load Select2 for Brand
+        $("#filter-brand").select2({
+            allowClear: true,
+            placeholder: {
+                id: "",
+                text: "ALL"
+            },
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2", "Brand")"
+            },
+            dropdownParent: $('#filterModal')
+        });
+
+        var recommendationState = {};
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            recommendationDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            recommendationDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[1, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            MovementId: "",
+            ItemClass: "",
+            ItemClassId: "",
+            Brand: "",
+            BrandId: "",
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
+        };
+
+        function checkDTChanged() {
+            if(!recommendationDT) return false;
+            
+            return JSON.stringify(recommendationDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   recommendationDT.page.info().start != defaultDTState.page ||
+                   recommendationDT.page.len() != defaultDTState.length ||
+                   (recommendationDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-movement").val() != defaultDTState.MovementId ||
+                   $("#filter-class").val() != defaultDTState.ItemId ||
+                   $("#filter-brand").val() != defaultDTState.BrandId ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
+        }
+
+        function resetToDefaultDTFilter() {
+            localStorage.removeItem(dt_storage);
+
+            $('#filter-movement').val(defaultDTState.ItemId);
+            $('#filter-class').val(defaultDTState.ItemClassId).trigger('change');
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+            
+            if (recommendationDT) {
+                recommendationDT.state.clear();
+                recommendationDT.order(defaultDTState.order);
+                recommendationDT.page(defaultDTState.page);
+                recommendationDT.search(defaultDTState.search.search);
+            }
+        }
+
+        var recommendationDT = $('.table-recommendation').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.MovementId = $('#filter-movement').val();
+                data.ItemClass = $('#filter-class option:selected').text();
+                data.ItemClassId = $('#filter-class').val();
+                data.Brand = $('#filter-brand option:selected').text();
+                data.BrandId = $('#filter-brand').val();
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                $('#filter-movement').val(data.MovementId);
+                if(data.ItemClassId) {
+                    var itemClassOption = new Option(data.ItemClass, data.ItemClassId, true, true);
+                    $(itemClassOption).data('data', {
+                        id: data.ItemClassId,
+                        text: data.ItemClass
+                    });
+                    $("#filter-Class").append(itemClassOption).trigger('change');
+                }
+                if(data.BrandId) {
+                    var brandOption = new Option(data.Brand, data.BrandId, true, true);
+                    $(brandOption).data('data', {
+                        id: data.BrandId,
+                        text: data.Brand
+                    });
+                    $("#filter-brand").append(brandOption).trigger('change');
+                }
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
+            ajax: {
+                url: "@Url.Action("GetOrderRecommendationDT")",
+                 data: function (data) {
+                    var movementId = $("#filter-movement").val();
+                    if (movementId) data.MovementCategory = movementId;
+                    
+                    var itemClassId = $("#filter-class").val();
+                    if (itemClassId) data.ItemClassId = itemClassId;
+                    
+                    var brandId = $("#filter-brand").val();
+                    if (brandId) data.BrandId = brandId;
+
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                },
+                type: "POST",
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        if (user_access.canAdd) {
+                            return '<input class="sochkclassorder" type="checkbox" ' + ( recommendationState[data.itemId + "_" + data.warehouseId + "_" + (data.locationCodeId || 0)] ? 'checked="checked" ' : '') + ' onchange="SORowSelect(this)" />';
+                        } else {
+                            return '<span class="text-warning" data-microtip-title="Select item to request&#10;Add access is required." data-microtip-position="right" role="tooltip"><span class="fas fa-exclamation-triangle"></span></span>';
+                        }
+                    }
+                },
+                { data: "itemNumber", name: "ItemNumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.partNumber + "</a>";
+                    },
+                    name: "PartNumber"
+                },
+                { data: "itemName", name: "ItemName" },
+                { data: "stockOnHand", name: "StockOnHand", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.locationCode || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "LocationCode"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.warehouseId + "' class='link-info' target='_blank'>" + data.warehouse + "</a>";
+                    },
+                    name: "Warehouse"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        var msg = `
+                        <b>INVOICES</b>
+                        <table style='width:100%; border-collapse:collapse;'>
+                            <tr>
+                                <td>Last 7 days</td>
+                                <td style='text-align:right;'>${data.lastWeekQuantity}</td>
+                            </tr>
+                            <tr>
+                                <td>Last 30 days</td>
+                                <td style='text-align:right;'>${data.lastMonthQuantity}</td>
+                            </tr>
+                            <tr>
+                                <td>Last 60 days</td>
+                                <td style='text-align:right;'>${data.last2MonthsQuantity}</td>
+                            </tr>
+                            <tr>
+                                <td>Last 365 days&emsp;</td>
+                                <td style='text-align:right;'>${data.lastYearQuantity}</td>
+                            </tr>
+                            <tr>
+                                <td><b>All</b></td>
+                                <td style='text-align:right;'><b>${data.overallQuantity}</b></td>
+                            </tr>
+                        </table>
+                        `;
+                        return '<span class="movement-tooltip" data-tippy-content="' + msg + '" data-tippy-placement="right" data-tippy-theme="translucent">' + data.movementCategory + '</span>';
+                    },
+                    name: "MovementCategory"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.itemClass || "<span class='text-muted'>N/A</span>";
+                    },
+                    name: "ItemClass"
+                },
+                { data: "suggestedOrderQuantity", name: "SuggestedOrderQuantity", className: "text-end" },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        if (user_access.canAdd && recommendationState[data.itemId + "_" + data.warehouseId + "_" + (data.locationCodeId || 0)]) {
+                            //data.orderQuantityD = recommendationState[data.itemId + "_" + data.warehouseId + "_" + (data.locationCodeId || 0)].orderQuantity;
+                            if (data.orderQuantityD > data.suggestedOrderQuantityD) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm orderquantity" style="width: 100%;" /><label class="text-warning text-xs fw-lighter fst-italic m-0">Requesting higher than suggested quantity</label>';
+                            } else if (data.orderQuantityD == 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm orderquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Cannot request a 0 quantity</label>';
+                            } else if (isNaN(data.orderQuantityD) || String(data.orderQuantityD).trim() == "" || data.orderQuantityD < 0) {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm orderquantity" style="width: 100%;" /><label class="text-danger text-xs fw-lighter fst-italic m-0">Invalid quantity</label>';
+                            } else {
+                                return '<input type="number" min="0" max="1999999" step="1" value="' + data.orderQuantityD + '" class="form-control form-control-sm orderquantity" style="width: 100%;" />';
+                            }
+                        } else {
+                            return '-';
+                        }
+                    },
+                    name: "OrderQuantity",
+                    className: "form-cell text-end"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        var msg = "";
+                        if (data.latestOrderCostD) msg = "Using unit cost from the latest purchase order";
+                        else if (data.beginningCostD) msg = "No purchase order found for this item; using beginning cost"
+                        else msg = "No purchase orders found and no beginning cost assigned";
+                        return '<span data-microtip-title="' + msg + '" data-microtip-position="left" role="tooltip">' + data.unitCost + '</span>';
+                    },
+                    name: "UnitCost",
+                    className: "text-end"
+                },
+                {
+                    orderable: false,
+                    data: function (data, type, dataToSet) {
+                        return data.totalCost;
+                    },
+                    name: "TotalCost",
+                    className: "text-end"
+                }
+            ],
+            order: defaultDTState.order
+        }).on("draw", function () {
+            checkDefaultFilter();
+            tippy('.movement-tooltip', {
+                allowHTML: true
+            });
+        });
+
+        function SORowSelect(elem) {
+            var tr = $(elem).closest('tr');
+            var row = recommendationDT.row(tr);
+            var rowData = row.data();
+
+            var isChecked = $(elem).prop("checked");
+            if (isChecked) {
+                recommendationState[rowData.itemId + "_" + rowData.warehouseId + "_" + (rowData.locationCodeId || 0)] = {
+                    itemId: rowData.itemId,
+                    warehouseId: rowData.warehouseId,
+                    locationCodeId: rowData.locationCodeId,
+                    orderQuantity: parseInt(rowData.suggestedOrderQuantityD)
+                };
+            } else {
+                delete recommendationState[rowData.itemId + "_" + rowData.warehouseId + "_" + (rowData.locationCodeId || 0)];
+            }
+            
+            rowData.orderQuantityD = isChecked ? parseInt(rowData.suggestedOrderQuantityD) : 0;
+            
+            row.data(rowData);
+            row.invalidate();
+        }
+
+        $(document).on("blur", ".orderquantity", function() {
+            var tr = $(this).closest('tr');
+            var row = recommendationDT.row(tr);
+            var rowData = row.data();
+
+            recommendationState[rowData.itemId + "_" + rowData.warehouseId + "_" + (rowData.locationCodeId || 0)].orderQuantity = parseInt($(this).val());
+            
+            rowData.orderQuantityD = parseInt($(this).val() || 0);
+
+            row.data(rowData);
+            row.invalidate();
+        });
+        
+        if (user_access.canAdd) {
+            $('.btn-add').click(function (e) {
+                var selected = Object.values(recommendationState).map(x => ({
+                    itemId: x.itemId,
+                    quantity: x.orderQuantity
+                }));
+                if(selected.length > 0) {
+                    swal({
+                        title: "Add to Purchase Request",
+                        text: "You are about to add all selected item to purchase request. Are you sure you want to continue?",
+                        icon: "info",
+                        buttons: true,
+                        successMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            $.ajax({
+                                url: "@Url.Action("AddRequest")",
+                                type: "POST",
+                                data: { recos: selected },
+                                success: function (data, status, xhr) {
+                                    if (data.purchaseRequestId)
+                                        $(".add-purchase-request").html("<a href='/PurchaseRequest/Details/" + data.purchaseRequestId + "' class='link-info' target='_blank'>" + data.documentNumber + "</a>");
+                                    else
+                                        $(".add-purchase-request").html("<span class='text-muted'>N/A</span>");
+                                    
+                                    if (data.status) 
+                                        $(".add-status").text(data.status);
+                                    else 
+                                        $(".add-status").html("<span class='text-muted'>N/A</span>");
+                                    
+                                    $(".table-added tbody").empty();
+                                    var tbody = "";
+                                    if (data.items.length > 0) {
+                                        data.items.forEach(function(item) {
+                                            tbody += "<tr><td>" + item.partNumber + "</td><td class='text-end'>" + item.quantity + "</td><td>" + item.status + "</td></tr>";
+                                        });
+                                    } else { 
+                                        tbody += "<tr><td colspan='3'><em class='text-center'>No items were added.</em></td></tr>";
+                                    }
+                                    $(".table-added tbody").html(tbody);
+
+                                    $("#addModal").modal("show");
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Add to Purchase Request",
+                        text: "Please select at least one item to add to the Purchase Request before continuing",
+                        icon: "warning",
+                        button: "OK"
+                    });
+                }
+            });
+        }
+    </script>
+}

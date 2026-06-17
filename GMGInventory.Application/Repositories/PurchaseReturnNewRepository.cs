@@ -107,8 +107,8 @@ namespace GMGInventory.Application.Repositories
         {
             var returnVM = from retrn in context.PurchaseReturnNews
                            where (filter.SupplierId == null || retrn.PurchaseReceive.PurchaseOrder.SupplierId == filter.SupplierId)
-                           && (filter.DateFrom == null || retrn.ReturnDate >= filter.DateFrom)
-                           && (filter.DateTo == null || retrn.ReturnDate <= filter.DateTo)
+                           && (filter.DateFrom == null || retrn.ReturnDate.Date >= filter.DateFrom.Value.Date)
+                           && (filter.DateTo == null || retrn.ReturnDate.Date <= filter.DateTo.Value.Date)
                            && (filter.StatusId == null || retrn.StatusId == filter.StatusId)
                            select new PurchaseReturnNewVM
                            {

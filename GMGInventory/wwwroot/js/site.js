@@ -235,7 +235,7 @@ $(document).on('hide.bs.modal', '.modal', function () {
     }
 });
 
-function loadSelect2(selector, modal, url, allowClear = false, ajaxdata = null, onselect, onunselect) {
+function loadSelect2(selector, modal, url, allowClear = false) {
     $(selector).select2({
         allowClear: allowClear,
         placeholder: {
@@ -252,15 +252,10 @@ function loadSelect2(selector, modal, url, allowClear = false, ajaxdata = null, 
             return repo.text;
         },
         ajax: {
-            url: url,
-            data: ajaxdata
+            url: url
         },
         dropdownParent: $(modal)
     });
-
-    $(selector).on("select2:select", onselect);
-
-    $(selector).on("select2:unselecting", onunselect);
 }
 
 function ToastrAndConsoleError(title, message) {

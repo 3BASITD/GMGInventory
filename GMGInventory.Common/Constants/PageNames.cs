@@ -88,7 +88,7 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("Barcotech (Stock)")] BarcotechStock,
         [PageNamesString("KYC")] KYC,
         [PageNamesString("Item Class")] ItemClass,
-        [PageNamesString("Ordering")] Ordering,
+        [PageNamesString("Order Recommendation")] OrderRecommendation,
         [PageNamesString("System Settings")] SystemSettings,
         [PageNamesString("Delivery Monitoring")] DeliveryMonitoring,
         [PageNamesString("Warehouse Dashboard")] WarehouseDashboard,

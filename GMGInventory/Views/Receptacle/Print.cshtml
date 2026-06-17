@@ -19,24 +19,32 @@
     <table class="formatted receptacle">
         <tr>
             <td class="center-text" style="width: 25%;">
-                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                @if (TempData["CompanyLogo"]?.ToString() == "3BAS")
                 {
-                    <img src="~/images/BAS-02.png" class="logo" />
+                    <img src="~/images/3BAS.png" class="logo" />
+                }
+                else if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                {
+                    <img src="~/images/GMG-01.png" class="logo" />
                 }
                 else
                 {
-                    <img src="~/images/GMG-01.png" class="logo" />
+                    <img src="~/images/BAS-02.png" class="logo" />
                 }
             </td>
             <td colspan="3">
                 <dl>
-                    @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                    @if (TempData["CompanyLogo"]?.ToString() == "3BAS")
                     {
-                        <dd>BINA'S AUTO SUPPLY INC.</dd>
+                        <dd>3BAS TIGERS INC.</dd>
+                    }
+                    else if (TempData["CompanyLogo"]?.ToString() == "GMG")
+                    {
+                        <dd>GMG AUTO PARTS TRADING</dd>
                     }
                     else
                     {
-                        <dd>AUTO PARTS TRADING</dd>
+                        <dd>BINA'S AUTO SUPPLY INC.</dd>
                     }
                     <dt>PACK DATE: @Model.PackDate.ToUpper()</dt>
                 </dl>

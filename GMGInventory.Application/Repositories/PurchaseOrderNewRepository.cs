@@ -165,7 +165,7 @@ namespace GMGInventory.Application.Repositories
                               && prli.PurchaseRequest.TypeId == RequestTypeId
                               && (RequestPurposeId == null || prli.PurchaseRequest.PurposeId == RequestPurposeId)
                               /*&& prli.PurchaseRequest.Status.Name.ToLower() == "approved"*/
-                              && (RegionId == null || prli.SalesOrder.Customer.Area.Region.Id == RegionId)
+                              /*&& (RegionId == null || prli.SalesOrder.Customer.Area.Region.Id == RegionId)*/
                            group prli by new { prli.PurchaseRequest.Id, prli.PurchaseRequest.DocumentNumber, Status = prli.PurchaseRequest.Status.Name } into g
                            orderby g.Key.Id ascending
                            select new
@@ -339,8 +339,8 @@ namespace GMGInventory.Application.Repositories
                           where (filter.TypeId == null || order.TypeId == filter.TypeId)
                           && (filter.ModeId == null || order.DeliveryModeId == filter.ModeId)
                           && (filter.SupplierId == null || order.Supplier.Id == filter.SupplierId)
-                          && (filter.DateFrom == null || order.OrderDate >= filter.DateFrom)
-                          && (filter.DateTo == null || order.OrderDate <= filter.DateTo)
+                          && (filter.DateFrom == null || order.OrderDate.Date >= filter.DateFrom.Value.Date)
+                          && (filter.DateTo == null || order.OrderDate.Date <= filter.DateTo.Value.Date)
                           && (filter.StatusId == null || order.StatusId == filter.StatusId)
                           select new PurchaseOrderNewVM
                           {

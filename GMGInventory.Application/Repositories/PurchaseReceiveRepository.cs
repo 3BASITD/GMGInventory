@@ -33,8 +33,8 @@ namespace GMGInventory.Application.Repositories
             var receiveVM = (from receive in context.PurchaseReceivings
                              where (filter.SupplierId == null || receive.PurchaseOrder.SupplierId == filter.SupplierId)
                              && (filter.WarehouseId == null || receive.WarehouseId == filter.WarehouseId)
-                             && (filter.DateFrom == null || receive.ReceiveDate >= filter.DateFrom)
-                             && (filter.DateTo == null || receive.ReceiveDate <= filter.DateTo)
+                             && (filter.DateFrom == null || receive.ReceiveDate.Date >= filter.DateFrom.Value.Date)
+                             && (filter.DateTo == null || receive.ReceiveDate.Date <= filter.DateTo.Value.Date)
                              && (filter.StatusId == null || receive.StatusId == filter.StatusId)
                              select new PurchaseReceiveVM
                              {

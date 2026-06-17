@@ -667,16 +667,54 @@
             loadSelect2("#create-unit", "#createModal", "@Url.Action("GetOptions2", "Unit")");
             loadSelect2("#create-brand", "#createModal", "@Url.Action("GetOptions2", "Brand")");
             loadSelect2("#create-item-class", "#createModal", "@Url.Action("GetOptions2", "ItemClass")", true);
-            loadSelect2("#create-category", "#createModal", "@Url.Action("GetOptions2", "Category")", false, null, function() {
-                $("#create-item-type").val(null).trigger("change");
-            }, function() {
+
+            $("#create-category").select2({
+                placeholder: {
+                    id: "",
+                    text: "<empty>"
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "Category")"
+                },
+                dropdownParent: $('#createModal')
+            });
+
+            $("#create-category").on("select2:select", function () {
                 $("#create-item-type").val(null).trigger("change");
             });
-            loadSelect2("#create-item-type", "#createModal", "@Url.Action("GetOptions2", "ItemType")", false, {
-                CategoryId: function() {
-                    return $("#edit-category").val()
-                }
+
+            $("#create-category").on("select2:unselecting", function (e) {
+                $("#create-item-type").val(null).trigger("change");
             });
+            
+            $("#create-item-type").select2({
+                placeholder: {
+                    id: "",
+                    text: "<empty>"
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "ItemType")",
+                    data: {
+                        CategoryId: function() {
+                            return $("#create-category").val()
+                        }
+                    }
+                },
+                dropdownParent: $('#createModal')
+            });
+
             loadSelect2("#create-warehouse", "#createModal", "@Url.Action("GetOptions2", "Warehouse")");
         }
 
@@ -684,16 +722,54 @@
             loadSelect2("#edit-unit", "#editModal", "@Url.Action("GetOptions2", "Unit")");
             loadSelect2("#edit-brand", "#editModal", "@Url.Action("GetOptions2", "Brand")");
             loadSelect2("#edit-item-class", "#editModal", "@Url.Action("GetOptions2", "ItemClass")", true);
-            loadSelect2("#edit-category", "#editModal", "@Url.Action("GetOptions2", "Category")", false, null, function() {
-                $("#edit-item-type").val(null).trigger("change");
-            }, function() {
+            
+            $("#edit-category").select2({
+                placeholder: {
+                    id: "",
+                    text: "<empty>"
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "Category")"
+                },
+                dropdownParent: $('#editModal')
+            });
+
+            $("#edit-category").on("select2:select", function () {
                 $("#edit-item-type").val(null).trigger("change");
             });
-            loadSelect2("#edit-item-type", "#editModal", "@Url.Action("GetOptions2", "ItemType")", false, {
-                CategoryId: function() {
-                    return $("#edit-category").val()
-                }
+
+            $("#edit-category").on("select2:unselecting", function (e) {
+                $("#edit-item-type").val(null).trigger("change");
             });
+            
+            $("#edit-item-type").select2({
+                placeholder: {
+                    id: "",
+                    text: "<empty>"
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "ItemType")",
+                    data: {
+                        CategoryId: function() {
+                            return $("#edit-category").val()
+                        }
+                    }
+                },
+                dropdownParent: $('#editModal')
+            });
+
             loadSelect2("#edit-warehouse", "#editModal", "@Url.Action("GetOptions2", "Warehouse")");
         }
 
@@ -1648,7 +1724,7 @@
             var value = $(this).val();
             if (value !== undefined && value !== null && value !== "") {
                 swal({
-                    icon: 'warning',
+                    icon: 'info',
                     title: 'v4 Enhancement',
                     text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgZnVsbHkgcGFpZCB2ZXJzaW9uLg=="),
                     button: 'Continue'
@@ -1658,7 +1734,7 @@
 
         $(document).on("click", ".btn-details-upload", function() {
             swal({
-                icon: 'warning',
+                icon: 'info',
                 title: 'v4 Enhancement',
                 text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgZnVsbHkgcGFpZCB2ZXJzaW9uLg=="),
                 button: 'Continue'

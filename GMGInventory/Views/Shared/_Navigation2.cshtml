@@ -473,13 +473,13 @@ else
             </li>
         }
 
-        @if (navPages.Contains(PageNames.Ordering.ToEnumString())
+        @if (navPages.Contains(PageNames.OrderRecommendation.ToEnumString())
             || navPages.Contains(PageNames.PurchaseRequest.ToEnumString())
             || navPages.Contains(PageNames.PurchaseOrder.ToEnumString())
             || navPages.Contains(PageNames.PurchaseReceiving.ToEnumString())
             || navPages.Contains(PageNames.PurchaseReturnNew.ToEnumString()))
         {
-            var navProcurementActive = (new List<string> { "Ordering", "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "");
+            var navProcurementActive = (new List<string> { "OrderRecommendation", "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "");
 
             <li class="nav-item dropdown">
                 <a id="menuProcurement" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle @(navProcurementActive ? "active" : "")">
@@ -495,11 +495,11 @@ else
                     PROCUREMENT
                 </a>
                 <ul aria-labelledby="menuProcurement" class="dropdown-menu mt-lg-3 border-0 shadow">
-                    @if (navPages.Contains(PageNames.Ordering.ToEnumString()))
+                    @if (navPages.Contains(PageNames.OrderRecommendation.ToEnumString()))
                     {
                         <li>
-                            <a class="dropdown-item @(currentController == "Ordering" ? "active" : "")"
-                                   asp-area="" asp-controller="Ordering" asp-action="Index">
+                            <a class="dropdown-item @(currentController == "OrderRecommendation" ? "active" : "")"
+                                   asp-area="" asp-controller="OrderRecommendation" asp-action="Index">
                                 @if (newIcon)
                                 {
                                     <span class="emoji">📅</span>
@@ -509,7 +509,7 @@ else
 
                                     <span class="nav-icon fas fa-calendar-check"></span>
                                 }
-                                Ordering
+                                Order Recommendation
                             </a>
                         </li>
                     }
