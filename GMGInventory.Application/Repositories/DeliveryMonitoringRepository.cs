@@ -114,7 +114,7 @@ namespace GMGInventory.Application.Repositories
                              && order.Status.Code != "DISAPPROVED"
                              && (filter.AgentId == null || filter.AgentId == order.AgentId)
                              && (filter.CustomerId == null || filter.CustomerId == order.CustomerId)
-                             && (filter.RegionId == null || filter.RegionId == order.Customer.Area.RegionId)
+                             && (filter.RegionId == null || filter.RegionId == order.RegionId)
                              && filter.DateFrom <= order.SalesOrderDate.Date
                              && order.SalesOrderDate.Date <= filter.DateTo
                              select new DeliveryMonitoringVM

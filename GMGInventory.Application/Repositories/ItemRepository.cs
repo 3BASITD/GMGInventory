@@ -153,9 +153,12 @@ namespace GMGInventory.Application.Repositories
                     .OrderByDescending(pr => pr.DateCreated)
                     .Take(1)
                     .DefaultIfEmpty()
-                let inventory = context.ItemInventories
+                from inventory in context.ItemInventories
                     .Where(inv => inv.ItemId == item.Id && inv.Warehouse.IsMain == true)
-                    .Sum(inv => (int?)inv.Quantity) ?? 0
+                    .OrderByDescending(pr => pr.DateCreated)
+                    .Take(1)
+                    .DefaultIfEmpty()
+                //.Sum(inv => (int?)inv.Quantity) ?? 0
                 where item.IsActive
                    && (string.IsNullOrWhiteSpace(search)
                    || item.Code.ToLower().Contains(search.ToLower())
@@ -166,7 +169,8 @@ namespace GMGInventory.Application.Repositories
                 select new JsonItemOptionsModel
                 {
                     Id = item.Id.ToString(),
-                    InventoryCount = inventory,
+                    InventoryCount = inventory == null ? 0 : inventory.Quantity,
+                    AllocatedQuantityD = inventory == null ? 0 : inventory.AllocatedQuantity,
                     Text = item.Code,
                     Name = item.Name,
                     OldCode = item.OldCode,

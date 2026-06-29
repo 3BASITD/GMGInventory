@@ -135,6 +135,8 @@ namespace GMGInventory.Common.Models
         public int? ItemPromoId { get; set; }
         public string ItemPromoName { get; set; }
         public int InventoryCount { get; set; }
+        public string AllocatedQuantity => string.Format(SystemFormat.StringIntegerComma, AllocatedQuantityD);
+        public int AllocatedQuantityD { get; set; }
         public int BrandId { get; set; }
        
     }
@@ -224,6 +226,11 @@ namespace GMGInventory.Common.Models
         public string Name { get; set; }
         public string Address { get; set; }
         public string CreditTerm { get; set; }
+        public string CreditLimit => string.Format(SystemFormat.StringDecimalComma, CreditLimitD);
+        public decimal CreditLimitD { get; set; }
+        public string Priority => SystemFormat.CustomerPriority(PriorityD);
+        public int PriorityD { get; set; }
+        public string Branch { get; set; }
         public string Region { get; set; }
         public string Agent { get; set; }
         public string AgentCode { get; set; }

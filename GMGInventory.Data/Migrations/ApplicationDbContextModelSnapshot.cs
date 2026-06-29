@@ -6802,6 +6802,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<string>("PurchaseOrder")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RegionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(501)");
 
@@ -6850,6 +6853,8 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("ForwarderId");
+
+                    b.HasIndex("RegionId");
 
                     b.HasIndex("ResubmitId");
 
@@ -8790,13 +8795,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "87b25dcd-c9c0-4f7b-aca2-f9818d76f997",
+                            ConcurrencyStamp = "8b55d389-1f9a-42e6-87af-399e236177c9",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC0SoTYY/vI9I+XMkLTyMJ2AFb39fMgeyQ8C/UQHxdchj3GM/CjCZGyhoM9YR6hz8Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN4AazMkPN800NnYpazcJVcQly+ZrA8Vew8t6wq0Fyy3kdsFqJuWFwo+SLRM7nEkxA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8d2a9f00-a411-4204-878d-93458484e3ba",
+                            SecurityStamp = "e16ae171-dbb6-4f13-855c-73876131a340",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8811,13 +8816,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fc4de692-b822-4958-9d2e-e2d3740bfa7d",
+                            ConcurrencyStamp = "500953fb-c779-4dd5-8644-148b28bb5d37",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE8Dk5n3OncNCAvVit2tvi4+eVZWeJscYtF03EbpoaEAmUXUcRw3bEYhklqitMFKIw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJgetzFKM3+ZLdCgqZXsyhc4UYLAd3rCcGFpCK0Upnuz0S38l3Kpf3Z+hLgfome15Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a9856724-f609-4554-af1e-54f0a0901c10",
+                            SecurityStamp = "83a6acc4-aa3d-4347-8588-19bea827d2e6",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9793,6 +9798,12 @@ namespace GMGInventory.Data.Migrations
                         .WithMany()
                         .HasForeignKey("ForwarderId");
 
+                    b.HasOne("GMGInventory.Data.Region", "Region")
+                        .WithMany("SalesOrders")
+                        .HasForeignKey("RegionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GMGInventory.Data.SalesOrder", "Resubmit")
                         .WithMany("SalesOrderResubmits")
                         .HasForeignKey("ResubmitId");
@@ -9816,6 +9827,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Forwarder");
+
+                    b.Navigation("Region");
 
                     b.Navigation("Resubmit");
 
@@ -10622,6 +10635,8 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Areas");
 
                     b.Navigation("PurchaseOrderNews");
+
+                    b.Navigation("SalesOrders");
 
                     b.Navigation("Suppliers");
                 });

@@ -611,10 +611,11 @@
             },
             ajax: {
                 url: "@Url.Action("GetOptions2", "ItemType")",
-                data: {
-                    CategoryId: function() {
-                        return $("#filter-category").val()
-                    }
+                data: function (params) {
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
+                        CategoryId: $("#filter-category").val()
+                    });
                 }
             },
             dropdownParent: $('#filterModal')
@@ -706,10 +707,11 @@
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions2", "ItemType")",
-                    data: {
-                        CategoryId: function() {
-                            return $("#create-category").val()
-                        }
+                    data: function (params) {
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
+                            CategoryId: $("#create-category").val()
+                        });
                     }
                 },
                 dropdownParent: $('#createModal')
@@ -761,10 +763,11 @@
                 },
                 ajax: {
                     url: "@Url.Action("GetOptions2", "ItemType")",
-                    data: {
-                        CategoryId: function() {
-                            return $("#edit-category").val()
-                        }
+                    data: function (params) {
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
+                            CategoryId: $("#edit-category").val()
+                        });
                     }
                 },
                 dropdownParent: $('#editModal')

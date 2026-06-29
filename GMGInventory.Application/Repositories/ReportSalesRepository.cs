@@ -543,7 +543,7 @@ namespace GMGInventory.Application.Repositories
                            let discount2 = (100 - soli.Discount2) / 100
                            where (filter.DateFrom == null || filter.DateFrom <= ili.Invoice.InvoiceDate.Date)
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
-                           && (filter.Region == null || (ili.Invoice.SalesOrder.Customer.Area != null && ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region))
+                           && (filter.Region == null || (ili.Invoice.SalesOrder.Customer.Area != null && ili.Invoice.SalesOrder.Region.Id == filter.Region))
                            && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new CustomerSalesRankingRVM
                            {
@@ -933,7 +933,7 @@ namespace GMGInventory.Application.Repositories
                                && (filter.Agent == null || invoice.SalesOrder.Agent.Id == filter.Agent)
                                && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
                                && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
-                               && (filter.Region2 == null || regions == null || regions.Contains(invoice.SalesOrder.Customer.Area.Region.Code))
+                               && (filter.Region2 == null || regions == null || regions.Contains(invoice.SalesOrder.Region.Code))
                                 let amount = invoiceAmounts.Where(s => s.InvoiceId == invoice.Id)
                                                            .Sum(s => (decimal?)s.TotalAmount) ?? 0
                                select new SalesInvoiceRVM
@@ -1197,10 +1197,10 @@ namespace GMGInventory.Application.Repositories
                            select new SalesReportBasisRVM
                            {
                                Code = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Code
-                                    : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Customer.Area.Region.Code
+                                    : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Region.Code
                                     : /*filter.Basis == "Brand" ?*/ ili.Item.Brand.Code,
                                Name = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Name
-                                    : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Customer.Area.Region.Name
+                                    : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Region.Name
                                     : /*filter.Basis == "Brand" ?*/ ili.Item.Brand.Name,
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2
                            };
@@ -1565,7 +1565,7 @@ namespace GMGInventory.Application.Repositories
                            && (filter.DateTo == null || ili.Invoice.InvoiceDate.Date <= filter.DateTo)
                            && (filter.Area == null || ili.Invoice.SalesOrder.Customer.Area.Id == filter.Area)
                            && (filter.Brand == null || ili.Item.Brand.Id == filter.Brand)
-                           && (filter.Region == null || ili.Invoice.SalesOrder.Customer.Area.Region.Id == filter.Region)
+                           && (filter.Region == null || ili.Invoice.SalesOrder.Region.Id == filter.Region)
                            && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
                            select new OutboundRVM
                            {
@@ -1577,7 +1577,7 @@ namespace GMGInventory.Application.Repositories
                                ItemName = ili.Item.Name,
                                OldSkuCode = ili.Item.OldCode,
                                QuantityD = ili.Quantity,
-                               Region = ili.Invoice.SalesOrder.Customer.Area.Region.Name,
+                               Region = ili.Invoice.SalesOrder.Region.Name,
 
                                SalesOrderNumber = ili.Invoice.SalesOrder.SalesOrderNumber
                            };

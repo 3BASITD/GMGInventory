@@ -253,248 +253,137 @@
                 </div>
             }
         </div>
-        @*<div class="row">
-        <div class="col-12">
-        <div class="card card-danger card-tabs">
-        <div class="card-header p-0 pt-1 pl-2 pr-2">
-        <ul class="nav nav-tabs nav-fill" role="tablist">
-        <li class="nav-item">
-        <a class="nav-link active" id="nav-shipping-tab" role="tab"
-        data-bs-toggle="tab" data-bs-target="#nav-shipping"
-        aria-controls="nav-shipping" aria-selected="true">
-        Shipping Details
-        </a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link" id="nav-receivables-tab" role="tab"
-        data-bs-toggle="tab" data-bs-target="#nav-receivables"
-        aria-controls="nav-receivables" aria-selected="true">
-        Receivables
-        </a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link" id="nav-payments-tab" role="tab"
-        data-bs-toggle="tab" data-bs-target="#nav-payments"
-        aria-controls="nav-
-        s" aria-selected="true">
-        Payments
-        </a>
-        </li>
-
-        </ul>
-        </div>
-        <div class="card-body">
-        <div class="tab-content">
-        <div class="tab-pane fade show active" id="nav-shipping" role="tabpanel"
-        aria-labelledby="nav-shipping-tab">
-
-        <table class="table table-head-fixed table-striped table-hover table-shipping">
-        <thead>
-        <tr>
-        <th>Address</th>
-        <th>Contact Person</th>
-        <th>Fax Number</th>
-        <th>Phone Number</th>
-        </tr>
-        </thead>
-        </table>
-        </div>
-        <div class="tab-pane fade" id="nav-receivables" role="tabpanel" aria-labelledby="nav-receivables-tab">
-        <table class="table table-head-fixed table-striped table-hover table-receivables">
-        <thead>
-        <tr>
-        <th>Invoiced Date</th>
-        <th>Invoiced Number</th>
-        <th>Amount</th>
-        </tr>
-        </thead>
-        </table>
-        </div>
-        <div class="tab-pane fade" id="nav-payments" role="tabpanel" aria-labelledby="nav-payments-tab">
-        <table class="table table-head-fixed table-striped table-hover table-payments">
-        <thead>
-        <tr>
-        <th>Collector Receipt #</th>
-        <th>SOA No</th>
-        <th>Total Invoice Amount</th>
-        <th>Amount Paid</th>
-        <th>Over Payment</th>
-        <th>Transaction Date</th>
-        <th>Created By</th>
-        <th>Remarks</th>
-        </tr>
-        </thead>
-        </table>
-        </div>
-
-
-        </div>
-
-        </div>
-        </div>
-        </div>
-        </div>*@
-
-        <nav>
-            <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-shipping" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Shipping Address</button>
-                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-receivables" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Receivables</button>
-                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-payments" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Payments</button>
-                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-discount" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Brand Discount</button>
-            </div>
-        </nav>
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-shipping" role="tabpanel" aria-labelledby="nav-home-tab">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-
-                                <span class="card-title">Shipping Address Details</span>
-                                <div class="card-tools">
-                                    @if (userAccess.CanAdd)
-                                    {
-                                        <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
-                                            <span class="fas fa-plus"></span> Add Shipping Details
-                                        </button>
-                                    }
+       
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-danger card-tabs mt-2">
+                    <div class="card-header p-0 pt-1 pl-2 pr-2">
+                        <ul class="nav nav-tabs nav-fill nav-item" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#nav-shipping">Shipping Address</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-receivables">Receivables</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-payments">Payments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-discount">Brand Discount</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-shipping" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        @if (userAccess.CanAdd)
+                                        {
+                                            <button type="button" class="btn btn-primary btn-sm float-right shippingBtn ml-2" data-bs-toggle="modal" data-bs-target="#shippingModal">
+                                                <span class="fas fa-plus"></span> Add Shipping Details
+                                            </button>
+                                        }
+                                        <table class="table table-head-fixed table-striped table-hover table-shipping">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Address</th>
+                                                    <th>Contact Person</th>
+                                                    <th>Fax Number</th>
+                                                    <th>Phone Number</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-shipping">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Address</th>
-                                            <th>Contact Person</th>
-                                            <th>Fax Number</th>
-                                            <th>Phone Number</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="tab-pane fade" id="nav-receivables" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                Receivables
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-receivables">
-                                    <thead>
-                                        <tr>
-                                            <th>Invoiced Date</th>
-                                            <th>Invoiced Number</th>
-                                            <th>BIR Invoiced Number</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th colspan="3" class="text-end">Total</th>
-                                            <th class="text-end">0.00</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="tab-pane fade" id="nav-payments" role="tabpanel" aria-labelledby="nav-contact-tab">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-                                Payments
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-payments">
-                                    <thead>
-                                        <tr>
-                                            <th>Collector Receipt #</th>
-                                            <th>SOA No</th>
-                                            <th>Total Invoice Amount</th>
-                                            <th>Amount Paid</th>
-                                            <th>Over Payment</th>
-                                            <th>Transaction Date</th>
-                                            <th>Created By</th>
-                                            <th>Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th colspan="2" class="text-end">Total</th>
-                                            <th class="text-end">0.00</th>
-                                            <th class="text-end">0.00</th>
-                                            <th class="text-end">0.00</th>
-                                            <th colspan="3"></th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="tab-pane fade" id="nav-discount" role="tabpanel" aria-labelledby="nav-contact-tab">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-light">
-
-                                <span class="card-title">Brand Discount</span>
-                                <div class="card-tools">
-                                    @if (userAccess.CanUploadDownload)
-                                    {
-                                        <button type="button" class="btn btn-secondary btn-sm float-right downloadDiscountBtn ml-2">
-                                            <span class="fas fa-download"></span> Download
-                                        </button>
-                                    }
-
-                                    @if (userAccess.CanAdd)
-                                    {
-                                        <button type="button" class="btn btn-primary btn-sm float-right discountBtn ml-2" data-bs-toggle="modal" data-bs-target="#discountModal">
-                                            <span class="fas fa-plus"></span> Add Discount
-                                        </button>
-                                    }
-
+                            <div class="tab-pane fade" id="nav-receivables" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <table class="table table-head-fixed table-striped table-hover table-receivables">
+                                            <thead>
+                                                <tr>
+                                                    <th>Invoiced Date</th>
+                                                    <th>Invoiced Number</th>
+                                                    <th>BIR Invoiced Number</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="3" class="text-end">Total</th>
+                                                    <th class="text-end">0.00</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <table class="table table-head-fixed table-striped table-hover table-discount">
-                                    <thead>
-                                        <tr>
-                                            
-                                            <th>Brand</th>
-                                            <th>Discount</th>
-                                            <th>Date Created</th>
-                                            <th>Created By</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                            <div class="tab-pane fade" id="nav-payments" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <table class="table table-head-fixed table-striped table-hover table-payments">
+                                            <thead>
+                                                <tr>
+                                                    <th>Collector Receipt #</th>
+                                                    <th>SOA No</th>
+                                                    <th>Total Invoice Amount</th>
+                                                    <th>Amount Paid</th>
+                                                    <th>Over Payment</th>
+                                                    <th>Transaction Date</th>
+                                                    <th>Created By</th>
+                                                    <th>Remarks</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="2" class="text-end">Total</th>
+                                                    <th class="text-end">0.00</th>
+                                                    <th class="text-end">0.00</th>
+                                                    <th class="text-end">0.00</th>
+                                                    <th colspan="3"></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-discount" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        @if (userAccess.CanUploadDownload)
+                                        {
+                                            <button type="button" class="btn btn-secondary btn-sm float-right downloadDiscountBtn ml-2">
+                                                <span class="fas fa-download"></span> Download
+                                            </button>
+                                        }
+                                        @if (userAccess.CanAdd)
+                                        {
+                                            <button type="button" class="btn btn-primary btn-sm float-right discountBtn ml-2" data-bs-toggle="modal" data-bs-target="#discountModal">
+                                                <span class="fas fa-plus"></span> Add Discount
+                                            </button>
+                                        }
+                                        <table class="table table-head-fixed table-striped table-hover table-discount">
+                                            <thead>
+                                                <tr>
+                                                    <th>Brand</th>
+                                                    <th>Discount</th>
+                                                    <th>Date Created</th>
+                                                    <th>Created By</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
-
-        
-        
-        
     </div>
 </div>
 
@@ -783,8 +672,8 @@
                         </div>
 
                     </div>
-                    
 
+                    
 
                 </div>
                 <div class="modal-footer">
@@ -1249,7 +1138,7 @@
                             if (user_access.canDelete) {
                                 actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-discount" data-microtip-title="Delete / Deactivate Brand Discount" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
                             }
-                        } 
+                        }
                         
                         else{
                             if (user_access.canAdd || user_access.canEdit) {
@@ -1335,8 +1224,8 @@
                     $("#save-discount-id").val(row_data.id);
                     $("#save-discount-brand").val(row_data.brandId).trigger("change");
                     $("#save-discount").val(row_data.discount);
-                    
 
+                    
                     $("#discountModal").modal("show");
                 });
             }
@@ -1700,8 +1589,8 @@
             messages: {
                 Brand: { required: "Brand is required" },
                 Discount: { required: "Discount is required", number: "Please enter a valid number."},
-                
 
+                
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -1818,8 +1707,8 @@
             $(".downloadDiscountBtn").click(function (e) {
                 var urlQuery = [];
                 urlQuery.push("id=" + @Model?.Id);
-                
 
+                
 
                 window.location = "@Url.Action("DownloadDiscountFile")?" + urlQuery.join("&");
             });

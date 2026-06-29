@@ -8,6 +8,7 @@ namespace GMGInventory.Application.Contracts
     {
         Task<Select2Model<JsonCustomerOptionsModel>> GetOptions(string search, int page);
         Task<Select2Model<JsonCustomerOptionsModel>> GetByAgentOptions(string search, int page, int? agent);
+        Task<decimal> GetOutstandingBalance(int CustomerId);
         Task<Select2Model<JsonCustomerOptionsModel>> GetOptionsWithOrder(string search, int page);
 
         Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId);

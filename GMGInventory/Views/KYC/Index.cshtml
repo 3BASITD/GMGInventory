@@ -1,13 +1,619 @@
 ﻿@{
     ViewData["Title"] = "KYC";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
-<div class="container full-height d-flex align-items-center justify-content-center">
-    <div class="text-center">
-        <h1 class="display-1 text-warning"><span class="fas fa-tools"></span></h1>
-        <h2 class="display-4">KYC (Page Coming Soon)</h2>
-        <p class="lead">
-            We’re currently working on this page to bring you new features and improvements. Please check back again soon.
-        </p>
+<div class="alert alert-warning" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span><strong>COMMING SOON</strong> We’re currently working on this page to bring you new features and improvements. Please check back again soon.
+</div>
+
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
+</div>
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanEdit)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right btn-approve ml-2">
+                    <span class="fas fa-edit"></span>Edit
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Edit&#10;Edit access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-edit mr-0"></span>
+                </button>
+            }
+            @if (userAccess.CanApproveDisapprove)
+            {
+                <button type="button" class="btn btn-success btn-sm float-right btn-approve ml-2">
+                    <span class="fas fa-check"></span>Approve
+                </button>
+                <button type="button" class="btn btn-danger btn-sm float-right btn-disapprove ml-2">
+                    <span class="fas fa-times"></span>Disapprove
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Approve&#10;Approve / Disapprove access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-check mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Disapprove&#10;Approve / Disapprove access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-times mr-0"></span>
+                </button>
+            }
+            @if (userAccess.CanAdd)
+            {
+                <button type="button" class="btn btn-primary btn-sm float-right btn-submit ml-2">
+                    <span class="fas fa-paper-plane"></span> Submit for Approval
+                </button>
+                <button type="button" class="btn btn-primary btn-sm float-right btn-resubmit ml-2">
+                    <span class="fas fa-paper-plane"></span> Resubmit for Approval
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm float-right btn-draft ml-2">
+                    <span class="fas fa-save"></span>Save as Draft
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Submit for Approval&#10;Add access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-paper-plane mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Resubmit for Approval&#10;Add access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-paper-plane mr-0"></span>
+                </button>
+                <button type="button"
+                        class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Save as Draft&#10;Add access is required"
+                        data-microtip-position="bottom-left"
+                        role="tooltip">
+                    <span class="fas fa-save mr-0"></span>
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Customer Code
+                    </span>
+                    <select name="Customer" class="form-control form-control-sm"></select>
+                </p>
+            </div>
+
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Customer Name
+                    </span>
+                    <b class="d-block form-gayahin">
+                        Temp
+                    </b>
+                </p>
+            </div>
+
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Status
+                    </span>
+                    <b class="d-block form-gayahin">
+                        Pending
+                    </b>
+                </p>
+            </div>
+            
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Date Approved
+                    </span>
+                    <b class="d-block form-gayahin">
+                        January 1, 2001
+                    </b>
+                </p>
+            </div>
+            
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Approved By
+                    </span>
+                    <b class="d-block form-gayahin">
+                        Temp
+                    </b>
+                </p>
+            </div>
+            
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Date Disapproved
+                    </span>
+                    <b class="d-block form-gayahin">
+                        January 1, 2001
+                    </b>
+                </p>
+            </div>
+            
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Disapproved By
+                    </span>
+                    <b class="d-block form-gayahin">
+                        Temp
+                    </b>
+                </p>
+            </div>
+            
+            <div class="col-12 col-md-4 col-sm-6">
+                <p class="text-sm">
+                    <span class="text-muted">
+                        Remarks
+                    </span>
+                    <b class="d-block form-gayahin">
+                        Temp
+                    </b>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-danger card-tabs mt-2">
+                    <div class="card-header p-0 pt-1 pl-2 pr-2">
+                        <ul class="nav nav-tabs nav-fill nav-item" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile">Company Profile & Contact Information</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#legalTax">Legal & Tax Status</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#personnel">Key Personnel & Authorized Signatories</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#businessCredit">Business Operation & Credit Data</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#clients">Major Clients</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#banks" type="button">Bank References</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#checklist" type="button">Documentation Checklist</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#privacy" type="button">Privacy Consent</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="kycTabContent">
+                            <div class="tab-pane fade show active" id="profile">
+                                <div class="row">
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Name of Company</label>
+                                        <input type="text" class="form-control form-control-sm" name="Company">
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Registered Address</label>
+                                        <input type="text" class="form-control form-control-sm" name="RegisteredAddress">
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Operating Address</label>
+                                        <input type="text" class="form-control form-control-sm" name="OperatingAddress">
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Plant / Warehouse Address</label>
+                                        <input type="text" class="form-control form-control-sm" name="PlantWarehouseAddress">
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Operating Hours</label>
+                                        <input type="text" class="form-control form-control-sm" name="OperatingHours">
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Website</label>
+                                        <input type="text" class="form-control form-control-sm" name="Website">
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Email Address</label>
+                                        <input type="text" class="form-control form-control-sm" name="EmailAddress">
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Contact Number</label>
+                                        <input type="text" class="form-control form-control-sm" name="ContactNumber">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="legalTax">
+                                <div class="row">
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Organization Type</label>
+
+                                        <div class="btn-group btn-group-sm w-100" role="group">
+                                            <input type="radio" class="btn-check" name="OrganizationType"
+                                                   id="add-sole" value="Sole Proprietorship" checked>
+                                            <label class="btn btn-outline-primary" for="add-sole">Sole Proprietorship</label>
+
+                                            <input type="radio" class="btn-check" name="OrganizationType"
+                                                   id="add-partnership" value="Partnership">
+                                            <label class="btn btn-outline-primary" for="add-partnership">Partnership</label>
+
+                                            <input type="radio" class="btn-check" name="OrganizationType"
+                                                   id="add-corporation" value="Corporation">
+                                            <label class="btn btn-outline-primary" for="add-corporation">Corporation</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">SEC / DTI Number</label>
+                                        <input type="text" class="form-control form-control-sm" name="SECDTINumber">
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">BIR TIN</label>
+                                        <input type="text" class="form-control form-control-sm" name="BIRNumber">
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">VAT Status</label>
+
+                                        <div class="btn-group btn-group-sm w-100" role="group">
+                                            <input type="radio" class="btn-check" name="VATStatus"
+                                                   id="add-vat-registered" value="VAT Registered" checked>
+                                            <label class="btn btn-outline-primary" for="add-vat-registered">VAT Registered</label>
+
+                                            <input type="radio" class="btn-check" name="VATStatus"
+                                                   id="add-non-vat" value="Non-VAT">
+                                            <label class="btn btn-outline-primary" for="add-non-vat">Non-VAT</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="personnel">
+                                @if (userAccess.CanAdd)
+                                {
+                                    <button type="button" class="btn btn-primary btn-sm float-right btn-draft ml-1">
+                                        <span class="fas fa-plus"></span> Add
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm float-right ml-1 ui-state-disabled"
+                                            data-microtip-title="Add&#10;Add access is required"
+                                            data-microtip-position="bottom-left"
+                                            role="tooltip">
+                                        <span class="fas fa-plus mr-0"></span>
+                                    </button>
+                                }
+                                <table class="table table-head-fixed table-striped table-hover table-personnel">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Designation</th>
+                                            <th>Mobile Number</th>
+                                            <th>Email Address</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+
+                            <div class="tab-pane fade" id="businessCredit">
+                                <div class="row">
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Nature of Business</label>
+                                        <input type="text" class="form-control form-control-sm" name="BusinessNature">
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Product / Service</label>
+                                        <input type="text" class="form-control form-control-sm" name="ProductService">
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Credit Amount</label>
+                                        <input type="number" class="form-control form-control-sm" name="CreditAmount">
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Credit Term</label>
+                                        <select name="CreditTerm" class="form-control form-control-sm"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="clients">
+                                @if (userAccess.CanAdd)
+                                {
+                                    <button type="button" class="btn btn-primary btn-sm float-right btn-draft ml-1">
+                                        <span class="fas fa-plus"></span> Add
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm float-right ml-1 ui-state-disabled"
+                                            data-microtip-title="Add&#10;Add access is required"
+                                            data-microtip-position="bottom-left"
+                                            role="tooltip">
+                                        <span class="fas fa-plus mr-0"></span>
+                                    </button>
+                                }
+                                <table class="table table-head-fixed table-striped table-hover table-client">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Contact Person</th>
+                                            <th>Contact Number</th>
+                                            <th>Sales Volume</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+
+                            <div class="tab-pane fade" id="banks">
+                                @if (userAccess.CanAdd)
+                                {
+                                    <button type="button" class="btn btn-primary btn-sm float-right btn-draft ml-1">
+                                        <span class="fas fa-plus"></span> Add
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm float-right ml-1 ui-state-disabled"
+                                            data-microtip-title="Add&#10;Add access is required"
+                                            data-microtip-position="bottom-left"
+                                            role="tooltip">
+                                        <span class="fas fa-plus mr-0"></span>
+                                    </button>
+                                }
+                                <table class="table table-head-fixed table-striped table-hover table-bank">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Branch</th>
+                                            <th>Account Number</th>
+                                            <th>Contact Number</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+
+                            <div class="tab-pane fade" id="checklist">
+                                <div class="row">
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">BIR Form 2303 (Certificate of Registration)</label>
+                                        <input type="datetime-local" name="ChecklistBIR" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Valid Mayor's / Business Permit (Current Year)</label>
+                                        <input type="datetime-local" name="ChecklistPermit" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">SEC / DTI Certificate of Registration</label>
+                                        <input type="datetime-local" name="ChecklistSECDTI" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Latest Audited Financial Statement (Last 2 Years)</label>
+                                        <input type="datetime-local" name="ChecklistAudit" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Articles of Incorporation / By-Laws (For Corporations)</label>
+                                        <input type="datetime-local" name="ChecklistArticle" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Secretary's Certificate (Authorizing the person above the sign)</label>
+                                        <input type="datetime-local" name="ChecklistSecretary" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Company Profile / Portfolio</label>
+                                        <input type="datetime-local" name="ChecklistProfile" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Valid Identification Card of the Signatories</label>
+                                        <input type="datetime-local" name="ChecklistSignatoriesID" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Sample Sales Invoice / Official Receipt (From Major Clients)</label>
+                                        <input type="datetime-local" name="ChecklistClientSIOR" class="form-control form-control-sm" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="privacy">
+                                <div class="row">
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Has Data Privacy Consent</label>
+
+                                        <div class="btn-group btn-group-sm w-100" role="group">
+                                            <input type="radio" class="btn-check" name="Consent"
+                                                   id="add-consent" value="No" checked>
+                                            <label class="btn btn-outline-primary" for="add-consent">No</label>
+
+                                            <input type="radio" class="btn-check" name="Consnt"
+                                                   id="add-consent" value="Yes">
+                                            <label class="btn btn-outline-primary" for="add-consent">Yes</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <div class="row">
+                                    <div class="col-12 col-md-4 mb-3">
+                                        <label class="form-label">Date</label>
+                                        <input type="datetime-local" name="ConsentDate" class="form-control form-control-sm" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="accordion" id="kycAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Customer Informations
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                        Legal & Tax Status
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                        Key Personnel & Authorized Signatories
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                        Business Operation & Credit Data
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFive">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                        Major Clients
+                    </button>
+                </h2>
+                <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingSix">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix">
+                        Bank References
+                    </button>
+                </h2>
+                <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingSeven">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseSeven">
+                        Mandatory Documentation Checklist
+                    </button>
+                </h2>
+                <div id="collapseSeven" class="accordion-collapse collapse"
+                     data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingEight">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseEight">
+                        Data Privacy Consent & Declaration
+                    </button>
+                </h2>
+                <div id="collapseEight" class="accordion-collapse collapse"
+                     data-bs-parent="#kycAccordion">
+                    <div class="accordion-body">
+                    </div>
+                </div>
+            </div>
+
+        </div>*@
     </div>
 </div>
+                                                
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+        // Load Select2 Credit Term
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "CreditTerm")",
+            success: function (data, status, xhr) {
+                $("#add-credit-term").select2({
+                    ajax: null, //already fetched outside
+                    data: data,
+                    dropdownParent: $("#createModal")
+                });
+            }
+        });
+        
+        var customerDT = $(".table-customer").DataTable();
+        var personnelDT = $(".table-personnel").DataTable();
+        var clientDT = $(".table-client").DataTable();
+        var bankDT = $(".table-bank").DataTable();
+    </script>
+}

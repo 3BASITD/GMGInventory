@@ -32,7 +32,7 @@ namespace GMGInventory.Application.Repositories
                                 || s.SalesOrder.Status.Name.Trim().ToLower() == "packing submitted"
                                 || s.SalesOrder.Status.Name.Trim().ToLower() == "fully packed")
                              && (filter.Brand == null || s.Item.Brand.Id == filter.Brand)
-                             && (filter.Region2 == null || regions == null || regions.Contains(s.SalesOrder.Customer.Area.Region.Code))
+                             && (filter.Region2 == null || regions == null || regions.Contains(s.SalesOrder.Region.Code))
                              && filter.StartDate.Date <= s.SalesOrder.SalesOrderDate.Date
                              && s.SalesOrder.SalesOrderDate.Date <= filter.EndDate.Date
                              let packed = context.PackLineItems

@@ -351,6 +351,25 @@
         var dt_duration = 3600000; // 1 hour
 
         function ApplyFilter() {
+            if (Object.keys(recommendationState).length == 0) {
+                DoApplyFilter();
+            } else {
+                swal({
+                    title: "Selection Resets on Filter",
+                    text: "Some movements are already checked; applying a filter will clear the selected items. Are you sure you want to continue?",
+                    icon: "info",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        recommendationState = {};
+                        DoApplyFilter();
+                    }
+                });
+            }
+        }
+
+        function DoApplyFilter() {
             $("#filterModal").modal("hide");
             recommendationDT.ajax.reload(() => {
                 var saved = localStorage.getItem(dt_storage);
@@ -364,6 +383,25 @@
         }
 
         function ResetFilter() {
+            if (Object.keys(recommendationState).length == 0) {
+                DoResetFilter();
+            } else {
+                swal({
+                    title: "Selection Resets on Filter",
+                    text: "Some movements are already checked; applying a filter will clear the selected items. Are you sure you want to continue?",
+                    icon: "info",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        recommendationState = {};
+                        DoResetFilter();
+                    }
+                });
+            }
+        }
+
+        function DoResetFilter() {
             $("#filterModal").modal("hide");
             resetToDefaultDTFilter();
             recommendationDT.ajax.reload(() => {

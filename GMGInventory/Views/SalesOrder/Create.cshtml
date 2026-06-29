@@ -37,6 +37,32 @@
             <div class="row">
                 <div class="col-12 col-lg-3 col-md-6">
                     <div class="form-group">
+                        <label for="order-purchase-number" class="form-label mb-0">Purchase Order Number</label>
+                        <input type="text" id="order-purchase-number" name="PurchaseNumber" class="form-control form-control-sm" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-region" class="form-label mb-0">Region</label>
+                        <select id="order-region" style="width: 100%"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-forwarder" class="form-label mb-0">Forwarder</label>
+                        <select id="order-forwarder" style="width: 100%"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-date" class="form-label mb-0">Sales Order Date</label>
+                        <input type="date" id="order-date" name="OrderDate" class="form-control form-control-sm" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-delivery-date" class="form-label mb-0">Required Delivery Date</label>
+                        <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order-sla" class="form-label mb-0">Service Level Agreement</label>
+                        <select id="order-sla" name="SLA" style="width: 100%"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3 col-md-6">
+                    <div class="form-group">
                         <label for="order-agent-code" class="form-label mb-0">Agent Code</label>
                         <select id="order-agent-code" name="AgentCode" style="width: 100%"></select>
                     </div>
@@ -56,49 +82,31 @@
                         <label for="order-customer-address" class="form-label mb-0">Customer Address</label>
                         <input type="text" id="order-customer-address" class="form-control form-control-sm" readonly="readonly" />
                     </div>
+                    <div class="form-group">
+                        <label for="order-customer-balance" class="form-label mb-0">Customer Outstanding Balance</label>
+                        <input type="text" id="order-customer-balance" class="form-control form-control-sm" readonly="readonly" />
+                    </div>
                 </div>
                 <div class="col-12 col-lg-3 col-md-6">
                     <div class="form-group">
-                        <label for="order-customer-balance" class="form-label mb-0">Outstanding Balance</label>
-                        <input type="text" id="order-customer-balance" class="form-control form-control-sm" readonly="readonly" />
+                        <label for="order-credit-limit" class="form-label mb-0">Customer Credit Limit</label>
+                        <input type="text" id="order-credit-limit" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                     <div class="form-group">
-                        <label for="order-credit-term" class="form-label mb-0">Credit Term</label>
+                        <label for="order-credit-term" class="form-label mb-0">Customer Credit Term</label>
                         <input type="text" id="order-credit-term" class="form-control form-control-sm" readonly="readonly" />
-                    </div>
-                    <div class="form-group">
-                        <label for="order-region" class="form-label mb-0">Customer Region</label>
-                        <input type="text" id="order-region" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                     <div class="form-group">
                         <label for="order-customer-status" class="form-label mb-0">Customer Account Status</label>
                         <input type="text" id="order-customer-status" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                     <div class="form-group">
-                        <label for="order-purchase-number" class="form-label mb-0">Purchase Order Number</label>
-                        <input type="text" id="order-purchase-number" name="PurchaseNumber" class="form-control form-control-sm" />
-                    </div>
-                </div>
-                <div class="col-12 col-lg-3 col-md-6">
-                    <div class="form-group">
-                        <label for="order-forwarder" class="form-label mb-0">Forwarder</label>
-                        <select id="order-forwarder" style="width: 100%"></select>
+                        <label for="order-customer-priority" class="form-label mb-0">Customer Priority</label>
+                        <input type="text" id="order-customer-priority" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                     <div class="form-group">
-                        <label for="order-remarks" class="form-label mb-0">Remarks</label>
-                        <input type="text" id="order-remarks" class="form-control form-control-sm" />
-                    </div>
-                    <div class="form-group">
-                        <label for="order-date" class="form-label mb-0">Date Ordered</label>
-                        <input type="date" id="order-date" name="OrderDate" class="form-control form-control-sm" />
-                    </div>
-                    <div class="form-group">
-                        <label for="order-delivery-date" class="form-label mb-0">Required Delivery Date</label>
-                        <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
-                    </div>
-                    <div class="form-group">
-                        <label for="order-sla" class="form-label mb-0">Service Level Agreement</label>
-                        <select id="order-sla" name="SLA" style="width: 100%"></select>
+                        <label for="order-customer-branch" class="form-label mb-0">Customer Branch</label>
+                        <input type="text" id="order-customer-branch" class="form-control form-control-sm" readonly="readonly" />
                     </div>
                 </div>
                 <div class="col-12 col-lg-3 col-md-6">
@@ -128,6 +136,10 @@
                         <select id="order-with-jitlpdelivery" style="width: 100%"></select>
                     </div>
                     <div class="form-group">
+                        <label for="order-remarks" class="form-label mb-0">Remarks</label>
+                        <input type="text" id="order-remarks" class="form-control form-control-sm" />
+                    </div>
+                    <div class="form-group">
                         <label for="order-instruction" class="form-label mb-0">Special Instruction</label>
                         <input type="text" id="order-instruction" name="Instruction" class="form-control form-control-sm" />
                     </div>
@@ -139,7 +151,7 @@
                         <div class="card-header bg-light">
                             <span class="card-title">Sales Order Item(s)</span>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2">
                                     <span class="fas fa-plus"></span> Add Sales Order Item
                                 </button>
                             </div>
@@ -155,6 +167,7 @@
                                         <th>Item Code</th>
                                         <th>Item Name</th>
                                         <th>Inventory Count</th>
+                                        <th>Allocated Quantity</th>
                                         <th>Unit Price</th>
                                         <th>Discount</th>
                                         <th>Extended Price</th> <!-- mas ok sana sabihing Gross Price kaso ayaw nila -->
@@ -164,7 +177,7 @@
                                     <tr>
                                         <th colspan="2" class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
-                                        <th colspan="6"></th>
+                                        <th colspan="7"></th>
                                         <th class="total-gross-price">0.00</th>
                                     </tr>
                                 </tfoot>
@@ -215,12 +228,18 @@
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
-                                <label for="add-unit" class="form-label mb-0">Unit</label>
-                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                                <label for="add-allocated-quantity" class="form-label mb-0">Allocated Quantity</label>
+                                <input type="text" id="add-allocated-quantity" name="AllocatedQuantity" class="form-control form-control-sm" readonly="readonly" />
                             </div>
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-unit" class="form-label mb-0">Unit</label>
+                                <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-unit-price" class="form-label mb-0">Unit Price <span class="add-price-source"></span></label>
@@ -228,10 +247,13 @@
                                 @*<input type="text" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" readonly="readonly" />*@
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-discount1" class="form-label mb-0">
-                                    Discount 1 <span class="discount1-info text-info d-none" data-microtip-title="Customer auto-brand discount. Sales Order (Special) Edit access is required to allow updating of discount 1" data-microtip-position="right" role="tooltip">
+                                    Discount 1
+                                    <span class="discount1-info text-info d-none" data-microtip-title="Customer auto-brand discount. Sales Order (Special) Edit access is required to allow updating of discount 1" data-microtip-position="right" role="tooltip">
                                         <span class="fas fa-info-circle"></span>
                                     </span>
                                 </label>
@@ -241,8 +263,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-discount2" class="form-label mb-0">Discount 2</label>
@@ -252,7 +272,9 @@
                                 </div>
                             </div>
                         </div>
-                            <div class="col-12 col-sm-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-discount3" class="form-label mb-0">Discount 3</label>
                                 <div class="input-group input-group-sm">
@@ -261,8 +283,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-discount4" class="form-label mb-0">Discount 4</label>
@@ -272,6 +292,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-discount5" class="form-label mb-0">Discount 5</label>
@@ -281,8 +303,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
@@ -400,16 +420,24 @@
         });
 
         $("#order-customer-code").on("select2:select", function () {
-            changingCustomerCode();
+            changingCustomerOrDateOrder();
+        });
+
+        $("#order-date").on("change", function() {
+            changingCustomerOrDateOrder();
         });
 
         var currentCustomer = "";
-        function changingCustomerCode() {
-            var selectedCustomer = $("#order-customer-code").val();
+        var currentDateOrder = DateForInput(new Date());
+        function changingCustomerOrDateOrder() {
+            var selectedCustomer = $("#order-customer-code").val() || "";
+            var selectedDateOrder = $("#order-date").val() || "";
+            console.log(currentDateOrder + " " + selectedDateOrder);
 
-            if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer)) {
-                var changed = "Customer Code"
-
+            if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer || selectedDateOrder != currentDateOrder)) {
+                var changed = selectedCustomer != currentCustomer ? "Customer Code"
+                            : selectedDateOrder != currentDateOrder ? "Sales Order Date"
+                            : "Customer Code / Sales Order Date";
                 swal({
                     title: "Sales Order Items not empty",
                     text: "Changing the selected " + changed + " will clear the added items. Do you want to continue?",
@@ -421,31 +449,44 @@
                         swal.close();
                         itemDT.clear().draw();
                         clearItemForm();
-                        currentCustomer = selectedCustomer;
-
-                        LoadCustomerDetails();
+                        
+                        if (selectedCustomer != currentCustomer) {
+                            currentCustomer = selectedCustomer;
+                            LoadCustomerDetails();
+                        }
+                        if (selectedDateOrder != currentDateOrder) {
+                            currentDateOrder = selectedDateOrder;
+                        }
                     } else {
                         $("#order-customer-code").val(currentCustomer).trigger("change");
+                        $("#order-date").val(currentDateOrder);
                     }
                 });
             } else {
-                currentCustomer = selectedCustomer;
-
-                LoadCustomerDetails();
+                if (selectedCustomer != currentCustomer) {
+                    currentCustomer = selectedCustomer;
+                    LoadCustomerDetails();
+                }
+                if (selectedDateOrder != currentDateOrder) {
+                    currentDateOrder = selectedDateOrder;
+                }
             }
         }
 
         function LoadCustomerDetails() {
             $("#order-customer-name").val($("#order-customer-code").select2("data")[0].name);
             $("#order-customer-address").val($("#order-customer-code").select2("data")[0].address);
-            $("#order-customer-balance").val($("#order-customer-code").select2("data")[0].outstandingBalance);
+            //$("#order-customer-balance").val($("#order-customer-code").select2("data")[0].outstandingBalance);
+            $("#order-credit-limit").val($("#order-customer-code").select2("data")[0].creditLimit);
             $("#order-credit-term").val($("#order-customer-code").select2("data")[0].creditTerm);
-            $("#order-region").val($("#order-customer-code").select2("data")[0].region);
+            //$("#order-region").val($("#order-customer-code").select2("data")[0].region);
             $("#order-customer-status").val($("#order-customer-code").select2("data")[0].customerStatus);
+            $("#order-customer-priority").val($("#order-customer-code").select2("data")[0].priority);
+            $("#order-customer-branch").val($("#order-customer-code").select2("data")[0].branch);
 
-            if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
-                toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
-            }
+            // if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
+            //     toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
+            // }
 
             if ($("#order-agent-code").val() == null) {
                 var agentId = $("#order-customer-code").select2("data")[0].agentId;
@@ -460,7 +501,35 @@
                 $("#order-agent-code").append(agentOption).trigger("change");
                 $("#order-agent-name").val(agentName);
             }
+            
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOutstandingBalance", "Customer")",
+                data: { customerId: $("#order-customer-code").select2("data")[0].id },
+                success: function (data, status, xhr) {
+                    var balance = parseFloat(data);
+                    $("#order-customer-balance").val(FormatStringInteger(balance));
+
+                    if (balance > 0) {
+                        toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + FormatStringInteger(balance), "Outstanding Balance");
+                    }
+                }
+            });
         }
+
+        // Load region data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#order-region").select2({
+                    minimumResultsForSearch: -1,
+                    ajax: null, //already fetched outside
+                    data: data,
+                    //minimumResultsForSearch: Infinity
+                });
+            }
+        });
 
         // Load forwarder data for select2
         $.ajax({
@@ -498,10 +567,10 @@
             ajax: {
                 url: "@Url.Action("GetOptionsPromo", "Item")",
                 data: function(params){
-                    var query ={
-                    search : params.term,
-                    page : params.page,
-                    orderDate : $("#order-date").val()
+                    var query = {
+                        search : params.term,
+                        page : params.page,
+                        orderDate : $("#order-date").val()
                     }
                     return query;
                 }
@@ -535,6 +604,7 @@
 
             $("#add-unit").val($("#add-code").select2("data")[0].unit);
             $(".add-inventory").text($("#add-code").select2("data")[0].inventoryCount);
+            $("#add-allocated-quantity").val($("#add-code").select2("data")[0].allocatedQuantityD);
             $("#add-quantity").val("1");
             $("#add-code-error").html("");
         });
@@ -545,6 +615,7 @@
             $(".add-price-source").text("");
             $("#add-unit").val("");
             $(".add-inventory").text("0");
+            $("#add-allocated-quantity").val("0");
             $("#add-quantity").val("0");
             $("#add-gross-price").val("0.00");
         });
@@ -575,16 +646,28 @@
             $("#add-quantity").val("0");
             $("#add-unit").val("");
             $(".add-inventory").text("0");
+            $("#add-allocated-quantity").val("0");
             $("#add-discount1").val("0.00");
             $("#add-discount2").val("0.00");
             $("#add-discount3").val("0.00");
             $("#add-discount4").val("0.00");
             $("#add-discount5").val("0.00");
             $("#add-gross-price").val("0.00");
-            
         }
 
-        $(".createBtn").on("click", clearItemForm);
+        $(".createBtn").on("click", function() {
+            if($("#order-date").val() == "") {
+                swal({
+                    title: "Sales Order Item",
+                    text: "Please select date ordered to continue selecting an item",
+                    icon: "warning",
+                    button: "OK"
+                });
+            } else {
+                clearItemForm();
+                $("#addModal").modal("show");
+            }
+        });
 
         // Validation for Add Item Modal
         var validateAdd = $("#form-item").validate({
@@ -605,7 +688,7 @@
         });
 
 
-        function GetBrandDiscount(brandId){
+        function GetBrandDiscount(brandId) {
             var custId = currentCustomer;
             if (!custId) return;
             var brandDiscountId = 0;
@@ -673,6 +756,7 @@
                     code: $("#add-code").select2("data")[0].text,
                     name: $("#add-code").select2("data")[0].name + ($("#add-code").select2("data")[0].itemPromoName == "" ? "": " ("+$("#add-code").select2("data")[0].itemPromoName+")" ),
                     inventoryCount: $("#add-code").select2("data")[0].inventoryCount,
+                    allocatedQuantity: $("#add-code").select2("data")[0].allocatedQuantity,
                     quantity: $("#add-quantity").val() || 0,
                     unit: $("#add-code").select2("data")[0].unit,
                     unitPrice: Round2Decimal($("#add-unit-price").val() || "0.00"),
@@ -713,11 +797,13 @@
                     var customerOption = new Option(data.customerCode, data.customerId, true, true);
                     $("#order-customer-code").append(customerOption).trigger('change');
                     $("#order-customer-code").select2("data")[0].name = data.customerName;
-                    $("#order-customer-code").select2("data")[0].outstandingBalanceD = data.outstandingBalanceD;
+                    //$("#order-customer-code").select2("data")[0].outstandingBalanceD = data.outstandingBalanceD;
+                    $("#order-customer-code").select2("data")[0].creditLimitD = data.creditLimitD;
                     $("#order-customer-code").select2("data")[0].customerStatus = data.accountStatus;
                     $("#order-customer-name").val(data.customerName);
                     $("#order-customer-address").val(data.customerAddress);
                     $("#order-customer-balance").val(data.outstandingBalance);
+                    $("#order-credit-limit").val(data.creditLimit);
                     $("#order-credit-term").val(data.creditTerms);
 
                     $("#order-region").val(data.region);
@@ -788,6 +874,7 @@
             $("#order-customer-name").val("");
             $("#order-customer-address").val("");
             $("#order-customer-balance").val("");
+            $("#order-credit-limit").val("");
             $("#order-credit-term").val("");
             $("#order-region").val("");
             $("#order-delivery-date").val(DateForInput(new Date()));
@@ -796,12 +883,6 @@
             $("#order-customer-status").val("");
         }
 
-
-        
-
-        
-        
-        
         var itemDT = $('.table-item').DataTable({
             data: [],
             filter: true,
@@ -842,6 +923,15 @@
                             + (data.inventoryCount == 0 ? "</span>" : "");
                     },
                     name: "InventoryCount",
+                    className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return (data.allocatedQuantityD == 0 ? "<span class='text-muted'>" : "")
+                            + data.allocatedQuantity
+                            + (data.allocatedQuantityD == 0 ? "</span>" : "");
+                    },
+                    name: "AllocatedQuantity",
                     className: "form-cell text-end"
                 },
                 {
@@ -1067,7 +1157,7 @@
                     discount4: row_discount4,
                     discount5: row_discount5,
                     customerBrandDiscountId: row_data.customerBrandDiscountId,
-                    itemPromoId: row_data.itemPromoId 
+                    itemPromoId: row_data.itemPromoId
                 });
             });
             return item_to_order;
@@ -1172,6 +1262,7 @@
                 url: "@Url.Action("SaveJson")",
                 data: {
                     Customer: $("#order-customer-code").val(),
+                    Region: $("#order-region").val(),
                     Forwarder: $("#order-forwarder").val(),
                     Agent: $("#order-agent-code").val(),
                     PurchaseOrder: $("#order-purchase-number").val(),

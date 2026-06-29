@@ -6,7 +6,6 @@ namespace GMGInventory.Data
     {
         public KYC()
         {
-            this.Customers = new HashSet<Customer>();
         }
 
         public string CompanyName { get; set; }
@@ -41,6 +40,10 @@ namespace GMGInventory.Data
         public DateTime DateConsent { get; set; }
 
 
+        [ForeignKey("CustomerId")]
+        public int CustomerId { get; set; }
+        public Customer Customer { get; set; }
+
         [ForeignKey("StatusId")]
         public int StatusId { get; set; }
         public KYCStatus Status { get; set; }
@@ -56,7 +59,5 @@ namespace GMGInventory.Data
         public string? DisapprovedReason { get; set; }
 
         public string? Remarks { get; set; }
-
-        public ICollection<Customer> Customers { get; set; }
     }
 }

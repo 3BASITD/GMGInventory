@@ -34,6 +34,11 @@ namespace GMGInventory.Controllers
             return Json(await customerRepository.GetByAgentOptions(search, page, agent));
         }
 
+        public async Task<IActionResult> GetOutstandingBalance(int CustomerId)
+        {
+            return Json(await customerRepository.GetOutstandingBalance(CustomerId));
+        }
+
         public async Task<IActionResult> GetOptionsWithOrder(string search, int page)
         {
             return Json(await customerRepository.GetOptionsWithOrder(search, page));

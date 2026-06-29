@@ -72,8 +72,8 @@
                     <button type="button"
                             class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
                             data-microtip-title=" Update to Resubmit&#10;@(Model.ResubmitId != null ? "Order already been resubmitted"
-                                                                                                                                            : canAdd ? "Only disapproved orders can be resubmitted"
-                                                                                                                                            : "Add access is required")"
+                                                                                                                                                        : canAdd ? "Only disapproved orders can be resubmitted"
+                                                                                                                                                        : "Add access is required")"
                             data-microtip-position="bottom"
                             role="tooltip">
                         <span class="fas fa-edit mr-0"></span>
@@ -159,7 +159,7 @@
                 @if (canPack)
                 {
                     <a href="@Url.Action("Create", "Pack")/@Model.Id?page=SalesOrder"
-                       class="btn btn-primary btn-sm float-right ml-2">
+                           class="btn btn-primary btn-sm float-right ml-2">
                         <span class="fas fa-box-open"></span> Start Packing
                     </a>
                 }
@@ -212,23 +212,23 @@
             }
             <div class="row">
                 <div class="col-12 col-md-6 col-lg-3">
-                    <p class="text-sm">
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.SONumber)
                         </span>
                         <b class="d-block form-gayahin">
                             @Model.SONumber
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.PONumber)
                         </span>
                         <b class="d-block form-gayahin order-purchase-number">
                             @(string.IsNullOrWhiteSpace(Model.PONumber) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.PONumber)
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-forwarder" class="form-label fw-normal mb-0 text-muted">
@@ -245,8 +245,62 @@
                                 @(string.IsNullOrWhiteSpace(Model.Forwarder) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Forwarder)
                             </b>
                         }
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft"))
+                        {
+                            <label for="order-date" class="form-label fw-normal mb-0 text-muted">
+                                @Html.DisplayNameFor(model => model.OrderDate)
+                            </label>
+                            <input type="date" id="order-date" name="OrderDate" class="form-control form-control-sm" value="@Model.OrderDate3" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.OrderDate)
+                            </span>
+                            <b class="d-block form-gayahin order-date">
+                                @Model.OrderDate
+                            </b>
+                        }
+                    </div>
+                    <div class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft"))
+                        {
+                            <label for="order-delivery-date" class="form-label fw-normal mb-0 text-muted">
+                                @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                            </label>
+                            <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" value="@Model.RequiredDeliveryDate3" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model.RequiredDeliveryDate
+                            </b>
+                        }
+                    </div>
+                    <div class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
+                        {
+                            <label for="order-sla" class="form-label fw-normal mb-0 text-muted">
+                                @Html.DisplayNameFor(model => model.ServiceLevelAgreement)
+                            </label>
+                            <select id="order-sla" name="SLA" style="width: 100%"></select>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.ServiceLevelAgreement)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @(string.IsNullOrWhiteSpace(Model.ServiceLevelAgreement) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.ServiceLevelAgreement)
+                            </b>
+                        }
+                    </div>
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-agent-code" class="form-label fw-normal mb-0 text-muted">
@@ -267,16 +321,36 @@
                                                         new { @class = "link-info", target = "_blank" })
                             </b>
                         }
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.AgentName)
                         </span>
                         <b class="d-block form-gayahin order-agent-name">
                             @Model.AgentName
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="text-sm">
+                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
+                        {
+                            <label for="order-region" class="form-label fw-normal mb-0 text-muted">
+                                @Html.DisplayNameFor(model => model.Region)
+                            </label>
+                            <select id="order-region" name="Region" style="width: 100%"></select>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @Html.DisplayNameFor(model => model.Region)
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model.Region
+                            </b>
+                        }
+                    </div>
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-customer-code" class="form-label fw-normal mb-0 text-muted">
@@ -297,129 +371,73 @@
                                                         new { @class = "link-info", target = "_blank" })
                             </b>
                         }
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.CustomerName)
                         </span>
                         <b class="d-block form-gayahin order-customer-name">
                             @Model.CustomerName
                         </b>
-                    </p>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.CustomerAddress)
                         </span>
                         <b class="d-block form-gayahin order-customer-address">
                             @(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.CustomerAddress)
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.OutstandingBalance)
                         </span>
                         <b class="d-block form-gayahin order-customer-balance">
                             @Model.OutstandingBalance
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.CreditLimit)
+                        </span>
+                        <b class="d-block form-gayahin order-credit-limit">
+                            @Model.CreditLimit
+                        </b>
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.CreditTerms)
                         </span>
                         <b class="d-block form-gayahin order-credit-term">
                             @Model.CreditTerms
                         </b>
-                    </p>
-                    <p class="text-sm">
-                        <span class="text-muted">
-                            @Html.DisplayNameFor(model => model.Region)
-                        </span>
-                        <b class="d-block form-gayahin order-region">
-                            @Model.Region
-                        </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.AccountStatus)
                         </span>
                         <b class="d-block form-gayahin order-customer-status">
                             @Model!.AccountStatus
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.Priority)
                         </span>
                         <b class="d-block form-gayahin order-customer-priority">
                             @Model.Priority
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.Branch)
                         </span>
                         <b class="d-block form-gayahin order-customer-branch">
                             @(string.IsNullOrWhiteSpace(Model.Branch) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Branch)
                         </b>
-                    </p>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <p class="text-sm">
-                        @if (Model!.Status.ToLower().Contains("draft"))
-                        {
-                            <label for="order-date" class="form-label fw-normal mb-0 text-muted">
-                                @Html.DisplayNameFor(model => model.OrderDate)
-                            </label>
-                            <input type="date" id="order-date" name="OrderDate" class="form-control form-control-sm" value="@Model.OrderDate3" />
-                        }
-                        else
-                        {
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.OrderDate)
-                            </span>
-                            <b class="d-block form-gayahin order-date">
-                                @Model.OrderDate
-                            </b>
-                        }
-                    </p>
-                    <p class="text-sm">
-                        @if (Model!.Status.ToLower().Contains("draft"))
-                        {
-                            <label for="order-delivery-date" class="form-label fw-normal mb-0 text-muted">
-                                @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
-                            </label>
-                            <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" value="@Model.RequiredDeliveryDate3" />
-                        }
-                        else
-                        {
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.RequiredDeliveryDate)
-                            </span>
-                            <b class="d-block form-gayahin">
-                                @Model.RequiredDeliveryDate
-                            </b>
-                        }
-                    </p>
-                    <p class="text-sm">
-                        @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
-                        {
-                            <label for="order-sla" class="form-label fw-normal mb-0 text-muted">
-                                @Html.DisplayNameFor(model => model.ServiceLevelAgreement)
-                            </label>
-                            <select id="order-sla" name="SLA" style="width: 100%"></select>
-                        }
-                        else
-                        {
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.ServiceLevelAgreement)
-                            </span>
-                            <b class="d-block form-gayahin">
-                                @(string.IsNullOrWhiteSpace(Model.ServiceLevelAgreement) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.ServiceLevelAgreement)
-                            </b>
-                        }
-                    </p>
+                    </div>
                     <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
@@ -441,7 +459,7 @@
                             </b>
                         }
                     </div>
-                    <p class="text-sm">
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-with-lp" class="form-label fw-normal mb-0 text-muted">
@@ -461,8 +479,8 @@
                                 @Model.WithLP
                             </b>
                         }
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-with-nondefect" class="form-label fw-normal mb-0 text-muted">
@@ -482,8 +500,8 @@
                                 @Model.WithREYCONonDefective
                             </b>
                         }
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-with-jitlpdelivery" class="form-label fw-normal mb-0 text-muted">
@@ -500,109 +518,113 @@
                                 @Model.WithREYCOJITLPDelivery
                             </b>
                         }
-                    </p>
-                    @if (!string.IsNullOrWhiteSpace(Model.AppOrderSource))
-                    {
-                        <p class="text-sm">
-                            <span class="text-muted">
-                                @Html.DisplayNameFor(model => model.AppOrderSource)
-                            </span>
-                            <b class="d-block form-gayahin">
+                    </div>
+                    <div class="text-sm">
+                        <span class="text-muted">
+                            @Html.DisplayNameFor(model => model.AppOrderSource)
+                        </span>
+                        <b class="d-block form-gayahin">
+                            @if (!string.IsNullOrWhiteSpace(Model.AppOrderSource))
+                            {
                                 @Html.ActionLink(Model.AppOrderSource,
                                                 "Details",
                                                 "OrderQueue",
                                                 new { @Id = Model.AppOrderSource },
-                                                        new { @class = "link-info", target = "_blank" })
-                            </b>
-                        </p>
-                     }
+                                                new { @class = "link-info", target = "_blank" })
+                            }
+                            else
+                            {
+                                <span class="text-muted">N/A</span>
+                            }
+                        </b>
+                    </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
-                    <p class="text-sm">
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.Status)
                         </span>
                         <b class="d-block form-gayahin">
                             @Model.Status
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.UserCreated)
                         </span>
                         <b class="d-block form-gayahin">
                             @Model.UserCreated
                         </b>
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         <span class="text-muted">
                             @Html.DisplayNameFor(model => model.DateCreated)
                         </span>
                         <b class="d-block form-gayahin">
                             @Model.DateCreated
                         </b>
-                    </p>
+                    </div>
                     @if (Model.UserModified != null)
                     {
-                        <p class="text-sm">
+                        <div class="text-sm">
                             <span class="text-muted">
                                 @Html.DisplayNameFor(model => model.UserModified)
                             </span>
                             <b class="d-block form-gayahin">
                                 @Model.UserModified
                             </b>
-                        </p>
+                        </div>
                     }
                     @if (Model.DateModified != null)
                     {
-                        <p class="text-sm">
+                        <div class="text-sm">
                             <span class="text-muted">
                                 @Html.DisplayNameFor(model => model.DateModified)
                             </span>
                             <b class="d-block form-gayahin">
                                 @Model.DateModified
                             </b>
-                        </p>
+                        </div>
                     }
                     @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy) && Model.ApprovedDate != null)
                     {
-                        <p class="text-sm">
+                        <div class="text-sm">
                             <span class="text-muted">
                                 @Html.DisplayNameFor(model => model.ApprovedBy)
                             </span>
                             <b class="d-block form-gayahin">
                                 @Model.ApprovedBy
                             </b>
-                        </p>
-                        <p class="text-sm">
+                        </div>
+                        <div class="text-sm">
                             <span class="text-muted">
                                 @Html.DisplayNameFor(model => model.ApprovedDate)
                             </span>
                             <b class="d-block form-gayahin">
                                 @Model.ApprovedDate
                             </b>
-                        </p>
+                        </div>
                     }
                     @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy) && Model.DisapprovedDate != null)
                     {
-                        <p class="text-sm">
+                        <div class="text-sm">
                             <span class="text-muted">
                                 @Html.DisplayNameFor(model => model.DisapprovedBy)
                             </span>
                             <b class="d-block form-gayahin">
                                 @Model.DisapprovedBy
                             </b>
-                        </p>
-                        <p class="text-sm">
+                        </div>
+                        <div class="text-sm">
                             <span class="text-muted">
                                 @Html.DisplayNameFor(model => model.DisapprovedDate)
                             </span>
                             <b class="d-block form-gayahin">
                                 @Model.DisapprovedDate
                             </b>
-                        </p>
+                        </div>
                     }
-                    <p class="text-sm">
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-remarks" class="form-label fw-normal mb-0 text-muted">
@@ -619,8 +641,8 @@
                                 @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.Remarks)
                             </b>
                         }
-                    </p>
-                    <p class="text-sm">
+                    </div>
+                    <div class="text-sm">
                         @if (Model!.Status.ToLower().Contains("draft") && userAccess.CanEdit)
                         {
                             <label for="order-instruction" class="form-label fw-normal mb-0 text-muted">
@@ -637,7 +659,7 @@
                                 @(string.IsNullOrWhiteSpace(Model.SpecialInstruction) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.SpecialInstruction)
                             </b>
                         }
-                    </p>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -650,7 +672,7 @@
                                 @if (userAccess.CanAdd)
                                 {
                                     <div class="card-tools">
-                                        <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2" data-bs-toggle="modal" data-bs-target="#addModal">
+                                        <button type="button" class="btn btn-primary btn-sm float-right createBtn ml-2">
                                             <span class="fas fa-plus"></span> Add Sales Order Item
                                         </button>
                                     </div>
@@ -668,6 +690,7 @@
                                         <th>Item Code</th>
                                         <th>Item Name</th>
                                         <th>Inventory Count</th>
+                                        <th>Allocated Quantity</th>
                                         <th>Unit Price</th>
                                         <th>Discount</th>
                                         <th>Extended Price</th>
@@ -680,7 +703,7 @@
                                     <tr>
                                         <th colspan="2" class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
-                                        <th colspan="6"></th>
+                                        <th colspan="7"></th>
                                         <th class="total-gross-price">0.00</th>
                                         <th class="total-served">0</th>
                                         <th class="total-unserved">0</th>
@@ -736,12 +759,18 @@
                             </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
-                                    <label for="add-unit" class="form-label mb-0">Unit</label>
-                                    <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                                    <label for="add-allocated-quantity" class="form-label mb-0">Allocated Quantity</label>
+                                    <input type="text" id="add-allocated-quantity" name="AllocatedQuantity" class="form-control form-control-sm" readonly="readonly" />
                                 </div>
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="add-unit" class="form-label mb-0">Unit</label>
+                                    <input type="text" id="add-unit" name="Unit" class="form-control form-control-sm" readonly="readonly" />
+                                </div>
+                            </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-unit-price" class="form-label mb-0">Unit Price <span class="add-price-source"></span></label>
@@ -749,10 +778,13 @@
                                     @*<input type="text" id="add-unit-price" name="UnitPrice" class="form-control form-control-sm" readonly="readonly" />*@
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-discount1" class="form-label mb-0">
-                                        Discount 1 <span class="discount1-info text-info d-none" data-microtip-title="Customer auto-brand discount. Sales Order (Special) Edit access is required to allow updating of discount 1" data-microtip-position="right" role="tooltip">
+                                        Discount 1
+                                        <span class="discount1-info text-info d-none" data-microtip-title="Customer auto-brand discount. Sales Order (Special) Edit access is required to allow updating of discount 1" data-microtip-position="right" role="tooltip">
                                             <span class="fas fa-info-circle"></span>
                                         </span>
                                     </label>
@@ -762,8 +794,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-discount2" class="form-label mb-0">Discount 2</label>
@@ -773,6 +803,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-discount3" class="form-label mb-0">Discount 3</label>
@@ -782,8 +814,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-discount4" class="form-label mb-0">Discount 4</label>
@@ -793,6 +823,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-discount5" class="form-label mb-0">Discount 5</label>
@@ -802,8 +834,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="add-gross-price" class="form-label mb-0">Extended Price</label>
@@ -980,274 +1010,331 @@
                 }
             });
 
-
-            function changingCustomerCode() {
-            var selectedCustomer = $("#order-customer-code").val();
-
-            var customerText = $("#order-customer-code").select2("data")[0]?.text.toLowerCase() || "";
-
-            if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer)) {
-                var changed = "Customer Code"
-
-                swal({
-                    title: "Sales Order Items not empty",
-                    text: "Changing the selected " + changed + " will clear the added items. Do you want to continue?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        swal.close();
-                        itemDT.clear().draw();
-                        clearItemForm();
-                        currentCustomer = selectedCustomer;
-
-                        $(".order-customer-name").text($("#order-customer-code").select2("data")[0].name);
-                        $(".order-customer-address").text($("#order-customer-code").select2("data")[0].address);
-                        $(".order-customer-balance").text($("#order-customer-code").select2("data")[0].outstandingBalance);
-                        $(".order-credit-term").text($("#order-customer-code").select2("data")[0].creditTerm);
-                        $(".order-region").text($("#order-customer-code").select2("data")[0].region);
-                        $(".order-customer-status").text($("#order-customer-code").select2("data")[0].customerStatus);
-
-                        if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
-                            toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
-                        }
-
-                        if ($("#order-agent-code").val() == null) {
-                            var agentId = $("#order-customer-code").select2("data")[0].agentId;
-                            var agentCode = $("#order-customer-code").select2("data")[0].agentCode;
-                            var agentName = $("#order-customer-code").select2("data")[0].agent;
-                            var agentOption = new Option(agentCode, agentId, true, true);
-                            $(agentOption).data('data', {
-                                id: agentId,
-                                text: agentCode,
-                                name: agentName
-                            });
-                            $("#order-agent-code").append(agentOption).trigger("change");
-                            $("#order-agent-name").val(agentName);
-                        }
-                    } else {
-
-                            $("#order-customer-code").val(currentCustomer).trigger("change");
-
-
-                    }
-                        });
-            } else {
-                currentCustomer = selectedCustomer;
-
-            }
-
-
-            }
-
-
             $("#order-customer-code").on("select2:select", function () {
-                changingCustomerCode();
-
-
+                changingCustomerOrDateOrder();
             });
 
-            // Load forwarder data for select2
+            $("#order-date").on("change", function() {
+                changingCustomerOrDateOrder();
+            });
+
+            var currentCustomer = so_details.customerId;
+            var currentDateOrder = so_details.orderDate3;
+            function changingCustomerOrDateOrder() {
+                var selectedCustomer = $("#order-customer-code").val() || "";
+                var selectedDateOrder = $("#order-date").val() || "";
+                console.log(currentDateOrder + " " + selectedDateOrder);
+
+                if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer || selectedDateOrder != currentDateOrder)) {
+                    var changed = selectedCustomer != currentCustomer ? "Customer Code"
+                                : selectedDateOrder != currentDateOrder ? "Sales Order Date"
+                                : "Customer Code / Sales Order Date";
+                    swal({
+                        title: "Sales Order Items not empty",
+                        text: "Changing the selected " + changed + " will clear the added items. Do you want to continue?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            swal.close();
+                            itemDT.clear().draw();
+                            clearItemForm();
+                        
+                            if (selectedCustomer != currentCustomer) {
+                                currentCustomer = selectedCustomer;
+                                LoadCustomerDetails();
+                            }
+                            if (selectedDateOrder != currentDateOrder) {
+                                currentDateOrder = selectedDateOrder;
+                            }
+                        } else {
+                            $("#order-customer-code").val(currentCustomer).trigger("change");
+                            $("#order-date").val(currentDateOrder);
+                        }
+                    });
+                } else {
+                    if (selectedCustomer != currentCustomer) {
+                        currentCustomer = selectedCustomer;
+                        LoadCustomerDetails();
+                    }
+                    if (selectedDateOrder != currentDateOrder) {
+                        currentDateOrder = selectedDateOrder;
+                    }
+                }
+            }
+        }
+
+        function LoadCustomerDetails() {
+            $(".order-customer-name").text($("#order-customer-code").select2("data")[0].name);
+            $(".order-customer-address").text($("#order-customer-code").select2("data")[0].address);
+            //$(".order-customer-balance").text($("#order-customer-code").select2("data")[0].outstandingBalance);
+            $(".order-credit-limit").text($("#order-customer-code").select2("data")[0].creditLimit);
+            $(".order-credit-term").text($("#order-customer-code").select2("data")[0].creditTerm);
+            //$(".order-region").text($("#order-customer-code").select2("data")[0].region);
+            $(".order-customer-status").text($("#order-customer-code").select2("data")[0].customerStatus);
+            $(".order-customer-priority").text($("#order-customer-code").select2("data")[0].priority);
+            $(".order-customer-branch").html($("#order-customer-code").select2("data")[0].branch || '<span class="text-muted">N/A</span>');
+
+            // if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
+            //     toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
+            // }
+
+            if ($("#order-agent-code").val() == null) {
+                var agentId = $("#order-customer-code").select2("data")[0].agentId;
+                var agentCode = $("#order-customer-code").select2("data")[0].agentCode;
+                var agentName = $("#order-customer-code").select2("data")[0].agent;
+                var agentOption = new Option(agentCode, agentId, true, true);
+                $(agentOption).data('data', {
+                    id: agentId,
+                    text: agentCode,
+                    name: agentName
+                });
+                $("#order-agent-code").append(agentOption).trigger("change");
+                $(".order-agent-name").text(agentName);
+            }
+
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetOptions", "Forwarder")",
+                url: "@Url.Action("GetOutstandingBalance", "Customer")",
+                data: { customerId: $("#order-customer-code").select2("data")[0].id },
                 success: function (data, status, xhr) {
-                    $("#order-forwarder").select2({
-                        placeholder: '<empty>',
-                        ajax: null, //already fetched outside
-                        data: data,
-                        //minimumResultsForSearch: Infinity
-                    });
+                    var balance = parseFloat(data);
+                    $("#order-customer-balance").val(FormatStringInteger(balance));
 
-                    if (so_details.forwarderId) {
-                        var exists = data.some(item => item.id == so_details.forwarderId);
+                    if (balance > 0) {
+                        toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + FormatStringInteger(balance), "Outstanding Balance");
+                    }
+                }
+            });
+        }
 
-                        if (exists) {
-                            $("#order-forwarder").val(so_details.forwarderId).trigger('change');
-                        } else {
-                            $("#order-forwarder").val(null).trigger('change');
-                        }
+        // Load forwarder data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Forwarder")",
+            success: function (data, status, xhr) {
+                $("#order-forwarder").select2({
+                    placeholder: '<empty>',
+                    ajax: null, //already fetched outside
+                    data: data,
+                    //minimumResultsForSearch: Infinity
+                });
+
+                if (so_details.forwarderId) {
+                    var exists = data.some(item => item.id == so_details.forwarderId);
+
+                    if (exists) {
+                        $("#order-forwarder").val(so_details.forwarderId).trigger('change');
                     } else {
                         $("#order-forwarder").val(null).trigger('change');
                     }
+                } else {
+                    $("#order-forwarder").val(null).trigger('change');
                 }
-            });
-
-            // Load service level agreement data for select2
-            $("#order-sla").select2({
-                minimumResultsForSearch: -1,
-                placeholder: '<empty>',
-                ajax: {
-                    url: "@Url.Action("GetOptions2", "ServiceLevelAgreement")"
-                }
-            });
-
-            // Load service level agreement data for select2
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetOptions", "DeliveryTime")",
-                data: { selectedId: so_details.withREYCOJITLPDeliveryId },
-                success: function (data, status, xhr) {
-                    $("#order-with-jitlpdelivery").select2({
-                        minimumResultsForSearch: -1,
-                        ajax: null,
-                        data: data
-                    });
-                }
-            });
-
-            var agentOption = new Option(so_details.agentCode, so_details.agentId, true, true);
-            $("#order-agent-code").append(agentOption).trigger('change');
-
-            var customerOption = new Option(so_details.customerCode, so_details.customerId, true, true);
-            $("#order-customer-code").append(customerOption).trigger('change');
-
-            // if (so_details.forwarderId) {
-            //     // var forwarderOption = new Option(so_details.forwarder, so_details.forwarderId, true, true);
-            //     // $("#order-forwarder").append(forwarderOption).trigger('change');
-            //     $("#order-forwarder").val(so_details.forwarderId);//.trigger('change');
-            // } else {
-            //     $("#order-forwarder").val(null).trigger('change');
-            // }
-
-            if (so_details.serviceLevelAgreement) {
-                var slaOption = new Option(so_details.serviceLevelAgreement, so_details.serviceLevelAgreementId, true, true);
-                $("#order-sla").append(slaOption).trigger('change');
-            } else {
-                $("#order-sla").val(null).trigger('change');
             }
+        });
 
-            $("#order-discount").val(so_details.overallDiscount);
-            $("#order-with-lp").val(so_details.withLP + "");
-            $("#order-with-nondefect").val(so_details.withREYCONonDefective + "");
+        // Load region data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#order-region").select2({
+                    minimumResultsForSearch: -1,
+                    placeholder: '<empty>',
+                    ajax: null, //already fetched outside
+                    data: data
+                });
 
-            $("#form-order button[type=submit]").on("click", function () {
-                $("#action-type").val($(this).data("action"));
-            });
+                if (so_details.regionId) {
+                    var exists = data.some(item => item.id == so_details.regionId);
 
-            // Validation for Save
-            var validateSave = $("#form-order").validate({
-                rules: {
-                    AgentCode: { required: true },
-                    CustomerCode: { required: true },
-                    Forwarder: { required: true },
-                    OrderDate: { required: true },
-                    DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" },
-                    Remarks: { maxlength: 500 },
-                    Instruction: { maxlength: 250 },
-                    SLA: { required: true }
-                },
-                messages: {
-                    AgentCode: { required: "Please select agent" },
-                    CustomerCode: { required: "Please select customer" },
-                    Forwarder: { required: "Please select forwarder" },
-                    OrderDate: { required: "Please select date of order" },
-                    DeliveryDate: {
-                        required: "Please select date of delivery",
-                        greaterThanOrEqualDate: "Required delivery date must be on or after the order date"
-                    },
-                    Remarks: { maxlength: "Remarks must not exceed 500 characters." },
-                    Instruction: { maxlength: "Remarks must not exceed 250 characters." },
-                    SLA: { required: "Please select sla" }
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    SaveOrder();
+                    if (exists) {
+                        $("#order-region").val(so_details.regionId).trigger('change');
+                    } else {
+                        $("#order-region").val(null).trigger('change');
+                    }
+                } else {
+                    $("#order-region").val(null).trigger('change');
                 }
-            });
+            }
+        });
 
-            function GetBrandDiscount(brandId){
-                var custId = currentCustomer;
-                if (!custId) return;
-                var brandDiscountId = 0;
+        // Load service level agreement data for select2
+        $("#order-sla").select2({
+            minimumResultsForSearch: -1,
+            placeholder: '<empty>',
+            ajax: {
+                url: "@Url.Action("GetOptions2", "ServiceLevelAgreement")"
+            }
+        });
 
-                $.ajax({
-                    url: "@Url.Action("GetBrandDiscount")",
-                    type: "POST",
-                    data: { customerId: custId, brandId: brandId }, // This sends id as a query parameter
-                    success: function (data) {
-                        if(Object.keys(data).length == 0){
-                            $("#add-discount1").val("0.00");
+        // Load service level agreement data for select2
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "DeliveryTime")",
+            data: { selectedId: so_details.withREYCOJITLPDeliveryId },
+            success: function (data, status, xhr) {
+                $("#order-with-jitlpdelivery").select2({
+                    minimumResultsForSearch: -1,
+                    ajax: null,
+                    data: data
+                });
+            }
+        });
+
+        var agentOption = new Option(so_details.agentCode, so_details.agentId, true, true);
+        $("#order-agent-code").append(agentOption).trigger('change');
+
+        var customerOption = new Option(so_details.customerCode, so_details.customerId, true, true);
+        $("#order-customer-code").append(customerOption).trigger('change');
+
+        // if (so_details.forwarderId) {
+        //     // var forwarderOption = new Option(so_details.forwarder, so_details.forwarderId, true, true);
+        //     // $("#order-forwarder").append(forwarderOption).trigger('change');
+        //     $("#order-forwarder").val(so_details.forwarderId);//.trigger('change');
+        // } else {
+        //     $("#order-forwarder").val(null).trigger('change');
+        // }
+
+        if (so_details.serviceLevelAgreement) {
+            var slaOption = new Option(so_details.serviceLevelAgreement, so_details.serviceLevelAgreementId, true, true);
+            $("#order-sla").append(slaOption).trigger('change');
+        } else {
+            $("#order-sla").val(null).trigger('change');
+        }
+
+        $("#order-discount").val(so_details.overallDiscount);
+        $("#order-with-lp").val(so_details.withLP + "");
+        $("#order-with-nondefect").val(so_details.withREYCONonDefective + "");
+
+        $("#form-order button[type=submit]").on("click", function () {
+            $("#action-type").val($(this).data("action"));
+        });
+
+        // Validation for Save
+        var validateSave = $("#form-order").validate({
+            rules: {
+                AgentCode: { required: true },
+                CustomerCode: { required: true },
+                Forwarder: { required: true },
+                OrderDate: { required: true },
+                DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" },
+                Remarks: { maxlength: 500 },
+                Instruction: { maxlength: 250 },
+                SLA: { required: true }
+            },
+            messages: {
+                AgentCode: { required: "Please select agent" },
+                CustomerCode: { required: "Please select customer" },
+                Forwarder: { required: "Please select forwarder" },
+                OrderDate: { required: "Please select date of order" },
+                DeliveryDate: {
+                    required: "Please select date of delivery",
+                    greaterThanOrEqualDate: "Required delivery date must be on or after the order date"
+                },
+                Remarks: { maxlength: "Remarks must not exceed 500 characters." },
+                Instruction: { maxlength: "Remarks must not exceed 250 characters." },
+                SLA: { required: "Please select sla" }
+            },
+            submitHandler: function (form, event) {
+                event.preventDefault();
+                SaveOrder();
+            }
+        });
+
+        function GetBrandDiscount(brandId){
+            var custId = currentCustomer;
+            if (!custId) return;
+            var brandDiscountId = 0;
+
+            $.ajax({
+                url: "@Url.Action("GetBrandDiscount")",
+                type: "POST",
+                data: { customerId: custId, brandId: brandId }, // This sends id as a query parameter
+                success: function (data) {
+                    if(Object.keys(data).length == 0){
+                        $("#add-discount1").val("0.00");
+                        $('#add-discount1').prop('readonly', false);
+                        $('.discount1-info').addClass('d-none');
+                    } else{
+                        $("#add-discount1").val(Round2Decimal(data[0].discount));
+                        $("#add-discount-id").val(data[0].id);
+
+                        $('#add-discount1').prop('readonly', true);
+                        $('.discount1-info').removeClass('d-none');
+
+                        brandDiscountId = data[0].id;
+
+                        if( user_access_special.canEdit || brandDiscountId == 0 || brandDiscountId == null )
+                        {
                             $('#add-discount1').prop('readonly', false);
                             $('.discount1-info').addClass('d-none');
-                        } else{
-                            $("#add-discount1").val(Round2Decimal(data[0].discount));
-                            $("#add-discount-id").val(data[0].id);
+                        }
 
-                            $('#add-discount1').prop('readonly', true);
-                            $('.discount1-info').removeClass('d-none');
+                        var quantity = parseFloat($("#add-quantity").val());
+                        var unit_price = parseFloat($("#add-unit-price").val());
+                        var discount1 = parseFloat($("#add-discount1").val());
+                        var discount2 = parseFloat($("#add-discount2").val());
+                        var discount3 = parseFloat($("#add-discount3").val());
+                        var discount4 = parseFloat($("#add-discount4").val());
+                        var discount5 = parseFloat($("#add-discount5").val());
 
-                            brandDiscountId = data[0].id;
+                        var grossprice = quantity * unit_price;
+                        var discounted1 = grossprice * (100 - discount1) / 100;
+                        var discounted2 = discounted1 * (100 - discount2) / 100;
+                        var discounted3 = discounted2 * (100 - discount3) / 100;
+                        var discounted4 = discounted3 * (100 - discount4) / 100;
+                        var discounted5 = discounted4 * (100 - discount5) / 100;
+                        $("#add-gross-price").val(Round2Decimal(discounted5));
+                    }
+                }
+            });
+        }
 
-                            if( user_access_special.canEdit || brandDiscountId == 0 || brandDiscountId == null )
-                            {
-                                $('#add-discount1').prop('readonly', false);
-                                $('.discount1-info').addClass('d-none');
-                            }
-
-                            var quantity = parseFloat($("#add-quantity").val());
-                            var unit_price = parseFloat($("#add-unit-price").val());
-                            var discount1 = parseFloat($("#add-discount1").val());
-                            var discount2 = parseFloat($("#add-discount2").val());
-                            var discount3 = parseFloat($("#add-discount3").val());
-                            var discount4 = parseFloat($("#add-discount4").val());
-                            var discount5 = parseFloat($("#add-discount5").val());
-
-                            var grossprice = quantity * unit_price;
-                            var discounted1 = grossprice * (100 - discount1) / 100;
-                            var discounted2 = discounted1 * (100 - discount2) / 100;
-                            var discounted3 = discounted2 * (100 - discount3) / 100;
-                            var discounted4 = discounted3 * (100 - discount4) / 100;
-                            var discounted5 = discounted4 * (100 - discount5) / 100;
-                            $("#add-gross-price").val(Round2Decimal(discounted5));
+        function SaveOrder() {
+            var itemsToReplenish = GetItemsToOrder();
+            var total_gross_price = 0
+            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",", ""));
+            });
+            if (itemsToReplenish.length == 0) {
+                toastr.warning("No item to replenish. Add an item to the list to continue", "Warning");
+            } else if (total_gross_price < parseFloat($("#order-discount").val())) {
+                toastr.warning("Overall discount cannot be higher than total extended price", "Warning");
+            } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
+                toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveJson")",
+                    data: {
+                        Id: so_details.id,
+                        Agent: $("#order-agent-code").val(),
+                        Customer: $("#order-customer-code").val(),
+                        DeliveryDate: $("#order-delivery-date").val(),
+                        Forwarder: $("#order-forwarder").val(),
+                        Region: $("#order-region").val(),
+                        Remarks: $("#order-remarks").val(),
+                        OrderDate: $("#order-date").val(),
+                        SericeLevelAgreement: $("#order-sla").val(),
+                        OverallDiscount: $("#order-discount").val(),
+                        WithLP: $("#order-with-lp").val(),
+                        WithREYCONonDefective: $("#order-with-nondefect").val(),
+                        WithREYCOJITLPDelivery: $("#order-with-jitlpdelivery").val(),
+                        SpecialInstruction: $("#order-instruction").val(),
+                        Status: $("#action-type").val(),
+                        Items: itemsToReplenish
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            window.location.reload();
                         }
                     }
                 });
-            }
-
-            function SaveOrder() {
-                var itemsToReplenish = GetItemsToOrder();
-                var total_gross_price = 0
-                itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    total_gross_price += parseFloat($(this.node()).find(".grossprice").html().replace(",", ""));
-                });
-                if (itemsToReplenish.length == 0) {
-                    toastr.warning("No item to replenish. Add an item to the list to continue", "Warning");
-                } else if (total_gross_price < parseFloat($("#order-discount").val())) {
-                    toastr.warning("Overall discount cannot be higher than total extended price", "Warning");
-                } else if (itemsToReplenish.filter(s => parseInt(s.quantity) === 0).length > 0) {
-                    toastr.warning("Some items have 0 quantity. Can't replenish an item with 0 quantity", "Warning");
-                } else {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("SaveJson")",
-                        data: {
-                            Id: so_details.id,
-                            Agent: $("#order-agent-code").val(),
-                            Customer: $("#order-customer-code").val(),
-                            DeliveryDate: $("#order-delivery-date").val(),
-                            Forwarder: $("#order-forwarder").val(),
-                            Remarks: $("#order-remarks").val(),
-                            OrderDate: $("#order-date").val(),
-                            SericeLevelAgreement: $("#order-sla").val(),
-                            OverallDiscount: $("#order-discount").val(),
-                            WithLP: $("#order-with-lp").val(),
-                            WithREYCONonDefective: $("#order-with-nondefect").val(),
-                            WithREYCOJITLPDelivery: $("#order-with-jitlpdelivery").val(),
-                            SpecialInstruction: $("#order-instruction").val(),
-                            Status: $("#action-type").val(),
-                            Items: itemsToReplenish
-                        },
-                        success: function (data, status, xhr) {
-                            if (data.status == "Error") {
-                                toastr.error(data.message, "Error");
-                            } else {
-                                window.location.reload();
-                            }
-                        }
-                    });
-                }
             }
         }
 
@@ -1286,7 +1373,6 @@
         });
 
         $("#add-code").on("select2:select", function () {
-
             $("#add-name").val($("#add-code").select2("data")[0].name);
             var itemname = $("#add-name").val();
             $('#add-unit-price').prop('readonly', false);
@@ -1312,6 +1398,7 @@
 
             $("#add-unit").val($("#add-code").select2("data")[0].unit);
             $(".add-inventory").text($("#add-code").select2("data")[0].inventoryCount);
+            $("#add-allocated-quantity").val($("#add-code").select2("data")[0].allocatedQuantity);
             $("#add-quantity").val("1");
             $("#add-code-error").html("");
 
@@ -1323,6 +1410,7 @@
             $(".add-price-source").text("");
             $("#add-unit").val("");
             $(".add-inventory").text("0");
+            $("#add-allocated-quantity").text("0");
             $("#add-quantity").val("0");
             $("#add-gross-price").val("0.00");
         });
@@ -1351,6 +1439,7 @@
             $("#add-unit-price").val("0.00");
             $(".add-price-source").text("");
             $("#add-quantity").val("0");
+            $("#add-allocated-quantity").val("0");
             $("#add-unit").val("");
             $(".add-inventory").text("0");
             $("#add-discount1").val("0.00");
@@ -1361,7 +1450,19 @@
             $("#add-gross-price").val("0.00");
         }
 
-        $(".createBtn").on("click", clearItemForm);
+        $(".createBtn").on("click", function() {
+            if($("#order-date").val() == "") {
+                swal({
+                    title: "Sales Order Item",
+                    text: "Please select date ordered to continue selecting an item",
+                    icon: "warning",
+                    button: "OK"
+                });
+            } else {
+                clearItemForm();
+                $("#addModal").modal("show");
+            }
+        });
 
         // Validation for Add Item Modal
         var validateAdd = $("#form-item").validate({
@@ -1393,11 +1494,13 @@
                 toastr.warning($("#add-code").select2("data")[0].text + " has already been added", "Duplicate");
             } else {
                 itemDT.row.add({
+                    sellingPriceD: $("#add-allocated-quantity").val() || 0,
                     itemId: $("#add-code").select2("data")[0].id,
                     lineNumber: itemDT.data().length == 0 ? 1 : (Math.max.apply(Math, itemDT.column(1).data().toArray()) + 1),
                     itemCode: $("#add-code").select2("data")[0].text,
                     itemName: $("#add-code").select2("data")[0].name + ($("#add-code").select2("data")[0].itemPromoName == "" ? "": " ("+$("#add-code").select2("data")[0].itemPromoName+")" ),
                     inventoryCount: $("#add-code").select2("data")[0].inventoryCount,
+                    allocatedQuantity: $("#add-code").select2("data")[0].allocatedQuantity,
                     quantity: Round2Decimal($("#add-quantity").val() || 0),
                     quantityD: $("#add-quantity").val() || 0,
                     unit: $("#add-code").select2("data")[0].unit,
@@ -1493,6 +1596,15 @@
                             + (data.inventoryCount == 0 ? "</span>" : "");
                     },
                     name: "InventoryCount",
+                    className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return (data.allocatedQuantityD == 0 ? "<span class='text-muted'>" : "")
+                            + data.allocatedQuantity
+                            + (data.allocatedQuantityD == 0 ? "</span>" : "");
+                    },
+                    name: "AllocatedQuantity",
                     className: "form-cell text-end"
                 },
                 {
@@ -1599,14 +1711,14 @@
                 var api = this.api(), data;
 
                 columnDTTotalInteger(api, 2);
-                columnDTTotalInteger(api, 10);
                 columnDTTotalInteger(api, 11);
+                columnDTTotalInteger(api, 12);
 
-                var totalprice = api.column(9).data().reduce(function (a, b) {
+                var totalprice = api.column(10).data().reduce(function (a, b) {
                     return cellDTNumberValue(a) + cellDTNumberValue(b);
                 }, 0);
                 totalprice -= so_details.overallDiscountD;
-                $(api.column(9).footer()).html(FormatStringDecimal(totalprice));
+                $(api.column(10).footer()).html(FormatStringDecimal(totalprice));
             }
         });
 
@@ -1614,9 +1726,9 @@
             //if (so_details.status.toLowerCase().includes("submitted")) {
             if (so_details.status.toLowerCase().includes("draft")) {
                 itemDT.column(0).visible(true); // remove button
-                itemDT.column(10).visible(false); // served quantity
-                itemDT.column(11).visible(false); // unserved quantity
-                itemDT.column(12).visible(false); // update served quantity button
+                itemDT.column(11).visible(false); // served quantity
+                itemDT.column(12).visible(false); // unserved quantity
+                itemDT.column(13).visible(false); // update served quantity button
             // } else if (so_details.status.toLowerCase().includes("approved")) {
             //     itemDT.column(0).visible(false);
             //     itemDT.column(11).visible(true);
@@ -1624,9 +1736,9 @@
             //     itemDT.column(13).visible(false);//true dati
             } else {
                 itemDT.column(0).visible(false);
-                itemDT.column(10).visible(true);//false dati
                 itemDT.column(11).visible(true);//false dati
-                itemDT.column(12).visible(false);
+                itemDT.column(12).visible(true);//false dati
+                itemDT.column(13).visible(false);
             }
 
             //hideLoader();

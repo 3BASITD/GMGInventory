@@ -18,7 +18,7 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.OrderRecommendation, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesInvoice)).Convert();
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.OrderRecommendation)).Convert();
             ViewData["PurchaseHistory"] = await orderRepository.GetPurchaseHistories();
             ViewData["IssuanceHistory"] = await orderRepository.GetIssuanceHistories();
 

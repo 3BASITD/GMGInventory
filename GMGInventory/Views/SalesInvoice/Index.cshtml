@@ -11,6 +11,9 @@
         <div class="card-tools">
             @if (hashMicroUserAccess.CanUploadDownload)
             {
+                <button class="btn btn-dark text-light btn-sm float-right ml-2" onclick="MoveAllMarkedToHashMicro()">
+                    <span class="fas fa-upload"></span> Move All Marked to HashMicro
+                </button>
                 <button class="btn btn-light text-dark btn-sm float-right ml-2" onclick="MoveAllToHashMicro()">
                     <span class="fas fa-upload"></span> Move All to HashMicro
                 </button>
@@ -127,8 +130,8 @@
                 Your filter, sort, and search will be saved for 1 hour
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btnReset"><span class="fas fa-undo"></span> Reset to Default</button>
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -197,29 +200,106 @@
             </div>
         </div>
     </div>
+    
+    <div class="modal fade" id="markedHMModal" role="dialog" data-bs-keyboard="false" data-bs-backdrop="static" aria-hidden="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Move Marked Invoice(s) to HashMicro</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label class="text-md mb-3">Move <span class="marked-count"></span> marked invoice(s) to HashMicro. Are you sure you want to continue?</label>
+                    <table class="table-marked" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Invoice Number</th>
+                                <th>Invoice Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="MoveMarked()"><span class="fas fa-upload"></span> Move All Marked</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @section Scripts {
     <script>
         var hashmicro_user_access = @Html.Raw(Json.Serialize(hashMicroUserAccess));
-
+        
+        var moveState = {};
         var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
         var dt_duration = 3600000; // 1 hour
 
-        $(".btnFilter").on("click", function () {
+        function ApplyFilter() {
+            if (Object.keys(moveState).length == 0) {
+                DoApplyFilter();
+            } else {
+                swal({
+                    title: "Selection Resets on Filter",
+                    text: "Some invoice are already marked to move; applying a filter will clear the marked invoice. Are you sure you want to continue?",
+                    icon: "info",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        moveState = {};
+                        DoApplyFilter();
+                    }
+                });
+            }
+        }
+
+        function DoApplyFilter() {
             $("#filterModal").modal("hide");
             invoiceDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
                 checkDefaultFilter();
             });
-        });
+        }
 
-        $(".btnReset").on("click", function () {
+        function ResetFilter() {
+            if (Object.keys(moveState).length == 0) {
+                DoResetFilter();
+            } else {
+                swal({
+                    title: "Selection Resets on Filter",
+                    text: "Some invoice are already marked to move; applying a filter will clear the marked invoice. Are you sure you want to continue?",
+                    icon: "info",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        moveState = {};
+                        DoResetFilter();
+                    }
+                });
+            }
+        }
+
+        function DoResetFilter() {
             $("#filterModal").modal("hide");
             resetToDefaultDTFilter();
             invoiceDT.ajax.reload(() => {
                 checkDefaultFilter();
             });
-        });
+        }
 
         var defaultDTState = {
             order: [[0, "desc"]],
@@ -361,12 +441,17 @@
                     orderable: false,
                     data: function (data, type, dataToSet) {
                         var actions = '<div class="btn-group" role="group">';
-                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
+                        actions += '<a class="btn btn-info btn-xs" asp-action="Details" href="@Url.Action("Details")/' + data.id + '" data-microtip-title="View Details" data-microtip-position="left" role="tooltip"><span class="fas fa-info-circle"></span></a>';
                         if (hashmicro_user_access.canUploadDownload && (data.status.toLowerCase() == "draft" || data.status.toLowerCase() == "invoiced")) {
                             if(data.hashMicroMoveId) {
-                                actions += '<button type="button" class="btn btn-secondary btn-xs" onclick="ViewHashMicro(this)" data-microtip-title="Already on HashMicro" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-cloud"></span></button>';
+                                actions += '<button type="button" class="btn btn-secondary btn-xs" onclick="ViewHashMicro(this)" data-microtip-title="Already on HashMicro" data-microtip-position="left" role="tooltip"><span class="fas fa-cloud"></span></button>';
                             } else {
-                                actions += '<button type="button" class="btn  btn-light text-dark btn-xs" onclick="MoveToHashMicro(this)" data-microtip-title="Move to HashMicro" data-microtip-position="bottom-left" role="tooltip"><span class="fas fa-upload"></span></button>';
+                                actions += '<button type="button" class="btn btn-light text-dark btn-xs" onclick="MoveToHashMicro(this)" data-microtip-title="Move to HashMicro" data-microtip-position="left" role="tooltip"><span class="fas fa-upload"></span></button>';
+                                if(moveState[data.id]) {
+                                    actions += '<button type="button" class="btn btn-dark text-light btn-xs" onclick="MarkToHashMicro(this)" data-microtip-title="Unmark to Move to HashMicro" data-microtip-position="left" role="tooltip"><span class="fas fa-check-square"></span></button>';
+                                } else {
+                                    actions += '<button type="button" class="btn btn-light text-dark btn-xs checked" onclick="MarkToHashMicro(this)" data-microtip-title="Mark to Move to HashMicro" data-microtip-position="left" role="tooltip"><span class="fas fa-square"></span></button>';
+                                }
                             }
                         }
                         return actions + "</div>";
@@ -432,7 +517,8 @@
                                 var success_ctr = 0;
                                 $("table.table-moveall tbody").html("");
                                 $.each(data, function (i, v) {
-                                    $("table.table-moveall tbody").append(`<tr><td>${v.newRow}</td><td>${v.message}</td></tr>`);
+                                    var jsonstr = JSON.parse(v.newRow);
+                                    $("table.table-moveall tbody").append(`<tr><td>Invoice Number: ${v.jsonstr.InvoiceNumber}<br />Move Name: ${v.jsonstr.HashMicroMoveName}</td><td>${v.message}</td></tr>`);
                                     success_ctr++;
                                 });
                                 if(success_ctr > 0) {
@@ -448,8 +534,9 @@
             }
 
             function MoveToHashMicro(invoice) {
-                var row = $(invoice).parents("tr");
-                var rowData = invoiceDT.row(row).data();
+                var tr = $(invoice).parents("tr");
+                var row = invoiceDT.row(tr);
+                var rowData = row.data();
 
                 swal({
                     title: "Move to HashMicro",
@@ -474,13 +561,91 @@
                             },
                             success: function (data, status, xhr) {
                                 if (data.status == "Success") {
-                                    invoiceDT.ajax.reload();
-                                    toastr.success(data.message, data.status);
+                                    var jsonstr = JSON.parse(v.newRow);
+                                    rowData.hashMicroMoveId = jsonstr.HashMicroMoveId;
+                                    rowData.hashMicroMoveName = jsonstr.HashMicroMoveName;
+                                    rowData.hashMicroMoveStatus = jsonstr.HashMicroMoveStatus;
+                                    rowData.hashMicroMoveBy = jsonstr.HashMicroMoveBy;
+                                    rowData.hashMicroMoveDate = jsonstr.HashMicroMoveDate;
+                                    
+                                    row.data(rowData).draw(false);
                                 } else {
                                     toastr.error(data.message, data.status);
                                 }
                             }
                         });
+                    }
+                });
+            }
+
+            function MarkToHashMicro(elem) {
+                var tr = $(elem).closest('tr');
+                var row = invoiceDT.row(tr);
+                var rowData = row.data();
+
+                var isChecked = $(elem).hasClass("checked");
+                if (isChecked) {
+                    moveState[rowData.id] = {
+                        invoiceDate: rowData.invoiceDate,
+                        invoiceNumber: rowData.invoiceNumber,
+                        status: rowData.status,
+                        totalAmount: rowData.totalAmount
+                    };
+                } else {
+                    delete moveState[rowData.id];
+                }
+            
+                row.invalidate();
+            }
+
+            function MoveAllMarkedToHashMicro() {
+                if (Object.keys(moveState).length == 0) {
+                    swal({
+                        title: "Move Marked Invoice(s) to HashMicro",
+                        text: "Please mark at least one invoice to move to HashMicro before continuing",
+                        icon: "warning",
+                        button: "OK"
+                    });
+                } else {
+                    var markedHtml = "";
+                    Object.keys(moveState).forEach(function (ms) {
+                        var markedData = moveState[ms];
+                        markedHtml += `<tr>
+                                           <td>${markedData.invoiceNumber}</td>
+                                           <td>${markedData.invoiceDate}</td>
+                                           <td>${markedData.status}</td>
+                                           <td class='text-end'>${markedData.totalAmount}</td>
+                                       </tr>`;
+                    });
+                    $(".marked-count").text(Object.keys(moveState).length);
+                    $(".table-marked tbody").html(markedHtml);
+                    $("#markedHMModal").modal("show");
+                }
+            }
+
+            function MoveMarked() {
+                $("#markedHMModal").modal("hide");
+                $.ajax({
+                    url: "@Url.Action("MoveSelectedToHashMicro", "SalesInvoice")",
+                    type: "POST",
+                    data: {
+                        Ids: Object.keys(moveState)
+                    },
+                    loaderMessage: "Please wait while this completes.<br><small class=\"text-muted\">Reloading the page will stop the process, so some records may be saved while others are not.</small>",
+                    success: function (data, status, xhr) {
+                        var success_ctr = 0;
+                        $("table.table-moveall tbody").html("");
+                        $.each(data, function (i, v) {
+                            var jsonstr = JSON.parse(v.newRow);
+                            $("table.table-moveall tbody").append(`<tr><td>Invoice Number: ${v.jsonstr.InvoiceNumber}<br />Move Name: ${v.jsonstr.HashMicroMoveName}</td><td>${v.message}</td></tr>`);
+                            success_ctr++;
+                        });
+                        if(success_ctr > 0) {
+                            invoiceDT.ajax.reload();
+                        } else {
+                            $("table.table-moveall tbody").append(`<tr><td colspan="2" class="text-center text-muted"><em>Nothing was moved</em></td></tr>`);
+                        }
+                        $("#viewAllHMModal").modal("show");
                     }
                 });
             }

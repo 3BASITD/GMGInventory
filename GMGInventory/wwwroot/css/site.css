@@ -1122,3 +1122,49 @@ a[target="_blank"]:hover::after {
 .card-body:-webkit-full-screen .btn-group .btn {
     padding: 5px 20px;
 }
+
+.accordion-button.collapsed {
+    padding: .5rem 1.25rem;
+}
+
+.accordion-button {
+    padding: 1rem 1.25rem;
+}
+
+.dark-mode .accordion-item {
+    background-color: #3a4047;
+    border: 1px solid #495057;
+}
+
+.dark-mode .accordion-button {
+    background-color: #3a4047;
+    color: #f8f9fa;
+    box-shadow: none;
+}
+
+    .dark-mode .accordion-button:hover {
+        background-color: #454d55;
+    }
+
+    .dark-mode .accordion-button:not(.collapsed) {
+        background-color: #495057;
+        color: #ffffff;
+    }
+
+    .dark-mode .accordion-button:focus {
+        box-shadow: none;
+        border-color: #6c757d;
+    }
+
+.dark-mode .accordion-body {
+    background-color: #343a40;
+    color: #f8f9fa;
+}
+
+.dark-mode .accordion {
+    border-color: #495057;
+}
+
+.dark-mode .accordion-button::after {
+    filter: invert(1);
+}

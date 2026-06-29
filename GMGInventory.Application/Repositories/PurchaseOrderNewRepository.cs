@@ -275,7 +275,7 @@ namespace GMGInventory.Application.Repositories
                          && order.Status.Code.ToLower() != "draft"
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.Trim().ToLower().Contains(search.Trim().ToLower())))
-                         && (regionId == null || order.Customer.Area.Region.Id == regionId)
+                         && (regionId == null || order.Region.Id == regionId)
                          //&& oli.Any(s => s.Quantity > s.Stock)
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
@@ -292,7 +292,7 @@ namespace GMGInventory.Application.Repositories
                              SalesOrderDateD = order.SalesOrderDate,
                              PurchaseOrder = order.PurchaseOrder,
                              ForwarderName = order.Forwarder != null ? order.Forwarder.Name : null,
-                             RegionId = order.Customer.Area.RegionId
+                             RegionId = order.RegionId
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>

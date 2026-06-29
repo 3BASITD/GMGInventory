@@ -198,5 +198,13 @@ namespace GMGInventory.Controllers
 
             return Json(await apiHMService.MoveAllPostedSalesInvoice(DateFrom, DateTo, apiHMOptions.Value.Host, apiHMOptions.Value.User, apiHMOptions.Value.Password));
         }
+
+        public async Task<IActionResult> MoveSelectedToHashMicro(List<int> Ids)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.HashMicroInvoice, AccessTypes.UploadDownload);
+            if (redirectResult != null) return redirectResult;
+
+            return Json(await apiHMService.MoveAllSelectedSalesInvoice(Ids, apiHMOptions.Value.Host, apiHMOptions.Value.User, apiHMOptions.Value.Password));
+        }
     }
 }

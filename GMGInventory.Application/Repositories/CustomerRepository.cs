@@ -128,65 +128,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetByAgentOptions(string search, int page, int? agent)
         {
-            var customerInvoices = from inv in context.InvoiceLineItems
-                                   where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
-                                                                       equals new { oli.SalesOrderId, oli.ItemId }
-                                   let discount1 = (100 - oli.Discount1) / 100
-                                   let discount2 = (100 - oli.Discount2) / 100
-                                   group new { inv.Quantity, inv.UnitPrice, discount1, discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
-                                   select new
-                                   {
-                                       CustomerId = g.Key,
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2)) ?? 0
-                                   };
-
-            var customerPayments = from pay in context.CustomerPaymentDetails
-                                   where (pay.Invoice.Status.Code.Trim().ToLower() == "invoiced" || pay.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                   group pay by pay.Invoice.SalesOrder.Customer.Id into g
-                                   select new
-                                   {
-                                       CustomerId = g.Key,
-                                       PaymentAmount = g.Sum(s => (decimal?)(s.PaidAmount) ?? 0)
-                                   };
-
-            var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
-                                       where (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                       group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
-                                       select new
-                                       {
-                                           CustomerId = g.Key,
-                                           SalesReturnAmount = g.Sum(s => (decimal?)(s.SalesReturnLineItem.Quantity
-                                                                        * s.SalesReturnLineItem.SellingPrice
-                                                                        * (100 - s.SalesReturnLineItem.Discount1) / 100
-                                                                        * (100 - s.SalesReturnLineItem.Discount2) / 100)) ?? 0
-                                       };
-
-            var customerSOACR = from s in context.SOACRLineItems
-                                where (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                group s by s.Invoice.SalesOrder.Customer.Id into g
-                                select new
-                                {
-                                    CustomerId = g.Key,
-                                    CreditMemoAmount = g.Sum(s => (decimal?)s.CreditAmount) ?? 0,
-                                    DebitMemoAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
-                                    FreightAmount = g.Sum(s => (decimal?)s.FreightCost) ?? 0
-                                };
-
-
             var customers = from customer in context.Customers
-                            let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
-                                                                .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
-                            let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
-                                                                .Sum(s => (decimal?)s.PaymentAmount) ?? 0
-                            let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
-                                                                        .Sum(s => (decimal?)s.SalesReturnAmount) ?? 0
-                            let creditAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
-                                                            .Sum(s => (decimal?)s.CreditMemoAmount) ?? 0
-                            let debitAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
-                                                           .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
-                            let freightAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
-                                                             .Sum(s => (decimal?)s.FreightAmount) ?? 0
                             where (string.IsNullOrWhiteSpace(search)
                             || customer.Code.ToLower().Contains(search.ToLower())
                             || customer.Name.ToLower().Contains(search.ToLower()))
@@ -203,15 +145,12 @@ namespace GMGInventory.Application.Repositories
                                                   .Select(s => s.Address)
                                                   .FirstOrDefault() ?? "N/A",
                                 CreditTerm = customer.CreditTerm.Name,
+                                CreditLimitD = customer.CreditLimit,
+                                PriorityD = customer.Priority,
+                                Branch = customer.Branch + "",
                                 Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
                                 AgentCode = customer.Agent.Code,
                                 AgentId = customer.Agent.Id,
-                                OutstandingBalanceD = invoiceAmount
-                                                    - paymentAmount
-                                                    - salesReturnAmount
-                                                    - creditAmount
-                                                    + debitAmount
-                                                    + freightAmount,
                                 CustomerStatus = customer.CustomerAccountStatus.Name,
                                 Region = customer.Area.Region.Name
                             };
@@ -225,6 +164,47 @@ namespace GMGInventory.Application.Repositories
                 items = customersFiltered,
                 total_count = customersList.Count
             };
+        }
+
+        public async Task<decimal> GetOutstandingBalance(int CustomerId)
+        {
+            var invoiceAmount = await (from inv in context.InvoiceLineItems
+                                       where inv.Invoice.SalesOrder.Customer.Id == CustomerId
+                                       && (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
+                                       join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
+                                                                           equals new { oli.SalesOrderId, oli.ItemId }
+                                       let discount1 = (100 - oli.Discount1) / 100
+                                       let discount2 = (100 - oli.Discount2) / 100
+                                       select inv.Quantity * inv.UnitPrice * discount1 * discount2).SumAsync();
+
+            var paymentAmount = await (from pay in context.CustomerPaymentDetails
+                                       where pay.Invoice.SalesOrder.Customer.Id == CustomerId
+                                       && (pay.Invoice.Status.Code.Trim().ToLower() == "invoiced" || pay.Invoice.Status.Code.Trim().ToLower() == "draft")
+                                       select pay.PaidAmount).SumAsync();
+
+            var salesReturnAmount = await (from tbr in context.SOACRLineItemTBRs
+                                           where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id == CustomerId
+                                           && (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
+                                           select tbr.SalesReturnLineItem.Quantity
+                                                * tbr.SalesReturnLineItem.SellingPrice
+                                                * (100 - tbr.SalesReturnLineItem.Discount1) / 100
+                                                * (100 - tbr.SalesReturnLineItem.Discount2) / 100).SumAsync();
+
+            var customerSOACR = from s in context.SOACRLineItems
+                                where s.Invoice.SalesOrder.Customer.Id == CustomerId
+                                && (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft")
+                                select new
+                                {
+                                    s.CreditAmount,
+                                    s.DebitAmount,
+                                    s.FreightCost
+                                };
+
+            var creditAmount = await customerSOACR.Select(s => s.CreditAmount).SumAsync();
+            var debitAmount = await customerSOACR.Select(s => s.DebitAmount).SumAsync();
+            var freightAmount = await customerSOACR.Select(s => s.FreightCost).SumAsync();
+
+            return invoiceAmount - paymentAmount - salesReturnAmount - creditAmount + debitAmount + freightAmount;
         }
 
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptionsWithOrder(string search, int page)

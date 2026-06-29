@@ -1,4 +1,5 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Math;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
@@ -208,8 +209,15 @@ namespace GMGInventory.Application.Services
 
                 context.Invoices.Update(invoiceUpdate);
                 await context.SaveChangesAsync(currentUserId);
-
-                return new ResponseModel<string> { Status = "Success", Message = "HashMicro: " + successResponse.message, NewRow = "Invoice Number: " + invoice.InvoiceNumber + "<br>Move Name: " + successResponse.move_name };
+                var jsonstr = JsonSerializer.Serialize(new {
+                    invoice.InvoiceNumber,
+                    invoiceUpdate.HashMicroMoveId,
+                    invoiceUpdate.HashMicroMoveName, 
+                    invoiceUpdate.HashMicroMoveStatus,
+                    invoiceUpdate.HashMicroMoveById, 
+                    invoiceUpdate.HashMicroMoveDate 
+                }, jsonOptions);
+                return new ResponseModel<string> { Status = "Success", Message = "HashMicro: " + successResponse.message, NewRow = jsonstr };
             }
         }
 
@@ -232,6 +240,33 @@ namespace GMGInventory.Application.Services
                                         .Include(s => s.Pack).ThenInclude(s => s.SalesOrder).ThenInclude(s => s.Customer)
                                         .Include(s => s.InvoiceLineItems).ThenInclude(s => s.Item)
                                         .ToListAsync();
+
+            return await MoveAllSelectedSalesInvoice(invoices, Host, access);
+        }
+
+        public async Task<IList<ResponseModel<string>>> MoveAllSelectedSalesInvoice(List<int> Ids, string Host, string User, string Password)
+        {
+            var access = await AccessAsync(Host, User, Password);
+
+            if (access == null)
+                return new List<ResponseModel<string>> { new ResponseModel<string> { Status = "Error", Message = "Cannot make connection to Hash Micro", NewRow = "HashMicro Access" } };
+
+            if (access.Status == "Error")
+                return new List<ResponseModel<string>> { new ResponseModel<string> { Status = access.Status, Message = access.Message, NewRow = "HashMicro Access" } };
+
+            var invoices = await context.Invoices
+                                        .Where(s => Ids.Contains(s.Id))
+                                        .Include(s => s.Status)
+                                        .Include(s => s.Pack).ThenInclude(s => s.SalesOrder).ThenInclude(s => s.Customer)
+                                        .Include(s => s.InvoiceLineItems).ThenInclude(s => s.Item)
+                                        .ToListAsync();
+
+            return await MoveAllSelectedSalesInvoice(invoices, Host, access);
+        }
+
+        private async Task<IList<ResponseModel<string>>> MoveAllSelectedSalesInvoice(List<Invoice> invoices, string Host, ResponseModel<APIHM_AccessTokenResponse> access)
+        {
+            var responses = new List<ResponseModel<string>>();
             foreach (var invoice in invoices)
             {
                 var invoiceMoving = new
@@ -293,7 +328,18 @@ namespace GMGInventory.Application.Services
                     context.Invoices.Update(invoiceUpdate);
                     await context.SaveChangesAsync(currentUserId);
 
-                    responses.Add(new ResponseModel<string> { Status = "Success", Message = "HashMicro: " + successResponse.message, NewRow = "Invoice Number: " + invoice.InvoiceNumber + "<br>Move Name: " + successResponse.move_name });
+                    var currentUser = await userManager.FindByIdAsync(currentUserId);
+
+                    var jsonstr = JsonSerializer.Serialize(new
+                    {
+                        invoice.InvoiceNumber,
+                        invoiceUpdate.HashMicroMoveId,
+                        invoiceUpdate.HashMicroMoveName,
+                        invoiceUpdate.HashMicroMoveStatus,
+                        HashMicroMoveBy = currentUser,
+                        invoiceUpdate.HashMicroMoveDate
+                    }, jsonOptions);
+                    responses.Add(new ResponseModel<string> { Status = "Success", Message = "HashMicro: " + successResponse.message, NewRow = jsonstr });
                 }
             }
             return responses;

@@ -103,7 +103,7 @@ namespace GMGInventory.Application.Repositories
                          && order.Status.Code.ToLower() != "draft"
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.Trim().ToLower().Contains(search.Trim().ToLower())))
-                         && (regionId == null || order.Customer.Area.Region.Id == regionId)
+                         && (regionId == null || order.Region.Id == regionId)
                          //&& oli.Any(s => s.Quantity > s.Stock)
                          orderby order.SalesOrderNumber ascending
                          select new JsonSalesOrderOptionsModel
@@ -120,7 +120,7 @@ namespace GMGInventory.Application.Repositories
                              SalesOrderDateD = order.SalesOrderDate,
                              PurchaseOrder = order.PurchaseOrder,
                              ForwarderName = order.Forwarder != null ? order.Forwarder.Name : null,
-                             RegionId = order.Customer.Area.RegionId
+                             RegionId = order.RegionId
                          };
             var ordersFiltered = await orders.Skip((page - 1) * 50).Take(50).ToListAsync();
             return new Select2Model<JsonSalesOrderOptionsModel>
@@ -289,6 +289,7 @@ namespace GMGInventory.Application.Repositories
                                ApprovedBy = approve.FirstName + " " + approve.LastName,
                                ApprovedDateD = order.ApprovedDate,
                                Branch = order.Customer.Branch,
+                               CreditLimitD = order.Customer.CreditLimit,
                                CreditTerms = order.Customer.CreditTerm.Name,
                                CustomerAddress = order.Customer
                                                       .ShippingAddresses
@@ -324,7 +325,8 @@ namespace GMGInventory.Application.Repositories
                                OverallDiscountD = order.OverallDiscount,
                                PONumber = order.PurchaseOrder,
                                PriorityD = order.Customer.Priority,
-                               Region = order.Customer.Area.Region.Name,
+                               RegionId = order.Region.Id,
+                               Region = order.Region.Name,
                                Remarks = order.Remarks + "",
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
                                ResubmitId = order.ResubmitId,
@@ -382,7 +384,7 @@ namespace GMGInventory.Application.Repositories
             var filteredOrder = from order in context.SalesOrders
                                 where (filter.AgentId == null || order.AgentId == filter.AgentId)
                                 && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
-                                && (filter.RegionId == null || order.Customer.Area.Region.Id == filter.RegionId)
+                                && (filter.RegionId == null || order.Region.Id == filter.RegionId)
                                 && DateFrom <= order.SalesOrderDate.Date
                                 && order.SalesOrderDate.Date <= DateTo
                                 && (filter.Status == null || filter.Status == order.Status.Id)
@@ -425,7 +427,7 @@ namespace GMGInventory.Application.Repositories
                                                       .Select(s => s.Address)
                                                       .FirstOrDefault() ?? null,
                                PriorityD = order.Customer.Priority,
-                               Region = order.Customer.Area.Region.Name,
+                               Region = order.Region.Name,
                                Area = order.Customer.Area.Name,
                                RequiredDeliveryDateD = order.RequiredDeliveryDate,
                                Forwarder = order.Forwarder != null ? order.Forwarder.Name : null,
@@ -600,7 +602,8 @@ namespace GMGInventory.Application.Repositories
                                                    .FirstOrDefault()
                                 let inventory = context.ItemInventories
                                                        .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true)
-                                                       .Sum(s => (int?)s.Quantity) ?? 0
+                                                       .OrderByDescending(s => s.DateCreated)
+                                                       .FirstOrDefault()
                                 let packedQuantity = context.PackLineItems
                                                             .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
                                                                      && s.ItemId == order.ItemId
@@ -618,6 +621,7 @@ namespace GMGInventory.Application.Repositories
                                 orderby order.LineNumber ascending
                                 select new SalesOrderItemVM
                                 {
+                                    AllocatedQuantityD = inventory == null ? 0 : inventory.AllocatedQuantity,
                                     Discount1D = order.Discount1,
                                     Discount2D = order.Discount2,
                                     Discount3D = order.Discount3 == null ? 0 : order.Discount3!.Value,
@@ -625,7 +629,7 @@ namespace GMGInventory.Application.Repositories
                                     Discount5D = order.Discount5 == null ? 0 : order.Discount5!.Value,
                                     CustomerBrandDiscountId = order.CustomerBrandDiscountId,
                                     Id = order.Id,
-                                    InventoryCountD = inventory,
+                                    InventoryCountD = inventory == null ? 0 : inventory.Quantity,
                                     InvoicedQuantityD = invoicedQuantity,
                                     ItemCode = order.Item.Code,
                                     ItemId = order.Item.Id,
@@ -769,6 +773,9 @@ namespace GMGInventory.Application.Repositories
             var forwarder = await context.Forwarders.Where(s => s.Id == form.Forwarder).FirstOrDefaultAsync();
             if (forwarder == null) return new ResponseModel<int> { Status = "Error", Message = "Forwarder is invalid" };
 
+            var region = await context.Regions.Where(s => s.Id == form.Region).FirstOrDefaultAsync();
+            if (region == null) return new ResponseModel<int> { Status = "Error", Message = "Region is invalid" };
+
             var sla = await context.ServiceLevelAgreements.Where(s => s.Id == form.SericeLevelAgreement).FirstOrDefaultAsync();
             if (sla == null) return new ResponseModel<int> { Status = "Error", Message = "Service Level Agreement is invalid" };
 
@@ -839,6 +846,7 @@ namespace GMGInventory.Application.Repositories
                     SalesOrderNumber = soNumber,
                     StatusId = statusId,
                     ForwarderId = form.Forwarder,
+                    RegionId = form.Region,
                     ServiceLevelAgreementId = form.SericeLevelAgreement,
                     OverallDiscount = form.OverallDiscount,
                     WithLP = form.WithLP,
@@ -867,6 +875,7 @@ namespace GMGInventory.Application.Repositories
                 orderVM.SalesOrderDate = form.OrderDate;
                 orderVM.StatusId = statusId;
                 orderVM.ForwarderId = form.Forwarder;
+                orderVM.RegionId = form.Region;
                 orderVM.ServiceLevelAgreementId = form.SericeLevelAgreement;
                 orderVM.OverallDiscount = form.OverallDiscount;
                 orderVM.WithLP = form.WithLP;

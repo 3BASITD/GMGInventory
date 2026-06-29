@@ -35,7 +35,7 @@ namespace GMGInventory.Application.Repositories
                              from userm in m.DefaultIfEmpty()
                              where (filter.AgentId == null || filter.AgentId == so.AgentId)
                                 && (filter.CustomerId == null || filter.CustomerId == so.CustomerId)
-                                && (filter.RegionId == null || filter.RegionId == so.Customer.Area.RegionId)
+                                && (filter.RegionId == null || filter.RegionId == so.RegionId)
                                 && filter.DateFrom <= so.DateCreated.Date
                                 && so.DateCreated.Date <= filter.DateTo
                              select new SalesOrderDeliveryVM

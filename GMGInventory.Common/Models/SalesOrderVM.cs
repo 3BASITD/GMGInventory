@@ -108,16 +108,16 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
 
-        [Display(Name = "Customer Address")]
+        [Display(Name = "Customer's Address")]
         public string? CustomerAddress { get; set; }
 
-        [Display(Name = "Customer Contact Number")]
+        [Display(Name = "Customer's Contact Number")]
         public string? CustomerContactNumber { get; set; }
 
-        [Display(Name = "Customer Contact Person")]
+        [Display(Name = "Customer's Contact Person")]
         public string? CustomerContactPerson { get; set; }
 
-        [Display(Name = "Outstanding Balance")]
+        [Display(Name = "Customer's Outstanding Balance")]
         public string OutstandingBalance => string.Format(SystemFormat.StringDecimalComma, OutstandingBalanceD);
         public decimal OutstandingBalanceD { get; set; }
 
@@ -137,7 +137,11 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Agent Name")]
         public string AgentName { get; set; }
 
-        [Display(Name = "Credit Terms")]
+        [Display(Name = "Customer's Credit Limit")]
+        public string CreditLimit => string.Format(SystemFormat.StringDecimalComma, CreditLimitD);
+        public decimal CreditLimitD { get; set; }
+
+        [Display(Name = "Customer's Credit Terms")]
         public string CreditTerms { get; set; }
 
         [Display(Name = "Purchase Order Number")]
@@ -151,10 +155,11 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer's Account Status")]
         public string AccountStatus { get; set; }
 
-        [Display(Name = "Customer's Region")]
+        [Display(Name = "Region")]
         public string Region { get; set; }
+        public int RegionId { get; set; }
 
-        [Display(Name = "Customer's Required Delivery Date")]
+        [Display(Name = "Required Delivery Date")]
         public string RequiredDeliveryDate => RequiredDeliveryDateD.ToString(SystemFormat.StringDate);
         public string RequiredDeliveryDate3 => RequiredDeliveryDateD.ToString(SystemFormat.StringDate3);
         public DateTime RequiredDeliveryDateD { get; set; }
@@ -305,6 +310,10 @@ namespace GMGInventory.Common.Models
         public string InventoryCount => string.Format(SystemFormat.StringIntegerComma, InventoryCountD);
         public int InventoryCountD { get; set; }
 
+        [Display(Name = "Allocated Quantity")]
+        public string AllocatedQuantity => string.Format(SystemFormat.StringIntegerComma, AllocatedQuantityD);
+        public int AllocatedQuantityD { get; set; }
+
         [Display(Name = "Quantity")]
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
@@ -402,6 +411,7 @@ namespace GMGInventory.Common.Models
         public int? Id { get; set; }
         public int Customer { get; set; }
         public int Forwarder { get; set; }
+        public int Region { get; set; }
         public int Agent { get; set; }
         public int GrossNet { get; set; }
         public string? PurchaseOrder { get; set; }

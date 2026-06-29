@@ -121,7 +121,7 @@ namespace GMGInventory.Application.Repositories
             var requestVM = from request in context.PurchaseRequests
                             where (filter.TypeId == null || request.TypeId == filter.TypeId)
                             && (filter.PurposeId == null || request.PurposeId == filter.PurposeId)
-                            && (filter.RegionId == null || request.PurchaseRequestLineItems.Any(s => s.SalesOrder.Customer.Area.Region.Id == filter.RegionId))
+                            && (filter.RegionId == null || request.PurchaseRequestLineItems.Any(s => s.SalesOrder.Region.Id == filter.RegionId))
                             && (filter.DateFrom == null || filter.DateFrom.Value.Date <= request.RequestDate.Date)
                             && (filter.DateTo == null || request.RequestDate.Date <= filter.DateTo.Value.Date)
                             && (filter.StatusId == null || request.StatusId == filter.StatusId)
@@ -136,7 +136,7 @@ namespace GMGInventory.Application.Repositories
                                         ? request.PurposeDefinition + ""
                                         : request.Purpose.Name,
                                 Region = firstitem.SalesOrderId != null
-                                       ? firstitem.SalesOrder.Customer.Area.Region.Name
+                                       ? firstitem.SalesOrder.Region.Name
                                        : "",
                                 Status = request.Status.Code,
                                 RequestDateD = request.RequestDate,
@@ -225,8 +225,8 @@ namespace GMGInventory.Application.Repositories
                               TypeId = request.Type.Id,
                               Purpose = request.Purpose == null ? request.PurposeDefinition + "" : request.Purpose.Name,
                               PurposeId = request.Purpose == null ? null : request.Purpose.Id,
-                              Region = firstitem.SalesOrderId == null ? "" : firstitem.SalesOrder.Customer.Area.Region.Name,
-                              RegionId = firstitem.SalesOrderId == null ? (int?)null : firstitem.SalesOrder.Customer.Area.Region.Id,
+                              Region = firstitem.SalesOrderId == null ? "" : firstitem.SalesOrder.Region.Name,
+                              RegionId = firstitem.SalesOrderId == null ? (int?)null : firstitem.SalesOrder.Region.Id,
                               Status = request.Status.Code,
                               RequestDateD = request.RequestDate,
                               Remarks = request.Remarks,
