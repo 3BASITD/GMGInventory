@@ -88,6 +88,7 @@ builder.Services.AddScoped(typeof(IItemPriceRepository), typeof(ItemPriceReposit
 builder.Services.AddScoped(typeof(IItemRepository), typeof(ItemRepository));
 builder.Services.AddScoped(typeof(IItemTransferRepository), typeof(ItemTransferRepository));
 builder.Services.AddScoped(typeof(IItemTypeRepository), typeof(ItemTypeRepository));
+builder.Services.AddScoped(typeof(IKYCRepository), typeof(KYCRepository));
 builder.Services.AddScoped(typeof(ILocationCodeRepository), typeof(LocationCodeRepository));
 builder.Services.AddScoped(typeof(IOrderQueueRepository), typeof(OrderQueueRepository));
 builder.Services.AddScoped(typeof(IOrderRecommendationRepository), typeof(OrderRecommendationRepository));

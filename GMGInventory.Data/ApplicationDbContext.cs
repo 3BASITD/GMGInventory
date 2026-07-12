@@ -191,6 +191,10 @@ namespace GMGInventory.Data
         public DbSet<ItemPrice> ItemPrices { get; set; }
         public DbSet<ItemPromo> ItemPromo { get; set; }
         public DbSet<ItemType> ItemTypes { get; set; }
+        public DbSet<KYC> KYCs { get; set; }
+        public DbSet<KYCBank> KYCBanks { get; set; }
+        public DbSet<KYCClient> KYCClients { get; set; }
+        public DbSet<KYCSignatory> KYCSignatories { get; set; }
         public DbSet<LocationCode> LocationCodes { get; set; }
         public DbSet<Pack> Packs { get; set; }
         public DbSet<PackLineItem> PackLineItems { get; set; }

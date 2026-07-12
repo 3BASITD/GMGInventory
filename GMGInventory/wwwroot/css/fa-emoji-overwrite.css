@@ -116,7 +116,7 @@
 .fa-shopping-cart::before { content: "🛒"; }
 .fa-sign-out-alt::before { content: "🚪"; }
 .fa-star::before { content: "⭐"; }
-.fa-square { content: "⬜"; }
+.fa-square::before { content: "⬜"; }
 .fa-sync::before { content: "🔄"; }
 .fa-table::before { content: "🗒️"; }
 .fa-thumbs-up::before { content: "👍"; }

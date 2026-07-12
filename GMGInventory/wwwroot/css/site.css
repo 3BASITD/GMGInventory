@@ -1168,3 +1168,20 @@ a[target="_blank"]:hover::after {
 .dark-mode .accordion-button::after {
     filter: invert(1);
 }
+
+.modified {
+    border-left: cyan solid 3px !important;
+    border-top-left-radius: 3px !important;
+    border-bottom-left-radius: 3px !important;
+}
+
+.badge.empty {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.badge {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .15s linear;
+}

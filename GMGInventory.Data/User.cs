@@ -8,6 +8,9 @@ namespace GMGInventory.Data
         public User()
         {
             this.InvoiceHashMicroMoveBy = new HashSet<Invoice>();
+            this.KYCSubmitter = new HashSet<KYC>();
+            this.KYCApprover = new HashSet<KYC>();
+            this.KYCDisapprover = new HashSet<KYC>();
             this.PurchaseOrderApprover = new HashSet<PurchaseOrderNew>();
             this.PurchaseOrderDisapprover = new HashSet<PurchaseOrderNew>();
             this.PurchaseReceivingApprover = new HashSet<PurchaseReceiving>();
@@ -48,6 +51,15 @@ namespace GMGInventory.Data
 
         [InverseProperty(nameof(Invoice.HashMicroMoveBy))]
         public ICollection<Invoice> InvoiceHashMicroMoveBy { get; set; }
+
+        [InverseProperty(nameof(KYC.Submitter))]
+        public ICollection<KYC> KYCSubmitter { get; set; }
+
+        [InverseProperty(nameof(KYC.Approver))]
+        public ICollection<KYC> KYCApprover { get; set; }
+
+        [InverseProperty(nameof(KYC.Disapprover))]
+        public ICollection<KYC> KYCDisapprover { get; set; }
 
         [InverseProperty(nameof(PurchaseOrderNew.Approver))]
         public ICollection<PurchaseOrderNew> PurchaseOrderApprover { get; set; }

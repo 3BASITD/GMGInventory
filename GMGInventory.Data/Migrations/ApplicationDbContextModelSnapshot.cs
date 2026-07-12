@@ -4230,6 +4230,295 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("ItemTypes");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.KYC", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ApproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BirTinNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("BusinessNature")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ContactNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("CreditLineAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("CreditTermId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DateApproved")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateDisapproved")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateSubmitted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisapprovedReason")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DisapproverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTime?>("ExpirationBIRForm2303")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationCompanyPortfolio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationIncorporationArticleByLaws")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationLatestAuditedFinancialStatement")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationMayorBusinessPermit")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationSECDTICertificate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationSampleSalesInvoiceOfficialReceipt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationSecretaryCertificate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationSignatoriesIdentificationCard")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OperatingAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("OperatingHours")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("OrganizationType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PrivacyConsent")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProductServiceOffered")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("RegisteredAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SecDtiNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubmitterId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("VatStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("WarehouseAddress")
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApproverId");
+
+                    b.HasIndex("CreditTermId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("DisapproverId");
+
+                    b.HasIndex("SubmitterId");
+
+                    b.ToTable("KYCs");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCBank", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Branch")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ContactNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("KYCId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KYCId");
+
+                    b.ToTable("KYCBanks");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCClient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ContactNumber")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ContactPerson")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("KYCId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("SalesVolume")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KYCId");
+
+                    b.ToTable("KYCClients");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCSignatory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ContactNumber")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Designation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("KYCId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KYCId");
+
+                    b.ToTable("KYCSignatories");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.LocationCode", b =>
                 {
                     b.Property<int>("Id")
@@ -8795,13 +9084,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8b55d389-1f9a-42e6-87af-399e236177c9",
+                            ConcurrencyStamp = "18f63f0c-7aba-4125-b850-1c97f26d7a10",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN4AazMkPN800NnYpazcJVcQly+ZrA8Vew8t6wq0Fyy3kdsFqJuWFwo+SLRM7nEkxA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDZKcK/onMLH4eWPWv8z1HOlxMU8vE4skUN9KHmhg+whf+BM0AbEsa/T3tKDtADeKw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e16ae171-dbb6-4f13-855c-73876131a340",
+                            SecurityStamp = "8323ec91-cec1-4839-a113-59985c021295",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -8816,13 +9105,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "500953fb-c779-4dd5-8644-148b28bb5d37",
+                            ConcurrencyStamp = "0584ecaf-8187-47c7-9567-dc75dfb0b3d3",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJgetzFKM3+ZLdCgqZXsyhc4UYLAd3rCcGFpCK0Upnuz0S38l3Kpf3Z+hLgfome15Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECunjoqezESfMnfEu0uaTL5G5h5rIZLF++wFO1zKj/0TIe7lJXvoU5/dbo6VNwGFPw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "83a6acc4-aa3d-4347-8588-19bea827d2e6",
+                            SecurityStamp = "55bd7ad3-9c02-4773-9c91-a2fc367241fa",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9186,6 +9475,76 @@ namespace GMGInventory.Data.Migrations
                         .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYC", b =>
+                {
+                    b.HasOne("GMGInventory.Data.User", "Approver")
+                        .WithMany("KYCApprover")
+                        .HasForeignKey("ApproverId");
+
+                    b.HasOne("GMGInventory.Data.CreditTerm", "CreditTerm")
+                        .WithMany()
+                        .HasForeignKey("CreditTermId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.User", "Disapprover")
+                        .WithMany("KYCDisapprover")
+                        .HasForeignKey("DisapproverId");
+
+                    b.HasOne("GMGInventory.Data.User", "Submitter")
+                        .WithMany("KYCSubmitter")
+                        .HasForeignKey("SubmitterId");
+
+                    b.Navigation("Approver");
+
+                    b.Navigation("CreditTerm");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Disapprover");
+
+                    b.Navigation("Submitter");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCBank", b =>
+                {
+                    b.HasOne("GMGInventory.Data.KYC", "KYC")
+                        .WithMany("KYCBanks")
+                        .HasForeignKey("KYCId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KYC");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCClient", b =>
+                {
+                    b.HasOne("GMGInventory.Data.KYC", "KYC")
+                        .WithMany("KYCClients")
+                        .HasForeignKey("KYCId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KYC");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCSignatory", b =>
+                {
+                    b.HasOne("GMGInventory.Data.KYC", "KYC")
+                        .WithMany("KYCSignatories")
+                        .HasForeignKey("KYCId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KYC");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.Pack", b =>
@@ -10482,6 +10841,15 @@ namespace GMGInventory.Data.Migrations
                     b.Navigation("Items");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.KYC", b =>
+                {
+                    b.Navigation("KYCBanks");
+
+                    b.Navigation("KYCClients");
+
+                    b.Navigation("KYCSignatories");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.LocationCode", b =>
                 {
                     b.Navigation("ItemInventories");
@@ -10771,6 +11139,12 @@ namespace GMGInventory.Data.Migrations
             modelBuilder.Entity("GMGInventory.Data.User", b =>
                 {
                     b.Navigation("InvoiceHashMicroMoveBy");
+
+                    b.Navigation("KYCApprover");
+
+                    b.Navigation("KYCDisapprover");
+
+                    b.Navigation("KYCSubmitter");
 
                     b.Navigation("PurchaseOrderApprover");
 

@@ -2,7 +2,7 @@
 {
     public static class SystemFormat
     {
-        public const string StringDateTime = "MMM dd, yyyy hh:mm:ss tt";
+        public const string StringDateTime = "MMM dd, yyyy hh:mm tt";
         public const string StringDate = "MMMM dd, yyyy";
         public const string StringDate2 = "MM/dd/yyyy";
         public const string StringDate3 = "yyyy-MM-dd";

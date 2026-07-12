@@ -24,6 +24,11 @@ namespace GMGInventory.Controllers
     {
         private readonly ControllerHelper chelper = new();
 
+        public async Task<IActionResult> GetOptions2Simple(string search, int page, bool ActiveOnly)
+        {
+            return Json(await customerRepository.GetOptions2Simple(search, page, ActiveOnly));
+        }
+
         public async Task<IActionResult> GetOptions(string search, int page)
         {
             return Json(await customerRepository.GetOptions(search, page));
@@ -55,6 +60,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Customer)).Convert();
+            ViewData["UserAccessKYC"] = new ViewsAccessData(await GetAccessAsync(PageNames.KYC)).Convert();
 
             return View();
         }
@@ -125,6 +131,7 @@ namespace GMGInventory.Controllers
             if (redirectResult != null) return redirectResult;
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.Customer)).Convert();
+            ViewData["UserAccessKYC"] = new ViewsAccessData(await GetAccessAsync(PageNames.KYC)).Convert();
 
             var cust = customerRepository.GetCustomerDtlVM(id);
             if (cust == null)

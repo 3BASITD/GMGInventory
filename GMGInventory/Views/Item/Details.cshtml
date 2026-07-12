@@ -859,7 +859,7 @@
         });
 
         $("#item-code").on("select2:select", function () {
-            window.location = window.location.href.replace(item_details.id + "", $("#item-code").val());
+            window.location = window.location.origin + "/Item/Details/" + $("#item-code").val();
         });
 
         $("#add-option").on("change", function () {

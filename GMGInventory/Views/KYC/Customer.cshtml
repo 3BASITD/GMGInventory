@@ -1,0 +1,1999 @@
+﻿@model KYCVM
+
+@{
+    ViewData["Title"] = "KYC Details";
+    ViewData["TitleDetails"] = $"[{Model.CustomerCode}]";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="KYC" asp-action="Index">KYCs</a></li>
+}
+
+<div class="alert alert-warning" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span><strong>COMMING SOON</strong> We’re currently working on this page to bring you new features and improvements. Please check back again soon.
+</div>
+
+<div class="alert alert-info" role="alert">
+    <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
+</div>
+
+<form id="form-save">
+    <div class="card card-default">
+        <div class="card-header">
+            <span class="card-title">@ViewData["Title"]</span>
+            <div class="card-tools">
+                <a class="btn btn-light btn-sm float-right ml-2" asp-action="Index">
+                    <span class="fas fa-arrow-left"></span> Back to List
+                </a>
+                @if (userAccess.CanEdit && (Model.Status == "Approved" || Model.Status == "Disapproved"))
+                {
+                    <button type="button" class="btn btn-primary btn-sm float-right btn-approve ml-2">
+                        <span class="fas fa-edit"></span>Edit
+                    </button>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="Edit&#10;@(Model.Status != "Approved" && Model.Status != "Disapproved" ? "Only approved / disapproved kyc can be editted" : "Edit access is required")"
+                            data-microtip-position="bottom-left"
+                            role="tooltip">
+                        <span class="fas fa-edit mr-0"></span>
+                    </button>
+                }
+                @if (userAccess.CanApproveDisapprove && Model.Status == "Submitted")
+                {
+                    <button type="button" class="btn btn-success btn-sm float-right btn-approve ml-2">
+                        <span class="fas fa-check"></span>Approve
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm float-right btn-disapprove ml-2">
+                        <span class="fas fa-times"></span>Disapprove
+                    </button>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-success btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="Approve&#10;@(Model.Status != "Submitted" ? "Only submitted kyc can be approved" : "Approve / Disapprove access is required")"
+                            data-microtip-position="bottom-left"
+                            role="tooltip">
+                        <span class="fas fa-check mr-0"></span>
+                    </button>
+                    <button type="button"
+                            class="btn btn-danger btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="Disapprove&#10;@(Model.Status != "Submitted" ? "Only submitted kyc can be disapproved" : "Approve / Disapprove access is required")"
+                            data-microtip-position="bottom-left"
+                            role="tooltip">
+                        <span class="fas fa-times mr-0"></span>
+                    </button>
+                }
+                @if (userAccess.CanAdd && Model.Status == "Draft")
+                {
+                    <button type="submit" class="btn btn-primary btn-sm float-right btn-submit ml-2" data-action="Submitted">
+                        <span class="fas fa-paper-plane"></span> Submit for Approval
+                    </button>
+                    <button type="submit" class="btn btn-secondary btn-sm float-right btn-draft ml-2" data-action="Draft">
+                        <span class="fas fa-save"></span>Save as Draft
+                    </button>
+                }
+                else
+                {
+                    <button type="submit"
+                            class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="Submit for Approval&#10;@(Model.Status != "Draft" ? "Only draft kyc can be submitted" : "Add access is required")"
+                            data-microtip-position="bottom-left"
+                            role="tooltip">
+                        <span class="fas fa-paper-plane mr-0"></span>
+                    </button>
+                    <button type="submit"
+                            class="btn btn-secondary btn-sm float-right ml-2 ui-state-disabled"
+                            data-microtip-title="Save as Draft&#10;@(Model.Status != "Draft" ? "Only draft kyc can be saved as draft" : "Add access is required")"
+                            data-microtip-position="bottom-left"
+                            role="tooltip">
+                        <span class="fas fa-save mr-0"></span>
+                    </button>
+                }
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-4 col-sm-6">
+                    <p class="text-sm">
+                        <span class="text-muted">
+                            Customer Code
+                        </span>
+                        <select name="Customer" id="kyc-customer" class="form-control form-control-sm s2-bold"></select>
+                    </p>
+                </div>
+
+                @if (Model.CustomerId == 0)
+                {
+                    <div class="col-12 col-md-8 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                &nbsp;
+                            </span>
+                            <span class="d-block form-gayahin text-info">
+                                Please select a customer first to configure their KYC
+                            </span>
+                        </p>
+                    </div>
+                }
+                else if (Model.CustomerName == "Invalid Customer")
+                {
+                    <div class="col-12 col-md-8 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                &nbsp;
+                            </span>
+                            <span class="d-block form-gayahin text-info">
+                                Please select a customer first to configure their KYC. Previously selected customer is invalid.
+                            </span>
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                Customer Name
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model.CustomerName
+                            </b>
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                Status
+                            </span>
+                            <b class="d-block form-gayahin">
+                                @Model.Status
+                            </b>
+                        </p>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ModifiedDate))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Date Last Modified
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.ModifiedDate
+                                </b>
+                            </p>
+                        </div>
+                    }
+                
+                    @if (!string.IsNullOrWhiteSpace(Model.ModifiedBy))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Last Modified By
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.ModifiedBy
+                                </b>
+                            </p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.SubmittedDate))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Date Submitted
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.SubmittedDate
+                                </b>
+                            </p>
+                        </div>
+                    }
+                
+                    @if (!string.IsNullOrWhiteSpace(Model.SubmittedBy))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Submitted By
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.SubmittedBy
+                                </b>
+                            </p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedDate))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Date Approved
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.ApprovedDate
+                                </b>
+                            </p>
+                        </div>
+                    }
+                
+                    @if (!string.IsNullOrWhiteSpace(Model.ApprovedBy))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Approved By
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.ApprovedBy
+                                </b>
+                            </p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedDate))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Date Disapproved
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.DisapprovedDate
+                                </b>
+                            </p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+                    {
+                        <div class="col-12 col-md-4 col-sm-6">
+                            <p class="text-sm">
+                                <span class="text-muted">
+                                    Disapproved By
+                                </span>
+                                <b class="d-block form-gayahin">
+                                    @Model.DisapprovedBy
+                                </b>
+                            </p>
+                        </div>
+                    }
+
+                    <div class="col-12 col-md-4 col-sm-6">
+                        <p class="text-sm">
+                            <span class="text-muted">
+                                Remarks
+                            </span>
+                            @if (Model.Status == "Draft")
+                            {
+                                <input type="text" name="Remarks" id="kyc-remarks" class="form-control form-control-sm modify-checker" />
+                            }
+                            else
+                            {
+                                <b class="d-block form-gayahin">
+                                    @(string.IsNullOrWhiteSpace(Model.Remarks) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Remarks)
+                                </b>
+                            }
+                        </p>
+                    </div>
+                }
+            </div>
+            @if (Model.CustomerId != 0 && Model.CustomerName != "Invalid Customer")
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-danger card-tabs mt-2">
+                            <div class="card-header p-0 pt-1 pl-2 pr-2">
+                                <ul class="nav nav-tabs nav-fill nav-item" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile">Company Profile & Contact Information</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#legalTax">Legal & Tax Status</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link position-relative" data-bs-toggle="tab" data-bs-target="#personnel">
+                                            Key Personnel & Authorized Signatories
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info empty signatory-counter">
+                                                0
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#businessCredit">Business Operation & Credit Data</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link position-relative" data-bs-toggle="tab" data-bs-target="#clients">
+                                            Major Clients
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info empty client-counter">
+                                                0
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link position-relative" data-bs-toggle="tab" data-bs-target="#banks">
+                                            Bank References
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info empty bank-counter">
+                                                0
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link position-relative" data-bs-toggle="tab" data-bs-target="#checklist">
+                                            Documentation Checklist
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill p-0 overflow-hidden empty checklist-counter">
+                                                <span class="bg-danger px-1 checklist-counter-no" style="line-height:1.5">0</span>
+                                                <span class="bg-success px-1 checklist-counter-yes" style="line-height:1.5">0</span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#privacy">Privacy Consent</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content" id="kycTabContent">
+                                    <div class="tab-pane fade show active" id="profile">
+                                        <div class="row">
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Name of Company</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="NameOfCompany" id="kyc-company" class="form-control form-control-sm modify-checker" value="@Model.NameOfCompany" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.NameOfCompany) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.NameOfCompany)
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Registered Address</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="RegisteredAddress" id="kyc-registered-address" class="form-control form-control-sm modify-checker" value="@Model.RegisteredAddress" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.RegisteredAddress) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.RegisteredAddress)
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Operating Address</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="OperatingAddress" id="kyc-operating-address" class="form-control form-control-sm modify-checker" value="@Model.OperatingAddress" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.OperatingAddress) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.OperatingAddress)
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Plant / Warehouse Address</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="WarehouseAddress" id="kyc-warehouse-address" class="form-control form-control-sm modify-checker" value="@Model.WarehouseAddress" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.WarehouseAddress) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.WarehouseAddress)
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Operating Hours</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="OperatingHours" id="kyc-operating-hours" class="form-control form-control-sm modify-checker" value="@Model.OperatingHours" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.OperatingHours) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.OperatingHours)
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Website / Social Media Profile</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="Website" id="kyc-website" class="form-control form-control-sm modify-checker" value="@Model.Website" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.Website) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.Website)
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Email Address</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="EmailAddress" id="kyc-email" class="form-control form-control-sm modify-checker" value="@Model.EmailAddress" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.EmailAddress) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.EmailAddress)
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Contact Number</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="ContactNumber" id="kyc-contact-number" class="form-control form-control-sm modify-checker" value="@Model.ContactNumber" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.ContactNumber) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.ContactNumber)
+                                                    </b>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="legalTax">
+                                        <div class="row">
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Organization Type</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check kyc-organization-type modify-checker" name="OrganizationType"
+                                                               id="kyc-organization-type-sole" value="1" @(Model.OrganizationTypeD == 1 ? "checked" : "")>
+                                                        <label class="btn btn-outline-primary" for="kyc-organization-type-sole">Sole Proprietorship</label>
+
+                                                        <input type="radio" class="btn-check kyc-organization-type modify-checker" name="OrganizationType"
+                                                               id="kyc-organization-type-partnership" value="2" @(Model.OrganizationTypeD == 2 ? "checked" : "")>
+                                                        <label class="btn btn-outline-primary" for="kyc-organization-type-partnership">Partnership</label>
+
+                                                        <input type="radio" class="btn-check kyc-organization-type modify-checker" name="OrganizationType"
+                                                               id="kyc-organization-type-corporation" value="3" @(Model.OrganizationTypeD == 3 ? "checked" : "")>
+                                                        <label class="btn btn-outline-primary" for="kyc-organization-type-corporation">Corporation</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.OrganizationType) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.OrganizationType)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">SEC / DTI Number</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="SecDtiNumber" id="kyc-secdti-number" class="form-control form-control-sm modify-checker" value="@Model.SecDtiNumber" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SecDtiNumber) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SecDtiNumber)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">BIR TIN</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="BirTinNumber" id="kyc-birtin-number" class="form-control form-control-sm modify-checker" value="@Model.BirTinNumber" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.BirTinNumber) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.BirTinNumber)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">VAT Status</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check kyc-vat-status modify-checker" name="VATStatus"
+                                                               id="kyc-vat-status-registered" value="VAT Registered" @(Model.VatStatusD ? "checked" : "")>
+                                                        <label class="btn btn-outline-primary" for="kyc-vat-status-registered">VAT Registered</label>
+
+                                                        <input type="radio" class="btn-check kyc-vat-status modify-checker" name="VATStatus"
+                                                               id="kyc-vat-status-none" value="Non-VAT" @(Model.VatStatusD ? "" : "checked")>
+                                                        <label class="btn btn-outline-primary" for="kyc-vat-status-none">Non-VAT</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.VatStatus) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.VatStatus)
+                                                    </b>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="personnel">
+                                        <div class="d-flex justify-content-end mb-2">
+                                            @if (Model.Status == "Draft")
+                                            {
+                                                @if (userAccess.CanAdd)
+                                                {
+                                                    <button type="button" class="btn btn-primary btn-sm float-right btn-add-signatory ml-1">
+                                                        <span class="fas fa-plus"></span> Add
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-primary btn-sm float-right ml-1 ui-state-disabled"
+                                                            data-microtip-title="Add&#10;Add access is required"
+                                                            data-microtip-position="bottom-left"
+                                                            role="tooltip">
+                                                        <span class="fas fa-plus mr-0"></span>
+                                                    </button>
+                                                }
+                                            }
+                                        </div>
+                                        <table class="table table-head-fixed table-striped table-hover table-signatories">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Designation</th>
+                                                    <th>Mobile Number</th>
+                                                    <th>Email Address</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="businessCredit">
+                                        <div class="row">
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Nature of Business</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="BusinessNature" id="kyc-business-nature" class="form-control form-control-sm modify-checker" value="@Model.BusinessNature" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.BusinessNature) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.BusinessNature)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Product / Service</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="ProductServiceOffered" id="kyc-product-service" class="form-control form-control-sm modify-checker" value="@Model.ProductServiceOffered" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.ProductServiceOffered) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.ProductServiceOffered)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Credit Line Amount</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="text" name="CreditLineAmount" id="kyc-credit-amount" class="form-control form-control-sm modify-checker" value="@Model.CreditLineAmountD" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.CreditLineAmount) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.CreditLineAmount)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Credit Term</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <select id="kyc-credit-term" style="width: 100%" name="CreditTerm" class="form-control form-control-sm modify-checker-s2"></select>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.CreditTerm) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.CreditTerm)
+                                                    </b>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="clients">
+                                        <div class="d-flex justify-content-end mb-2">
+                                            @if (Model.Status == "Draft")
+                                            {
+                                                @if (userAccess.CanAdd)
+                                                {
+                                                    <button type="button" class="btn btn-primary btn-sm float-right btn-add-client ml-1">
+                                                        <span class="fas fa-plus"></span> Add
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-primary btn-sm float-right ml-1 ui-state-disabled"
+                                                            data-microtip-title="Add&#10;Add access is required"
+                                                            data-microtip-position="bottom-left"
+                                                            role="tooltip">
+                                                        <span class="fas fa-plus mr-0"></span>
+                                                    </button>
+                                                }
+                                            }
+                                        </div>
+                                        <table class="table table-head-fixed table-striped table-hover table-client">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Contact Person</th>
+                                                    <th>Contact Number</th>
+                                                    <th>Sales Volume</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="banks">
+                                        <div class="d-flex justify-content-end mb-2">
+                                            @if (Model.Status == "Draft")
+                                            {
+                                                @if (userAccess.CanAdd)
+                                                {
+                                                    <button type="button" class="btn btn-primary btn-sm float-right btn-add-bank ml-1">
+                                                        <span class="fas fa-plus"></span> Add
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-primary btn-sm float-right ml-1 ui-state-disabled"
+                                                            data-microtip-title="Add&#10;Add access is required"
+                                                            data-microtip-position="bottom-left"
+                                                            role="tooltip">
+                                                        <span class="fas fa-plus mr-0"></span>
+                                                    </button>
+                                                }
+                                            }
+                                        </div>
+                                        <table class="table table-head-fixed table-striped table-hover table-bank">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Branch</th>
+                                                    <th>Account Number</th>
+                                                    <th>Contact Number</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="checklist">
+                                        <div class="row">
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">BIR Form 2303 (Certificate of Registration)</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-bir-form-no" value="No" @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? "checked" : "") name="BIRForm2303Option">
+                                                        <label class="btn btn-outline-danger" for="kyc-bir-form-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-bir-form-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? "" : "checked") name="BIRForm2303Option">
+                                                        <label class="btn btn-outline-success" for="kyc-bir-form-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="BIRForm2303" id="kyc-bir-form" class="form-control form-control-sm modify-checker date-requirement" value="@Model.BIRForm23033" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.BIRForm2303)
+                                                    </b>
+                                                }
+                                            </div>
+                                        
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Valid Mayor's / Business Permit (Current Year)</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-business-permit-no" value="No" @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? "checked" : "") name="MayorBusinessPermitOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-business-permit-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-business-permit-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? "" : "checked") name="MayorBusinessPermitOption">
+                                                        <label class="btn btn-outline-success" for="kyc-business-permit-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="MayorBusinessPermit" id="kyc-business-permit" class="form-control form-control-sm modify-checker date-requirement" value="@Model.MayorBusinessPermit3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.MayorBusinessPermit)
+                                                    </b>
+                                                }
+                                            </div>
+                                        
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">SEC / DTI Certificate of Registration</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-secdti-certificate-no" value="No" @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? "checked" : "") name="SecDtiCertificateOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-secdti-certificate-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-secdti-certificate-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? "" : "checked") name="SecDtiCertificateOption">
+                                                        <label class="btn btn-outline-success" for="kyc-secdti-certificate-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="SecDtiCertificate" id="kyc-secdti-certificate" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SecDtiCertificate3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SecDtiCertificate)
+                                                    </b>
+                                                }
+                                            </div>
+                                        
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Latest Audited Financial Statement (Last 2 Years)</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-audit-statement-no" value="No" @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? "checked" : "") name="LatestAuditedFinancialStatementOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-audit-statement-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-audit-statement-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? "" : "checked") name="LatestAuditedFinancialStatementOption">
+                                                        <label class="btn btn-outline-success" for="kyc-audit-statement-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="LatestAuditedFinancialStatement" id="kyc-audit-statement" class="form-control form-control-sm modify-checker date-requirement" value="@Model.LatestAuditedFinancialStatement3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.LatestAuditedFinancialStatement)
+                                                    </b>
+                                                }
+                                            </div>
+                                        
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Articles of Incorporation / By-Laws (For Corporations)</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-article-bylaw-no" value="No" @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? "checked" : "") name="IncorporationArticleByLawsOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-article-bylaw-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-article-bylaw-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? "" : "checked") name="IncorporationArticleByLawsOption">
+                                                        <label class="btn btn-outline-success" for="kyc-article-bylaw-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="IncorporationArticleByLaws" id="kyc-article-bylaw" class="form-control form-control-sm modify-checker date-requirement" value="@Model.IncorporationArticleByLaws3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.IncorporationArticleByLaws)
+                                                    </b>
+                                                }
+                                            </div>
+                                        
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Secretary's Certificate (Authorizing the person above the sign)</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-secretary-certificate-no" value="No" @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? "checked" : "") name="SecretaryCertificateOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-secretary-certificate-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-secretary-certificate-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? "" : "checked") name="SecretaryCertificateOption">
+                                                        <label class="btn btn-outline-success" for="kyc-secretary-certificate-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="SecretaryCertificate" id="kyc-secretary-certificate" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SecretaryCertificate3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SecretaryCertificate)
+                                                    </b>
+                                                }
+                                            </div>
+                                        
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Company Profile / Portfolio</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-portfolio-no" value="No" @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? "checked" : "") name="CompanyPortfolioOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-portfolio-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-portfolio-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? "" : "checked") name="CompanyPortfolioOption">
+                                                        <label class="btn btn-outline-success" for="kyc-portfolio-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="CompanyPortfolio" id="kyc-portfolio" class="form-control form-control-sm modify-checker date-requirement" value="@Model.CompanyPortfolio3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.CompanyPortfolio)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Valid Identification Card of the Signatories</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-id-signatories-no" value="No" @(string.IsNullOrWhiteSpace(Model.SignatoriesIdentificationCard) ? "checked" : "") name="SignatoriesIdentificationCardOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-id-signatories-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-id-signatories-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SignatoriesIdentificationCard) ? "" : "checked") name="SignatoriesIdentificationCardOption">
+                                                        <label class="btn btn-outline-success" for="kyc-id-signatories-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="SignatoriesIdentificationCard" id="kyc-id-signatories" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SignatoriesIdentificationCard3" placeholder="Expiration Date" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SignatoriesIdentificationCard) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SignatoriesIdentificationCard)
+                                                    </b>
+                                                }
+                                            </div>
+
+                                            <div class="col-8 col-lg-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Sample Sales Invoice / Official Receipt (From Major Clients)</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-sample-sior-no" value="No" @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "checked" : "") name="SampleSalesInvoiceOfficialReceiptOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-sample-sior-no">Not Submitted</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-sample-sior-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "" : "checked") name="SampleSalesInvoiceOfficialReceiptOption">
+                                                        <label class="btn btn-outline-success" for="kyc-sample-sior-yes">Submitted</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                            <div class="col-4 col-lg-2 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="SampleSalesInvoiceOfficialReceipt" id="kyc-sample-sior" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SampleSalesInvoiceOfficialReceipt3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SampleSalesInvoiceOfficialReceipt)
+                                                    </b>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="privacy">
+                                        <div class="row">
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Has Data Privacy Consent</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                        <input type="radio" class="btn-check date-not-required" id="kyc-consent-no" value="No" @(string.IsNullOrWhiteSpace(Model.PrivacyConsent) ? "checked" : "") name="PrivacyConsentOption">
+                                                        <label class="btn btn-outline-danger" for="kyc-consent-no">No</label>
+
+                                                        <input type="radio" class="btn-check" id="kyc-consent-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.PrivacyConsent) ? "" : "checked") name="PrivacyConsentOption">
+                                                        <label class="btn btn-outline-success" for="kyc-consent-yes">Yes</label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.PrivacyConsent) ? "No" : "Yes")
+                                                    </b>
+                                                }
+                                            </div>
+                                        </div>
+                        
+                                        <div class="row">
+                                            <div class="col-12 col-md-4 mb-2">
+                                                <label class="form-label fw-normal text-muted mb-0">Date</label>
+                                                @if (Model.Status == "Draft")
+                                                {
+                                                    <input type="datetime-local" name="PrivacyConsent" id="kyc-consent" class="form-control form-control-sm modify-checker date-requirement" value="@Model.PrivacyConsent3" />
+                                                }
+                                                else
+                                                {
+                                                    <b class="d-block form-gayahin">
+                                                        @(string.IsNullOrWhiteSpace(Model.PrivacyConsent) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.PrivacyConsent)
+                                                    </b>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</form>
+
+<!-- Save Signatory Modal -->
+<div class="modal fade" id="signatoryModal" role="dialog" aria-labelledby="signatoryModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Key Personnel & Authorized Signatory</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="signatoryForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="signatory-name" class="control-label mb-0 d-block">Name</label>
+                                <input type="text" name="Name" id="signatory-name" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="signatory-designation" class="control-label mb-0 d-block">Designation</label>
+                                <input type="text" name="Designation" id="signatory-designation" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="signatory-mobile" class="control-label mb-0 d-block">Mobile Number</label>
+                                <input type="text" name="MobileNumber" id="signatory-mobile" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="signatory-email" class="control-label mb-0 d-block">Email Address</label>
+                                <input type="text" name="EmailAddress" id="signatory-email" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-save"></span>Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Save Client Modal -->
+<div class="modal fade" id="clientModal" role="dialog" aria-labelledby="clientModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Major Client</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="clientForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="client-name" class="control-label mb-0 d-block">Name</label>
+                                <input type="text" name="Name" id="client-name" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="client-person" class="control-label mb-0 d-block">Contact Person</label>
+                                <input type="text" name="ContactPerson" id="client-person" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="client-number" class="control-label mb-0 d-block">Contact Number</label>
+                                <input type="text" name="ContactNumber" id="client-number" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="client-sales" class="control-label mb-0 d-block">Sales Volume</label>
+                                <input type="number" min="0" max="1999999.99" step="0.01" name="SalesVolume" id="client-sales" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-save"></span>Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Save Bank Modal -->
+<div class="modal fade" id="bankModal" role="dialog" aria-labelledby="bankModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bank Reference</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="bankForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="bank-name" class="control-label mb-0 d-block">Name</label>
+                                <input type="text" name="Name" id="bank-name" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="bank-branch" class="control-label mb-0 d-block">Branch</label>
+                                <input type="text" name="Branch" id="bank-branch" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="bank-account" class="control-label mb-0 d-block">Account Number</label>
+                                <input type="text" name="AccountNumber" id="bank-account" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="bank-number" class="control-label mb-0 d-block">Contact Number</label>
+                                <input type="text" name="ContactNumber" id="bank-number" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-save"></span>Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+        var kyc_details = @Html.Raw(Json.Serialize(Model));
+        
+        // Load customer data for select2
+        $("#kyc-customer").select2({
+            //minimumInputLength: 1,
+            placeholder: '<empty>',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2Simple", "Customer")",
+                data: function (params) {
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
+                        ActiveOnly: false
+                    });
+                }
+            }
+        });
+
+        $("#kyc-customer").on("select2:select", function () {
+            window.location = window.location.origin + "/KYC/Customer/" + $("#kyc-customer").val();
+        });
+        
+        if(kyc_details.customerId != 0 && kyc_details.customerName != "Invalid Customer") {
+            var formChanged = false;
+
+            var customerOption = new Option(kyc_details.customerCode, kyc_details.customerId, true, true);
+            $("#kyc-customer").append(customerOption).trigger('change');
+
+            $(document).on("change input", ".modify-checker", function () {
+                if($(this).is(":radio")) {
+                    $("input[name='" + this.name + "']").siblings("label").first().addClass("modified");
+                } else {
+                    $(this).addClass("modified");
+                }
+                formChanged = true;
+            });
+
+            $(".modify-checker-s2").on("select2:select", function () {
+                $("#select2-" + $(this).attr("id") + "-container").addClass("modified");
+                formChanged = true;
+            });
+
+            window.addEventListener("beforeunload", function (e) {
+                if (!formChanged)
+                     return;
+
+                e.preventDefault();
+                e.returnValue = "";
+            });
+            
+            var checklistFields = [
+                "birForm2303",
+                "mayorBusinessPermit",
+                "secDtiCertificate",
+                "latestAuditedFinancialStatement",
+                "incorporationArticleByLaws",
+                "secretaryCertificate",
+                "companyPortfolio",
+                "signatoriesIdentificationCard",
+                "sampleSalesInvoiceOfficialReceipt"
+            ];
+
+            var countChecklist = checklistFields.filter(s => kyc_details[s] != null).length;
+            //if (countChecklist > 0) {
+                $(".checklist-counter").removeClass("empty");
+            // } else {
+            //     $(".checklist-counter").addClass("empty");
+            // }
+            $(".checklist-counter-no").text(checklistFields.length - countChecklist);
+            $(".checklist-counter-yes").text(countChecklist);
+
+            $(document).on("change blur", ".date-requirement", function () {
+                $(this).val($(this).val());
+                if ($(this).val() != "") {
+                    $("#" + this.id + "-yes").prop("checked", true);
+                    $("#" + this.id + "-no").prop("checked", false);
+                }
+                
+                var count = $("#checklist input[type=datetime-local]:filled").length;
+                //if (count > 0) {
+                    $(".checklist-counter").removeClass("empty");
+                // } else {
+                //     $(".checklist-counter").addClass("empty");
+                // }
+                $(".checklist-counter-no").text(checklistFields.length - count);
+                $(".checklist-counter-yes").text(count);
+            });
+
+            $(document).on("change", ".date-not-required", function () {
+                if ($(this).prop("checked")) {
+                    $("#" + this.id.replace("-no", "")).val("");
+                }
+            });
+
+            // Load Select2 Credit Term
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetOptions", "CreditTerm")",
+                success: function (data, status, xhr) {
+                    $("#kyc-credit-term").select2({
+                        ajax: null, //already fetched outside
+                        data: data
+                    });
+                }
+            });
+
+            if (kyc_details.creditTermId) {
+                var creditTermOption = new Option(kyc_details.creditTerm, kyc_details.creditTermId, true, true);
+                $("#kyc-credit-term").append(creditTermOption).trigger('change');
+            }
+
+            var action_type = "";
+
+            $("#form-save button[type=submit]").on("click", function () {
+                action_type = $(this).data("action");
+            });
+            
+            var validateSave = $("#form-save").validate({
+                ignore: [],
+                rules: {
+                    Remarks: { minlength: 10, maxlength: 250 },
+                    NameOfCompany: { required: true, maxlength: 50 },
+                    RegisteredAddress: { required: true, maxlength: 300 },
+                    OperatingAddress: { required: true, maxlength: 300 },
+                    WarehouseAddress: { maxlength: 300 },
+                    OperatingHours: { maxlength: 50 },
+                    Website: { maxlength: 250 },
+                    EmailAddress: { required: true, maxlength: 250 },
+                    ContactNumber: { required: true, maxlength: 50 },
+                    //OrganizationType: {},
+                    SecDtiNumber: { required: true, maxlength: 50 },
+                    BirTinNumber: { required: true, maxlength: 50 },
+                    //VATStatus: {},
+                    BusinessNature: { required: true, maxlength: 100 },
+                    ProductServiceOffered: { required: true, maxlength: 100 },
+                    CreditLineAmount: { required: true, range: [0, 1999999.99] },
+                    CreditTerm: { required: true },
+                    BIRForm23033: { required: function () { return $("#kyc-bir-form-yes").prop("checked") == true; } },
+                    MayorBusinessPermit: { required: function () { return $("#kyc-business-permit-yes").prop("checked") == true; } },
+                    SecDtiCertificate: { required: function () { return $("#kyc-secdti-certificate-yes").prop("checked") == true; } },
+                    LatestAuditedFinancialStatement: { required: function () { return $("#kyc-audit-statement-yes").prop("checked") == true; } },
+                    IncorporationArticleByLaws: { required: function () { return $("#kyc-article-bylaw-yes").prop("checked") == true; } },
+                    SecretaryCertificate: { required: function () { return $("#kyc-secretary-certificate-yes").prop("checked") == true; } },
+                    CompanyPortfolio: { required: function () { return $("#kyc-portfolio-yes").prop("checked") == true; } },
+                    SignatoriesIdentificationCard: { required: function () { return $("#kyc-id-signatories-yes").prop("checked") == true; } },
+                    SampleSalesInvoiceOfficialReceipt: { required: function () { return $("#kyc-sample-sior-yes").prop("checked") == true; } },
+                    PrivacyConsent: { required: function () { return $("#kyc-consent-yes").prop("checked") == true; } }
+                },
+                messages: {
+                    Remarks: { minlength: "Remarks must atleast 10 characters", maxlength: "Remarks must not exceed 250 characters" },
+                    NameOfCompany: { required: "Please enter name of company", maxlength: "Name of company must not exceed 50 characters" },
+                    RegisteredAddress: { required: "Please enter registered address", maxlength: "Registered address must not exceed 300 characters" },
+                    OperatingAddress: { required: "Please enter operating address", maxlength: "Operating address must not exceed 300 characters" },
+                    WarehouseAddress: { maxlength: "Warehouse address must not exceed 300 characters" },
+                    OperatingHours: { maxlength: "Operating hours must not exceed 50 characters" },
+                    Website: { maxlength: "Website / social media must not exceed 250 characters" },
+                    EmailAddress: { required: "Please enter email address", maxlength: "Email address must not exceed 250 characters" },
+                    ContactNumber: { required: "Please enter contact number", maxlength: "Contact number must not exceed 50 characters" },
+                    //OrganizationType: {},
+                    SecDtiNumber: { required: "Please enter sec / dti number", maxlength: "sec / dti number must not exceed 50 characters" },
+                    BirTinNumber: { required: "Please enter bir tin number", maxlength: "bit tin number must not exceed 50 characters" },
+                    //VATStatus: {},
+                    BusinessNature: { required: "Please enter business nature", maxlength: "Business nature must not exceed 100 characters" },
+                    ProductServiceOffered: { required: "Please enter product / service offered", maxlength: "Product / service offered must not exceed 100 characters" },
+                    CreditLineAmount: { required: "Please enter credit line amount", range: "Credit line amount must be between 0-1999999.99" },
+                    CreditTerm: { required: "Please select a credit term" },
+                    BIRForm23033: { required: "Please enter expiration date of submitted bir form 2303" },
+                    MayorBusinessPermit: { required: "Please enter expiration date of submitted mayor's / business permit" },
+                    SecDtiCertificate: { required: "Please enter expiration date of submitted sec / dti certificate of registration" },
+                    LatestAuditedFinancialStatement: { required: "Please enter expiration date of submitted latest audited financial statement" },
+                    IncorporationArticleByLaws: { required: "Please enter expiration date of submitted articles of incorporation / by laws" },
+                    SecretaryCertificate: { required: "Please enter expiration date of submitted secretary's certificate" },
+                    CompanyPortfolio: { required: "Please enter expiration date of submitted company profile / portfolio" },
+                    SignatoriesIdentificationCard: { required: "Please enter expiration date of submitted valid identification card of the signatories" },
+                    SampleSalesInvoiceOfficialReceipt: { required: "Please enter expiration date of submitted sales invoice / official receipt" },
+                    PrivacyConsent: { required: "Please enter the date of data privacy consent" }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    
+                    var countSignatory = signatoryDT.page.info().recordsTotal;
+                    if (action_type == "Submitted" && countSignatory == 0) {
+                        toastr.error("Please add at least 1 Key Personnel & Authorized Signatory before continuing with the submission", "Error");
+                    } else {
+                        DoSave();
+                    }
+                }
+            });
+
+            function DoSave() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveDetails")",
+                    data: {
+                        customerId: kyc_details.customerId,
+                        Remarks: $("#kyc-remarks").val(),
+                        NameOfCompany: $("#kyc-company").val(),
+                        RegisteredAddress: $("#kyc-registered-address").val(),
+                        OperatingAddress: $("#kyc-operating-address").val(),
+                        WarehouseAddress: $("#kyc-warehouse-address").val(),
+                        OperatingHours: $("#kyc-operating-hours").val(),
+                        Website: $("#kyc-website").val(),
+                        EmailAddress: $("#kyc-email").val(),
+                        ContactNumber: $("#kyc-contact-number").val(),
+                        OrganizationType: $("#kyc-organization-type-corporation").prop("checked") ? 3
+                                        : $("#kyc-organization-type-partnership").prop("checked") ? 2
+                                        : 1,
+                        SecDtiNumber: $("#kyc-secdti-number").val(),
+                        BirTinNumber: $("#kyc-birtin-number").val(),
+                        VatStatus: $("#kyc-vat-status-registered").prop("checked"),
+                        BusinessNature: $("#kyc-business-nature").val(),
+                        ProductServiceOffered: $("#kyc-product-service").val(),
+                        CreditLineAmount: $("#kyc-credit-amount").val(),
+                        CreditTermId: $("#kyc-credit-term").val(),
+                        BIRForm2303: $("#kyc-bir-form").val(),
+                        MayorBusinessPermit: $("#kyc-business-permit").val(),
+                        SecDtiCertificate: $("#kyc-secdti-certificate").val(),
+                        LatestAuditedFinancialStatement: $("#kyc-audit-statement").val(),
+                        IncorporationArticleByLaws: $("#kyc-article-bylaw").val(),
+                        SecretaryCertificate: $("#kyc-secretary-certificate").val(),
+                        CompanyPortfolio: $("#kyc-portfolio").val(),
+                        SignatoriesIdentificationCard: $("#kyc-id-signatories").val(),
+                        SampleSalesInvoiceOfficialReceipt: $("#kyc-sample-sior").val(),
+                        PrivacyConsent: $("#kyc-consent").val(),
+                        Status: action_type || "Draft"
+                    },
+                    success: function (data, status, xhr) {
+                        if (data.status == "Error") {
+                            toastr.error(data.message, "Error");
+                        } else {
+                            toastr.success(data.message, "Success");
+                            formChanged = false;
+                            if (action_type == "" || action_type == "Draft") {
+                                $(".modified").removeClass("modified");
+                            } else {
+                                setInterval(function() {
+                                    window.location.reload();
+                                }, 3000);
+                            }
+                        }
+                    }
+                });
+            }
+        
+            var signatoryDT = $('.table-signatories').DataTable({
+                ajax: {
+                    url: "@Url.Action("GetKYCSignatoriesDT")",
+                    type: "POST",
+                    data: function (data) {
+                        data.CustomerId = kyc_details.customerId;
+                    },
+                    beforeSend: function (jqXHR, settings) {
+                        settings.isDataTableRequest = true;
+                    }
+                },
+                processing: true,
+                language: {
+                    processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+                },
+                serverSide: true,
+                filter: false,
+                responsive: true,
+                autoWidth: false,
+                lengthChange: false,
+                info: false,
+                paging: false,
+                columns: [
+                    { data: "name", name: "Name" },
+                    { data: "designation", name: "Designation" },
+                    { data: "mobileNumber", name: "MobileNumber" },
+                    { data: "emailAddress", name: "EmailAddress" },
+                    {
+                        orderable: false,
+                        data: function (data, type, dataToSet) {
+                            var actions = '<div class="btn-group" role="group">';
+                            if (user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-edit-signatory" data-microtip-title="Edit Key Personnel & Authorized Signatory" data-microtip-position="top" role="tooltip"><span class="fas fa-edit"></span></button>';
+                            }
+                            if (user_access.canDelete) {
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-signatory" data-microtip-title="Delete Key Personnel & Authorized Signatory" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
+                            }
+                            return actions + "</div>";
+                        },
+                        visible: kyc_details.status == "Draft"
+                    }
+                ],
+                order: [[0, "asc"]]
+            }).on("draw", function () {
+                var count = signatoryDT.page.info().recordsTotal;
+
+                if (count > 0) {
+                    $(".signatory-counter").removeClass("empty");
+                } else {
+                    $(".signatory-counter").addClass("empty");
+                }
+                $(".signatory-counter").text(count);
+
+                var disableAdd = count >= 5;
+                $(".btn-add-signatory").toggleClass("ui-state-disabled", disableAdd);
+                if (disableAdd) {
+                    $(".btn-add-signatory").attr({
+                        "data-microtip-title": "Add\nReached maximum allowed record",
+                        "data-microtip-position": "left",
+                        "role": "tooltip",
+                         "disabled": "disabled"
+                    });
+                } else {
+                    $(".btn-add-signatory").removeAttr("data-microtip-title data-microtip-position role disabled");
+                }
+            });
+
+            var clientDT = $(".table-client").DataTable({
+                ajax: {
+                    url: "@Url.Action("GetKYCClientsDT")",
+                    type: "POST",
+                    data: function (data) {
+                        data.CustomerId = kyc_details.customerId;
+                    },
+                    beforeSend: function (jqXHR, settings) {
+                        settings.isDataTableRequest = true;
+                    }
+                },
+                processing: true,
+                language: {
+                    processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+                },
+                serverSide: true,
+                filter: false,
+                responsive: true,
+                autoWidth: false,
+                lengthChange: false,
+                info: false,
+                paging: false,
+                columns: [
+                    { data: "name", name: "Name" },
+                    {
+                        data: function (data, type, dataToSet) {
+                            return data.contactPerson || '<span class="text-muted">N/A</span>';
+                        }, 
+                        name: "ContactPerson" 
+                    },
+                    {
+                        data: function (data, type, dataToSet) {
+                            return data.contactNumber || '<span class="text-muted">N/A</span>';
+                        },
+                        name: "ContactNumber" 
+                    },
+                    { 
+                        data: function (data, type, dataToSet) {
+                            return data.salesVolume || '<span class="text-muted">N/A</span>';
+                        },
+                        name: "SalesVolume" 
+                    },
+                    {
+                        orderable: false,
+                        data: function (data, type, dataToSet) {
+                            var actions = '<div class="btn-group" role="group">';
+                            if (user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-edit-client" data-microtip-title="Edit Major Client" data-microtip-position="top" role="tooltip"><span class="fas fa-edit"></span></button>';
+                            }
+                            if (user_access.canDelete) {
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-client" data-microtip-title="Delete Major Client" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
+                            }
+                            return actions + "</div>";
+                        },
+                        visible: kyc_details.status == "Draft"
+                    }
+                ],
+                order: [[0, "asc"]]
+            }).on("draw", function () {
+                var count = clientDT.page.info().recordsTotal;
+
+                if (count > 0) {
+                    $(".client-counter").removeClass("empty");
+                } else {
+                    $(".client-counter").addClass("empty");
+                }
+                $(".client-counter").text(count);
+
+                var disableAdd = count >= 5;
+                 $(".btn-add-client").toggleClass("ui-state-disabled", disableAdd);
+                 if (disableAdd) {
+                     $(".btn-add-client").attr({
+                         "data-microtip-title": "Add\nReached maximum allowed record",
+                         "data-microtip-position": "left",
+                         "role": "tooltip",
+                         "disabled": "disabled"
+                     });
+                 } else {
+                     $(".btn-add-client").removeAttr("data-microtip-title data-microtip-position role disabled");
+                 }
+            });
+
+            var bankDT = $(".table-bank").DataTable({
+                ajax: {
+                    url: "@Url.Action("GetKYCBanksDT")",
+                    type: "POST",
+                    data: function (data) {
+                        data.CustomerId = kyc_details.customerId;
+                    },
+                    beforeSend: function (jqXHR, settings) {
+                        settings.isDataTableRequest = true;
+                    }
+                },
+                processing: true,
+                language: {
+                    processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+                },
+                serverSide: true,
+                filter: false,
+                responsive: true,
+                autoWidth: false,
+                lengthChange: false,
+                info: false,
+                paging: false,
+                columns: [
+                    { data: "name", name: "Name" },
+                    { data: "branch", name: "Branch" },
+                    { data: "accountNumber", name: "AccountNumber" },
+                    { data: "contactNumber", name: "ContactNumber" },
+                    {
+                        orderable: false,
+                        data: function (data, type, dataToSet) {
+                            var actions = '<div class="btn-group" role="group">';
+                            if (user_access.canEdit) {
+                                actions += '<button type="button" class="btn btn-primary btn-xs btn-edit-bank" data-microtip-title="Edit Bank Reference" data-microtip-position="top" role="tooltip"><span class="fas fa-edit"></span></button>';
+                            }
+                            if (user_access.canDelete) {
+                                actions += '<button type="button" class="btn btn-danger btn-xs btn-remove-bank" data-microtip-title="Delete Bank Reference" data-microtip-position="top" role="tooltip"><span class="fas fa-trash-alt"></span></button>';
+                            }
+                            return actions + "</div>";
+                        },
+                        visible: kyc_details.status == "Draft"
+                    }
+                ],
+                order: [[0, "asc"]]
+            }).on("draw", function () {
+                var count = bankDT.page.info().recordsTotal;
+
+                if (count > 0) {
+                    $(".bank-counter").removeClass("empty");
+                } else {
+                    $(".bank-counter").addClass("empty");
+                }
+                $(".bank-counter").text(count);
+
+                var disableAdd = count >= 5;
+                 $(".btn-add-bank").toggleClass("ui-state-disabled", disableAdd);
+                 if (disableAdd) {
+                     $(".btn-add-bank").attr({
+                         "data-microtip-title": "Add\nReached maximum allowed record",
+                         "data-microtip-position": "left",
+                         "role": "tooltip",
+                         "disabled": "disabled"
+                     });
+                 } else {
+                     $(".btn-add-bank").removeAttr("data-microtip-title data-microtip-position role disabled");
+                 }
+            });
+
+            if (user_access.canAdd || user_access.canEdit) {
+                // signatory
+                $(document).on("click", ".btn-add-signatory", function () {
+                    $("#signatory-name").data("Id", "");
+                    $("#signatory-name").val("");
+                    $("#signatory-designation").val("");
+                    $("#signatory-mobile").val("");
+                    $("#signatory-email").val("");
+
+                    $("#signatoryModal").modal("show");
+                });
+
+                $(document).on("click", ".btn-edit-signatory", function () {
+                    var data = signatoryDT.row($(this).closest("tr")).data();
+
+                    $("#signatory-name").data("Id", data.id);
+                    $("#signatory-name").val(data.name);
+                    $("#signatory-designation").val(data.designation);
+                    $("#signatory-mobile").val(data.mobileNumber);
+                    $("#signatory-email").val(data.emailAddress);
+
+                    $("#signatoryModal").modal("show");
+                });
+            
+                var validateSaveSignatory = $("#signatoryForm").validate({
+                    rules: {
+                        Name: { required: true, maxlength: 100 },
+                        Designation: { required: true, maxlength: 50 },
+                        MobileNumber: { required: true, maxlength: 50 },
+                        EmailAddress: { required: true, maxlength: 50, email: true }
+                    },
+                    messages: {
+                        Name: { required: "Please enter name", maxlength: "Name must not exceed 100 characters" },
+                        Designation: { required: "Please enter designation", maxlength: "Designation must not exceed 50 characters" },
+                        MobileNumber: { required: "Please enter mobile number", maxlength: "Mobile number must not exceed 50 characters" },
+                        EmailAddress: { required: "Please enter email address", maxlength: "Email address must not exceed 50 characters", email: "Email is not a valid format" }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoSaveSignatory();
+                    }
+                });
+
+                function DoSaveSignatory() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveSignatory")",
+                        data: {
+                            Id: $("#signatory-name").data("Id"),
+                            KYCId: kyc_details.id,
+                            Name: $("#signatory-name").val(),
+                            Designation: $("#signatory-designation").val(),
+                            MobileNumber: $("#signatory-mobile").val(),
+                            EmailAddress: $("#signatory-email").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#signatoryModal").modal("hide");
+                                signatoryDT.ajax.reload();
+                            }
+                        }
+                    });
+                }
+                // end signatory
+
+                
+                // client
+                $(document).on("click", ".btn-add-client", function () {
+                    $("#client-name").data("Id", "");
+                    $("#client-name").val("");
+                    $("#client-person").val("");
+                    $("#client-number").val("");
+                    $("#client-sales").val("");
+
+                    $("#clientModal").modal("show");
+                });
+
+                $(document).on("click", ".btn-edit-client", function () {
+                    var data = clientDT.row($(this).closest("tr")).data();
+
+                    $("#client-name").data("Id", data.id);
+                    $("#client-name").val(data.name);
+                    $("#client-person").val(data.contactPerson);
+                    $("#client-number").val(data.contactNumber);
+                    $("#client-sales").val(data.salesVolumeD);
+
+                    $("#clientModal").modal("show");
+                });
+            
+                var validateSaveClient = $("#clientForm").validate({
+                    rules: {
+                        Name: { required: true, maxlength: 50 },
+                        ContactPerson: { maxlength: 50 },
+                        ContactNumber: { maxlength: 50 },
+                        SalesVolume: { range: [0, 1999999.99] }
+                    },
+                    messages: {
+                        Name: { required: "Please enter name", maxlength: "Name must not exceed 50 characters" },
+                        ContactPerson: { maxlength: "Contact person must not exceed 50 characters" },
+                        ContactNumber: { maxlength: "Contact number must not exceed 50 characters" },
+                        SalesVolume: { range: "Sales volume must be between 0-1999999.99" }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoSaveClient();
+                    }
+                });
+
+                function DoSaveClient() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveClient")",
+                        data: {
+                            Id: $("#client-name").data("Id"),
+                            KYCId: kyc_details.id,
+                            Name: $("#client-name").val(),
+                            ContactPerson: $("#client-person").val(),
+                            ContactNumber: $("#client-number").val(),
+                            SalesVolumeD: $("#client-sales").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#clientModal").modal("hide");
+                                clientDT.ajax.reload();
+                            }
+                        }
+                    });
+                }
+                // end client
+
+                
+                // bank
+                $(document).on("click", ".btn-add-bank", function () {
+                    $("#bank-name").data("Id", "");
+                    $("#bank-name").val("");
+                    $("#bank-branch").val("");
+                    $("#bank-account").val("");
+                    $("#bank-number").val("");
+
+                    $("#bankModal").modal("show");
+                });
+
+                $(document).on("click", ".btn-edit-bank", function () {
+                    var data = bankDT.row($(this).closest("tr")).data();
+
+                    $("#bank-name").data("Id", data.id);
+                    $("#bank-name").val(data.name);
+                    $("#bank-branch").val(data.branch);
+                    $("#bank-account").val(data.accountNumber);
+                    $("#bank-number").val(data.contactNumber);
+
+                    $("#bankModal").modal("show");
+                });
+            
+                var validateSaveBank = $("#bankForm").validate({
+                    rules: {
+                        Name: { required: true, maxlength: 50 },
+                        Branch: { required: true, maxlength: 50 },
+                        AccountNumber: { required: true, maxlength: 50 },
+                        ContactNumber: { required: true, maxlength: 50 }
+                    },
+                    messages: {
+                        Name: { required: "Please enter name", maxlength: "Name must not exceed 50 characters" },
+                        Branch: { required: "Please enter branch", maxlength: "Branch must not exceed 50 characters" },
+                        AccountNumber: { required: "Please enter account number", maxlength: "Account number must not exceed 50 characters" },
+                        ContactNumber: { required: "Please enter contact number", maxlength: "Contact number must not exceed 50 characters" }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoSaveBank();
+                    }
+                });
+
+                function DoSaveBank() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveBank")",
+                        data: {
+                            Id: $("#bank-name").data("Id"),
+                            KYCId: kyc_details.id,
+                            Name: $("#bank-name").val(),
+                            Branch: $("#bank-branch").val(),
+                            AccountNumber: $("#bank-account").val(),
+                            ContactNumber: $("#bank-number").val()
+                        },
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#bankModal").modal("hide");
+                                bankDT.ajax.reload();
+                            }
+                        }
+                    });
+                }
+                // end client
+            }
+
+            if (user_access.canDelete) {
+                // signatory
+                $(document).on("click", ".btn-remove-signatory", function () {
+                    var data = signatoryDT.row($(this).closest("tr")).data();
+
+                    swal({
+                        title: "Delete Key Personnel & Authorized Signatory",
+                        text: "Continue to delete this ket personnel & authorized signatory?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm != null) {
+                            $.ajax({
+                                url: "@Url.Action("DeleteSignatory")",
+                                type: "POST",
+                                data: {
+                                    SignatoryId: data.id,
+                                    KYCId: kyc_details.id
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        toastr.success(data.message, "Success");
+                                        signatoryDT.ajax.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                // end signatory
+                
+                // client
+                $(document).on("click", ".btn-remove-client", function () {
+                    var data = clientDT.row($(this).closest("tr")).data();
+
+                    swal({
+                        title: "Delete Major Client",
+                        text: "Continue to delete this major client?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm != null) {
+                            $.ajax({
+                                url: "@Url.Action("DeleteClient")",
+                                type: "POST",
+                                data: {
+                                    ClientId: data.id,
+                                    KYCId: kyc_details.id
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        toastr.success(data.message, "Success");
+                                        clientDT.ajax.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                // end client
+                
+                // bank
+                $(document).on("click", ".btn-remove-bank", function () {
+                    var data = bankDT.row($(this).closest("tr")).data();
+
+                    swal({
+                        title: "Delete Bank Reference",
+                        text: "Continue to delete this bank reference?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm != null) {
+                            $.ajax({
+                                url: "@Url.Action("DeleteBank")",
+                                type: "POST",
+                                data: {
+                                    BankId: data.id,
+                                    KYCId: kyc_details.id
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        toastr.success(data.message, "Success");
+                                        bankDT.ajax.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                // end bank
+            }
+        }
+    </script>
+}

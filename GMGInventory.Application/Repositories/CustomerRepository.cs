@@ -1,20 +1,11 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
-using GMGInventory.Data.Migrations;
-using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using static Humanizer.In;
-using static Humanizer.On;
 
 namespace GMGInventory.Application.Repositories
 {
@@ -31,6 +22,27 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+        }
+
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2Simple(string search, int page, bool ActiveOnly)
+        {
+            var customers = from customer in context.Customers
+                            where (ActiveOnly == true && customer.IsActive)
+                            || ActiveOnly == false
+                            select new JsonNameOptionsModel
+                            {
+                                Id = customer.Id.ToString(),
+                                Text = customer.Code,
+                                Name = customer.Name
+                            };
+
+            var customersFiltered = await customers.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonNameOptionsModel>
+            {
+                //incomplete_results = false,
+                items = customersFiltered,
+                total_count = customers.Count()
+            };
         }
 
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptions(string search, int page)

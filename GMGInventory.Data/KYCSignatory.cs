@@ -6,14 +6,22 @@ namespace GMGInventory.Data
     {
         public KYCSignatory()
         {
-            this.KYCs = new HashSet<KYC>();
         }
 
-        public string Name { get; set; }
-        public string Designation { get; set; }
-        public string? Email { get; set; }
-        public string? ContactNumber { get; set; }
+        [ForeignKey(nameof(KYCId))]
+        public int KYCId { get; set; }
+        public virtual KYC KYC { get; set; }
 
-        public ICollection<KYC> KYCs { get; set; }
+        [Column(TypeName = "nvarchar(100)")]
+        public string Name { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string Designation { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? Email { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? ContactNumber { get; set; }
     }
 }

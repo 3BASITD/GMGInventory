@@ -6,58 +6,125 @@ namespace GMGInventory.Data
     {
         public KYC()
         {
+            this.KYCBanks = new HashSet<KYCBank>();
+            this.KYCClients = new HashSet<KYCClient>();
+            this.KYCSignatories = new HashSet<KYCSignatory>();
         }
 
+        [Column(TypeName = "nvarchar(100)")]
         public string CompanyName { get; set; }
+
+        [Column(TypeName = "nvarchar(300)")]
         public string RegisteredAddress { get; set; }
+
+        [Column(TypeName = "nvarchar(300)")]
         public string OperatingAddress { get; set; }
-        public string WarehouseAddress { get; set; }
-        public string OperatingHours { get; set; }
+
+        [Column(TypeName = "nvarchar(300)")]
+        public string? WarehouseAddress { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? OperatingHours { get; set; }
+
+        [Column(TypeName = "nvarchar(250)")]
         public string? Website { get; set; }
-        public string? Email { get; set; }
-        public string? ContactNumber { get; set; }
-        public bool IsSolProprietorship { get; set; }
-        public bool IsPartnership { get; set; }
-        public bool IsCorporation { get; set; }
-        public string? SECDTINumber { get; set; }
-        public string? TINNumber { get; set; }
-        public bool IsVATRegistered { get; set; }
-        public bool IsNonVAT { get; set; }
-        public string? BusinessNature { get; set; }
-        public string? ProductServiceOffered { get; set; }
-        public decimal? CreditLineAmount { get; set; }
-        public int? CreditTerm { get; set; }
-        public bool HasBIRForm2303 { get; set; }
-        public bool HasMayorBusinessPermit { get; set; }
-        public bool HasSECDTICertificate { get; set; }
-        public bool HasLatestAuditedFinancialStatement { get; set; }
-        public bool HasIncorporationArticleByLaws { get; set; }
-        public bool HasSecretaryCertificate { get; set; }
-        public bool HasCompanyPortfolio { get; set; }
-        public bool HasSignatoriesIdentificationCard { get; set; }
-        public bool HasSampleSalesInvoiceOfficialReceipt { get; set; }
-        public bool HasPrivacyConsent { get; set; }
-        public DateTime DateConsent { get; set; }
+
+        [Column(TypeName = "nvarchar(250)")]
+        public string Email { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string ContactNumber { get; set; }
+
+        public int OrganizationType { get; set; } // 1 soleproprietorship, 2 partnership, 3 corporation
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string SecDtiNumber { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string BirTinNumber { get; set; }
+
+        [Column(TypeName = "bit")]
+        public bool VatStatus { get; set; } // true vat registered, false non-vat
+
+        [Column(TypeName = "nvarchar(100)")]
+        public string BusinessNature { get; set; }
+
+        [Column(TypeName = "nvarchar(100)")]
+        public string ProductServiceOffered { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal CreditLineAmount { get; set; }
+
+        [ForeignKey(nameof(CreditTermId))]
+        public int CreditTermId { get; set; }
+        public virtual CreditTerm CreditTerm { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationBIRForm2303 { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationMayorBusinessPermit { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationSECDTICertificate { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationLatestAuditedFinancialStatement { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationIncorporationArticleByLaws { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationSecretaryCertificate { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationCompanyPortfolio { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationSignatoriesIdentificationCard { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? ExpirationSampleSalesInvoiceOfficialReceipt { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? PrivacyConsent { get; set; }
 
 
-        [ForeignKey("CustomerId")]
+        [ForeignKey(nameof(CustomerId))]
         public int CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
 
-        [ForeignKey("StatusId")]
-        public int StatusId { get; set; }
-        public KYCStatus Status { get; set; }
+        public string? Status { get; set; }
 
-        [ForeignKey("ApproverId")]
+        [ForeignKey(nameof(SubmitterId))]
+        public string? SubmitterId { get; set; }
+        public virtual User Submitter { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? DateSubmitted { get; set; }
+
+        [ForeignKey(nameof(ApproverId))]
         public string? ApproverId { get; set; }
         public virtual User Approver { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? DateApproved { get; set; }
 
         [ForeignKey("DisapproverId")]
         public string? DisapproverId { get; set; }
         public virtual User Disapprover { get; set; }
 
+        [Column(TypeName = "datetime2")]
+        public DateTime? DateDisapproved { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
         public string? DisapprovedReason { get; set; }
 
+        [Column(TypeName = "nvarchar(50)")]
         public string? Remarks { get; set; }
+
+        public ICollection<KYCBank> KYCBanks { get; set; }
+        public ICollection<KYCClient> KYCClients { get; set; }
+        public ICollection<KYCSignatory> KYCSignatories { get; set; }
     }
 }
