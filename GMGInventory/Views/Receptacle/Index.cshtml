@@ -123,7 +123,7 @@
                 return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Customer")"
+                url: "@Url.Action("GetOptions2Simple", "Customer")"
             },
             dropdownParent: $("#filterModal")
         });

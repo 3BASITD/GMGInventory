@@ -457,7 +457,7 @@
                 return $("<strong>" + repo.text + "</strong> <em class='fw-light'> - All with keyword &quot;" + repo.text + "&quot;</em>");
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Customer")"
+                url: "@Url.Action("GetOptions2Simple", "Customer")"
             },
             dropdownParent: $("#filterModal")
         });
@@ -496,26 +496,52 @@
         });
 
         // Load Select2 Customer
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("GetOptions2", "Customer")",
-            success: function (data, status, xhr) {
-                if (user_access.canAdd) {
-                    $("#create-customer").select2({
-                        ajax: null, //already fetched outside
-                        data: data,
-                        dropdownParent: $("#createModal")
-                    });
-                }
-                if (user_access.canEdit) {
-                    $("#edit-customer").select2({
-                        ajax: null, //already fetched outside
-                        data: data,
-                        dropdownParent: $("#editModal")
-                    });
-                }
-            }
-        });
+        if (user_access.canAdd) {
+            $("#create-customer").select2({
+                //minimumInputLength: 1,
+                placeholder: '<empty>',
+                language: {
+                    noResults: function () {
+                        return "No customers found for selected Agent";
+                    }
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " +
+                                (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                                (repo.disabledReason ? "<br /><small class='text-danger'>" + repo.disabledReason + "</small>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetByAgentOptions", "Customer")"
+                },
+                dropdownParent: $("#createModal")
+            });
+        }
+        if (user_access.canEdit) {
+            $("#edit-customer").select2({
+                //minimumInputLength: 1,
+                placeholder: '<empty>',
+                language: {
+                    noResults: function () {
+                        return "No customers found for selected Agent";
+                    }
+                },
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " +
+                                (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                                (repo.disabledReason ? "<br /><small class='text-danger'>" + repo.disabledReason + "</small>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetByAgentOptions", "Customer")"
+                },
+                dropdownParent: $("#editModal")
+            });
+        }
 
         // Load Select2 User
         $.ajax({

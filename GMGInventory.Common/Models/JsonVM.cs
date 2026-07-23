@@ -219,12 +219,19 @@ namespace GMGInventory.Common.Models
         public decimal? PreviousCostD { get; set; }
     }
 
-    public class JsonCustomerOptionsModel
+    public class JsonCustomerSimpleOptionsModel
     {
         public string Id { get; set; }
         public string Text { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
+        public bool Selected { get; set; } = false;
+        public bool Disabled { get; set; }
+        public string DisabledReason { get; set; }
+    }
+
+    public class JsonCustomerOptionsModel : JsonCustomerSimpleOptionsModel
+    {
         public string CreditTerm { get; set; }
         public string CreditLimit => string.Format(SystemFormat.StringDecimalComma, CreditLimitD);
         public decimal CreditLimitD { get; set; }
@@ -232,6 +239,8 @@ namespace GMGInventory.Common.Models
         public int PriorityD { get; set; }
         public string Branch { get; set; }
         public string Region { get; set; }
+        public string RegionCode { get; set; }
+        public int RegionId { get; set; }
         public string Agent { get; set; }
         public string AgentCode { get; set; }
         public int AgentId { get; set; }

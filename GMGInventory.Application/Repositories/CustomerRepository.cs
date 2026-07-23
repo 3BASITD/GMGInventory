@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -14,6 +15,8 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly string currentUserId;
+        private readonly bool kycRequired;
 
         public CustomerRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
@@ -22,14 +25,32 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            this.kycRequired = CheckIfKYCRequired();
         }
 
-        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2Simple(string search, int page, bool ActiveOnly)
+        private bool CheckIfKYCRequired()
+        {
+            var settings = context.SystemSettings
+                                  .Where(s => s.Name == "KYCRequired")
+                                  .FirstOrDefault();
+            return settings != null && settings.Value == "true";
+        }
+        public async Task<Select2Model<JsonCustomerSimpleOptionsModel>> GetOptions2Simple(string search, int page, bool ActiveOnly)
         {
             var customers = from customer in context.Customers
-                            where (ActiveOnly == true && customer.IsActive)
-                            || ActiveOnly == false
-                            select new JsonNameOptionsModel
+                            join kyc in context.KYCs on customer.Id equals kyc.CustomerId into kg
+                            from kyc in kg.DefaultIfEmpty()
+                            where (string.IsNullOrWhiteSpace(search)
+                            || customer.Code.ToLower().Contains(search.ToLower())
+                            || customer.Name.ToLower().Contains(search.ToLower()))
+                            && ((ActiveOnly == true
+                            && customer.IsActive == true
+                            && ((kycRequired == true && kyc != null && kyc.Status == "Approved")
+                            || (kycRequired != true && (kyc == null || kyc.Status != "Approved"))))
+                            || ActiveOnly == false)
+                            orderby customer.Code ascending
+                            select new JsonCustomerSimpleOptionsModel
                             {
                                 Id = customer.Id.ToString(),
                                 Text = customer.Code,
@@ -37,7 +58,7 @@ namespace GMGInventory.Application.Repositories
                             };
 
             var customersFiltered = await customers.Skip((page - 1) * 50).Take(50).ToListAsync();
-            return new Select2Model<JsonNameOptionsModel>
+            return new Select2Model<JsonCustomerSimpleOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,
@@ -45,71 +66,16 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<Select2Model<JsonCustomerOptionsModel>> GetOptions(string search, int page)
+        public async Task<Select2Model<JsonCustomerSimpleOptionsModel>> GetOptions(string search, int page)
         {
-            var customerInvoices = from inv in context.InvoiceLineItems
-                                   where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                   join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
-                                                                       equals new { oli.SalesOrderId, oli.ItemId }
-                                   let discount1 = (100 - oli.Discount1) / 100
-                                   let discount2 = (100 - oli.Discount2) / 100
-                                   group new { inv.Quantity, inv.UnitPrice, discount1, discount2 } by inv.Invoice.SalesOrder.Customer.Id into g
-                                   select new
-                                   {
-                                       CustomerId = g.Key,
-                                       //InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2 / 100)) ?? 0
-                                       InvoiceAmount = g.Sum(s => (decimal?)(s.Quantity * s.UnitPrice * s.discount1 * s.discount2)) ?? 0
-                                   };
-            var customerPayments = from pay in context.CustomerPaymentDetails
-                                   where (pay.Invoice.Status.Code.Trim().ToLower() == "invoiced" || pay.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                   group pay by pay.Invoice.SalesOrder.Customer.Id into g
-                                   select new
-                                   {
-                                       CustomerId = g.Key,
-                                       PaymentAmount = g.Sum(s => (decimal?)(s.PaidAmount) ?? 0)
-                                   };
-
-            var customerSalesReturns = from tbr in context.SOACRLineItemTBRs
-                                       where (tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "invoiced" || tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                       group tbr by tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.SalesOrder.Customer.Id into g
-                                       select new
-                                       {
-                                           CustomerId = g.Key,
-                                           SalesReturnAmount = g.Sum(s => (decimal?)(s.SalesReturnLineItem.Quantity
-                                                                        * s.SalesReturnLineItem.SellingPrice
-                                                                        * (100 - s.SalesReturnLineItem.Discount1) / 100
-                                                                        * (100 - s.SalesReturnLineItem.Discount2) / 100)) ?? 0
-                                       };
-
-            var customerSOACR = from s in context.SOACRLineItems
-                                where (s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                group s by s.Invoice.SalesOrder.Customer.Id into g
-                                select new
-                                {
-                                    CustomerId = g.Key,
-                                    CreditMemoAmount = g.Sum(s => (decimal?)s.CreditAmount) ?? 0,
-                                    DebitMemoAmount = g.Sum(s => (decimal?)s.DebitAmount) ?? 0,
-                                    FreightAmount = g.Sum(s => (decimal?)s.FreightCost) ?? 0
-                                };
-
             var customers = from customer in context.Customers
-                            let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
-                                                                .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
-                            let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
-                                                                .Sum(s => (decimal?)s.PaymentAmount) ?? 0
-                            let salesReturnAmount = customerSalesReturns.Where(s => s.CustomerId == customer.Id)
-                                                                        .Sum(s => (decimal?)s.SalesReturnAmount) ?? 0
-                            let creditAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
-                                                            .Sum(s => (decimal?)s.CreditMemoAmount) ?? 0
-                            let debitAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
-                                                           .Sum(s => (decimal?)s.DebitMemoAmount) ?? 0
-                            let freightAmount = customerSOACR.Where(s => s.CustomerId == customer.Id)
-                                                             .Sum(s => (decimal?)s.FreightAmount) ?? 0
-                            where string.IsNullOrWhiteSpace(search)
-                               || customer.Code.ToLower().Contains(search.ToLower())
-                               || customer.Name.ToLower().Contains(search.ToLower())
+                            join kyc in context.KYCs on customer.Id equals kyc.CustomerId into kg
+                            from kyc in kg.DefaultIfEmpty()
+                            where (string.IsNullOrWhiteSpace(search)
+                            || customer.Code.ToLower().Contains(search.ToLower())
+                            || customer.Name.ToLower().Contains(search.ToLower()))
                             orderby customer.Code ascending
-                            select new JsonCustomerOptionsModel
+                            select new JsonCustomerSimpleOptionsModel
                             {
                                 Id = customer.Id.ToString(),
                                 Text = customer.Code,
@@ -118,34 +84,32 @@ namespace GMGInventory.Application.Repositories
                                                   .Where(s => s.IsDefault == true)
                                                   .Select(s => s.Address)
                                                   .FirstOrDefault() ?? "N/A",
-                                CreditTerm = customer.CreditTerm.Name,
-                                Agent = customer.Agent.FirstName + " " + customer.Agent.LastName,
-                                OutstandingBalanceD = invoiceAmount
-                                                    - paymentAmount
-                                                    - salesReturnAmount
-                                                    - creditAmount
-                                                    + debitAmount
-                                                    + freightAmount
+                                Disabled = customer.IsActive == false || (kycRequired == true && (kyc == null || kyc.Status != "Approved")),
+                                DisabledReason = customer.IsActive == false ? "Customer is Inactive"
+                                               : (kycRequired == true && kyc == null) ? "Customer has no KYC record"
+                                               : (kycRequired == true && kyc.Status != "Approved") ? "Customer has no Approved KYC record"
+                                               : ""
                             };
 
-            var customersList = await customers.ToListAsync();
-            var customersFiltered = customersList.Skip((page - 1) * 50).Take(50).ToList();
-            return new Select2Model<JsonCustomerOptionsModel>
+            var customersFiltered = await customers.Skip((page - 1) * 50).Take(50).ToListAsync();
+            return new Select2Model<JsonCustomerSimpleOptionsModel>
             {
                 //incomplete_results = false,
                 items = customersFiltered,
-                total_count = customersList.Count
+                total_count = customers.Count()
             };
         }
 
         public async Task<Select2Model<JsonCustomerOptionsModel>> GetByAgentOptions(string search, int page, int? agent)
         {
             var customers = from customer in context.Customers
+                            join kyc in context.KYCs on customer.Id equals kyc.CustomerId into kg
+                            from kyc in kg.DefaultIfEmpty()
                             where (string.IsNullOrWhiteSpace(search)
                             || customer.Code.ToLower().Contains(search.ToLower())
                             || customer.Name.ToLower().Contains(search.ToLower()))
                             && (agent == null || customer.AgentId == agent)
-                            && customer.IsActive == true
+                            //&& customer.IsActive == true
                             orderby customer.Code ascending
                             select new JsonCustomerOptionsModel
                             {
@@ -164,7 +128,14 @@ namespace GMGInventory.Application.Repositories
                                 AgentCode = customer.Agent.Code,
                                 AgentId = customer.Agent.Id,
                                 CustomerStatus = customer.CustomerAccountStatus.Name,
-                                Region = customer.Area.Region.Name
+                                Region = customer.Area.Region.Name,
+                                RegionCode = customer.Area.Region.Code,
+                                RegionId = customer.Area.Region.Id,
+                                Disabled = customer.IsActive == false || (kycRequired == true && (kyc == null || kyc.Status != "Approved")),
+                                DisabledReason = customer.IsActive == false ? "Customer is Inactive"
+                                               : (kycRequired == true && kyc == null) ? "Customer has no KYC record"
+                                               : (kycRequired == true && kyc.Status != "Approved") ? "Customer has no Approved KYC record"
+                                               : ""
                             };
 
             var customersList = await customers.ToListAsync();
@@ -267,6 +238,8 @@ namespace GMGInventory.Application.Repositories
 
 
             var customers = from customer in context.Customers
+                            join kyc in context.KYCs on customer.Id equals kyc.CustomerId into kg
+                            from kyc in kg.DefaultIfEmpty()
                             let invoiceAmount = customerInvoices.Where(s => s.CustomerId == customer.Id)
                                                                 .Sum(s => (decimal?)s.InvoiceAmount) ?? 0
                             let paymentAmount = customerPayments.Where(s => s.CustomerId == customer.Id)
@@ -303,7 +276,12 @@ namespace GMGInventory.Application.Repositories
                                                     - salesReturnAmount
                                                     - creditAmount
                                                     + debitAmount
-                                                    + freightAmount
+                                                    + freightAmount,
+                                Disabled = customer.IsActive == false || (kycRequired == true && (kyc == null || kyc.Status != "Approved")),
+                                DisabledReason = customer.IsActive == false ? "Customer is Inactive"
+                                               : (kycRequired == true && kyc == null) ? "Customer has no KYC record"
+                                               : (kycRequired == true && kyc.Status != "Approved") ? "Customer has no Approved KYC record"
+                                               : ""
                             };
 
             var customersList = await customers.ToListAsync();
@@ -316,18 +294,23 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<JsonOptionsModel>> GetOptions2(int? IncludeId)
+        public async Task<IList<JsonCustomerSimpleOptionsModel>> GetOptions2(int? IncludeId)
         {
-            return await context.Customers
-                .Where(s => s.IsActive || s.Id == IncludeId)
-                .Select(s => new JsonOptionsModel
-                {
-                    Id = s.Id.ToString(),
-                    Text = s.Name,
-                    Selected = IncludeId != null && IncludeId == s.Id
-                })
-                .OrderBy(s => s.Text)
-                .ToListAsync();
+            var customers = from customer in context.Customers
+                            join kyc in context.KYCs on customer.Id equals kyc.CustomerId into kg
+                            from kyc in kg.DefaultIfEmpty()
+                            select new JsonCustomerSimpleOptionsModel
+                            {
+                                Id = customer.Id.ToString(),
+                                Text = customer.Name,
+                                Selected = IncludeId != null && IncludeId == customer.Id,
+                                Disabled = customer.IsActive == false || (kycRequired == true && (kyc == null || kyc.Status != "Approved")),
+                                DisabledReason = customer.IsActive == false ? "Customer is Inactive"
+                                               : (kycRequired == true && kyc == null) ? "Customer has no KYC record"
+                                               : (kycRequired == true && kyc.Status != "Approved") ? "Customer has no Approved KYC record"
+                                               : ""
+                            };
+            return await customers.OrderBy(s => s.Text).ToListAsync();
         }
 
 
@@ -344,6 +327,7 @@ namespace GMGInventory.Application.Repositories
             var customers = await context.Customers.Where(s => s.Code == Code).FirstOrDefaultAsync();
             return customers?.Id;
         }
+
         public CustomerVM? GetCustomerDtlVM(int? id)
         {
             var customerVM = (from cust in context.Customers
@@ -610,7 +594,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task DeactivateCustomerAsync(int id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var customers = await context.Customers.FirstAsync(s => s.Id == id);
             customers.IsActive = false;
             await context.SaveChangesAsync(currentUserId);
@@ -618,7 +601,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task ReactivateCustomerAsync(int id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             var customers = await context.Customers.FirstAsync(s => s.Id == id);
             customers.IsActive = true;
             await context.SaveChangesAsync(currentUserId);
@@ -631,7 +613,6 @@ namespace GMGInventory.Application.Repositories
 
             if (cust == null || area == null) throw new DbUpdateConcurrencyException();
 
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             cust.Code = custVM.Code;
             cust.Name = custVM.Name;
             cust.IsActive = true;
@@ -660,9 +641,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task AddAsync(CustomerVM custVM)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-
-
             var cust = new Customer
             {
                 Code = custVM.Code,
@@ -693,7 +671,6 @@ namespace GMGInventory.Application.Repositories
 
         //public async Task AddForwarderAsync(CustomerVM forwarderVM)
         //{
-        //    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         //    var forwarders = new Forwarder
         //    {
         //        CustomerId = forwarderVM.Id,
@@ -709,10 +686,10 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<CustomerVM>> GetCustomerDetailsAsync(int id)
         {
             var customerVM = from cust in context.Customers
-                                 //.Include(s => s.Area)
-                                 //.Include(s => s.CustomerType)
-                                 //.Include(s => s.Agent)
-                                 //.Include(s => s.CreditTerm)
+                             //.Include(s => s.Area)
+                             //.Include(s => s.CustomerType)
+                             //.Include(s => s.Agent)
+                             //.Include(s => s.CreditTerm)
                              select new CustomerVM
                              {
                                  Code = cust.Code,
@@ -998,7 +975,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<ResponseModel> SaveShippingAsync(CustomerShippingVM shippingVM)
         {
             ResponseModel response = new();
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             var checkShipping = await context.ShippingAddresses.Where(s => (shippingVM.Id == null || (shippingVM.Id != null && shippingVM.Id != s.Id)) && s.Address.Trim().ToLower() == shippingVM.Address.Trim().ToLower()).FirstOrDefaultAsync();
             if (checkShipping != null)
@@ -1059,7 +1035,6 @@ namespace GMGInventory.Application.Repositories
         public async Task<ResponseModel> SaveDiscountAsync(CustomerBrandDiscountVM brandDiscountVM)
         {
             ResponseModel response = new();
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
             var checkDiscount = await context.CustomerBrandDiscount.Where(s => (brandDiscountVM.Id == null || (brandDiscountVM.Id != null && brandDiscountVM.Id != s.Id))
                                                                                && (s.CustomerId == brandDiscountVM.CustomerId && s.BrandId == brandDiscountVM.BrandId && s.IsActive)).FirstOrDefaultAsync();
@@ -1114,7 +1089,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> SetDefaultShippingAsync(int Id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
 
             var shipping = await context.ShippingAddresses.Where(s => s.Id == Id).FirstOrDefaultAsync();
@@ -1148,7 +1122,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> DeleteOrDeactivateShippingAsync(int Id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
             var shipping = await context.ShippingAddresses.Where(s => s.Id == Id).FirstOrDefaultAsync();
             if (shipping == null)
@@ -1197,7 +1170,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> DeleteOrDeactivateDiscountAsync(int Id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
             var discount = await context.CustomerBrandDiscount.Where(s => s.Id == Id).FirstOrDefaultAsync();
             if (discount == null)
@@ -1241,7 +1213,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> ReactivateShippingAsync(int Id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
             var shipping = await context.ShippingAddresses.Where(s => s.Id == Id).FirstOrDefaultAsync();
             if (shipping == null)
@@ -1265,7 +1236,6 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<ResponseModel> ReactivateDiscountAsync(int Id)
         {
-            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
             ResponseModel response = new();
             var discount = await context.CustomerBrandDiscount.Where(s => s.Id == Id).FirstOrDefaultAsync();
             if (discount == null)
@@ -1691,7 +1661,6 @@ namespace GMGInventory.Application.Repositories
                                               .FirstOrDefaultAsync();
                 if (creditTerm == null) return $"Invalid Credit Term: {customer.CreditTermName} not found";
 
-                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
                 var msg = new List<string>();
 
                 var code = SaveCustomerFromFileTruncate(customer.Code, 50, msg, "Code", false);

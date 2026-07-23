@@ -997,7 +997,9 @@
                     if (repo.loading) {
                         return repo.text;
                     }
-                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                    return $("<strong>" + repo.text + "</strong> " +
+                             (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                             (repo.disabledReason ? "<br /><small class='text-danger'>" + repo.disabledReason + "</small>" : ""));
                 },
                 ajax: {
                     url: "@Url.Action("GetByAgentOptions", "Customer")",

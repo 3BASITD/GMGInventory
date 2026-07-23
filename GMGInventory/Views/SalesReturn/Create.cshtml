@@ -258,13 +258,15 @@
         var user_access = @Html.Raw(Json.Serialize(userAccess));
 
         $("#return-customer-code").select2({
-            minimumInputLength: 1,
+            //minimumInputLength: 1,
             placeholder: '<empty>',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $("<strong>" + repo.text + "</strong> " +
+                         (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                         (repo.disabledReason ? "<br /><small class='text-danger'>" + repo.disabledReason + "</small>" : ""));
             },
             ajax: {
                 url: "@Url.Action("GetOptions", "Customer")"

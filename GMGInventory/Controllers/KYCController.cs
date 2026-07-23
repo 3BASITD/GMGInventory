@@ -49,7 +49,10 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await kycRepository.SaveDetails(param));
+            var response = await kycRepository.SaveDetails(param);
+            if (response.Status == "Success" && param.Status == "Submitted") TempData["SuccessMessage"] = response.Message;
+
+            return Json(response);
         }
 
         [HttpPost]
@@ -58,7 +61,10 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.ApproveDisapprove);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await kycRepository.ApproveDetails(CustomerId));
+            var response = await kycRepository.ApproveDetails(CustomerId);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+
+            return Json(response);
         }
 
         [HttpPost]
@@ -67,7 +73,10 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.ApproveDisapprove);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await kycRepository.DisapproveDetails(CustomerId, Reason));
+            var response = await kycRepository.DisapproveDetails(CustomerId, Reason);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+
+            return Json(response);
         }
 
         [HttpPost]
@@ -76,7 +85,10 @@ namespace GMGInventory.Controllers
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await kycRepository.EditDetails(CustomerId));
+            var response = await kycRepository.EditDetails(CustomerId);
+            if (response.Status == "Success") TempData["SuccessMessage"] = response.Message;
+
+            return Json(response);
         }
 
         [HttpPost]

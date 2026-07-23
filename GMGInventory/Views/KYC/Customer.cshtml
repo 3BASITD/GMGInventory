@@ -10,10 +10,6 @@
     <li class="breadcrumb-item"><a asp-controller="KYC" asp-action="Index">KYCs</a></li>
 }
 
-<div class="alert alert-warning" role="alert">
-    <span class="fas fa-exclamation-triangle mr-3"></span><strong>COMMING SOON</strong> We’re currently working on this page to bring you new features and improvements. Please check back again soon.
-</div>
-
 <div class="alert alert-info" role="alert">
     <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
 </div>
@@ -28,7 +24,7 @@
                 </a>
                 @if (userAccess.CanEdit && (Model.Status == "Approved" || Model.Status == "Disapproved"))
                 {
-                    <button type="button" class="btn btn-primary btn-sm float-right btn-approve ml-2">
+                    <button type="button" class="btn btn-primary btn-sm float-right btn-edit ml-2">
                         <span class="fas fa-edit"></span>Edit
                     </button>
                 }
@@ -70,10 +66,10 @@
                 }
                 @if (userAccess.CanAdd && Model.Status == "Draft")
                 {
-                    <button type="submit" class="btn btn-primary btn-sm float-right btn-submit ml-2" data-action="Submitted">
+                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
                         <span class="fas fa-paper-plane"></span> Submit for Approval
                     </button>
-                    <button type="submit" class="btn btn-secondary btn-sm float-right btn-draft ml-2" data-action="Draft">
+                    <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
                         <span class="fas fa-save"></span>Save as Draft
                     </button>
                 }
@@ -97,6 +93,17 @@
             </div>
         </div>
         <div class="card-body">
+            @if (!string.IsNullOrWhiteSpace(Model.DisapprovedBy))
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-danger text-sm" role="alert">
+                            <strong>Reason of Disapproval:</strong>
+                            @(string.IsNullOrWhiteSpace(Model.DisapprovedReason) ? "No reason why it was disapproved." : Model.DisapprovedReason)
+                        </div>
+                    </div>
+                </div>
+            }
             <div class="row">
                 <div class="col-12 col-md-4 col-sm-6">
                     <p class="text-sm">
@@ -141,7 +148,7 @@
                                 Customer Name
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model.CustomerName
+                                <a href="@Url.Action("Details", "Customer")/@Model.CustomerId" class="link-info" target="_blank">@Model.CustomerName</a>
                             </b>
                         </p>
                     </div>
@@ -151,7 +158,9 @@
                                 Status
                             </span>
                             <b class="d-block form-gayahin">
-                                @Model.Status
+@Model.Status @(Model.Status == "Draft" && !string.IsNullOrWhiteSpace(Model.ApprovedBy) ? Html.Raw("<span class='text-muted fw-normal'>(Reverted from Approved)</span>")
+              : Model.Status == "Draft" && !string.IsNullOrWhiteSpace(Model.DisapprovedBy) ? Html.Raw("<span class='text-muted fw-normal'>(Reverted from Disapproved)</span>")
+              : "")
                             </b>
                         </p>
                     </div>
@@ -161,7 +170,7 @@
                         <div class="col-12 col-md-4 col-sm-6">
                             <p class="text-sm">
                                 <span class="text-muted">
-                                    Date Last Modified
+                                    Date Last Modified @Model.DisapprovedReason
                                 </span>
                                 <b class="d-block form-gayahin">
                                     @Model.ModifiedDate
@@ -1459,17 +1468,110 @@
                         if (data.status == "Error") {
                             toastr.error(data.message, "Error");
                         } else {
-                            toastr.success(data.message, "Success");
-                            formChanged = false;
                             if (action_type == "" || action_type == "Draft") {
+                                toastr.success(data.message, "Success");
+                                formChanged = false;
                                 $(".modified").removeClass("modified");
                             } else {
-                                setInterval(function() {
-                                    window.location.reload();
-                                }, 3000);
+                                window.location.reload();
                             }
                         }
                     }
+                });
+            }
+
+            if (user_access.canApproveDisapprove)
+            {
+                $(document).on("click", ".btn-approve", function() {
+                    swal({
+                        title: "Approve KYC",
+                        text: "Continue to approve this KYC?",
+                        icon: "success",
+                        buttons: true,
+                        successMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            $.ajax({
+                                url: "@Url.Action("ApproveDetails")",
+                                type: "POST",
+                                data: {
+                                    CustomerId: kyc_details.customerId
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        window.location.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                
+                $(document).on("click", ".btn-disapprove", function() {
+                    swal({
+                        title: "Disapprove KYC",
+                        text: "Continue to disapprove this KYC?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                        content: {
+                            element: "input",
+                            attributes: {
+                                placeholder: "Reason for Disapproving",
+                                type: "text"
+                            }
+                        }
+                    }).then((confirm) => {
+                        if (confirm != null) {
+                            $.ajax({
+                                url: "@Url.Action("DisapproveDetails")",
+                                type: "POST",
+                                data: {
+                                    CustomerId: kyc_details.customerId,
+                                    Reason: confirm
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        window.location.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (user_access.canEdit)
+            {
+                $(document).on("click", ".btn-edit", function() {
+                    swal({
+                        title: "Edit KYC",
+                        text: "This will revert the status to Draft to enable editing. Do you want to continue editing this KYC?",
+                        icon: "success",
+                        buttons: true,
+                        successMode: true
+                    }).then((confirm) => {
+                        if (confirm) {
+                            $.ajax({
+                                url: "@Url.Action("EditDetails")",
+                                type: "POST",
+                                data: {
+                                    CustomerId: kyc_details.customerId
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        window.location.reload();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
                 });
             }
         
@@ -1567,20 +1669,20 @@
                     {
                         data: function (data, type, dataToSet) {
                             return data.contactPerson || '<span class="text-muted">N/A</span>';
-                        }, 
-                        name: "ContactPerson" 
+                        },
+                        name: "ContactPerson"
                     },
                     {
                         data: function (data, type, dataToSet) {
                             return data.contactNumber || '<span class="text-muted">N/A</span>';
                         },
-                        name: "ContactNumber" 
+                        name: "ContactNumber"
                     },
-                    { 
+                    {
                         data: function (data, type, dataToSet) {
                             return data.salesVolume || '<span class="text-muted">N/A</span>';
                         },
-                        name: "SalesVolume" 
+                        name: "SalesVolume"
                     },
                     {
                         orderable: false,

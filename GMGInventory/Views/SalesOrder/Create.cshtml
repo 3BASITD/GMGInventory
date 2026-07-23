@@ -379,7 +379,9 @@
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $("<strong>" + repo.text + "</strong> " + 
+                         (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                         (repo.disabledReason ? "<br /><small class='text-danger'>" + repo.disabledReason + "</small>" : ""));
             },
             ajax: {
                 url: "@Url.Action("GetByAgentOptions", "Customer")",
@@ -432,7 +434,6 @@
         function changingCustomerOrDateOrder() {
             var selectedCustomer = $("#order-customer-code").val() || "";
             var selectedDateOrder = $("#order-date").val() || "";
-            console.log(currentDateOrder + " " + selectedDateOrder);
 
             if (itemDT.data().length > 0 && (selectedCustomer != currentCustomer || selectedDateOrder != currentDateOrder)) {
                 var changed = selectedCustomer != currentCustomer ? "Customer Code"
@@ -487,6 +488,18 @@
             // if (parseFloat($("#order-customer-code").select2("data")[0].outstandingBalanceD) > 0) {
             //     toastr.warning("(" + $("#order-customer-code").select2("data")[0].text.trim() + ") " + $("#order-customer-code").select2("data")[0].name.trim() + " has an outstanding balance of " + $("#order-customer-code").select2("data")[0].outstandingBalance, "Outstanding Balance");
             // }
+            
+             var regionId = $("#order-customer-code").select2("data")[0].regionId;
+            // var regionCode = $("#order-customer-code").select2("data")[0].regionCode;
+            // var regionName = $("#order-customer-code").select2("data")[0].region;
+            // var regionOption = new Option(regionCode, regionId, true, true);
+            // $(regionOption).data('data', {
+            //     id: regionId,
+            //     text: regionCode,
+            //     name: regionName
+            // });
+            // $("#order-region").append(regionOption).trigger("change");
+            $("#order-region").val(regionId).trigger("change");
 
             if ($("#order-agent-code").val() == null) {
                 var agentId = $("#order-customer-code").select2("data")[0].agentId;

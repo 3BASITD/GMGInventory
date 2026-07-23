@@ -201,7 +201,7 @@
                 return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
             ajax: {
-                url: "@Url.Action("GetOptions", "Customer")"
+                url: "@Url.Action("GetOptions2Simple", "Customer")"
             },
             dropdownParent: $("#filterModal")
         });

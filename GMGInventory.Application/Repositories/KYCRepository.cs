@@ -154,6 +154,14 @@ namespace GMGInventory.Application.Repositories
                                                  .Where(u => u.Id == kyc.DisapproverId)
                                                  .FirstOrDefaultAsync();
 
+            var createdby = await userManager.Users
+                                             .Where(c => c.Id == kyc.UserCreated)
+                                             .FirstOrDefaultAsync();
+
+            var modifiedby = await userManager.Users
+                                              .Where(m => m.Id == kyc.UserModified)
+                                              .FirstOrDefaultAsync();
+
             var kycDetails = new KYCVM
             {
                 Id = kyc.Id,
@@ -205,7 +213,10 @@ namespace GMGInventory.Application.Repositories
 
                 DisapprovedBy = disapprovedby == null ? null : disapprovedby.FirstName + " " + disapprovedby.LastName,
                 DisapprovedDateD = kyc.DateDisapproved,
-                DisapprovedReason = kyc.DisapprovedReason
+                DisapprovedReason = kyc.DisapprovedReason,
+
+                ModifiedBy = modifiedby == null ? null : modifiedby.FirstName + " " + modifiedby.LastName,
+                ModifiedDateD = kyc.DateModified
             };
 
             return kycDetails;
@@ -324,7 +335,7 @@ namespace GMGInventory.Application.Repositories
 
                 if (kyc == null) return new ResponseModel { Status = "Error", Message = $"Invalid kyc. Please reload the page" };
 
-                if (kyc.Status == "Submitted") return new ResponseModel { Status = "Error", Message = $"KYC should be submitted before approving" };
+                if (kyc.Status != "Submitted") return new ResponseModel { Status = "Error", Message = $"KYC should be submitted before approving" };
                 if (kyc.Status == "Approved") return new ResponseModel { Status = "Error", Message = $"KYC already approved" };
 
                 kyc.Status = "Approved";
@@ -360,7 +371,7 @@ namespace GMGInventory.Application.Repositories
 
                 if (kyc == null) return new ResponseModel { Status = "Error", Message = $"Invalid kyc. Please reload the page" };
 
-                if (kyc.Status == "Submitted") return new ResponseModel { Status = "Error", Message = $"KYC should be submitted before disapproving" };
+                if (kyc.Status != "Submitted") return new ResponseModel { Status = "Error", Message = $"KYC should be submitted before disapproving" };
                 if (kyc.Status == "Disapproved") return new ResponseModel { Status = "Error", Message = $"KYC already disapproved" };
 
                 kyc.Status = "Disapproved";

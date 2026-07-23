@@ -151,13 +151,15 @@
     <script>
         // Load Select2 for Customer
         $("#soa-customer").select2({
-            minimumInputLength: 0,
+            //minimumInputLength: 0,
             placeholder: '<empty>',
             templateResult: function (repo) {
                 if (repo.loading) {
                     return repo.text;
                 }
-                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                return $("<strong>" + repo.text + "</strong> " +
+                        (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : "") +
+                        (repo.disabledReason ? "<br /><small class='text-danger'>" + repo.disabledReason + "</small>" : ""));
             },
             ajax: {
                 url: "@Url.Action("GetOptionsWithOrder", "Customer")"
