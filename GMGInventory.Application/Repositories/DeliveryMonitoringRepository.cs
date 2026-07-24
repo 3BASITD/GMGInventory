@@ -122,6 +122,7 @@ namespace GMGInventory.Application.Repositories
                                  SalesOrderId = order.Id,
                                  DateOrderD = order.SalesOrderDate,
                                  SalesOrderNumber = order.SalesOrderNumber,
+                                 TotalSalesOrder = order.SalesOrderLineItems.Sum(s => s.Quantity * s.SellingPrice).ToString("N2"),
                                  PackId = pack.Id,
                                  OrderQueueNumber = order.SalesOrderItemSources
                                                          .Select(s => s.SourceOrderNumber)
@@ -187,6 +188,7 @@ namespace GMGInventory.Application.Repositories
                 {
                     s.DateOrder,
                     s.SalesOrderNumber,
+                    s.TotalSalesOrder,
                     s.OrderQueueNumber,
                     s.ServiceLevelAgreement,
                     s.Customer,

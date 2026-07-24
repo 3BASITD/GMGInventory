@@ -11,6 +11,8 @@ namespace GMGInventory.Common.Models
         public DateTime DateOrderD { get; set; }
         [Display(Name = "Sales Order Number")]
         public string SalesOrderNumber { get; set; }
+        [Display(Name = "Total Sales Order")]
+        public string TotalSalesOrder { get; set; }
         [Display(Name = "Order Queue Number")]
         public string? OrderQueueNumber { get; set; }
         public int? PackId { get; set; }
