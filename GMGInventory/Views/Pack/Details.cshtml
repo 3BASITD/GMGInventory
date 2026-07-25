@@ -250,13 +250,14 @@
                                     <th>Package Number</th>
                                     <th>Package Type</th>
                                     <th>Item Code</th>
+                                    <th>Item Part Number</th>
                                     <th>Item Name</th>
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="5" class="text-end">Total</th>
+                                    <th colspan="6" class="text-end">Total</th>
                                     <th>0</th>
                                 </tr>
                             </tfoot>
@@ -407,6 +408,7 @@
                     },
                     name: "ItemCode"
                 },
+                { data: "itemPartNumber", name: "ItemPartNumber" },
                 { data: "itemName", name: "ItemName" },
                 { data: "sellingPrice", name: "SellingPrice", className: "text-end" },
                 { data: "discount1", name: "Discount1", className: "text-end" },
@@ -614,8 +616,10 @@
                         return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
                     name: "ItemCode"
-                },
+                },  
+                { data: "itemPartNumber", name: "ItemPartNumber" },
                 { data: "itemName", name: "ItemName" },
+               
                 //{ data: "quantity", name: "Quantity", className: "text-end" },
                 {data: function (data, type, dataToSet) {
 
@@ -648,6 +652,7 @@
                 },
                 endRender: function (rows, group) {
                     return $('<tr/>')
+                        .append('<td></td>')
                         .append('<td colspan="3" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
