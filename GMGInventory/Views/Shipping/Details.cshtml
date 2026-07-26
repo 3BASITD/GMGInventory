@@ -40,7 +40,13 @@
                         @Html.DisplayNameFor(model => model.SONumber)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.SONumber
+                        @Html.ActionLink(Model.SONumber,
+                                        "Details",
+                                        "SalesOrder", 
+                                        new { id = Model.SalesOrderId }, 
+                                        new { @class = "text-info", 
+                                              role = "tooltip",
+                                              target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -52,7 +58,13 @@
                         @Html.DisplayNameFor(model => model.CustomerName)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.CustomerName
+                        @Html.ActionLink(Model.CustomerName,
+                                        "Details",
+                                        "Customer", 
+                                        new { id = Model.CustomerId }, 
+                                        new { @class = "text-info", 
+                                              role = "tooltip",
+                                              target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -62,7 +74,7 @@
                         @Html.DisplayNameFor(model => model.CustomerAddress)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.CustomerAddress
+                        @Model.CustomerAddress
                     </b>
                 </p>
             </div>
@@ -75,7 +87,17 @@
                         @Html.DisplayNameFor(model => model.PairedInvoices)
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.PairedInvoices
+                        @foreach(var invoices in Model.PairedInvoices.Split(","))
+                        {
+                            var invoice = invoices.Split(":::");
+                            @Html.ActionLink(invoice[1],
+                                            "Details",
+                                            "SalesInvoice",
+                                            new { id = invoice[0] },
+                                            new { @class = "text-info",
+                                                role = "tooltip",
+                                                target = "_blank" })
+                        }
                     </b>
                 </p>
             </div>
@@ -85,7 +107,7 @@
                         Number of boxes,crates,roll etc
                     </span>
                     <b class="d-block form-gayahin">
-                        @Model?.Packaging
+                        @Model.Packaging
                     </b>
                 </p>
             </div>
@@ -160,7 +182,7 @@
         }).DataTable({
             ajax: {
                 url: "@Url.Action("GetItemsJson")",
-                data: { salesOrderId: @Model?.SalesOrderId },
+                data: { salesOrderId: @Model.SalesOrderId },
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -235,7 +257,7 @@
             });
             setTimeout(function () {
                 var urlQuery = [];
-                urlQuery.push("Id=" + @Model?.SalesOrderId);
+                urlQuery.push("Id=" + @Model.SalesOrderId);
                 urlQuery.push("Company=" + print_company);
                 urlQuery.push("Desc=" + print_desc);
                 urlQuery.push("Freight=" + print_freight);

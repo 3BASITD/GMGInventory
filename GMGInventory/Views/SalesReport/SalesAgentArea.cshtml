@@ -380,7 +380,12 @@
                 return: true,
             },
             columns: [
-                { data: "agentCode", name: "AgentCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agentCode + "</a>";
+                    },
+                    name: "AgentCode"
+                },
                 { data: "agentName", name: "AgentName" },
                 { data: "area", name: "Area" },
                 { data: "sales", name: "Sales", className: "text-end" },

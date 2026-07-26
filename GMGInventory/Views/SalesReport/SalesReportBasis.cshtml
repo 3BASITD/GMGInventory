@@ -222,11 +222,11 @@
                 url: "@Url.Action("GetSalesReportBasisDT")",
                 type: "POST",
                 data: function (data) {
-                    var basisId = $("#filter-basis").val();
+                    var basis = $("#filter-basis").val();
 
                     data.DateFrom = $("#filter-from").val();
                     data.DateTo = $("#filter-to").val();
-                    if (basisId) data.Basis = basisId;
+                    if (basis) data.Basis = basis;
                 },
                 beforeSend: function (jqXHR, settings) {
                     settings.isDataTableRequest = true;
@@ -244,7 +244,16 @@
                 return: true,
             },
             columns: [
-                { data: "code", name: "Code" },
+                {
+                    data: function (data, type, dataToSet) {
+                        if ($("#filter-basis").val() == "Customer") {
+                            return "<a href='/Customer/Details/" + data.id + "' class='link-info' target='_blank'>" + data.code + "</a>";
+                        } else {
+                            return data.code;
+                        }
+                    },
+                    name: "Code"
+                },
                 { data: "name", name: "Name" },
                 { data: "amount", name: "Amount", className: "text-end" }
             ],

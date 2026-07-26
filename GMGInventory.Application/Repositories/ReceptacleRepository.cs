@@ -40,8 +40,10 @@ namespace GMGInventory.Application.Repositories
                         select new ReceptacleVM
                         {
                             SONumber = p.SalesOrder.SalesOrderNumber,
+                            SOId = p.SalesOrder.Id,
                             Id = p.Id,
                             Customer = p.SalesOrder.Customer.Name,
+                            CustomerId = p.SalesOrder.Customer.Id,
                             Destination = p.SalesOrder
                                            .Customer
                                            .ShippingAddresses
@@ -121,8 +123,10 @@ namespace GMGInventory.Application.Repositories
                                select new ReceptacleDetailVM
                                {
                                    SONumber = pack.SalesOrder.SalesOrderNumber,
+                                   SOId = pack.SalesOrder.Id,
                                    Id = pack.Id,
                                    Customer = pack.SalesOrder.Customer.Name,
+                                   CustomerId = pack.SalesOrder.Customer.Id,
                                    Destination = destination == null ? null : destination.Address,
                                    DeliveryDateD = pack.SalesOrder.RequiredDeliveryDate
                                };

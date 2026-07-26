@@ -9,6 +9,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Agent")]
         public string Agent { get; set; }
 
+        public int AgentId { get; set; }
+
         [Display(Name = "Brand")]
         public string Brand { get; set; }
 
@@ -17,6 +19,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
@@ -39,6 +43,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "BIR Invoice Number")]
         public string ControlNumber { get; set; }
+
+        public int InvoiceId { get; set; }
     }
 
     public class AgentSalesPerItemPVM
@@ -64,6 +70,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Agent Code")]
         public string AgentCode { get; set; }
+
+        public int AgentId { get; set; }
 
         [Display(Name = "Agent Name")]
         public string AgentName { get; set; }
@@ -93,6 +101,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
@@ -150,8 +160,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
 
+        public int InvoiceId { get; set; }
+
         [Display(Name = "Customer")]
         public string Customer { get; set; }
+
+        public int CustomerId { get; set; }
 
         [Display(Name = "Agent")]
         public string Agent { get; set; }
@@ -223,6 +237,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
 
+        public int CustomerId { get; set; }
+
         [Display(Name = "Total Amount")]
         public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
         public decimal AmountD { get; set; }
@@ -247,6 +263,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
+
+        public int CustomerId { get; set; }
 
         [Display(Name = "Brand")]
         public string Brand { get; set; }
@@ -284,17 +302,23 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
 
+        public int InvoiceId { get; set; }
+
         [Display(Name = "BIR Invoice Number")]
         public string BIRInvoiceNumber { get; set; }
 
         [Display(Name = "Customer Code")]
         public string CustomerCode { get; set; }
 
+        public int CustomerId { get; set; }
+
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
 
         [Display(Name = "Agent")]
         public string Agent { get; set; }
+
+        public int AgentId { get; set; }
 
         [Display(Name = "Term")]
         public string Term { get; set; }
@@ -345,9 +369,13 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
 
+        public int CustomerId { get; set; }
+
         [Display(Name = "Agent")]
         public string Agent { get; set; }
         public string AgentCode { get; set; }
+
+        public int AgentId { get; set; }
 
         [Display(Name = "Status")]
         public string Status { get; set; }
@@ -418,6 +446,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Name")]
         public string Name { get; set; }
 
+        public int Id { get; set; }
+
         [Display(Name = "Amount")]
         public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
         public decimal AmountD { get; set; }
@@ -449,11 +479,15 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Unit")]
         public string Unit { get; set; }
 
         [Display(Name = "Sales Return Number")]
         public string SRNumber { get; set; }
+
+        public int SRId { get; set; }
 
         [Display(Name = "Return Date")]
         public FormattedDate ReturnDate => new FormattedDate(ReturnDateD);
@@ -477,14 +511,22 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer")]
         public string Customer { get; set; }
 
+        public int CustomerId { get; set; }
+
         [Display(Name = "Agent")]
         public string Agent { get; set; }
+
+        public int AgentId { get; set; }
 
         [Display(Name = "Sales Invoice Number")]
         public string? SINumber { get; set; }
 
+        public int? SIId { get; set; }
+
         [Display(Name = "Sales Order Number")]
         public string? SONumber { get; set; }
+
+        public int? SOId { get; set; }
 
         [Display(Name = "Control Number")]
         public string ControlNumber { get; set; }
@@ -533,6 +575,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Pending")]
         public string Pending => string.Format(SystemFormat.StringIntegerComma, PendingD);
         public int PendingD { get; set; }
@@ -572,6 +616,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
@@ -585,8 +631,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Sales Order Number")]
         public string SalesOrderNumber { get; set; }
 
+        public int SalesOrderId { get; set; }
+
         [Display(Name = "BIR Invoice Number")]
         public string ControlNumber { get; set; }
+
+        public int InvoiceId { get; set; }
 
         [Display(Name = "Region")]
         public string Region { get; set; }

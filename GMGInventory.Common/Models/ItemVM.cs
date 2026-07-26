@@ -37,6 +37,9 @@ namespace GMGInventory.Common.Models
         public string? ModelNumber { get; set; }
         public string? Size { get; set; }
         public bool? IsTable { get; set; }
+
+        public DateTime DateFrom { get; set; } = DateTime.MinValue;
+        public DateTime DateTo { get; set; } = DateTime.MaxValue;
     }
 
     public class ItemCommonVM

@@ -307,7 +307,12 @@
             },
             columns: [
                 { data: "brand", name: "Brand" },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
+                    },
+                    name: "ItemCode"
+                },
                 { data: "oldCode", name: "OldCode" },
                 { data: "itemName", name: "ItemName" },
                 { data: "pending", name: "Pending", className: "text-end" },

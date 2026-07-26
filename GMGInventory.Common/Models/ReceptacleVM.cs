@@ -8,6 +8,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Sales Order Number")]
         public string SONumber { get; set; }
+        public int SOId { get; set; }
 
         [Display(Name = "Pack Number")]
         public string PackNumber => Id + "";
@@ -15,6 +16,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer")]
         public string Customer { get; set; }
+        public int CustomerId { get; set; }
 
         [Display(Name = "Destination")]
         public string? Destination { get; set; }

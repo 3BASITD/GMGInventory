@@ -437,12 +437,22 @@
                 return: true,
             },
             columns: [
-                { data: "srNumber", name: "SRNumber", responsivePriority: 1 },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesReturn/Details/" + data.srId + "' class='link-info' target='_blank'>" + data.srNumber + "</a>";
+                    },
+                    name: "SRNumber", 
+                    responsivePriority: 1 
+                },
                 { data: "returnDate.format1", name: "ReturnDate", responsivePriority: 2 },
                 { data: "returnReason", name: "ReturnReason", responsivePriority: 3 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.soNumber || "<span class='text-muted'>N/A</span>";
+                        if (data.soNumber) {
+                            return "<a href='/SalesOrder/Details/" + data.soId + "' class='link-info' target='_blank'>" + data.soNumber + "</a>";
+                        } else {
+                            return "<span class='text-muted'>N/A</span>";
+                        }
                     },
                     name: "SONumber",
                     responsivePriority: 4
@@ -456,21 +466,33 @@
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.customer || "<span class='text-muted'>N/A</span>";
+                        if (data.customer) {
+                            return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customer + "</a>";
+                        } else {
+                            return "<span class='text-muted'>N/A</span>";
+                        }
                     },
                     name: "Customer",
                     responsivePriority: 6
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.agent || "<span class='text-muted'>N/A</span>";
+                        if (data.agent) {
+                            return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agent + "</a>";
+                        } else {
+                            return "<span class='text-muted'>N/A</span>";
+                        }
                     },
                     name: "Agent",
                     responsivePriority: 7
                 },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.siNumber || "<span class='text-muted'>N/A</span>";
+                        if (data.siNumber) {
+                            return "<a href='/SalesInvoice/Details/" + data.siId + "' class='link-info' target='_blank'>" + data.siNumber + "</a>";
+                        } else {
+                            return "<span class='text-muted'>N/A</span>";
+                        }
                     },
                     name: "SINumber",
                     responsivePriority: 8
@@ -490,7 +512,13 @@
                     name: "PickupDate", 
                     responsivePriority: 10
                 },
-                { data: "itemCode", name: "ItemCode", responsivePriority: 11 },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
+                    },
+                    name: "ItemCode", 
+                    responsivePriority: 11
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "brand", name: "Brand" },
                 { data: "itemType", name: "ItemType" },

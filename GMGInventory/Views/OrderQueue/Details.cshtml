@@ -136,9 +136,19 @@
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
                     }
+                    else if (!string.IsNullOrWhiteSpace(Model.Agent))
+                    {
+                        @Html.ActionLink(Model.Agent,
+                                        "Details",
+                                        "Agent", 
+                                        new { id = Model.AgentId }, 
+                                        new { @class = "text-info", 
+                                              role = "tooltip",
+                                              target = "_blank" })
+                    }
                     else
                     {
-                        @(string.IsNullOrWhiteSpace(Model.Agent) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Agent)
+                        <span class="fw-normal text-muted">N/A</span>
                     }
                 </b>
             </div>
@@ -154,9 +164,19 @@
                             &emsp;<span class="fas fa-exclamation-triangle"></span>
                         </span>
                     }
+                    else if (!string.IsNullOrWhiteSpace(Model.Customer))
+                    {
+                        @Html.ActionLink(Model.Customer,
+                                        "Details",
+                                        "Customer", 
+                                        new { id = Model.CustomerId }, 
+                                        new { @class = "text-info", 
+                                              role = "tooltip",
+                                              target = "_blank" })
+                    } 
                     else
                     {
-                        @(string.IsNullOrWhiteSpace(Model.Customer) ? Html.Raw("<span class='fw-normal text-muted'>N/A</span>") : Model.Customer)
+                        <span class="fw-normal text-muted">N/A</span>
                     }
                 </b>
             </div>

@@ -440,12 +440,27 @@
             columns: [
                 { data: "invoiceDate", name: "InvoiceDate" },
                 { data: "oldSkuCode", name: "OldSkuCode" },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
+                    },
+                    name: "ItemCode" 
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "brand", name: "Brand" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "salesOrderNumber", name: "SalesOrderNumber" },
-                { data: "controlNumber", name: "ControlNumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.salesOrderNumber + "</a>";
+                    },
+                    name: "SalesOrderNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesInvoice/Details/" + data.invoiceId + "' class='link-info' target='_blank'>" + data.controlNumber + "</a>";
+                    },
+                    name: "ControlNumber"
+                },
                 { data: "region", name: "Region" },
                 { data: "area", name: "Area" }
             ],

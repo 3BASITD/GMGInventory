@@ -399,12 +399,27 @@
                 return: true,
             },
             columns: [
-                { data: "invoiceNumber", name: "InvoiceNumber" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesInvoice/Details/" + data.id + "' class='link-info' target='_blank'>" + data.invoiceNumber + "</a>";
+                    },
+                    name: "InvoiceNumber"
+                },
                 { data: "controlNumber", name: "ControlNumber" },
                 { data: "invoiceDate", name: "InvoiceDate" },
-                { data: "customerCode", name: "CustomerCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerCode + "</a>";
+                    },
+                    name: "CustomerCode"
+                },
                 { data: "customerName", name: "CustomerName" },
-                { data: "agent", name: "Agent" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agent + "</a>";
+                    },
+                    name: "Agent" 
+                },
                 { data: "status", name: "Status" },
                 { data: "amount", name: "Amount", className: "text-end", orderable: false }
             ],

@@ -292,11 +292,31 @@
                 return: true,
             },
             columns: [
-                { data: "invoiceNumber", name: "InvoiceNumber" },
-                { data: "soNumber", name: "SONumber" },
-                { data: "customerName", name: "CustomerName" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesInvoice/Details/" + data.invoiceId + "' class='link-info' target='_blank'>" + data.invoiceNumber + "</a>";
+                    },
+                    name: "InvoiceNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.soNumber + "</a>";
+                    },
+                    name: "SONumber" 
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerName + "</a>";
+                    },
+                    name: "CustomerName"
+                },
                 { data: "customerAddress", name: "CustomerAddress" },
-                { data: "packId", name: "PackId" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Pack/Details/" + data.packId + "' class='link-info' target='_blank'>" + data.packId + "</a>";
+                    },
+                    name: "PackId"
+                },
                 { data: "salesOrderDate", name: "SalesOrderDate" },
                 { data: "forwarder", name: "Forwarder" },
                 { data: "totalPackageCount", name: "TotalPackageCount" },

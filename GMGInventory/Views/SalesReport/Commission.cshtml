@@ -425,9 +425,25 @@
             },
             columns: [
                 { data: "invoiceDate", name: "InvoiceDate" },
-                { data: "invoiceNumber", name: "InvoiceNumber" },
-                { data: "customer", name: "Customer" },
-                { data: "agent", name: "Agent" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesInvoice/Details/" + data.invoiceId + "' class='link-info' target='_blank'>" + data.invoiceNumber + "</a>";
+                    },
+                    name: "InvoiceNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customer + "</a>";
+                    },
+                    name: "Customer"
+                },
+                {
+                    
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agent + "</a>";
+                    },
+                    name: "Agent"
+                },
                 { data: "commissionRate", name: "CommissionRate" },
                 { data: "invoiceAmount", name: "InvoiceAmount", className: "text-end" },
                 { data: "commissionAmount", name: "CommissionAmount", className: "text-end" }

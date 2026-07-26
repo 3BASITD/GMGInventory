@@ -38,14 +38,17 @@ namespace GMGInventory.Application.Repositories
                            select new AgentSalesPerItemRVM
                            {
                                Agent = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
+                               AgentId = ili.Invoice.SalesOrder.Agent.Id,
                                Brand = ili.Item.Brand.Name,
                                ItemCode = ili.Item.Code,
                                ItemName = ili.Item.Name,
+                               ItemId = ili.Item.Id,
                                ItemType = ili.Item.ItemType.Name,
                                PriceD = ili.UnitPrice * discount1 * discount2,
                                QuantityD = ili.Quantity,
                                DateInvoiceD = ili.Invoice.InvoiceDate,
-                               ControlNumber = ili.Invoice.ControlNumber
+                               ControlNumber = ili.Invoice.ControlNumber,
+                               InvoiceId = ili.Invoice.Id
                            };
             return await invoices.ToListAsync();
         }
@@ -148,6 +151,7 @@ namespace GMGInventory.Application.Repositories
                            {
                                AgentCode = ili.Invoice.SalesOrder.Agent.Code,
                                AgentName = ili.Invoice.SalesOrder.Agent.FirstName + " " + ili.Invoice.SalesOrder.Agent.LastName,
+                               AgentId = ili.Invoice.SalesOrder.Agent.Id,
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                Brand = ili.Item.Brand.Name
                            };
@@ -157,12 +161,14 @@ namespace GMGInventory.Application.Repositories
                              {
                                  invoice.AgentCode,
                                  invoice.AgentName,
+                                 invoice.AgentId,
                                  invoice.Brand
                              } into i
                              select new BrandSalesRVM
                              {
                                  AgentCode = i.Key.AgentCode,
                                  AgentName = i.Key.AgentName,
+                                 AgentId = i.Key.AgentId,
                                  Brand = i.Key.Brand,
                                  AmountD = i.Sum(s => s.AmountD)
                              };
@@ -258,6 +264,7 @@ namespace GMGInventory.Application.Repositories
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                Brand = ili.Item.Brand.Name,
                                CurrentQuantityD = ii,
+                               ItemId = ili.Item.Id,
                                ItemCode = ili.Item.Code,
                                ItemName = ili.Item.Name + (soli.ItemPromo.Name == null ? "" : " (" + soli.ItemPromo.Name + ")"),
                                PartNumber = ili.Item.PartNumber + "",
@@ -272,6 +279,7 @@ namespace GMGInventory.Application.Repositories
                                  invoice.Brand,
                                  invoice.ItemCode,
                                  invoice.ItemName,
+                                 invoice.ItemId,
                                  invoice.PartNumber,
                                  invoice.Unit,
                                  invoice.UnitPriceD
@@ -283,6 +291,7 @@ namespace GMGInventory.Application.Repositories
                                  CurrentQuantityD = filter.Basis == "Quantity" ? i.Sum(s => s.CurrentQuantityD) : 0,
                                  ItemCode = i.Key.ItemCode,
                                  ItemName = i.Key.ItemName,
+                                 ItemId = i.Key.ItemId,
                                  PartNumber = i.Key.PartNumber,
                                  QuantityD = filter.Basis == "Quantity" ? i.Sum(s => s.QuantityD) : 0,
                                  Unit = i.Key.Unit,
@@ -405,6 +414,7 @@ namespace GMGInventory.Application.Repositories
                                Area = ili.Invoice.SalesOrder.Agent.Area.Name,
                                InvoiceDateD = ili.Invoice.InvoiceDate,
                                InvoiceNumber = ili.Invoice.InvoiceNumber,
+                               InvoiceId = ili.Invoice.Id,
                                InvoiceAmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                CommissionRateD = ili.Invoice.SalesOrder.Customer.CommissionRate != null
                                                ? ili.Invoice.SalesOrder.Customer.CommissionRate!.Value
@@ -413,7 +423,8 @@ namespace GMGInventory.Application.Repositories
                                                   * (ili.Invoice.SalesOrder.Customer.CommissionRate != null
                                                   ? ili.Invoice.SalesOrder.Customer.CommissionRate!.Value
                                                   : ili.Invoice.SalesOrder.Agent.Area.CommissionRate) / 100,
-                               Customer = ili.Invoice.SalesOrder.Customer.Name
+                               Customer = ili.Invoice.SalesOrder.Customer.Name,
+                               CustomerId = ili.Invoice.SalesOrder.Customer.Id
                            };
             var invoicelist = await invoices.ToListAsync();
             var grpinvoice = from invoice in invoicelist
@@ -426,8 +437,10 @@ namespace GMGInventory.Application.Repositories
                                  invoice.CommissionRateD,
                                  invoice.Area,
                                  invoice.Customer,
+                                 invoice.CustomerId,
                                  invoice.InvoiceDateD,
-                                 invoice.InvoiceNumber
+                                 invoice.InvoiceNumber,
+                                 invoice.InvoiceId
                              } into i
                              let total = invoicelist.Where(s => s.AgentCode == i.Key.AgentCode)
                              select new CommissionRVM
@@ -438,8 +451,10 @@ namespace GMGInventory.Application.Repositories
                                  Agent = i.Key.Agent,
                                  Area = i.Key.Area,
                                  Customer = i.Key.Customer,
+                                 CustomerId = i.Key.CustomerId,
                                  InvoiceDateD = i.Key.InvoiceDateD,
                                  InvoiceNumber = i.Key.InvoiceNumber,
+                                 InvoiceId = i.Key.InvoiceId,
                                  InvoiceAmountD = i.Sum(s => s.InvoiceAmountD),
                                  CommissionAmount2D = i.Sum(s => s.CommissionAmount2D),
                                  AgentTotalInvoiceD = total.Sum(s => s.InvoiceAmountD),
@@ -550,13 +565,15 @@ namespace GMGInventory.Application.Repositories
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                CustomerCode = ili.Invoice.SalesOrder.Customer.Code,
                                CustomerName = ili.Invoice.SalesOrder.Customer.Name,
+                               CustomerId = ili.Invoice.SalesOrder.Customer.Id,
                                RankD = 0
                            };
             var grpinvoice = (await invoices.ToListAsync())
                             .GroupBy(s => new
                             {
                                 s.CustomerCode,
-                                s.CustomerName
+                                s.CustomerName,
+                                s.CustomerId
                             })
                             .OrderByDescending(s => s.Sum(a => a.AmountD))
                             .Select((s, i) => new CustomerSalesRankingRVM
@@ -564,6 +581,7 @@ namespace GMGInventory.Application.Repositories
                                 AmountD = s.Sum(s => s.AmountD),
                                 CustomerCode = s.Key.CustomerCode,
                                 CustomerName = s.Key.CustomerName,
+                                CustomerId = s.Key.CustomerId,
                                 RankD = i + 1
                             });
             return grpinvoice.ToList();
@@ -654,7 +672,8 @@ namespace GMGInventory.Application.Repositories
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2,
                                Brand = ili.Item.Brand.Name,
                                CustomerCode = ili.Invoice.SalesOrder.Customer.Code,
-                               CustomerName = ili.Invoice.SalesOrder.Customer.Name
+                               CustomerName = ili.Invoice.SalesOrder.Customer.Name,
+                               CustomerId = ili.Invoice.SalesOrder.Customer.Id
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
                              orderby invoice.CustomerCode ascending, invoice.Brand ascending
@@ -662,6 +681,7 @@ namespace GMGInventory.Application.Repositories
                              {
                                  invoice.CustomerCode,
                                  invoice.CustomerName,
+                                 invoice.CustomerId,
                                  invoice.Brand
                              } into i
                              select new CustomerSalesRVM
@@ -670,6 +690,7 @@ namespace GMGInventory.Application.Repositories
                                  Brand = i.Key.Brand,
                                  CustomerCode = i.Key.CustomerCode,
                                  CustomerName = i.Key.CustomerName,
+                                 CustomerId = i.Key.CustomerId
                              };
             return grpinvoice.ToList();
         }
@@ -753,9 +774,8 @@ namespace GMGInventory.Application.Repositories
                            && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
                            select new DailySalesRVM
                            {
-                               Agent = invoice.SalesOrder.Agent.FirstName
-                                     + (invoice.SalesOrder.Agent.MiddleName == null ? "" : " " + invoice.SalesOrder.Agent.MiddleName) + " "
-                                     + invoice.SalesOrder.Agent.LastName,
+                               Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
+                               AgentId = invoice.SalesOrder.Agent.Id,
                                AmountD = (from ili in invoice.InvoiceLineItems
                                           join soli in invoice.SalesOrder.SalesOrderLineItems on ili.ItemId equals soli.ItemId
                                           let discount1 = (100 - soli.Discount1) / 100
@@ -763,9 +783,11 @@ namespace GMGInventory.Application.Repositories
                                           select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)).Sum() ?? 0,
                                CustomerCode = invoice.SalesOrder.Customer.Code,
                                CustomerName = invoice.SalesOrder.Customer.Name,
+                               CustomerId = invoice.SalesOrder.Customer.Id,
                                InvoiceDateD = invoice.InvoiceDate,
                                InvoiceNumber = invoice.InvoiceNumber,
                                BIRInvoiceNumber = invoice.ControlNumber,
+                               InvoiceId = invoice.Id,
                                Term = invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.SalesOrder.Customer.CreditTerm.Name,
                                PercentD = invoice.SalesOrder.Customer.CommissionRate != null
                                         ? invoice.SalesOrder.Customer.CommissionRate.Value
@@ -941,10 +963,12 @@ namespace GMGInventory.Application.Repositories
                                    Id = invoice.Id,
                                    Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
                                    AgentCode = invoice.SalesOrder.Agent.Code,
+                                   AgentId = invoice.SalesOrder.Agent.Id,
                                    AmountD = amount,
                                    ControlNumber = invoice.ControlNumber,
                                    CustomerCode = invoice.SalesOrder.Customer.Code,
                                    CustomerName = invoice.SalesOrder.Customer.Name,
+                                   CustomerId = invoice.SalesOrder.Customer.Id,
                                    InvoiceDateD = invoice.InvoiceDate.Date,
                                    InvoiceNumber = invoice.InvoiceNumber,
                                    Status = invoice.Status.Code
@@ -1202,6 +1226,9 @@ namespace GMGInventory.Application.Repositories
                                Name = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Name
                                     : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Region.Name
                                     : /*filter.Basis == "Brand" ?*/ ili.Item.Brand.Name,
+                               Id = filter.Basis == "Customer" ? ili.Invoice.SalesOrder.Customer.Id
+                                  : filter.Basis == "Region" ? ili.Invoice.SalesOrder.Region.Id
+                                  : ili.Item.Brand.Id,
                                AmountD = ili.Quantity * ili.UnitPrice * discount1 * discount2
                            };
             var grpinvoice = from invoice in await invoices.ToListAsync()
@@ -1209,12 +1236,14 @@ namespace GMGInventory.Application.Repositories
                              group invoice by new
                              {
                                  invoice.Code,
-                                 invoice.Name
+                                 invoice.Name,
+                                 invoice.Id
                              } into i
                              select new SalesReportBasisRVM
                              {
                                  Code = i.Key.Code,
                                  Name = i.Key.Name,
+                                 Id = i.Key.Id,
                                  AmountD = i.Sum(s => s.AmountD)
                              };
             return grpinvoice.ToList();
@@ -1296,12 +1325,15 @@ namespace GMGInventory.Application.Repositories
                            select new SalesReturnRVM
                            {
                                Agent = sreturn.InvoiceLineItem == null ? "" : sreturn.InvoiceLineItem.Invoice.SalesOrder.Agent.Code,
+                               AgentId = sreturn.InvoiceLineItem == null ? 0 : sreturn.InvoiceLineItem.Invoice.SalesOrder.Agent.Id,
                                Brand = sreturn.Item.Brand.Name,
                                ControlNumber = sreturn.InvoiceLineItem == null ? "TBR" : sreturn.InvoiceLineItem.Invoice.ControlNumber,
                                Customer = sreturn.SalesReturn.SalesOrder!.Customer.Name,
+                               CustomerId = sreturn.SalesReturn.SalesOrder!.Customer.Id,
                                DeliveryDateD = delivery == null ? null : delivery.DateDeliver,
                                ItemCode = sreturn.Item.Code,
                                ItemName = sreturn.Item.Name,
+                               ItemId = sreturn.Item.Id,
                                ItemType = sreturn.Item.ItemType.Code,
                                OrderDateD = sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? null : sreturn.InvoiceLineItem.Invoice.SalesOrder.SalesOrderDate,
                                PickupDateD = delivery == null ? null : delivery.DatePickup,
@@ -1310,8 +1342,11 @@ namespace GMGInventory.Application.Repositories
                                ReturnReason = sreturn.ReasonOfReturn.Name,
                                ReturnDateD = sreturn.SalesReturn.ReturnDate,
                                SINumber = sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? null : sreturn.InvoiceLineItem.Invoice.InvoiceNumber,
+                               SIId = sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? 0 : sreturn.InvoiceLineItem.Invoice.Id,
                                SONumber = sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? null : sreturn.InvoiceLineItem.Invoice.SalesOrder.SalesOrderNumber,
+                               SOId = sreturn.InvoiceLineItem == null || sreturn.InvoiceLineItem.Invoice == null ? 0 : sreturn.InvoiceLineItem.Invoice.SalesOrder.Id,
                                SRNumber = sreturn.SalesReturn.SalesReturnNumber,
+                               SRId = sreturn.SalesReturn.Id,
                                Unit = sreturn.Item.Unit.Code
                            };
             return await sreturns.ToListAsync();
@@ -1451,6 +1486,7 @@ namespace GMGInventory.Application.Repositories
                               ItemCode = soline.Item.Code,
                               OldCode = soline.Item.OldCode + "",
                               ItemName = soline.Item.Name,
+                              ItemId = soline.Item.Id,
                               //PendingD = soline.Quantity - (packedQuantity - returnedQuantity),
                               //PendingD = soline.Quantity - inventory > 0 ? soline.Quantity - inventory : 0,
                               //PendingD = Math.Max(0, soline.Quantity - inventory),
@@ -1465,7 +1501,8 @@ namespace GMGInventory.Application.Repositories
                                  soal.Brand,
                                  soal.ItemCode,
                                  soal.OldCode,
-                                 soal.ItemName
+                                 soal.ItemName,
+                                 soal.ItemId
                              } into i
                              let current = solineslist.Where(s => s.ItemCode == i.Key.ItemCode).Take(1).Max(s => s.ReplenishDateD)
                              select new UnservedItemRVM
@@ -1474,6 +1511,7 @@ namespace GMGInventory.Application.Repositories
                                  ItemCode = i.Key.ItemCode,
                                  OldCode = i.Key.OldCode,
                                  ItemName = i.Key.ItemName,
+                                 ItemId = i.Key.ItemId,
                                  ReplenishDateD = current,
                                  CurrentD = i.Sum(s => s.CurrentD),
                                  PendingD = i.Sum(s => s.PendingD)
@@ -1572,14 +1610,16 @@ namespace GMGInventory.Application.Repositories
                                Area = ili.Invoice.SalesOrder.Customer.Area.Name,
                                Brand = ili.Item.Brand.Name,
                                ControlNumber = ili.Invoice.ControlNumber,
+                               InvoiceId = ili.Invoice.Id,
                                InvoiceDateD = ili.Invoice.InvoiceDate,
                                ItemCode = ili.Item.Code,
                                ItemName = ili.Item.Name,
+                               ItemId = ili.Item.Id,
                                OldSkuCode = ili.Item.OldCode,
                                QuantityD = ili.Quantity,
                                Region = ili.Invoice.SalesOrder.Region.Name,
-
-                               SalesOrderNumber = ili.Invoice.SalesOrder.SalesOrderNumber
+                               SalesOrderNumber = ili.Invoice.SalesOrder.SalesOrderNumber,
+                               SalesOrderId = ili.Invoice.SalesOrder.Id
                            };
             return await outbound.ToListAsync();
         }

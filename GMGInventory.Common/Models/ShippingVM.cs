@@ -15,6 +15,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Customer Name")]
         public string CustomerName { get; set; }
+
+        public int CustomerId { get; set; }
         public string? CustomerAddress { get; set; }
         public string? CustomerContactNo { get; set; }
 
@@ -22,6 +24,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; }
+
+        public int InvoiceId { get; set; }
 
         [Display(Name = "Pack Number")]
         public int PackId { get; set; }

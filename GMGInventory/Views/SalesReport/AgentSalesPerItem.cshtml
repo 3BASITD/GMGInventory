@@ -412,11 +412,26 @@
             },
             columns: [
                 { data: "dateInvoice", name: "DateInvoice" },
-                { data: "controlNumber", name: "ControlNumber" },
-                { data: "agent", name: "Agent" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesInvoice/Details/" + data.invoiceId + "' class='link-info' target='_blank'>" + data.controlNumber + "</a>";
+                    },
+                    name: "ControlNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agent + "</a>";
+                    },
+                    name: "Agent" 
+                },
                 { data: "brand", name: "Brand" },
                 { data: "itemType", name: "ItemType" },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
+                    },
+                    name: "ItemCode"
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 { data: "price", name: "Price", className: "text-end" },

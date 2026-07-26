@@ -248,6 +248,8 @@ namespace GMGInventory.Application.Repositories
                                       && (filter.CategoryId == null || filter.CategoryId == item.CategoryId)
                                       && (filter.ItemTypeId == null || filter.ItemTypeId == item.ItemTypeId)
                                       && (filter.BrandId == null || filter.BrandId == item.BrandId))
+                                      && filter.DateFrom <= price.DateCreated.Date
+                                      && price.DateCreated.Date <= filter.DateTo
                                   select new ItemPriceUpdateVM
                                   {
                                       Code = item.Code,

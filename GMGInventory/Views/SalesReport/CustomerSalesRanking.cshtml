@@ -293,7 +293,12 @@
             },
             columns: [
                 { data: "rank", name: "Rank" },
-                { data: "customerCode", name: "CustomerCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerCode + "</a>";
+                    },
+                    name: "CustomerCode" 
+                },
                 { data: "customerName", name: "CustomerName" },
                 { data: "amount", name: "Amount", className: "text-end" }
             ],

@@ -27,7 +27,13 @@
                         @Html.DisplayNameFor(model => model.SONumber)
                     </span>
                     <b class="d-block">
-                        @Model.SONumber
+                        @Html.ActionLink(Model.SONumber,
+                                        "Details",
+                                        "SalesOrder", 
+                                        new { id = Model.SOId }, 
+                                        new { @class = "text-info", 
+                                              role = "tooltip",
+                                              target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -37,7 +43,13 @@
                         @Html.DisplayNameFor(model => model.PackNumber)
                     </span>
                     <b class="d-block">
-                        @Model.PackNumber
+                        @Html.ActionLink(Model.PackNumber,
+                                        "Details",
+                                        "Pack", 
+                                        new { id = Model.Id }, 
+                                        new { @class = "text-info", 
+                                              role = "tooltip",
+                                              target = "_blank" })
                     </b>
                 </p>
             </div>
@@ -59,7 +71,13 @@
                         @Html.DisplayNameFor(model => model.Customer)
                     </span>
                     <b class="d-block">
-                        @Model.Customer
+                        @Html.ActionLink(Model.Customer,
+                                        "Details",
+                                        "Customer", 
+                                        new { id = Model.CustomerId }, 
+                                        new { @class = "text-info", 
+                                              role = "tooltip",
+                                              target = "_blank" })
                     </b>
                 </p>
             </div>

@@ -286,9 +286,24 @@
                 return: true,
             },
             columns: [
-                { data: "soNumber", name: "SONumber" },
-                { data: "packNumber", name: "PackNumber" },
-                { data: "customer", name: "Customer" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/SalesOrder/Details/" + data.soId + "' class='link-info' target='_blank'>" + data.soNumber + "</a>";
+                    },
+                    name: "SONumber"
+                },
+                { 
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Pack/Details/" + data.id + "' class='link-info' target='_blank'>" + data.packNumber + "</a>";
+                    },
+                    name: "PackNumber"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customer + "</a>";
+                    },
+                    name: "Customer"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         return data.destination == null ? "N/A" : data.destination;

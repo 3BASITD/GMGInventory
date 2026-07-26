@@ -579,7 +579,12 @@
                 return: true,
             },
             columns: [
-                { data: "customerCode", name: "CustomerCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerCode + "</a>";
+                    },
+                    name: "CustomerCode"
+                },
                 { data: "brand", name: "Brand" },
                 { data: "amount", name: "Amount", className: "text-end" }
             ],
@@ -699,7 +704,12 @@
                 return: true,
             },
             columns: [
-                { data: "customerCode", name: "CustomerCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerCode + "</a>";
+                    },
+                    name: "CustomerCode"
+                },
                 { data: "brand", name: "Brand" },
                 { data: "amount", name: "Amount", className: "text-end" }
             ],

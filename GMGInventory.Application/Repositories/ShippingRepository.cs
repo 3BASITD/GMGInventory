@@ -57,9 +57,11 @@ namespace GMGInventory.Application.Repositories
                            select new ShippingVM
                            {
                                InvoiceNumber = invs.InvoiceNumber,
+                               InvoiceId = invs.Id,
                                SONumber = so.SalesOrderNumber,
                                SalesOrderId = so.Id,
                                CustomerName = cust.Name,
+                               CustomerId = cust.Id,
                                CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
                                PackId = pack.Id,
                                SalesOrderDateD = invs.SalesOrder.SalesOrderDate,
@@ -138,10 +140,11 @@ namespace GMGInventory.Application.Repositories
             var orderVM = (from order in context.SalesOrders.Include(s => s.SalesOrderDeliveryMonitorings).ThenInclude(s => s.Forwarder)
                            let invoices = context.InvoiceLineItems
                              .Where(s => s.Invoice.SalesOrderId == order.Id)
-                             .GroupBy(s => s.Invoice.InvoiceNumber)
+                             .GroupBy(s => new { InvoiceId = s.Invoice.Id, InvoiceNumber = s.Invoice.InvoiceNumber })
                              .Select(x => new
                              {
-                                 Id = x.Key
+                                 InvoiceId = x.Key.InvoiceId,
+                                 InvoiceNumber = x.Key.InvoiceNumber
                               //   Value =  x.Sum(s => s.Invoice.PaidAmount)  //x.Sum(s => (decimal?)(s.UnitPrice * s.Quantity)) ?? 0
                              }).ToList()
 
@@ -166,6 +169,7 @@ namespace GMGInventory.Application.Repositories
                            {
                                CustomerCode = order.Customer.Code,
                                CustomerName = order.Customer.Name,
+                               CustomerId = order.Customer.Id,
                                CustomerAddress = shippingAddress == null ? null : shippingAddress.Address,
                                CustomerContactNo = shippingAddress == null ? null : shippingAddress.PhoneNumber,
                                Forwarder = forwarder != null ? forwarder.Name
@@ -174,7 +178,7 @@ namespace GMGInventory.Application.Repositories
                                SalesOrderId = order.Id,
                                SalesOrderDateD = order.DateCreated,
                                SONumber = order.SalesOrderNumber,
-                               PairedInvoices = string.Join(",", invoices.Select(s => s.Id)),
+                               PairedInvoices = string.Join(",", invoices.Select(s => s.InvoiceId + ":::" + s.InvoiceNumber)),
                                Packaging = string.Join(", ", packaging.Select(s => s.Text)),
                                TotalPackageCount = packaging.Sum(s => s.PackageCount)
                                //      Value = invoices.Sum(s => s.Value)

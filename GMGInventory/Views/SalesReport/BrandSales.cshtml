@@ -355,7 +355,12 @@
             },
             columns: [
                 { data: "brand", name: "Brand" },
-                { data: "agentName", name: "AgentName" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Agent/Details/" + data.agentId + "' class='link-info' target='_blank'>" + data.agentName + "</a>";
+                    },
+                    name: "AgentName"
+                },
                 { data: "amount", name: "Amount", className: "text-end" }
             ],
             footerCallback: function (row, data, start, end, display) {

@@ -741,7 +741,12 @@
             columns: [
                 { data: "collectDate", name: "CollectDate" },
                 { data: "refNo", name: "RefNo" },
-                { data: "customerName", name: "CustomerName" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Customer/Details/" + data.customerId + "' class='link-info' target='_blank'>" + data.customerName + "</a>";
+                    },
+                    name: "CustomerName"
+                },
                 { data: "checkDate", name: "CheckDate" },
                 { data: "check", name: "Check" },
                 { data: "branch", name: "Branch" },
