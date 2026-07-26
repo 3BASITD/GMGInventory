@@ -275,6 +275,7 @@ namespace GMGInventory.Application.Repositories
                              Id = pack.Id,
                              ItemId = pack.Item.Id,
                              ItemCode = pack.Item.Code,
+                             ItemPartNumber = order.Item.PartNumber + "",
                              ItemName = pack.Item.Name + (order.ItemPromo == null ? "" : " (" + order.ItemPromo.Name + ")"),
                              PackType = pack.PackType.Id,
                              PackTypeName = pack.PackType.Code,

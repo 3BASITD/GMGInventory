@@ -2,15 +2,32 @@
 
 @{
     ViewData["Title"] = "Customer Purchase History";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"] (Customer: <strong class="customer-name">All</strong>)</span>
         <div class="card-tools">
-            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right ml-2 btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-secondary btn-sm float-right ml-2 downloadBtn">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                        data-microtip-title="Download&#10;Download access is required"
+                        data-microtip-position="top-left"
+                        role="tooltip">
+                    <span class="fas fa-download mr-0"></span>
+                </button>
+            }
         </div>
     </div>
     <div class="card-body">
@@ -169,6 +186,8 @@
 
 @section Scripts {
     <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
         // Load Select2 for Customer
         $("#filter-customer").select2({
             tags: true,
@@ -618,5 +637,20 @@
         }).on("draw", function () {
             checkDefaultFilter();
         });
+
+        if (user_access.canUploadDownload) {
+            $(".downloadBtn").click(function(e) {
+                var urlQuery = [];
+                if ($("#filter-item-code").val()) { urlQuery.push("ItemId=" + $("#filter-item-code").val()); }
+                if ($("#filter-customer").val()) { urlQuery.push("CustomerId=" + $("#filter-customer").val()); }
+                if ($("#filter-category").val()) { urlQuery.push("CategoryId=" + $("#filter-category").val()); }
+
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+
+
+                window.location = "@Url.Action("DownloadFile")?" + urlQuery.join("&");
+            });
+        }
     </script>
 }

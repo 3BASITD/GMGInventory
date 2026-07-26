@@ -97,6 +97,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Code")]
         public string ItemCode { get; set; }
 
+        [Display(Name = "Item Part Number")]
+        public string ItemPartNumber { get; set; }
+
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 

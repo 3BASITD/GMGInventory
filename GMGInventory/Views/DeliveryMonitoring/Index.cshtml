@@ -28,6 +28,7 @@
                 <tr>
                     <th>Sales Order Date</th>
                     <th>Sales Order Number</th>
+                    <th>Total Sales Order</th>
                     <th>Order Queue Number</th>
                     <th>Service Level Agreement</th>
                     <th>Customer</th>
@@ -582,6 +583,15 @@
                         return "<a href='/SalesOrder/Details/" + data.salesOrderId + "' class='link-info' target='_blank'>" + data.salesOrderNumber + "</a>";
                     },
                     name: "SalesOrderNumber"
+                },
+                {
+                    data: function(data, type, dataToSet) {
+                        if (data.totalSalesOrder)
+                            return data.totalSalesOrder || '<em class="text-muted">N/A</em>';
+                        else
+                            return '<span class="text-muted">N/A</span>';
+                    },
+                    name: "TotalSalesOrder"
                 },
                 {
                     data: function (data, type, dataToSet) {

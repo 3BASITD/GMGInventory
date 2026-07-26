@@ -15,7 +15,7 @@ namespace GMGInventory.Application.Repositories
             this.context = context;
         }
 
-        private async Task<IList<CustomerPurchaseVM>> GetListAsync(CustomerPurchaseFilterVM filter)
+        public async Task<IList<CustomerPurchaseVM>> GetListAsync(CustomerPurchaseFilterVM filter)
         {
             var salesOrder = from soli in context.SalesOrderLineItems
                              join so in context.SalesOrders on soli.SalesOrderId equals so.Id

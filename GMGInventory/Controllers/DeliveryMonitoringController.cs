@@ -95,6 +95,7 @@ namespace GMGInventory.Controllers
             {
                 dt.Rows.Add(so.DateOrder,
                             so.SalesOrderNumber,
+                            so.TotalSalesOrder,
                             so.OrderQueueNumber,
                             so.ServiceLevelAgreement,
                             so.Customer,
