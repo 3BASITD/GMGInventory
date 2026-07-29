@@ -3,6 +3,10 @@
 @{
     Layout = "";
     var title = "Sales Order";
+
+    var submittedDisplay = DateTime.TryParse(Model.Details.SubmittedDate, out var submittedDate)
+    ? submittedDate.ToString("MMMM dd, yyyy")
+    : Model.Details.SubmittedDate;
 }
 
 <!DOCTYPE html>
@@ -60,6 +64,9 @@
                         <div class="sub-col center w-40pc">
                             <span class="title">SO Date:</span>
                             <span class="desc">@Model.Details.OrderDate</span>
+                            <hr />
+                            <span class="title">Submitted Date:</span>
+                            <span class="desc">@submittedDisplay</span>
                             <hr />
                             <span class="title">SO No.:</span>
                             <span class="desc">@Model.Details.SONumber</span>

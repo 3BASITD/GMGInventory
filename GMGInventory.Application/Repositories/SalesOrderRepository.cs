@@ -288,6 +288,8 @@ namespace GMGInventory.Application.Repositories
                                               : null,
                                ApprovedBy = approve.FirstName + " " + approve.LastName,
                                ApprovedDateD = order.ApprovedDate,
+                               SubmittedDateD = order.SubmittedDate,
+                               ResubmittedDateD = order.ResubmittedDate,
                                Branch = order.Customer.Branch,
                                CreditLimitD = order.Customer.CreditLimit,
                                CreditTerms = order.Customer.CreditTerm.Name,
@@ -792,6 +794,9 @@ namespace GMGInventory.Application.Repositories
 
                 var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
                 string soNumber = "";
+                string soResubbmitedBy = "";
+                DateTime? soResubbmitedDate = null;
+
                 if (previous == null)
                 {
                     var latestOrder = context.SalesOrders
@@ -822,6 +827,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     var tempSalesOrderNumber = previous.SalesOrderNumber.Split("-D");
                     soNumber = tempSalesOrderNumber[0];
+                    soResubbmitedBy = currentUserId;
+                    soResubbmitedDate = DateTime.UtcNow;
                 }
 
 
@@ -844,6 +851,10 @@ namespace GMGInventory.Application.Repositories
                     Remarks = form.Remarks,
                     SalesOrderDate = form.OrderDate,
                     SalesOrderNumber = soNumber,
+                    SubmittedBy = currentUserId,
+                    SubmittedDate = form.OrderDate,
+                    ResubmittedBy = soResubbmitedBy,
+                    ResubmittedDate = soResubbmitedDate,
                     StatusId = statusId,
                     ForwarderId = form.Forwarder,
                     RegionId = form.Region,
@@ -862,6 +873,9 @@ namespace GMGInventory.Application.Repositories
                     context.SalesOrders.Remove(previous);
 
                     previous.ResubmitId = orderVM.Id;
+                    previous.ResubmittedBy = currentUserId;
+                    previous.ResubmittedDate = DateTime.UtcNow;
+
                     context.SalesOrders.Update(previous);
                     await context.SaveChangesAsync(currentUserId);
                 }

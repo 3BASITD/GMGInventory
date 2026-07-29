@@ -217,6 +217,14 @@ namespace GMGInventory.Common.Models
         public string DisapprovedDate => DisapprovedDateD == null ? "-" : DisapprovedDateD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DisapprovedDateD { get; set; }
 
+        [Display(Name = "Submitted Date")]
+        public string SubmittedDate => SubmittedDateD == null ? "-" : SubmittedDateD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? SubmittedDateD { get; set; }
+
+        [Display(Name = "Resubmitted Date")]
+        public string ResubmittedDate => ResubmittedDateD == null ? "-" : ResubmittedDateD.Value.ToString(SystemFormat.StringDateTime);
+        public DateTime? ResubmittedDateD { get; set; }
+
         [Display(Name = "Disapproved Reason")]
         public string DisapprovedReason { get; set; }
 
