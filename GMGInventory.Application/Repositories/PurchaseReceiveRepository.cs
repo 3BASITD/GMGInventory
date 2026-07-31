@@ -598,6 +598,8 @@ namespace GMGInventory.Application.Repositories
                             .Include(x => x.OrderItem).ThenInclude(x => x.RequestItem)
                             .Where(s => s.PurchaseReceivingId == receivingId).ToListAsync();
 
+
+
                         foreach (var receiving in preceiveItems)
                         {
                             var itemId = receiving.OrderItem.RequestItem.ItemId;
@@ -619,10 +621,18 @@ namespace GMGInventory.Application.Repositories
                                 };
                                 context.PhysicalCountHistories.Add(countHistory);
 
+                                // check items already added in this loop but not yet saved
+                                if (itemInventory == null)
+                                {
+                                    itemInventory = context.ItemInventories.Local
+                                        .FirstOrDefault(s => s.WarehouseId == warehouseId && s.ItemId == itemId);
+                                }
+
+
                                 if (itemInventory != null)
                                 {
                                     itemInventory.Quantity += receiving.Quantity;
-                                    context.ItemInventories.Update(itemInventory);
+                                    //context.ItemInventories.Update(itemInventory);
                                 }
                                 else
                                 {
@@ -632,7 +642,11 @@ namespace GMGInventory.Application.Repositories
                                         Quantity = receiving.Quantity,
                                         WarehouseId = warehouseId
                                     };
+
+
                                     await context.ItemInventories.AddAsync(newItemInventory);
+
+
                                 }
                             }
                         }
