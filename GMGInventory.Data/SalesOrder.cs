@@ -74,6 +74,14 @@ namespace GMGInventory.Data
         public DateTime? ApprovedDate { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
+        public string? SubmittedBy { get; set; }
+        public DateTime? SubmittedDate { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string? ResubmittedBy { get; set; }
+        public DateTime? ResubmittedDate { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
         public string? DisapprovedBy { get; set; }
         public DateTime? DisapprovedDate { get; set; }
 

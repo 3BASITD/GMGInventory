@@ -34,6 +34,7 @@ namespace GMGInventory.Data.Configurations.Entities
                 new() {
                     Id = (int)PageNames.CustomerPurchaseHistory,
                     Name = PageNames.CustomerPurchaseHistory.ToEnumString(),
+                    HasUploadDownload = true,
                     HasView = true
                 },
                 new() {
@@ -560,6 +561,12 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasView = true,
                     HasUploadDownload = true,
                     HasPrint = true
+                },
+                new() {
+                    Id = (int)PageNames.DeliveryMonitoring,
+                    Name = PageNames.PurchaseReceivingReport.ToEnumString(),
+                    HasView = true,
+                    HasUploadDownload = true,
                 }
             };
 

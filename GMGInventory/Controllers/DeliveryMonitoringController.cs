@@ -74,6 +74,7 @@ namespace GMGInventory.Controllers
             dt.Columns.AddRange([
                 new DataColumn(chelper.DisplayName<DeliveryMonitoringVM>("DateOrder")),
                 new DataColumn(chelper.DisplayName<DeliveryMonitoringVM>("SalesOrderNumber")),
+                new DataColumn(chelper.DisplayName<DeliveryMonitoringVM>("TotalSalesOrder")),
                 new DataColumn(chelper.DisplayName<DeliveryMonitoringVM>("OrderQueueNumber")),
                 new DataColumn(chelper.DisplayName<DeliveryMonitoringVM>("ServiceLevelAgreement")),
                 new DataColumn(chelper.DisplayName<DeliveryMonitoringVM>("Customer")),
@@ -116,7 +117,7 @@ namespace GMGInventory.Controllers
             wb.SaveAs(stream);
             return File(stream.ToArray(),
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        DateTime.Now.ToString("yyyyMMdd") + " Sales Order Delivery.xlsx");
+                        DateTime.Now.ToString("yyyyMMdd") + " Delivery Monitoring.xlsx");
         }
 
         [HttpPost]
