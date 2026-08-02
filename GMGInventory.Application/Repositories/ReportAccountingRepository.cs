@@ -28,6 +28,7 @@ namespace GMGInventory.Application.Repositories
                           {
                               AmountD = soa.CreditAmount,
                               Customer = soa.Invoice.SalesOrder.Customer.Name,
+                              CustomerId = soa.Invoice.SalesOrder.Customer.Id,
                               MemoDateD = soa.DateCreated,
                               MemoNumber = soa.CreditReferenceNumber
                           };
@@ -123,6 +124,7 @@ namespace GMGInventory.Application.Repositories
                          {
                              AmountD = soa.DebitAmount,
                              Customer = soa.Invoice.SalesOrder.Customer.Name,
+                             CustomerId = soa.Invoice.SalesOrder.Customer.Id,
                              MemoDateD = soa.DateCreated,
                              MemoNumber = soa.DebitReferenceNumber
                          };

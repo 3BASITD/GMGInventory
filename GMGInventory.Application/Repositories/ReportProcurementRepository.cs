@@ -40,11 +40,14 @@ namespace GMGInventory.Application.Repositories
                            {
                                Item = pRequest.Item.Code,
                                ItemDescription = pRequest.ItemDescription,
+                               ItemId = pRequest.Item.Id,
                                Quantity = porder.Quantity,
                                Unit = pRequest.Item.Unit.Code,
                                UnitCost = porder.UnitCost,
                                DocumentNumber = porder.PurchaseOrder.DocumentNumber,
+                               OrderId = porder.PurchaseOrder.Id,
                                Supplier = porder.PurchaseOrder.Supplier.Name,
+                               SupplierId = porder.PurchaseOrder.Supplier.Id,
                                OrderDateD = porder.PurchaseOrder.OrderDate,
                                UnservedQuantity = pRequest.Quantity - porder.Quantity,
                                UnservedAmount = (pRequest.Quantity - porder.Quantity) * porder.UnitCost
@@ -182,12 +185,15 @@ namespace GMGInventory.Application.Repositories
                             {
                                 Item = preceiving.OrderItem.RequestItem.Item.Code,
                                 ItemDescription = preceiving.OrderItem.RequestItem.ItemDescription,
+                                ItemId = preceiving.OrderItem.RequestItem.Item.Id,
                                 Quantity = poItems.Quantity,
                                 Unit = preceiving.OrderItem.RequestItem.Item.Unit.Code,
                                 UnitCost = poItems.UnitCost,
                                 TotalAmount = poItems.Quantity * poItems.UnitCost,
                                 DocumentNumber = preturn.PurchaseReturn.DocumentNumber,
+                                ReturnId = preturn.PurchaseReturn.Id,
                                 Supplier = poItems.PurchaseOrder.Supplier.Name,
+                                SupplierId = poItems.PurchaseOrder.Supplier.Id,
                                 ReturnDateD = preturn.PurchaseReturn.ReturnDate, // change to return
                                 ReturnQuantity = preturn.Quantity,
                                 ReturnTotalAmount = poItems.UnitCost * preturn.Quantity
@@ -315,12 +321,15 @@ namespace GMGInventory.Application.Repositories
                              {
                                  Item = preceive.OrderItem.RequestItem.Item.Code,
                                  ItemDescription = preceive.OrderItem.RequestItem.ItemDescription,
+                                 ItemId = preceive.OrderItem.RequestItem.Item.Id,
                                  Quantity = preceive.Quantity,
                                  Unit = preceive.OrderItem.RequestItem.Item.Unit.Code,
                                  UnitCost = preceive.OrderItem.UnitCost,
                                  TotalAmount = preceive.Quantity * preceive.OrderItem.UnitCost,
                                  DocumentNumber = preceive.PurchaseReceiving.DocumentNumber,
+                                 ReceivingId = preceive.PurchaseReceiving.Id,
                                  Supplier = poItems.PurchaseOrder.Supplier.Name,
+                                 SupplierId = poItems.PurchaseOrder.Supplier.Id,
                                  ReturnDateD = preceive.PurchaseReceiving.ReceiveDate, // change to return pero di matandaan. kaya binalik uli
                                  //ReturnDateD = (from rtrn in preceive.PurchaseReturnLineItem
                                  //               orderby rtrn.PurchaseReturn.ReturnDate descending

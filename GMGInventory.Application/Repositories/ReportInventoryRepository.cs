@@ -26,17 +26,9 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<BelowMaintainingRVM>> GetBelowMaintaining(ListFilterInventoryModel filter)
         {
             var items = from item in context.Items
-                                            .Include(s => s.Brand)
-                                            .Include(s => s.Unit)
                         let inventory = context.ItemInventories
                                                .Where(s => s.ItemId == item.Id && s.Warehouse.IsMain == true)
                                                .Sum(s => (int?)s.Quantity) ?? 0
-                        let packedQuantity = context.PackLineItems
-                                                    .Where(s => s.ItemId == item.Id)
-                                                    .Sum(s => (int?)s.Quantity) ?? 0
-                        let returnedQuantity = context.SalesReturnLineItems
-                                                      .Where(s => s.ItemId == item.Id)
-                                                      .Sum(s => (int?)s.Quantity) ?? 0
                         where item.IsActive == true
                            && (filter.Brand == null || item.BrandId == filter.Brand)
                            && (filter.Item == null || item.Id == filter.Item)
@@ -45,6 +37,7 @@ namespace GMGInventory.Application.Repositories
                             Brand = item.Brand.Name,
                             ItemCode = item.Code,
                             ItemName = item.Name,
+                            ItemId = item.Id,
                             MaintainingQuantityD = inventory,
                             PartNumber = item.PartNumber + "",
                             QuantityOnHandD = inventory,
@@ -141,13 +134,16 @@ namespace GMGInventory.Application.Repositories
                                Brand = receive.OrderItem.RequestItem.Item.Brand.Code,
                                DateD = receive.DateCreated,
                                DocumentNumber = receive.PurchaseReceiving.DocumentNumber,
+                               ReceivingId = receive.PurchaseReceiving.Id,
                                ItemCode = receive.OrderItem.RequestItem.Item.Code,
                                ItemName = receive.OrderItem.RequestItem.Item.Name,
+                               ItemId = receive.OrderItem.RequestItem.Item.Id,
                                ItemType = receive.OrderItem.RequestItem.Item.ItemType.Code,
                                PartNumber = receive.OrderItem.RequestItem.Item.PartNumber,
                                QuantityD = receive.Quantity,
                                Unit = receive.OrderItem.RequestItem.Item.Unit.Code,
-                               Warehouse = receive.PurchaseReceiving.Warehouse.Name
+                               Warehouse = receive.PurchaseReceiving.Warehouse.Name,
+                               WarehouseId = receive.PurchaseReceiving.Warehouse.Id
                            };
             return await receives.ToListAsync();
         }
@@ -236,9 +232,12 @@ namespace GMGInventory.Application.Repositories
                              AmountD = order.UnitCost * order.Quantity,
                              DateD = order.DateCreated,
                              DocumentNumber = order.PurchaseOrder.DocumentNumber,
+                             POId = order.PurchaseOrder.Id,
                              Item = order.RequestItem.Item.Name,
+                             ItemId = order.RequestItem.Item.Id,
                              QuantityD = order.Quantity,
                              Supplier = order.PurchaseOrder.Supplier.Name,
+                             SupplierId = order.PurchaseOrder.Supplier.Id,
                              Unit = order.RequestItem.Item.Unit.Code,
                              UnitCostD = order.UnitCost
                          };
@@ -331,6 +330,7 @@ namespace GMGInventory.Application.Repositories
                            Brand = preceive.OrderItem.RequestItem.Item.Brand.Name,
                            ItemCode = preceive.OrderItem.RequestItem.Item.Code,
                            ItemName = preceive.OrderItem.RequestItem.Item.Name,
+                           ItemId = preceive.OrderItem.RequestItem.Item.Id,
                            ItemType = preceive.OrderItem.RequestItem.Item.ItemType.Code,
                            PartNumber = preceive.OrderItem.RequestItem.Item.PartNumber,
                            QuantityD = preceive.Quantity,
@@ -412,66 +412,66 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<StockCardRVM>> GetStockCard(ListFilterInventoryModel filter)
         {
             var cards1 = from card in context.InvoiceLineItems
-                                            .Include(s => s.Item)
-                                            .Include(s => s.Invoice).ThenInclude(s => s.SalesOrder).ThenInclude(s => s.Customer)
                          where filter.DateFrom <= card.Invoice.InvoiceDate.Date
                            && card.Invoice.InvoiceDate.Date <= filter.DateTo &&
                          (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
                              DateD = card.Invoice.InvoiceDate,
-                             DetailsRemarks = "Sold to - " + card.Invoice.SalesOrder.Customer.Name,
+                             //DetailsRemarks = "Sold to - " + card.Invoice.SalesOrder.Customer.Name,
+                             DetailsRemarks = $"Sold to - <a href='/Customer/Details/{card.Invoice.SalesOrder.Customer.Id}' class='link-info' target='_blank'>{card.Invoice.SalesOrder.Customer.Name}</a>",
                              InD = 0,
                              Item = card.Item.Name,
+                             ItemId = card.Item.Id,
                              OutD = card.Quantity,
                              TransactionType = "Sales"
                          };
-            var cards2 = from card in context.PurchaseOrderLineItems
-                                            .Include(s => s.Item)
-                                            .Include(s => s.PurchaseOrder).ThenInclude(s => s.Supplier)
-                         where filter.DateFrom <= card.PurchaseOrder.ReplenishDate.Date
-                         && card.PurchaseOrder.ReplenishDate.Date <= filter.DateTo
-                         && (filter.Item == null || card.Item.Id == filter.Item)
+            var cards2 = from card in context.PurchaseOrderNewLineItems
+                         where filter.DateFrom <= card.PurchaseOrder.OrderDate.Date
+                         && card.PurchaseOrder.OrderDate.Date <= filter.DateTo
+                         && (filter.Item == null || card.RequestItem.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
-                             DateD = card.PurchaseOrder.ReplenishDate,
-                             DetailsRemarks = "Purchase from - " + card.PurchaseOrder.Supplier.Name,
+                             DateD = card.PurchaseOrder.OrderDate,
+                             //DetailsRemarks = "Purchase from - " + card.PurchaseOrder.Supplier.Name,
+                             DetailsRemarks = $"Purchase from - <a href='/Supplier/Details/{card.PurchaseOrder.Supplier.Id}' class='link-info' target='_blank'>{card.PurchaseOrder.Supplier.Name}</a>",
                              InD = card.Quantity,
-                             Item = card.Item.Name,
+                             Item = card.RequestItem.Item.Name,
+                             ItemId = card.RequestItem.Item.Id,
                              OutD = 0,
                              TransactionType = "Purchase"
                          };
-            /* TO CONFIRM IF INCLUDED
+            /* TO CONFIRM IF INCLUDED*/
             var cards3 = from card in context.TransferItemDetails
-                                            .Include(s => s.Item)
-                                            .Include(s => s.TransferItem).ThenInclude(s => s.Source)
                          where filter.DateFrom <= card.TransferItem.TransferDate.Date
                          && card.TransferItem.TransferDate.Date <= filter.DateTo
                          && (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
                              DateD = card.TransferItem.TransferDate,
-                             DetailsRemarks = "Transfer from - " + card.TransferItem.Source.Name,
+                             //DetailsRemarks = "Transfer from - " + card.TransferItem.Source.Name,
+                             DetailsRemarks = $"Transfer from - <a href='/Warehouse/Details/{card.TransferItem.Source.Id}' class='link-info' target='_blank'>{card.TransferItem.Source.Name}</a>",
                              InD = 0,
                              Item = card.Item.Name,
+                             ItemId = card.Item.Id,
                              OutD = card.Quantity,
                              TransactionType = "Warehouse Transfer"
                          };
             var cards4 = from card in context.TransferItemDetails
-                                            .Include(s => s.Item)
-                                            .Include(s => s.TransferItem).ThenInclude(s => s.Destination)
                          where filter.DateFrom <= card.TransferItem.TransferDate.Date
                          && card.TransferItem.TransferDate.Date <= filter.DateTo
                          && (filter.Item == null || card.Item.Id == filter.Item)
                          select new StockCardRVM
                          {
                              DateD = card.TransferItem.TransferDate,
-                             DetailsRemarks = "Transfer to - " + card.TransferItem.Destination.Name,
+                             //DetailsRemarks = "Transfer to - " + card.TransferItem.Destination.Name,
+                             DetailsRemarks = $"Transfer to - <a href='/Warehouse/Details/{card.TransferItem.Destination.Id}' class='link-info' target='_blank'>{card.TransferItem.Destination.Name}</a>",
                              InD = card.Quantity,
                              Item = card.Item.Name,
+                             ItemId = card.Item.Id,
                              OutD = 0,
                              TransactionType = "Warehouse Transfer"
-                         }; */
+                         }; /**/
             var cards5 = from card in context.PhysicalCountHistories
                                             .Include(s => s.Item)
                                             .Include(s => s.Warehouse)
@@ -486,29 +486,32 @@ namespace GMGInventory.Application.Repositories
                              DetailsRemarks = "Adjusted by - " + SystemFormat.Name(user.FirstName, user.LastName, user.Nickname),
                              InD = card.QuantityFrom < card.QuantityTo ? card.QuantityTo - card.QuantityFrom : 0,
                              Item = card.Item.Name,
+                             ItemId = card.Item.Id,
                              OutD = card.QuantityFrom > card.QuantityTo ? card.QuantityFrom - card.QuantityTo : 0,
                              TransactionType = "Stock Adjustment"
                          };
-            /* TO CONFIRM IF INCLUDED
+            /* TO CONFIRM IF INCLUDED */
             var cards6 = from card in context.SalesReturnLineItems
-                                            .Include(s => s.Item)
-                                            .Include(s => s.SalesReturn).ThenInclude(s => s.Customer)
                          where filter.DateFrom <= card.DateCreated.Date
                          && card.DateCreated.Date <= filter.DateTo
                          && (filter.Item == null || card.Item.Id == filter.Item)
+                         && card.SalesReturn.Customer != null
                          select new StockCardRVM
                          {
                              DateD = card.DateCreated,
-                             DetailsRemarks = "Return by - " + card.SalesReturn.Customer.Name,
+                             //DetailsRemarks = "Return by - " + card.SalesReturn.Customer.Name,
+                             DetailsRemarks = $"Return by - <a href='/Customer/Details/{card.SalesReturn.Customer.Id}' class='link-info' target='_blank'>{card.SalesReturn.Customer.Name}</a>",
                              InD = card.Quantity,
                              Item = card.Item.Name,
                              OutD = 0,
                              TransactionType = "Sales Return"
-                         }; */
-            //return await cards1.Union(cards2).Union(cards5).ToListAsync();
+                         }; /**/
             var union = await cards1.ToListAsync();
             union.AddRange(await cards2.ToListAsync());
+            union.AddRange(await cards3.ToListAsync());
+            union.AddRange(await cards4.ToListAsync());
             union.AddRange(await cards5.ToListAsync());
+            union.AddRange(await cards6.ToListAsync());
             return union;
         }
 
@@ -616,6 +619,7 @@ namespace GMGInventory.Application.Repositories
                              Brand = item.Brand.Name,
                              ItemCode = item.Code,
                              ItemName = item.Name,
+                             ItemId = item.Id,
                              ItemType = item.ItemType.Name,
                              PartNumber = item.PartNumber,
                              QuantityOnHandD = ii,
@@ -711,9 +715,11 @@ namespace GMGInventory.Application.Repositories
                                 Currency = purchase.PurchaseOrder.Supplier.Currency.Name,
                                 ItemCode = purchase.RequestItem.Item.Code,
                                 ItemName = purchase.RequestItem.Item.Name,
+                                ItemId = purchase.RequestItem.Item.Id,
                                 PurchaseDateD = purchase.DateCreated,
                                 QuantityD = purchase.Quantity,
                                 Supplier = purchase.PurchaseOrder.Supplier.Name,
+                                SupplierId = purchase.PurchaseOrder.Supplier.Id,
                                 Unit = purchase.RequestItem.Item.Unit.Name,
                                 UnitPriceD = purchase.UnitCost
                             };
@@ -816,11 +822,14 @@ namespace GMGInventory.Application.Repositories
                               select new WarehouseTransferRVM
                               {
                                   Destination = transfer.Destination.Name,
+                                  DestinationId = transfer.Destination.Id,
                                   Id = transfer.Id,
                                   ItemCode = trdetail.Item.Code,
                                   ItemName = trdetail.Item.Name,
+                                  ItemId = trdetail.Item.Id,
                                   QuantityD = trdetail.Quantity,
                                   Source = transfer.Source.Name,
+                                  SourceId = transfer.Source.Id,
                                   CreatedBy = user.FirstName + " " + user.LastName,
                                   TransferDateD = transfer.TransferDate,
                                   BrandName = trdetail.Item.Brand.Name

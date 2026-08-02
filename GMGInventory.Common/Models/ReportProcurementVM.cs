@@ -14,6 +14,8 @@ namespace GMGInventory.Common.Models
         public int LineNumber { get; set; }
         public string Item { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Item Desc")]
         public string ItemDescription { get; set; }
         public int Quantity { get; set; }
@@ -26,11 +28,15 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Doc Number")]
         public string DocumentNumber { get; set; }
 
+        public int OrderId { get; set; }
+
         [Display(Name = "Type")]
         public string Type { get; set; }
 
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
+
+        public int SupplierId { get; set; }
 
         [Display(Name = "Date Ordered")]
         public string OrderDate => OrderDateD.ToString(SystemFormat.StringDateTime);
@@ -76,10 +82,15 @@ namespace GMGInventory.Common.Models
         public string DocumentNumber { get; set; }
 
         // ref po no
+        public int ReturnId { get; set; }
 
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
+
+        public int SupplierId { get; set; }
         public string Item { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Item Desc")]
         public string ItemDescription { get; set; }
@@ -135,9 +146,16 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
 
+        public int SupplierId { get; set; }
+
         [Display(Name = "Doc Number")]
         public string DocumentNumber { get; set; }
+
+        public int ReceivingId { get; set; }
+
         public string Item { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Item Desc")]
         public string ItemDescription { get; set; }

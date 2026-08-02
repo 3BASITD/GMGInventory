@@ -14,6 +14,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Part Number")]
         public string PartNumber { get; set; }
 
@@ -54,6 +56,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Part Number")]
         public string? PartNumber { get; set; }
 
@@ -62,6 +66,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Document Number")]
         public string DocumentNumber { get; set; }
+
+        public int ReceivingId { get; set; }
 
         [Display(Name = "Date")]
         public string Date => DateD.ToString(SystemFormat.StringDate);
@@ -73,6 +79,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Warehouse")]
         public string Warehouse { get; set; }
+
+        public int WarehouseId { get; set; }
     }
 
     public class ReceivingPVM
@@ -92,6 +100,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
 
+        public int SupplierId { get; set; }
+
         [Display(Name = "Date")]
         public string Date => DateD.ToString(SystemFormat.StringDate);
         public DateTime DateD { get; set; }
@@ -99,8 +109,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Document Number")]
         public string DocumentNumber { get; set; }
 
+        public int POId { get; set; }
+
         [Display(Name = "Item")]
         public string Item { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Quantity")]
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
@@ -144,6 +158,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Part Number")]
         public string? PartNumber { get; set; }
 
@@ -171,6 +187,8 @@ namespace GMGInventory.Common.Models
     {
         [Display(Name = "Item")]
         public string Item { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Transaction Type")]
         public string TransactionType { get; set; }
@@ -219,6 +237,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
 
+        public int ItemId { get; set; }
+
         [Display(Name = "Part Number")]
         public string? PartNumber { get; set; }
 
@@ -259,6 +279,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Supplier")]
         public string Supplier { get; set; }
 
+        public int SupplierId { get; set; }
+
         [Display(Name = "Brand")]
         public string Brand { get; set; }
 
@@ -267,6 +289,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Unit")]
         public string Unit { get; set; }
@@ -311,8 +335,12 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Source Warehouse")]
         public string Source { get; set; }
 
+        public int SourceId { get; set; }
+
         [Display(Name = "Destination Warehouse")]
         public string Destination { get; set; }
+
+        public int DestinationId { get; set; }
 
         [Display(Name = "Transfer Date")]
         public string TransferDate => TransferDateD.ToString(SystemFormat.StringDate);
@@ -345,6 +373,8 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Item Name")]
         public string ItemName { get; set; }
+
+        public int ItemId { get; set; }
 
         [Display(Name = "Brand")]
         public string BrandName { get; set; }

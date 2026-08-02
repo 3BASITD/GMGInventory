@@ -16,6 +16,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Customer")]
         public string Customer { get; set; }
 
+        public int CustomerId { get; set; }
+
         [Display(Name = "Amount")]
         public string Amount => string.Format(SystemFormat.StringDecimalComma, AmountD);
         public decimal AmountD { get; set; }

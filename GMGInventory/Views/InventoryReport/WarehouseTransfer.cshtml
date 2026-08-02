@@ -22,7 +22,7 @@
                     <span class="fas fa-download"></span> Download
                 </button>
             }
-            <button class="btn btn-secondary btn-sm float-right" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
                 <span class="fas fa-filter"></span> Filter
             </button>
         </div>
@@ -83,7 +83,7 @@
                 <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
-                            <label for="filter-source" class="form-label mb-0">Warehouse Origin</label>
+                            <label for="filter-source" class="form-label mb-0">Warehouse Source</label>
                             <select id="filter-source" style="width:100%">
                                 <option></option>
                             </select>
@@ -94,6 +94,29 @@
                             <label for="filter-destination" class="form-label mb-0">Warehouse Destination</label>
                             <select id="filter-destination" style="width:100%">
                                 <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-brand" class="form-label mb-0">Brand</label>
+                            <select id="filter-brand" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
                             </select>
                         </div>
                     </div>
@@ -112,19 +135,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label for="filter-brand" class="form-label mb-0">Brand</label>
-                            <select id="filter-brand" style="width:100%">
-                                <option></option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary btnFilter"><span class="fas fa-filter"></span> Apply Filter</button>
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
             </div>
         </div>
     </div>
@@ -133,29 +150,6 @@
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
-
-        SetDateFilter();
-        function SetDateFilter() {
-            if ($("#filter-to").val() == "") {
-                if ($("#filter-from").val() == "") {
-                    $("#filter-to").val(DateForInput(new Date()));
-                } else {
-                    var dt_from = new Date($("#filter-from").val());
-                    //dt_from.setFullYear(dt_from.getFullYear() + 1);
-                    dt_from.setMonth(dt_from.getMonth() + 1);
-                    $("#filter-to").val(DateForInput(dt_from));
-                }
-            }
-
-            if ($("#filter-from").val() == "") {
-                var dt_to = new Date($("#filter-to").val());
-                //dt_to.setFullYear(dt_to.getFullYear() - 1);
-                dt_to.setMonth(dt_to.getMonth() - 1);
-                $("#filter-from").val(DateForInput(dt_to));
-            }
-        }
-
-        $("#filter-to, #filter-from").on("focusout", SetDateFilter);
 
         // Load Select2 for Item
         $("#filter-item").select2({
@@ -243,12 +237,142 @@
                 });
             }
         });
-        
+
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            transferDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            transferDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "asc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            SourceId: "",
+            Source: "",
+            DestinationId: "",
+            Destination: "",
+            BrandId: "",
+            Brand: "",
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
+        };
+
+        function checkDTChanged() {
+            if(!transferDT) return false;
+            
+            return JSON.stringify(transferDT.order()) != JSON.stringify(defaultDTState.order) ||
+                   transferDT.page.info().start != defaultDTState.page ||
+                   transferDT.page.len() != defaultDTState.length ||
+                   (transferDT.search() || "") != defaultDTState.search.search ||
+                   $("#filter-source").val() != defaultDTState.SourceId ||
+                   $("#filter-destination").val() != defaultDTState.DestinationId ||
+                   $("#filter-brand").val() != defaultDTState.BrandId ||
+                   $("#filter-preset").val() != defaultDTState.Preset ||
+                   $('#filter-from').val() != defaultDTState.DateFrom ||
+                   $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-source').val(defaultDTState.SourceId).trigger('change');
+            $('#filter-destination').val(defaultDTState.DestinationId).trigger('change');
+            $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+            
+            localStorage.removeItem(dt_storage);
+
+            if (transferDT) {
+                transferDT.state.clear();
+                transferDT.order(defaultDTState.order);
+                transferDT.page(defaultDTState.page);
+                transferDT.search(defaultDTState.search.search);
+            }
+            
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
 
         // Load List on DataTable
-        var transferDT = $('.table-transfer').on('preXhr.dt', function (e, settings, data) {
-            //showLoader();
-        }).DataTable({
+        var transferDT = $('.table-transfer').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function (settings, data) {
+                data.SourceId = $('#filter-source').val();
+                data.Source = $('#filter-source option:selected').text();
+                data.DestinationId = $('#filter-destination').val();
+                data.Destination = $('#filter-destination option:selected').text();
+                data.BrandId = $('#filter-brand').val();
+                data.Brand = $('#filter-brand option:selected').text();
+                data.Preset = $('#filter-preset').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function (settings, data) {
+                if (data.SourceId) {
+                    var sourceOption = new Option(data.Source, data.SourceId, true, true);
+                    $("#filter-source").append(sourceOption).trigger('change');
+                }
+                if (data.DestinationId) {
+                    var destinationOption = new Option(data.Destination, data.DestinationId, true, true);
+                    $("#filter-destination").append(destinationOption).trigger('change');
+                }
+                if (data.BrandId) {
+                    var brandOption = new Option(data.Brand, data.BrandId, true, true);
+                    $("#filter-brand").append(brandOption).trigger('change');
+                }
+                $('#filter-preset').val(data.Preset).trigger('change');
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
             ajax: {
                 url: "@Url.Action("GetWarehouseTransferAllDT")",
                 type: "POST",
@@ -280,13 +404,28 @@
             },
             columns: [
                 { data: "id", name: "Id" },
-                { data: "itemCode", name: "ItemCode" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
+                    },
+                    name: "ItemCode"
+                },
                 { data: "itemName", name: "ItemName" },
                 { data: "brandName", name: "BrandName" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
-                { data: "source", name: "Source" },
-                { data: "destination", name: "Destination", className: "text-end" },
-                { data: "transferDate", name: "TransferDate", className: "text-end" }
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.sourceId + "' class='link-info' target='_blank'>" + data.source + "</a>";
+                    },
+                    name: "Source"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return "<a href='/Warehouse/Details/" + data.destinationId + "' class='link-info' target='_blank'>" + data.destination + "</a>";
+                    },
+                    name: "Destination"
+                },
+                { data: "transferDate", name: "TransferDate" }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var json = transferDT.ajax.json();
@@ -295,19 +434,10 @@
                 $(api.column(4).footer()).html(FormatStringInteger(json.totalQuantity));
                 
             },
-            order: [[0, "asc"]]
-        });
-
-        // Load functions upon DataTable load
-        transferDT.on("draw", function () {
-            //hideLoader();
-
+            order: defaultDTState.order
+        }).on("draw", function () {
+            checkDefaultFilter();
             $(".table-transfer thead th").removeClass("text-end");
-        });
-
-        $(".btnFilter").on("click", function () {
-            transferDT.ajax.reload();
-            $("#filterModal").modal("hide");
         });
 
         if (user_access.canUploadDownload) {
