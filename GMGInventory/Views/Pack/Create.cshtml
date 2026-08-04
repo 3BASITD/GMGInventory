@@ -352,7 +352,6 @@
                             row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) - quantityToPack;
                             row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
                             row_data.grossPrice = FormatStringInteger(row_data.grossPriceD);
-                            //row_data.grossPriceD = parseInt(row_data.grossPriceD);
 
                             var toItem = {
                                 id: row_data.id,
@@ -364,7 +363,6 @@
                                 itemPartNumber: row_data.itemPartNumber,
                                 itemName: row_data.itemName,
                                 quantity: quantityToPack,
-                                //extendedPrice: FormatStringInteger(row_data.grossPriceD)
                                 extendedPriceD: row_data.grossPriceD
                             };
 
@@ -457,7 +455,6 @@
                     name: "Quantity",
                     className: "form-cell text-end"
                 }
-                ,
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
