@@ -20,5 +20,7 @@ namespace GMGInventory.Data
         public PackType PackType { get; set; }
 
         public string? BarcotechOutboundId { get; set; }
+        public decimal GrossPriceD { get; set; }
+
     }
 }

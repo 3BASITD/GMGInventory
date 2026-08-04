@@ -153,6 +153,7 @@
                                     <th>Package Type</th>
                                     <th>Item Code</th>
                                     <th>Item Name</th>
+                                    <th>Extended Price</th>
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
@@ -213,6 +214,7 @@
                     name: "ItemCode"
                 },
                 { data: "itemName", name: "ItemName" },
+                { data: "extendedPrice2", name: "ExtendedPrice2" },
                 { data: "quantity", name: "Quantity", className: "text-end" }
             ],
             // footerCallback: function (row, data, start, end, display) {
@@ -224,11 +226,11 @@
             rowGroup: {
                 startRender: function (rows, group) {
                     return $('<tr/>')
-                        .append('<td colspan="3"><strong>Package ' + group + '</strong></td>');
+                        .append('<td colspan="4"><strong>Package ' + group + '</strong></td>');
                 },
                 endRender: function (rows, group) {
                     return $('<tr/>')
-                        .append('<td colspan="2" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
+                        .append('<td colspan="3" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
                 dataSrc: function (row) {

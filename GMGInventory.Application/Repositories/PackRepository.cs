@@ -281,7 +281,9 @@ namespace GMGInventory.Application.Repositories
                              PackTypeName = pack.PackType.Code,
                              Quantity = pack.Quantity,
                              SalesOrderLineItemId = order.Id,
-                             Unit = pack.Item.Unit.Code
+                             Unit = pack.Item.Unit.Code,
+                             ExtendedPrice2 = pack.GrossPriceD.ToString("N2"),
+                             ExtendedPriceD2 = Math.Round(pack.GrossPriceD, 2)
                          };
             return await itemVM.ToListAsync();
         }
@@ -479,7 +481,9 @@ namespace GMGInventory.Application.Repositories
                     ItemId = item.ItemId!.Value,
                     PackId = pack.Id,
                     PackTypeId = item.PackTypeId!.Value,
-                    Quantity = item.Quantity
+                    Quantity = item.Quantity,
+                    GrossPriceD = item.ExtendedPriceD
+
                 };
                 await context.PackLineItems.AddAsync(packItem);
                 await context.SaveChangesAsync(currentUserId);

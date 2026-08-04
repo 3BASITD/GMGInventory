@@ -206,6 +206,7 @@ namespace GMGInventory.Application.Repositories
                             ItemName = packItems.Item.Name,
                             PackType = packItems.PackType.Id,
                             PackTypeName = packItems.PackType.Code,
+                            ExtendedPrice2 = packItems.GrossPriceD.ToString("N2"),
                             Quantity = packItems.Quantity,
                             Unit = packItems.Item.Unit.Code
                         };
@@ -220,6 +221,7 @@ namespace GMGInventory.Application.Repositories
                 s.ItemName,
                 s.PackType,
                 s.PackTypeName,
+                s.ExtendedPrice2,
                 s.Quantity,
                 s.Unit
             }).Select((s, i) => new PackItemVM
@@ -232,6 +234,7 @@ namespace GMGInventory.Application.Repositories
                     ItemName = s.Key.ItemName,
                     PackType = s.Key.PackType,
                     PackTypeName = s.Key.PackTypeName,
+                    ExtendedPrice2 = s.Key.ExtendedPrice2,
                     Quantity = s.Key.Quantity,
                     Unit = s.Key.Unit
                 });

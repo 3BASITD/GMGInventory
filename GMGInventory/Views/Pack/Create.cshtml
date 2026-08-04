@@ -84,12 +84,13 @@
                                     <th>Item Code</th>
                                     <th>Item Part Number</th>
                                     <th>Item Name</th>
+                                    <th>Extended Price</th>
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" class="text-end">Total</th>
+                                    <th colspan="7" class="text-end">Total</th>
                                     <th class="total-quantity">0</th>
                                 </tr>
                             </tfoot>
@@ -350,6 +351,8 @@
                             row_data.packedQuantity = FormatStringInteger(row_data.packedQuantityD);
                             row_data.remainingQuantityD = parseInt(row_data.remainingQuantityD) - quantityToPack;
                             row_data.remainingQuantity = FormatStringInteger(row_data.remainingQuantityD);
+                            row_data.grossPrice = FormatStringInteger(row_data.grossPriceD);
+                            //row_data.grossPriceD = parseInt(row_data.grossPriceD);
 
                             var toItem = {
                                 id: row_data.id,
@@ -360,7 +363,9 @@
                                 itemCode: row_data.itemCode,
                                 itemPartNumber: row_data.itemPartNumber,
                                 itemName: row_data.itemName,
-                                quantity: quantityToPack
+                                quantity: quantityToPack,
+                                //extendedPrice: FormatStringInteger(row_data.grossPriceD)
+                                extendedPriceD: row_data.grossPriceD
                             };
 
                             hasItemToAdd = true;
@@ -443,7 +448,7 @@
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemPartNumber", name: "ItemPartNumber" },
                 { data: "itemName", name: "ItemName" },
-                //{ data: "quantity", name: "Quantity", className: "text-end" }
+                { data: "extendedPriceD", name: "ExtendedPriceD" },
                 {data: function (data, type, dataToSet) {
                        
                     return '<input type="number" min="0" max="1999999" value="' + data.quantity + '" class="form-control form-control-sm quantity" style="width: 100%;" />';
@@ -452,6 +457,7 @@
                     name: "Quantity",
                     className: "form-cell text-end"
                 }
+                ,
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
@@ -463,12 +469,12 @@
             rowGroup: {
                 startRender: function (rows, group) {
                     return $('<tr/>')
-                        .append('<td colspan="4"><strong>Package ' + group + '</strong></td>');
+                        .append('<td colspan="6"><strong>Package ' + group + '</strong></td>');
                 },
                 endRender: function (rows, group) {
                     return $('<tr/>')
                         .append('<td></td>')
-                        .append('<td colspan="3" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
+                        .append('<td colspan="4" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
                 dataSrc: function (row) {
@@ -700,6 +706,7 @@
                     packTypeId: row_data.packType,
                     itemId: row_data.itemId,
                     quantity: row_data.quantity,
+                    extendedPriceD: row_data.extendedPriceD
                 });
             });
             return item_to_pack;

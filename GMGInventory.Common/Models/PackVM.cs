@@ -131,6 +131,9 @@ namespace GMGInventory.Common.Models
         public string ExtendedPrice => string.Format(SystemFormat.StringDecimalComma, ExtendedPriceD);
         public decimal ExtendedPriceD => Math.Round(Quantity * SellingPriceD * (100 - Discount1D) / 100 * (100 - Discount2D) / 100, 2);
 
+        [Display(Name = "Extended Price")]
+        public string ExtendedPrice2  { get; set; }
+        public decimal ExtendedPriceD2 { get; set; }
         public int SalesOrderLineItemId { get; set; }
     }
 
@@ -156,6 +159,7 @@ namespace GMGInventory.Common.Models
         public int BoxNumber { get; set; }
         public int? PackTypeId { get; set; }
         public string? PackTypeName { get; set; }
+        public decimal ExtendedPriceD { get; set; }
     }
 
     public class PackDetailsPVM
