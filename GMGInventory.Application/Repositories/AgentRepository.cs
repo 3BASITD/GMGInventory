@@ -28,27 +28,34 @@ namespace GMGInventory.Application.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page)
+        public async Task<Select2Model<JsonNameOptionsModel>> GetOptions2(string search, int page, int? customer)
         {
-            var agents = await context.Agents
-                                      .Where(s => s.IsActive 
-                                               && (string.IsNullOrWhiteSpace(search)
-                                               || s.Code.ToLower().Contains(search.ToLower())
-                                               || ((s.FirstName + " " + s.LastName).ToLower().Contains(search.ToLower()))))
-                                      .Select(s => new JsonNameOptionsModel
-                                      {
-                                          Id = s.Id.ToString(),
-                                          Text = s.Code,
-                                          Name = s.FirstName + " " + s.LastName,
-                                      })
-                                      .OrderBy(s => s.Text)
-                                      .ToListAsync();
-            var agentsFilterd = agents.Skip((page - 1) * 50).Take(50).ToList();
+            var agents = context.Agents
+                    .Where(a => a.IsActive
+                        && (string.IsNullOrWhiteSpace(search)
+                            || a.Code.ToLower().Contains(search.ToLower())
+                            || ((a.FirstName + (a.MiddleName == null ? "" : " " + a.MiddleName) + " " + a.LastName)
+                                .ToLower().Contains(search.ToLower())))
+                        && (customer == null || context.Customers.Any(c => c.AgentId == a.Id && c.Id == customer)))
+                    .OrderBy(a => a.Code)
+                    .Select(a => new JsonNameOptionsModel
+                    {
+                        Id = a.Id.ToString(),
+                        Text = a.Code,
+                        Name = a.FirstName + (a.MiddleName == null ? "" : " " + a.MiddleName) + " " + a.LastName,
+                    });
+
+            var totalCount = await agents.CountAsync();
+
+            var agentsFiltered = await agents
+                .Skip((page - 1) * 50)
+                .Take(50)
+                .ToListAsync();
+
             return new Select2Model<JsonNameOptionsModel>
             {
-                //incomplete_results = false,
-                items = agentsFilterd,
-                total_count = agents.Count
+                items = agentsFiltered,
+                total_count = totalCount
             };
         }
 

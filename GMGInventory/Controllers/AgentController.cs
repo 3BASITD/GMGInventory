@@ -16,9 +16,9 @@ namespace GMGInventory.Controllers
                                , IAreaRepository areaRepository
                                , IRegionRepository regionRepository) : BaseController(accessRepository)
     {
-        public async Task<IActionResult> GetOptions2(string search, int page)
+        public async Task<IActionResult> GetOptions2(string search, int page, int? customer)
         {
-            return Json(await agentRepository.GetOptions2(search, page));
+            return Json(await agentRepository.GetOptions2(search, page, customer));
         }
 
         public async Task<IActionResult> GetOptions(int? IncludeId)
