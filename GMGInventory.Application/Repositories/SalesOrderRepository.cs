@@ -484,7 +484,7 @@ namespace GMGInventory.Application.Repositories
                              AgentCode = order.Agent.Code,
                              CustomerId = order.CustomerId,
                              CustomerCode = order.Customer.Code,
-                             CustomeName = order.Customer.Name,
+                             CustomerName = order.Customer.Name,
                              SalesOrderNumber = order.SalesOrderNumber,
                              OrderDate = order.SalesOrderDate,
                              UserCreated = userc.FirstName + " " + userc.LastName,
