@@ -69,7 +69,7 @@
         <tr>
             <td colspan="4">
                 <dl>
-                    <dt>SALES ORDER NUMBER</dt>
+                    <dt style="font-size: 20px;">SALES ORDER NUMBER</dt>
                 </dl>
                 <svg id="barcode"></svg>
             </td>
@@ -119,7 +119,10 @@
         lineColor: "#000", // Color of the barcode
         width: 3,          // Width of the bars
         height: 75,        // Height of the bars
-        displayValue: true // Show the text below the barcode
+        displayValue: true, // Show the text below the barcode
+        fontSize: 30,        // increase this value for bigger text
+        fontOptions: "bold",  // optional: make it bold too
+        textMargin: 5         // optional: adjust spacing between barcode and text
     });
 
     window.print();

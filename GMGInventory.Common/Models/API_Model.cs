@@ -74,6 +74,9 @@ namespace GMGInventory.Common.Models
         public int AgentId { get; set; }
         public string AgentCode { get; set; }
         public int CustomerId { get; set; }
+        public string CustomerName { get; set; }
+        public int? ServiceLevelAgreementId { get; set; }
+        public string? ServiceLevelAgreement { get; set; }
         public string CustomerCode { get; set; }
         public DateTime OrderDate { get; set; }
         public string UserCreated { get; set; }

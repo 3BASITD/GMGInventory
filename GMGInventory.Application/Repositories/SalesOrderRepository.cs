@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -483,12 +484,15 @@ namespace GMGInventory.Application.Repositories
                              AgentCode = order.Agent.Code,
                              CustomerId = order.CustomerId,
                              CustomerCode = order.Customer.Code,
+                             CustomerName = order.Customer.Name,
                              SalesOrderNumber = order.SalesOrderNumber,
                              OrderDate = order.SalesOrderDate,
                              UserCreated = userc.FirstName + " " + userc.LastName,
                              DateCreated = order.DateCreated,
                              LastUserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
                              LastDateModified = order.DateModified,
+                             ServiceLevelAgreement = order.ServiceLevelAgreementId == null ? null : order.ServiceLevelAgreement.Name,
+                             ServiceLevelAgreementId = order.ServiceLevelAgreementId == null ? null : order.ServiceLevelAgreement.Id,
                              LineItems = from item in order.SalesOrderLineItems
                                          select new APISalesOrderLineItem
                                          {

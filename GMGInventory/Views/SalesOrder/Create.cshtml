@@ -351,7 +351,14 @@
                 return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
             },
             ajax: {
-                url: "@Url.Action("GetOptions2", "Agent")"
+                url: "@Url.Action("GetOptions2", "Agent")",
+                data: function (params) {
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
+                        customer: $("#order-customer-code").val()
+                    });
+                }
+
             }
         });
 

@@ -43,6 +43,10 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Sales Order Date")]
         public string SalesOrderDate => SalesOrderDateD.ToString(SystemFormat.StringDate);
         public DateTime SalesOrderDateD { get; set; }
+
+        [Display(Name = "Extended Price")]
+        public string ExtendedPrice { get; set; }
+        public decimal ExtendedPriceD { get; set; }
     }
 
     public class ShippingPVM

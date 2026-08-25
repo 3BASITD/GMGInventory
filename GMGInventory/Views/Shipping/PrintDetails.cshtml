@@ -3,6 +3,7 @@
 @{
     Layout = "";
     var title = "Shipping Report";
+    var isEnvelope = TempData["CompanyLogo"]?.ToString() == "ENV";
 }
 
 <!DOCTYPE html>
@@ -13,182 +14,230 @@
     <title>GMGInventory | @title</title>
     <link rel="icon" href="~/images/box.ico" />
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
+   @if (isEnvelope)
+    {
+        <style>
+            @@page {
+                size: 8.875in 3.875in;
+                margin: 0.2in;
+            }
+
+            body {
+                width: 8.875in;
+            }
+
+            span {
+                font-size: 18px !important;
+            }
+        </style>
+    }
 </head>
 <body>
-    <table class="formatted shipping">
-        <tr>
-            <td rowspan="2" class="left-text" style="width: 23%;">
-                @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                {
-                    <img src="~/images/BAS-02.png" class="logo" />
-                }
-                else
-                {
-                    <img src="~/images/GMG-01.png" class="logo" />
-                }
-            </td>
-            <td class="left-text">
-                <div class="column center-text">
-                    <dl>
-                        @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                        {
-                            <dd>BINA'S AUTO SUPPLY INC</dd>
-                        }
-                        else
-                        {
-                            @* <dd>GMG AUTO PARTS EXPRESS</dd> *@
-                            <dd>GMG AUTO PARTS TRADING</dd>
-                        }
-                        <dt>1034 KUSANG LOOB  STA. CRUZ MANILA</dt>
-                        <dt>CONTACT NO: 712-9260 / 0920-909-2787</dt>
-                        <dd>SHIPPING LIST</dd>
-                    </dl>
-                </div>
-            </td>
-            <td class="right-text" style="vertical-align: top">
-               Sales Order No: @Model.Details?.SONumber 
-            </td>
-        </tr>
-    <tr>
-            <td></td>
-            <td class="right-text"><strong>Date: @DateTime.Now.ToString("MM/dd/yyyy") </strong></td>
-    </tr>
-    </table>
+    @if (TempData["CompanyLogo"]?.ToString() == "BAS" || TempData["CompanyLogo"]?.ToString() == "GMG")
+    {
+        <table class="formatted shipping">
+            <tr>
+                <td rowspan="2" class="left-text" style="width: 23%;">
+                    @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                    {
+                        <img src="~/images/BAS-02.png" class="logo" />
+                    }
+                    else
+                    {
+                        <img src="~/images/GMG-01.png" class="logo" />
+                    }
+                </td>
+                <td class="left-text">
+                    <div class="column center-text">
+                        <dl>
+                            @if (TempData["CompanyLogo"]?.ToString() == "BAS")
+                            {
+                                <dd>BINA'S AUTO SUPPLY INC</dd>
+                            }
+                            else
+                            {
+                                @* <dd>GMG AUTO PARTS EXPRESS</dd> *@
+                                <dd>GMG AUTO PARTS TRADING</dd>
+                            }
+                            <dt>1034 KUSANG LOOB  STA. CRUZ MANILA</dt>
+                            <dt>CONTACT NO: 712-9260 / 0920-909-2787</dt>
+                            <dd>SHIPPING LIST</dd>
+                        </dl>
+                    </div>
+                </td>
+                <td class="right-text" style="vertical-align: top">
+                    Sales Order No: @Model.Details?.SONumber
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="right-text"><strong>Date: @DateTime.Now.ToString("MM/dd/yyyy") </strong></td>
+            </tr>
+        </table>
+    }
+
     @if (TempData["CompanyLogo"]?.ToString() == "BAS")
     {
         <p> Received from BINA'S AUTO SUPPLY INC the following Goods for shipment and delivery consignee name below: </p>
     }
-    else
+    else if(TempData["CompanyLogo"]?.ToString() == "GMG")
     {
         <p> Received from GMG AUTO PARTS TRADING the following Goods for shipment and delivery consignee name below: </p>
     }
     <br />
 
-    <table>
-        <tr>
-            <td style="vertical-align:top">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="min-width: 25px;">Quantity</th>
-                            <th style="min-width: 25px;">UOM</th>
-                            <th>DESCRIPTION OF ARTICLE</th>
-                            <th style="min-width: 25px;">VALUE</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td class="center-text">@Model.DescriptionOfArticle</td>
-                            <td class="right-text">@Model.Value</td>
-                        </tr>
-                        @foreach (var item in Model.Items)
-                        {
+    @if (TempData["CompanyLogo"]?.ToString() == "BAS" || TempData["CompanyLogo"]?.ToString() == "GMG")
+    {
+        <table>
+            <tr>
+                <td style="vertical-align:top">
+                    <table>
+                        <thead>
                             <tr>
-                                <td class="center-text"><nobr>@item.Quantity</nobr></td>
-                                <td class="center-text"><nobr>@item.UOM</nobr></td>
+                                <th style="min-width: 25px;">Quantity</th>
+                                <th style="min-width: 25px;">UOM</th>
+                                <th>DESCRIPTION OF ARTICLE</th>
+                                <th style="min-width: 25px;">VALUE</th>
+
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </td>
-            <td style="vertical-align:top">
-                <table>
-                    <thead>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="center-text">@Model.DescriptionOfArticle</td>
+                                <td class="right-text">@Model.Value</td>
+                            </tr>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="center-text"><nobr>@item.Quantity</nobr></td>
+                                    <td class="center-text"><nobr>@item.UOM</nobr></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+                <td style="vertical-align:top">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="min-width: 25px;"></th>
+                                <th class="left-text">FREIGHT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td></td><td></td></tr>
+                            <tr>
+                                @if (Model.Freight == "prepaid")
+                                {
+                                    <td class="right-text" style="padding:0px"> &#10004; </td>
+                                    <td class="left-text">
+                                        <strong> Prepaid </strong>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td style="padding:0px"></td>
+                                    <td class="left-text">
+                                        <strong> Prepaid </strong>
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                @if (Model.Freight == "collect")
+                                {
+                                    <td class="right-text" style="padding:0px"> &#10004; </td>
+                                    <td class="left-text">
+                                        <strong> Collect </strong>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td style="padding:0px"></td>
+                                    <td class="left-text">
+                                        <strong> Collect </strong>
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                @if (Model.Freight == "cod")
+                                {
+                                    <td class="right-text" style="padding:0px"> &#10004; </td>
+                                    <td class="left-text">
+                                        <strong> C.O.D </strong>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td style="padding:0px"></td>
+                                    <td class="left-text">
+                                        <strong> C.O.D </strong>
+                                    </td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    }
+    else
+    {
+        <div class="label-sheet">
+            <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th colspan="2" style="width: 50%;"><span>@Model.Details!.CustomerName</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
                         <tr>
-                            <th style="min-width: 25px;"></th>
-                            <th class="left-text">FREIGHT</th>
+                            <td class="center-text" style="width: 50%;"><nobr><span>@item.Quantity @item.UOM</span></nobr></td>
+                            <td class="center-text" style="width: 50%;"><nobr><span>@Model.Details?.SONumber</span></nobr></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td></td><td></td></tr>
-                        <tr>
-                            @if (Model.Freight == "prepaid")
-                            {
-                                <td class="right-text" style="padding:0px"> &#10004; </td>
-                                <td class="left-text">
-                                    <strong> Prepaid </strong>
-                                </td>
-                            }
-                            else
-                            {
-                                <td style="padding:0px"></td>
-                                <td class="left-text">
-                                    <strong> Prepaid </strong>
-                                </td>
-                            }
-                        </tr>
-                        <tr>
-                            @if (Model.Freight == "collect")
-                            {
-                                <td class="right-text" style="padding:0px"> &#10004; </td>
-                                <td class="left-text">
-                                    <strong> Collect </strong>
-                                </td>
-                            }
-                            else
-                            {
-                                <td style="padding:0px"></td>
-                                <td class="left-text">
-                                    <strong> Collect </strong>
-                                </td>
-                            }
-                        </tr>
-                        <tr>
-                            @if (Model.Freight == "cod")
-                            {
-                                <td class="right-text" style="padding:0px"> &#10004; </td>
-                                <td class="left-text">
-                                    <strong> C.O.D </strong>
-                                </td>
-                            }
-                            else
-                            {
-                                <td style="padding:0px"></td>
-                                <td class="left-text">
-                                    <strong> C.O.D </strong>
-                                </td>
-                            }
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-    </table>
-   
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
     <br />
 
-    <table>
-        <tr>
-            <td>
-                <dl>
-                    <dt><strong>TOTAL: </strong> @Model.Items.Sum(s => s.Quantity) </dt>
-                    <dt><strong>INVOICE NO./PO NO: </strong> @Model.Details!.PairedInvoices</dt>
-                    <dt><strong>CONSIGNEE: </strong> @Model.Details!.CustomerName</dt>
-                    <dt><strong>ADDRESS: </strong> @Model.Details!.CustomerAddress</dt>
-                    <dt><strong>CONTACT NO: </strong> @Model.Details!.CustomerContactNo </dt>
-                </dl>
-            </td>
-            <td>
-                <dl>
-                    <dt><strong>FORWARDER/SHIPPING CO/TRUCKING CO:</strong> @Model.Details!.Forwarder</dt>
-                    <br />
-                    <br />
-@* 
+    @if (TempData["CompanyLogo"]?.ToString() == "BAS" || TempData["CompanyLogo"]?.ToString() == "GMG")
+    {
+        <table>
+            <tr>
+                <td>
+                    <dl>
+                        <dt><strong>TOTAL: </strong> @Model.Items.Sum(s => s.Quantity) </dt>
+                        <dt><strong>INVOICE NO./PO NO: </strong> @Model.Details!.PairedInvoices</dt>
+                        <dt><strong>CONSIGNEE: </strong> @Model.Details!.CustomerName</dt>
+                        <dt><strong>ADDRESS: </strong> @Model.Details!.CustomerAddress</dt>
+                        <dt><strong>CONTACT NO: </strong> @Model.Details!.CustomerContactNo </dt>
+                    </dl>
+                </td>
+                <td>
+                    <dl>
+                        <dt><strong>FORWARDER/SHIPPING CO/TRUCKING CO:</strong> @Model.Details!.Forwarder</dt>
+                        <br />
+                        <br />
+                        @*
                     <dt></dt>
                     <dt></dt> *@
-                    <dt><strong>RECEIVED BY:</strong> </dt>
-                </dl>
-            </td>
-        </tr>
-    </table>
+                        <dt><strong>RECEIVED BY:</strong> </dt>
+                    </dl>
+                </td>
+            </tr>
+        </table>
+    }
 </body>
 <script type="text/javascript">
     window.print();
-    window.onafterprint = function () {
-        setTimeout(function () {
+    window.onafterprint = function() {
+        setTimeout(function() {
             window.close();
         }, 100);
     };
