@@ -42,6 +42,7 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new PurchaseRequestPurposeSeedConfiguration());
             builder.ApplyConfiguration(new PurchaseStatusSeedConfiguration());
 
+            builder.ApplyConfiguration(new KYCDocumentTypeSeedConfiguration());
         }
 
         public DbSet<AuditLog> AuditLogs { get; set; }
@@ -194,6 +195,8 @@ namespace GMGInventory.Data
         public DbSet<KYC> KYCs { get; set; }
         public DbSet<KYCBank> KYCBanks { get; set; }
         public DbSet<KYCClient> KYCClients { get; set; }
+        public DbSet<KYCDocument> KYCDocuments { get; set; }
+        public DbSet<KYCDocumentType> KYCDocumentTypes { get; set; }
         public DbSet<KYCSignatory> KYCSignatories { get; set; }
         public DbSet<LocationCode> LocationCodes { get; set; }
         public DbSet<Pack> Packs { get; set; }

@@ -339,9 +339,9 @@
                                     <li class="nav-item">
                                         <a class="nav-link position-relative" data-bs-toggle="tab" data-bs-target="#checklist">
                                             Documentation Checklist
-                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill p-0 overflow-hidden empty checklist-counter">
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill p-0 overflow-hidden checklist-counter">
                                                 <span class="bg-danger px-1 checklist-counter-no" style="line-height:1.5">0</span>
-                                                <span class="bg-success px-1 checklist-counter-yes" style="line-height:1.5">0</span>
+                                                <span class="bg-success px-1 checklist-counter-yes" style="line-height:1.5;margin-left:-2px;">0</span>
                                             </span>
                                         </a>
                                     </li>
@@ -708,302 +708,6 @@
 
                                     <div class="tab-pane fade" id="checklist">
                                         <div class="row">
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">BIR Form 2303 (Certificate of Registration)</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-bir-form-no" value="No" @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? "checked" : "") name="BIRForm2303Option">
-                                                        <label class="btn btn-outline-danger" for="kyc-bir-form-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-bir-form-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? "" : "checked") name="BIRForm2303Option">
-                                                        <label class="btn btn-outline-success" for="kyc-bir-form-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="BIRForm2303" id="kyc-bir-form" class="form-control form-control-sm modify-checker date-requirement" value="@Model.BIRForm23033" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.BIRForm2303) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.BIRForm2303)
-                                                    </b>
-                                                }
-                                            </div>
-                                        
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Valid Mayor's / Business Permit (Current Year)</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-business-permit-no" value="No" @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? "checked" : "") name="MayorBusinessPermitOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-business-permit-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-business-permit-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? "" : "checked") name="MayorBusinessPermitOption">
-                                                        <label class="btn btn-outline-success" for="kyc-business-permit-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="MayorBusinessPermit" id="kyc-business-permit" class="form-control form-control-sm modify-checker date-requirement" value="@Model.MayorBusinessPermit3" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.MayorBusinessPermit) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.MayorBusinessPermit)
-                                                    </b>
-                                                }
-                                            </div>
-                                        
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">SEC / DTI Certificate of Registration</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-secdti-certificate-no" value="No" @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? "checked" : "") name="SecDtiCertificateOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-secdti-certificate-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-secdti-certificate-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? "" : "checked") name="SecDtiCertificateOption">
-                                                        <label class="btn btn-outline-success" for="kyc-secdti-certificate-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="SecDtiCertificate" id="kyc-secdti-certificate" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SecDtiCertificate3" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SecDtiCertificate) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SecDtiCertificate)
-                                                    </b>
-                                                }
-                                            </div>
-                                        
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Latest Audited Financial Statement (Last 2 Years)</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-audit-statement-no" value="No" @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? "checked" : "") name="LatestAuditedFinancialStatementOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-audit-statement-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-audit-statement-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? "" : "checked") name="LatestAuditedFinancialStatementOption">
-                                                        <label class="btn btn-outline-success" for="kyc-audit-statement-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="LatestAuditedFinancialStatement" id="kyc-audit-statement" class="form-control form-control-sm modify-checker date-requirement" value="@Model.LatestAuditedFinancialStatement3" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.LatestAuditedFinancialStatement) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.LatestAuditedFinancialStatement)
-                                                    </b>
-                                                }
-                                            </div>
-                                        
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Articles of Incorporation / By-Laws (For Corporations)</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-article-bylaw-no" value="No" @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? "checked" : "") name="IncorporationArticleByLawsOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-article-bylaw-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-article-bylaw-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? "" : "checked") name="IncorporationArticleByLawsOption">
-                                                        <label class="btn btn-outline-success" for="kyc-article-bylaw-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="IncorporationArticleByLaws" id="kyc-article-bylaw" class="form-control form-control-sm modify-checker date-requirement" value="@Model.IncorporationArticleByLaws3" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.IncorporationArticleByLaws) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.IncorporationArticleByLaws)
-                                                    </b>
-                                                }
-                                            </div>
-                                        
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Secretary's Certificate (Authorizing the person above the sign)</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-secretary-certificate-no" value="No" @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? "checked" : "") name="SecretaryCertificateOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-secretary-certificate-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-secretary-certificate-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? "" : "checked") name="SecretaryCertificateOption">
-                                                        <label class="btn btn-outline-success" for="kyc-secretary-certificate-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="SecretaryCertificate" id="kyc-secretary-certificate" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SecretaryCertificate3" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SecretaryCertificate) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SecretaryCertificate)
-                                                    </b>
-                                                }
-                                            </div>
-                                        
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Company Profile / Portfolio</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-portfolio-no" value="No" @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? "checked" : "") name="CompanyPortfolioOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-portfolio-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-portfolio-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? "" : "checked") name="CompanyPortfolioOption">
-                                                        <label class="btn btn-outline-success" for="kyc-portfolio-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="CompanyPortfolio" id="kyc-portfolio" class="form-control form-control-sm modify-checker date-requirement" value="@Model.CompanyPortfolio3" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.CompanyPortfolio) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.CompanyPortfolio)
-                                                    </b>
-                                                }
-                                            </div>
-
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Valid Identification Card of the Signatories</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-id-signatories-no" value="No" @(string.IsNullOrWhiteSpace(Model.SignatoriesIdentificationCard) ? "checked" : "") name="SignatoriesIdentificationCardOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-id-signatories-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-id-signatories-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SignatoriesIdentificationCard) ? "" : "checked") name="SignatoriesIdentificationCardOption">
-                                                        <label class="btn btn-outline-success" for="kyc-id-signatories-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="SignatoriesIdentificationCard" id="kyc-id-signatories" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SignatoriesIdentificationCard3" placeholder="Expiration Date" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SignatoriesIdentificationCard) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SignatoriesIdentificationCard)
-                                                    </b>
-                                                }
-                                            </div>
-
-                                            <div class="col-8 col-lg-4 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Sample Sales Invoice / Official Receipt (From Major Clients)</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                                        <input type="radio" class="btn-check date-not-required" id="kyc-sample-sior-no" value="No" @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "checked" : "") name="SampleSalesInvoiceOfficialReceiptOption">
-                                                        <label class="btn btn-outline-danger" for="kyc-sample-sior-no">Not Submitted</label>
-
-                                                        <input type="radio" class="btn-check" id="kyc-sample-sior-yes" value="Yes" @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "" : "checked") name="SampleSalesInvoiceOfficialReceiptOption">
-                                                        <label class="btn btn-outline-success" for="kyc-sample-sior-yes">Submitted</label>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? "No" : "Yes")
-                                                    </b>
-                                                }
-                                            </div>
-                                            <div class="col-4 col-lg-2 mb-2">
-                                                <label class="form-label fw-normal text-muted mb-0">Expiration Date</label>
-                                                @if (Model.Status == "Draft")
-                                                {
-                                                    <input type="datetime-local" name="SampleSalesInvoiceOfficialReceipt" id="kyc-sample-sior" class="form-control form-control-sm modify-checker date-requirement" value="@Model.SampleSalesInvoiceOfficialReceipt3" />
-                                                }
-                                                else
-                                                {
-                                                    <b class="d-block form-gayahin">
-                                                        @(string.IsNullOrWhiteSpace(Model.SampleSalesInvoiceOfficialReceipt) ? Html.Raw("<span class='text-muted'>N/A</span>") : Model.SampleSalesInvoiceOfficialReceipt)
-                                                    </b>
-                                                }
-                                            </div>
                                         </div>
                                     </div>
 
@@ -1230,6 +934,56 @@
     </div>
 </div>
 
+<!-- Upload Document Modal -->
+<div class="modal fade" id="documentModal" role="dialog" aria-labelledby="documentModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Document Checklist</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" id="documentForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="document-name" class="control-label mb-0 d-block">Name</label>
+                                <input type="text" name="Name" id="document-name" class="form-control form-control-sm" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="document-file" class="control-label mb-0 d-block">File</label>
+                                <input type="file" name="File" id="document-file" class="form-control form-control-sm" accept=".doc,.docx,.txt,.rtf,.pdf,.jpg,.jpeg,.png" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="document-expiration" class="control-label mb-0 d-block">Expiration Date</label>
+                                <input type="date" name="Expiration" id="document-expiration" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fas fa-save"></span>Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="fas fa-times"></span>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         var user_access = @Html.Raw(Json.Serialize(userAccess));
@@ -1287,50 +1041,6 @@
                 e.preventDefault();
                 e.returnValue = "";
             });
-            
-            var checklistFields = [
-                "birForm2303",
-                "mayorBusinessPermit",
-                "secDtiCertificate",
-                "latestAuditedFinancialStatement",
-                "incorporationArticleByLaws",
-                "secretaryCertificate",
-                "companyPortfolio",
-                "signatoriesIdentificationCard",
-                "sampleSalesInvoiceOfficialReceipt"
-            ];
-
-            var countChecklist = checklistFields.filter(s => kyc_details[s] != null).length;
-            //if (countChecklist > 0) {
-                $(".checklist-counter").removeClass("empty");
-            // } else {
-            //     $(".checklist-counter").addClass("empty");
-            // }
-            $(".checklist-counter-no").text(checklistFields.length - countChecklist);
-            $(".checklist-counter-yes").text(countChecklist);
-
-            $(document).on("change blur", ".date-requirement", function () {
-                $(this).val($(this).val());
-                if ($(this).val() != "") {
-                    $("#" + this.id + "-yes").prop("checked", true);
-                    $("#" + this.id + "-no").prop("checked", false);
-                }
-                
-                var count = $("#checklist input[type=datetime-local]:filled").length;
-                //if (count > 0) {
-                    $(".checklist-counter").removeClass("empty");
-                // } else {
-                //     $(".checklist-counter").addClass("empty");
-                // }
-                $(".checklist-counter-no").text(checklistFields.length - count);
-                $(".checklist-counter-yes").text(count);
-            });
-
-            $(document).on("change", ".date-not-required", function () {
-                if ($(this).prop("checked")) {
-                    $("#" + this.id.replace("-no", "")).val("");
-                }
-            });
 
             // Load Select2 Credit Term
             $.ajax({
@@ -1375,15 +1085,6 @@
                     ProductServiceOffered: { required: true, maxlength: 100 },
                     CreditLineAmount: { required: true, range: [0, 1999999.99] },
                     CreditTerm: { required: true },
-                    BIRForm23033: { required: function () { return $("#kyc-bir-form-yes").prop("checked") == true; } },
-                    MayorBusinessPermit: { required: function () { return $("#kyc-business-permit-yes").prop("checked") == true; } },
-                    SecDtiCertificate: { required: function () { return $("#kyc-secdti-certificate-yes").prop("checked") == true; } },
-                    LatestAuditedFinancialStatement: { required: function () { return $("#kyc-audit-statement-yes").prop("checked") == true; } },
-                    IncorporationArticleByLaws: { required: function () { return $("#kyc-article-bylaw-yes").prop("checked") == true; } },
-                    SecretaryCertificate: { required: function () { return $("#kyc-secretary-certificate-yes").prop("checked") == true; } },
-                    CompanyPortfolio: { required: function () { return $("#kyc-portfolio-yes").prop("checked") == true; } },
-                    SignatoriesIdentificationCard: { required: function () { return $("#kyc-id-signatories-yes").prop("checked") == true; } },
-                    SampleSalesInvoiceOfficialReceipt: { required: function () { return $("#kyc-sample-sior-yes").prop("checked") == true; } },
                     PrivacyConsent: { required: function () { return $("#kyc-consent-yes").prop("checked") == true; } }
                 },
                 messages: {
@@ -1404,15 +1105,6 @@
                     ProductServiceOffered: { required: "Please enter product / service offered", maxlength: "Product / service offered must not exceed 100 characters" },
                     CreditLineAmount: { required: "Please enter credit line amount", range: "Credit line amount must be between 0-1999999.99" },
                     CreditTerm: { required: "Please select a credit term" },
-                    BIRForm23033: { required: "Please enter expiration date of submitted bir form 2303" },
-                    MayorBusinessPermit: { required: "Please enter expiration date of submitted mayor's / business permit" },
-                    SecDtiCertificate: { required: "Please enter expiration date of submitted sec / dti certificate of registration" },
-                    LatestAuditedFinancialStatement: { required: "Please enter expiration date of submitted latest audited financial statement" },
-                    IncorporationArticleByLaws: { required: "Please enter expiration date of submitted articles of incorporation / by laws" },
-                    SecretaryCertificate: { required: "Please enter expiration date of submitted secretary's certificate" },
-                    CompanyPortfolio: { required: "Please enter expiration date of submitted company profile / portfolio" },
-                    SignatoriesIdentificationCard: { required: "Please enter expiration date of submitted valid identification card of the signatories" },
-                    SampleSalesInvoiceOfficialReceipt: { required: "Please enter expiration date of submitted sales invoice / official receipt" },
                     PrivacyConsent: { required: "Please enter the date of data privacy consent" }
                 },
                 submitHandler: function (form, event) {
@@ -1452,15 +1144,6 @@
                         ProductServiceOffered: $("#kyc-product-service").val(),
                         CreditLineAmount: $("#kyc-credit-amount").val(),
                         CreditTermId: $("#kyc-credit-term").val(),
-                        BIRForm2303: $("#kyc-bir-form").val(),
-                        MayorBusinessPermit: $("#kyc-business-permit").val(),
-                        SecDtiCertificate: $("#kyc-secdti-certificate").val(),
-                        LatestAuditedFinancialStatement: $("#kyc-audit-statement").val(),
-                        IncorporationArticleByLaws: $("#kyc-article-bylaw").val(),
-                        SecretaryCertificate: $("#kyc-secretary-certificate").val(),
-                        CompanyPortfolio: $("#kyc-portfolio").val(),
-                        SignatoriesIdentificationCard: $("#kyc-id-signatories").val(),
-                        SampleSalesInvoiceOfficialReceipt: $("#kyc-sample-sior").val(),
                         PrivacyConsent: $("#kyc-consent").val(),
                         Status: action_type || "Draft"
                     },
@@ -1791,6 +1474,66 @@
                  }
             });
 
+            LoadDocuments();
+            function LoadDocuments() {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetKYCDocuments")",
+                    data: {
+                        CustomerId: kyc_details.customerId
+                    },
+                    beforeSend: function(jqXHR, settings) {
+                        $("#checklist .row").html("");
+                    },
+                    success: function(data, status, xhr) {
+                        var counter_no = 0, counter_yes = 0;
+                        $.each(data, function (i, v) {
+                            if (v.isExpired == true || v.fileName == null) counter_no++;
+                            else counter_yes++;
+
+                            $("#checklist .row").append(`
+                                <div class="col-12 col-md-6 col-xl-4">
+                                            <div class="card ${v.isExpired == true ? 'card-outline card-danger' : ''} min-h-110">
+                                        <div class="card-body d-flex align-items-center">
+                                            ${ v.fileName == null ? '<i class="bi bi-file-earmark-x-fill fs-3"></i>'
+                                            : v.fileName.endsWith(".doc") || v.fileName.endsWith(".docx") ? '<i class="bi bi-file-earmark-word-fill fs-3"></i>'
+                                            : v.fileName.endsWith(".txt") || v.fileName.endsWith(".rtf") ? '<i class="bi bi-file-earmark-text-fill fs-3"></i>'
+                                            : v.fileName.endsWith(".pdf") ? '<i class="bi bi-file-earmark-pdf-fill fs-3"></i>'
+                                            : v.fileName.endsWith(".jpg") || v.fileName.endsWith(".jpeg") || v.fileName.endsWith(".png") ? '<i class="bi bi-file-earmark-image-fill fs-3"></i>'
+                                            : '<i class="bi bi-file-earmark-x-fill fs-3"></i>'}
+
+                                            <div class="flex-grow-1 ms-2">
+                                                <div${v.fileName == null ? ' class="text-muted"' : ''}>${v.documentType}</div>
+                                                <small class="text-muted">Expiration Date: ${v.expirationDate || 'N/A'}</small>
+                                            </div>
+
+                                            ${kyc_details.status == "Draft" && v.fileName ? `
+                                            <button type="button" class="btn btn-sm btn-outline-danger ml-1 delete-document" data-id="${v.id}" data-microtip-title="Delete Document" data-microtip-position="top" role="tooltip">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>` : ''}
+                                            ${v.fileName ? `
+                                            <button type="button" class="btn btn-sm btn-outline-info ml-1 download-document" data-filename="${v.fileName}" data-microtip-title="Download Document" data-microtip-position="top" role="tooltip">
+                                                <i class="bi bi-cloud-download-fill"></i>
+                                            </button>` : ''}
+                                            ${kyc_details.status == "Draft" ? `
+                                            <button type="button" class="btn btn-sm btn-outline-info ml-1 upload-document" data-type-id="${v.documentTypeId}" data-type="${v.documentType}" data-microtip-title="Upload Document" data-microtip-position="top" role="tooltip">
+                                                <i class="bi bi-cloud-upload-fill"></i>
+                                            </button>` : ''}
+                                        </div>
+                                    </div>
+                                </div>`);
+                        });
+                        $(".checklist-counter-no").text(counter_no);
+                        $(".checklist-counter-yes").text(counter_yes);
+                    }
+                });
+            }
+
+            $(document).on("click", ".download-document", function () {
+                var document_filename = $(this).data("filename");
+                window.open("/Documents/" + document_filename, '_blank');
+            });
+
             if (user_access.canAdd || user_access.canEdit) {
                 // signatory
                 $(document).on("click", ".btn-add-signatory", function () {
@@ -1859,7 +1602,6 @@
                 }
                 // end signatory
 
-                
                 // client
                 $(document).on("click", ".btn-add-client", function () {
                     $("#client-name").data("Id", "");
@@ -1993,7 +1735,62 @@
                         }
                     });
                 }
-                // end client
+                // end bank
+
+                // document
+                $(document).on("click", ".upload-document", function() {
+                    $("#document-name").data("DocumentTypeId", $(this).data("type-id"));
+                    $("#document-name").val($(this).data("type"));
+                    $("#document-file").val("");
+                    $("#document-expiration").val("");
+
+                    $("#documentModal").modal("show");
+                });
+            
+                var validateSaveDocument = $("#documentForm").validate({
+                    rules: {
+                        File: { required: true, accept: "doc|docx|txt|rtf|pdf|jpg|jpeg|png" },
+                        Expiration: { required: true }
+                    },
+                    messages: {
+                        File: { required: "Please select a file", accept: "Only doc, docx, txt, rtf, pdf, jpg, jpeg, or png are allowed" },
+                        Expiration: { required: "Please enter expiration date" }
+                    },
+                    submitHandler: function (form, event) {
+                        event.preventDefault();
+                        DoSaveDocument();
+                    }
+                });
+
+                function DoSaveDocument() {
+                    var formData = new FormData();
+                    formData.append("KYCId", kyc_details.id);
+                    formData.append("DocumentTypeId", $("#document-name").data("DocumentTypeId"));
+                    formData.append("File", $("#document-file")[0].files[0]);
+                    formData.append("ExpirationDateD", $("#document-expiration").val());
+
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveDocument")",
+                        data: formData,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        enctype: "multipart/form-data",
+                        processData: false,
+                        success: function (data, status, xhr) {
+                            if (data.status == "Error") {
+                                toastr.error(data.message, "Error");
+                            } else {
+                                toastr.success(data.message, "Success");
+                                $("#documentModal").modal("hide");
+                                LoadDocuments();
+                            }
+                        }
+                    });
+                }
+
+                // end document
             }
 
             if (user_access.canDelete) {
@@ -2095,6 +1892,39 @@
                     });
                 });
                 // end bank
+
+                // document
+                $(document).on("click", ".delete-document", function () {
+                    var document_id = $(this).data("id");
+
+                    swal({
+                        title: "Delete Document",
+                        text: "Continue to delete this document?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    }).then((confirm) => {
+                        if (confirm != null) {
+                            $.ajax({
+                                url: "@Url.Action("DeleteDocument")",
+                                type: "POST",
+                                data: {
+                                    DocumentId: document_id,
+                                    KYCId: kyc_details.id
+                                },
+                                success: function (data, status, xhr) {
+                                    if (data.status == "Success") {
+                                        toastr.success(data.message, "Success");
+                                        LoadDocuments();
+                                    } else {
+                                        toastr.error(data.message, data.status);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                // end document
             }
         }
     </script>

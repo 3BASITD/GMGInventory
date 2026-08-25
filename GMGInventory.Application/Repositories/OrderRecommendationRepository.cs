@@ -3,6 +3,7 @@ using GMGInventory.Application.Helpers;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,63 +37,112 @@ namespace GMGInventory.Application.Repositories
             var last2MonthsStart = dtNow.AddDays(-60);
             var lastYearStart = dtNow.AddDays(-365);
 
+            var defaultWarehouseId = await context.Warehouses
+                                            .Where(s => s.Name == "MAIN")
+                                            .Select(s => s.Id)
+                                            .FirstOrDefaultAsync();
+
+            var lastWeek = from ili in context.InvoiceLineItems
+                           where ili.Invoice.InvoiceDate >= lastWeekStart
+                           && (ili.Invoice.Status.Name == "INVOICE DRAFT" || ili.Invoice.Status.Name == "INVOICE SUBMITTED")
+                           group ili by new { ili.ItemId, ili.Invoice.Pack.WarehouseId } into g
+                           select new
+                           {
+                               g.Key.ItemId,
+                               WarehouseId = g.Key.WarehouseId ?? defaultWarehouseId,
+                               Quantity = g.Sum(s => (int?)s.Quantity)
+                           };
+
+            var lastMonth = from ili in context.InvoiceLineItems
+                            where ili.Invoice.InvoiceDate >= lastMonthStart
+                            && (ili.Invoice.Status.Name == "INVOICE DRAFT" || ili.Invoice.Status.Name == "INVOICE SUBMITTED")
+                            group ili by new { ili.ItemId, ili.Invoice.Pack.WarehouseId } into g
+                            select new
+                            {
+                                g.Key.ItemId,
+                                WarehouseId = g.Key.WarehouseId ?? defaultWarehouseId,
+                                Quantity = g.Sum(s => (int?)s.Quantity)
+                            };
+
+            var last2Months = from ili in context.InvoiceLineItems
+                              where ili.Invoice.InvoiceDate >= last2MonthsStart
+                              && (ili.Invoice.Status.Name == "INVOICE DRAFT" || ili.Invoice.Status.Name == "INVOICE SUBMITTED")
+                              group ili by new { ili.ItemId, ili.Invoice.Pack.WarehouseId } into g
+                              select new
+                              {
+                                  g.Key.ItemId,
+                                  WarehouseId = g.Key.WarehouseId ?? defaultWarehouseId,
+                                  Quantity = g.Sum(s => (int?)s.Quantity)
+                              };
+
+            var lastYear = from ili in context.InvoiceLineItems
+                           where ili.Invoice.InvoiceDate >= lastYearStart
+                           && (ili.Invoice.Status.Name == "INVOICE DRAFT" || ili.Invoice.Status.Name == "INVOICE SUBMITTED")
+                           group ili by new { ili.ItemId, ili.Invoice.Pack.WarehouseId } into g
+                           select new
+                           {
+                               g.Key.ItemId,
+                               WarehouseId = g.Key.WarehouseId ?? defaultWarehouseId,
+                               Quantity = g.Sum(s => (int?)s.Quantity)
+                           };
+
+            var overall = from ili in context.InvoiceLineItems
+                          where ili.Invoice.Status.Name == "INVOICE DRAFT" || ili.Invoice.Status.Name == "INVOICE SUBMITTED"
+                          group ili by new { ili.ItemId, ili.Invoice.Pack.WarehouseId } into g
+                          select new
+                          {
+                              g.Key.ItemId,
+                              WarehouseId = g.Key.WarehouseId ?? defaultWarehouseId,
+                              Quantity = g.Sum(s => (int?)s.Quantity)
+                          };
+
             var quantities = await (from ii in context.ItemInventories
                                     join item in context.Items on ii.ItemId equals item.Id
+                                    join whse in context.Warehouses on ii.WarehouseId equals whse.Id
                                     join icls in context.ItemClasses on item.ItemClassId equals icls.Id into gicls
                                     from icls in gicls.DefaultIfEmpty()
-                                    join whse in context.Warehouses on ii.WarehouseId equals whse.Id
                                     join loc in context.LocationCodes on ii.LocationCodeId equals loc.Id into gloc
                                     from loc in gloc.DefaultIfEmpty()
-                                    join ili in context.InvoiceLineItems on ii.ItemId equals ili.ItemId into gili
-                                    from ili in gili.DefaultIfEmpty()
-                                    join inv in context.Invoices on ili.InvoiceId equals inv.Id into ginv
-                                    from inv in ginv.DefaultIfEmpty()
-                                    where (inv == null || inv.Status.Name == "INVOICE DRAFT" || inv.Status.Name == "INVOICE SUBMITTED")
-                                    && (inv == null || inv.Pack.WarehouseId == ii.WarehouseId)
-                                    && (filter.ItemClassId == null || item.ItemClassId == filter.ItemClassId)
+                                    join lw in lastWeek on new { ii.ItemId, ii.WarehouseId } equals new { lw.ItemId, lw.WarehouseId } into lwg
+                                    from lw in lwg.DefaultIfEmpty()
+                                    join lm in lastMonth on new { ii.ItemId, ii.WarehouseId } equals new { lm.ItemId, lm.WarehouseId } into lmg
+                                    from lm in lmg.DefaultIfEmpty()
+                                    join l2m in last2Months on new { ii.ItemId, ii.WarehouseId } equals new { l2m.ItemId, l2m.WarehouseId } into l2mg
+                                    from l2m in l2mg.DefaultIfEmpty()
+                                    join ly in lastYear on new { ii.ItemId, ii.WarehouseId } equals new { ly.ItemId, ly.WarehouseId } into lyg
+                                    from ly in lyg.DefaultIfEmpty()
+                                    join oa in overall on new { ii.ItemId, ii.WarehouseId } equals new { oa.ItemId, oa.WarehouseId } into oag
+                                    from oa in oag.DefaultIfEmpty()
+                                    where (filter.ItemClassId == null || item.ItemClassId == filter.ItemClassId)
                                     && (filter.BrandId == null || item.BrandId == filter.BrandId)
-                                    group new { ili, inv } by new
+                                    orderby item.Code ascending
+                                    select new OrderRecommendationVM
                                     {
-                                        ii.ItemId,
+                                        ItemId = ii.ItemId,
                                         ItemCode = item.Code,
                                         ItemName = item.Name,
-                                        item.PartNumber,
+                                        PartNumber = item.PartNumber,
                                         ItemClassId = icls == null ? (int?)null : icls.Id,
                                         ItemClass = icls == null ? null : icls.Name,
                                         WarehouseId = whse.Id,
                                         Warehouse = whse.Name,
                                         LocationCodeId = loc == null ? (int?)null : loc.Id,
                                         LocationCode = loc == null ? null : loc.Name,
-                                        Stock = ii.Quantity,
-                                        item.BeginningCost
-                                    } into g
-                                    select new OrderRecommendationVM
-                                    {
-                                        ItemId = g.Key.ItemId,
-                                        ItemCode = g.Key.ItemCode,
-                                        ItemName = g.Key.ItemName,
-                                        PartNumber = g.Key.PartNumber,
-                                        ItemClassId = g.Key.ItemClassId,
-                                        ItemClass = g.Key.ItemClass,
-                                        WarehouseId = g.Key.WarehouseId,
-                                        Warehouse = g.Key.Warehouse,
-                                        LocationCodeId = g.Key.LocationCodeId,
-                                        LocationCode = g.Key.LocationCode,
-                                        StockOnHandD = g.Key.Stock,
-                                        LastWeekQuantityD = g.Where(s => s.inv != null && s.inv.InvoiceDate >= lastWeekStart).Sum(s => (int?)s.ili.Quantity) ?? 0,
-                                        LastMonthQuantityD = g.Where(s => s.inv != null && s.inv.InvoiceDate >= lastMonthStart).Sum(s => (int?)s.ili.Quantity) ?? 0,
-                                        Last2MonthsQuantityD = g.Where(s => s.inv != null && s.inv.InvoiceDate >= last2MonthsStart).Sum(s => (int?)s.ili.Quantity) ?? 0,
-                                        LastYearQuantityD = g.Where(s => s.inv != null && s.inv.InvoiceDate >= lastYearStart).Sum(s => (int?)s.ili.Quantity) ?? 0,
-                                        OverallQuantityD = g.Sum(s => (int?)s.ili.Quantity) ?? 0,
-                                        BeginningCostD = g.Key.BeginningCost
-                                    }).OrderBy(s => s.ItemCode).ToListAsync();
+                                        StockOnHandD = ii.Quantity,
+                                        LastWeekQuantityD = lw.Quantity ?? 0,
+                                        LastMonthQuantityD = lm.Quantity ?? 0,
+                                        Last2MonthsQuantityD = l2m.Quantity ?? 0,
+                                        LastYearQuantityD = ly.Quantity ?? 0,
+                                        OverallQuantityD = oa.Quantity ?? 0,
+                                        BeginningCostD = item.BeginningCost
+                                    }).ToListAsync();
 
             quantities = quantities.Where(s => filter.MovementCategory == null || s.MovementCategory == filter.MovementCategory).ToList();
 
-            for (int i = 0; i < quantities.Count; i++)
-            {
-                quantities[i].ItemNumberD = i + 1;
-            }
+            //for (int i = 0; i < quantities.Count; i++)
+            //{
+            //    quantities[i].ItemNumberD = i + 1;
+            //}
 
             return quantities;
         }

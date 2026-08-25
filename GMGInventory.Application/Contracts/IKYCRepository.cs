@@ -20,5 +20,8 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<KYCBankModel>> GetKYCBanksDT(DataTablesRequestForm form, int CustomerId);
         Task<ResponseModel> SaveBank(KYCBankModel param);
         Task<ResponseModel> DeleteBank(int BankId, int KYCId);
+        Task<IList<KYCDocumentModel>> GetKYCDocuments(int CustomerId);
+        Task<ResponseModel> SaveDocument(KYCDocumentModel param);
+        Task<ResponseModel> DeleteDocument(int DocumentId, int KYCId);
     }
 }

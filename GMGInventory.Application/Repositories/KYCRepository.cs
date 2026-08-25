@@ -1,7 +1,9 @@
-﻿using GMGInventory.Application.Contracts;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,13 +16,16 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly UserManager<User> userManager;
         private readonly string currentUserId;
+        private readonly IHostingEnvironment hostingEnvironment;
 
         public KYCRepository(ApplicationDbContext context
-            , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager)
+                           , IHttpContextAccessor httpContextAccessor
+                           , IHostingEnvironment hostingEnvironment
+                           , UserManager<User> userManager)
         {
             this.context = context;
             this.userManager = userManager;
+            this.hostingEnvironment = hostingEnvironment;
             this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
@@ -193,16 +198,6 @@ namespace GMGInventory.Application.Repositories
                 CreditTerm = creditTerm == null ? null : creditTerm.Name,
                 CreditTermId = creditTerm == null ? null : creditTerm.Id,
 
-                BIRForm2303D = kyc.ExpirationBIRForm2303,
-                MayorBusinessPermitD = kyc.ExpirationMayorBusinessPermit,
-                SecDtiCertificateD = kyc.ExpirationSECDTICertificate,
-                LatestAuditedFinancialStatementD = kyc.ExpirationLatestAuditedFinancialStatement,
-                IncorporationArticleByLawsD = kyc.ExpirationIncorporationArticleByLaws,
-                SecretaryCertificateD = kyc.ExpirationSecretaryCertificate,
-                CompanyPortfolioD = kyc.ExpirationCompanyPortfolio,
-                SignatoriesIdentificationCardD = kyc.ExpirationSignatoriesIdentificationCard,
-                SampleSalesInvoiceOfficialReceiptD = kyc.ExpirationSampleSalesInvoiceOfficialReceipt,
-
                 PrivacyConsentD = kyc.PrivacyConsent,
 
                 SubmittedBy = submittedby == null ? null : submittedby.FirstName + " " + submittedby.LastName,
@@ -283,15 +278,6 @@ namespace GMGInventory.Application.Repositories
                 kyc.ProductServiceOffered = param.ProductServiceOffered!;
                 kyc.CreditLineAmount = param.CreditLineAmount ?? 0;
                 kyc.CreditTermId = creditTerm!.Id;
-                kyc.ExpirationBIRForm2303 = param.BIRForm2303;
-                kyc.ExpirationMayorBusinessPermit = param.MayorBusinessPermit;
-                kyc.ExpirationSECDTICertificate = param.SecDtiCertificate;
-                kyc.ExpirationLatestAuditedFinancialStatement = param.LatestAuditedFinancialStatement;
-                kyc.ExpirationIncorporationArticleByLaws = param.IncorporationArticleByLaws;
-                kyc.ExpirationSecretaryCertificate = param.SecretaryCertificate;
-                kyc.ExpirationCompanyPortfolio = param.CompanyPortfolio;
-                kyc.ExpirationSignatoriesIdentificationCard = param.SignatoriesIdentificationCard;
-                kyc.ExpirationSampleSalesInvoiceOfficialReceipt = param.SampleSalesInvoiceOfficialReceipt;
                 kyc.PrivacyConsent = param.PrivacyConsent;
                 if (param.Status == "Draft")
                 {
@@ -738,6 +724,119 @@ namespace GMGInventory.Application.Repositories
                 await context.SaveChangesAsync(currentUserId);
 
                 return new ResponseModel { Status = "Success", Message = $"Successfully deleted bank reference" };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = $"Exception: {SystemFormat.GetInnermostExceptionMessage(ex)}" };
+            }
+        }
+
+        public async Task<IList<KYCDocumentModel>> GetKYCDocuments(int CustomerId)
+        {
+            var documents = from dtype in context.KYCDocumentTypes
+                            join document in context.KYCDocuments on dtype.Id equals document.KYCDocumentTypeId into docg
+                            from document in docg.DefaultIfEmpty()
+                            where document == null || document.KYC.CustomerId == CustomerId
+                            select new KYCDocumentModel
+                            {
+                                Id = document.Id,
+                                DocumentType = dtype.Name,
+                                DocumentTypeId = dtype.Id,
+                                FileName = document.FileName,
+                                ExpirationDateD = document.ExpirationDate
+                            };
+            return await documents.ToListAsync();
+        }
+
+        public async Task<ResponseModel> SaveDocument(KYCDocumentModel param)
+        {
+            try
+            {
+                if (param.KYCId == null) return new ResponseModel { Status = "Error", Message = "KYC is required" };
+                if (param.DocumentTypeId == null) return new ResponseModel { Status = "Error", Message = "Document type is required" };
+                if (param.File == null || param.File.Length == 0) return new ResponseModel { Status = "Error", Message = "File is required" };
+                if (param.ExpirationDateD == null) return new ResponseModel { Status = "Error", Message = "Expiration date is required" };
+
+                var dtype = await context.KYCDocumentTypes.Where(s => s.Id == param.DocumentTypeId).FirstOrDefaultAsync();
+
+                if (dtype == null) return new ResponseModel { Status = "Error", Message = "Invalid document type" };
+
+                var kyc = await context.KYCs
+                                       .Where(s => s.Id == param.KYCId)
+                                       .Select(s => s.Customer.Code)
+                                       .FirstOrDefaultAsync();
+
+                if(kyc == null) return new ResponseModel { Status = "Error", Message = "Invalid KYC" };
+
+                var isNew = false;
+                var document = await context.KYCDocuments
+                                            .Where(s => s.KYCId == param.KYCId
+                                                     && s.KYCDocumentTypeId == dtype.Id)
+                                            .FirstOrDefaultAsync();
+
+                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Documents");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                long longNow = long.Parse(DateTime.Now.ToString("yyMMddHHmm"));
+                var specialFileName = SystemFormat.ToValidFileName($"{longNow.ToString("X")} {kyc} {dtype.Name}{Path.GetExtension(param.File.FileName)}", "_", true);
+                var filePath = Path.Combine(uploadsFolder, specialFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await param.File.CopyToAsync(fileStream);
+                }
+
+                if (document == null)
+                {
+                    document = new KYCDocument();
+                    document.KYCId = param.KYCId.Value;
+                    document.KYCDocumentTypeId = dtype.Id;
+                    await context.KYCDocuments.AddAsync(document);
+                    isNew = true;
+                }
+                else
+                {
+                    var filePathDelete = Path.Combine(uploadsFolder, document.FileName);
+
+                    if (File.Exists(filePathDelete))
+                        File.Delete(filePathDelete);
+                }
+
+                document.FileName = specialFileName;
+                document.ExpirationDate = param.ExpirationDateD.Value;
+
+                await context.SaveChangesAsync(currentUserId);
+
+                return new ResponseModel { Status = "Success", Message = $"Successfully {(isNew ? "added" : "updated")} document" };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { Status = "Error", Message = $"Exception: {SystemFormat.GetInnermostExceptionMessage(ex)}" };
+            }
+        }
+
+        public async Task<ResponseModel> DeleteDocument(int DocumentId, int KYCId)
+        {
+            try
+            {
+                var document = await context.KYCDocuments
+                                            .Where(s => s.Id == DocumentId)
+                                            .FirstOrDefaultAsync();
+
+                if (document != null && document.KYCId != KYCId) return new ResponseModel { Status = "Error", Message = "Deleting document for the wrong kyc" };
+                
+                if (document == null) return new ResponseModel { Status = "Error", Message = $"Invalid document. {DocumentId} not found" };
+
+                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images\\Documents");
+                var filePathDelete = Path.Combine(uploadsFolder, document.FileName);
+
+                if (File.Exists(filePathDelete))
+                    File.Delete(filePathDelete);
+
+                context.KYCDocuments.Remove(document);
+                await context.SaveChangesAsync(currentUserId);
+                return new ResponseModel { Status = "Success", Message = $"Successfully deleted document" };
             }
             catch (Exception ex)
             {
