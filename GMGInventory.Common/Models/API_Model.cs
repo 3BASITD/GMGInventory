@@ -83,6 +83,7 @@ namespace GMGInventory.Common.Models
         public DateTime DateCreated { get; set; }
         public string? LastUserModified { get; set; }
         public DateTime? LastDateModified { get; set; }
+        public string SpecialInstruction { get; set; }
         public IEnumerable<APISalesOrderLineItem> LineItems { get; set; }
     }
 

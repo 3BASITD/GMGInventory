@@ -493,6 +493,7 @@ namespace GMGInventory.Application.Repositories
                              LastDateModified = order.DateModified,
                              ServiceLevelAgreement = order.ServiceLevelAgreementId == null ? null : order.ServiceLevelAgreement.Name,
                              ServiceLevelAgreementId = order.ServiceLevelAgreementId == null ? null : order.ServiceLevelAgreement.Id,
+                             SpecialInstruction = order.SpecialInstruction,
                              LineItems = from item in order.SalesOrderLineItems
                                          select new APISalesOrderLineItem
                                          {
