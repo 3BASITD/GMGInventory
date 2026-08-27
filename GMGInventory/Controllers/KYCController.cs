@@ -183,5 +183,36 @@ namespace GMGInventory.Controllers
             var responseModel = await kycRepository.DeleteBank(BankId, KYCId);
             return Json(responseModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> GetKYCDocuments(int CustomerId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.View);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = await kycRepository.GetKYCDocuments(CustomerId);
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveDocument(KYCDocumentModel param)
+        {
+            var redirectResultAdd = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.Add);
+            var redirectResultEdit = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.Edit);
+            if (redirectResultAdd != null && redirectResultEdit != null) return redirectResultAdd;
+
+            var responseModel = await kycRepository.SaveDocument(param);
+            return Json(responseModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteDocument(int DocumentId, int KYCId)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.KYC, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var responseModel = await kycRepository.DeleteDocument(DocumentId, KYCId);
+            return Json(responseModel);
+        }
     }
 }

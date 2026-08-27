@@ -4291,33 +4291,6 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<DateTime?>("ExpirationBIRForm2303")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationCompanyPortfolio")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationIncorporationArticleByLaws")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationLatestAuditedFinancialStatement")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationMayorBusinessPermit")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationSECDTICertificate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationSampleSalesInvoiceOfficialReceipt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationSecretaryCertificate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationSignatoriesIdentificationCard")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("OperatingAddress")
                         .IsRequired()
                         .HasColumnType("nvarchar(300)");
@@ -4472,6 +4445,113 @@ namespace GMGInventory.Data.Migrations
                     b.HasIndex("KYCId");
 
                     b.ToTable("KYCClients");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("KYCDocumentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KYCId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KYCDocumentTypeId");
+
+                    b.HasIndex("KYCId");
+
+                    b.ToTable("KYCDocuments");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCDocumentType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KYCDocumentTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "BIR Form 2303 (Certificate of Registration)"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Valid Mayor's / Business Permit (Current Year)"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "SEC / DTI Certificate of Registration"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Latest Audited Financial Statement (Last 2 Years)"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Articles of Incorporation / By-Laws (For Corporations)"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Secretary's Certificate (Authorizing the person above the sign)"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Company Profile / Portfolio"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Valid Identification Card of the Signatories"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Sample Sales Invoice / Official Receipt (From Major Clients)"
+                        });
                 });
 
             modelBuilder.Entity("GMGInventory.Data.KYCSignatory", b =>
@@ -5647,6 +5727,20 @@ namespace GMGInventory.Data.Migrations
                             HasDelete = false,
                             HasEdit = false,
                             HasPrint = true,
+                            HasUploadDownload = true,
+                            HasView = true,
+                            Name = "Purchase Receiving Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
+                        },
+                        new
+                        {
+                            Id = 87,
+                            HasAdd = false,
+                            HasApproveDisapprove = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
                             Name = "Purchase Receiving Report",
@@ -9096,13 +9190,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "52bed0dc-208b-422f-bbbc-d016679b5048",
+                            ConcurrencyStamp = "b648935f-6481-4b2f-9330-b90c6bd9b468",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGjaBr9+JmmDa7Y4JcHGg7ExM2cSyW/M/51PC/ck2L+R8Ol1T8rz1v0tlBPe2mDjjw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKK0g3EMfLvHjzDK/n4Po91oDRO3Ai8cc9q0jeCQja0klHowd/bF9VYBGKo6b4biaQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a6333a3a-1917-4609-b1b8-5ef886309cf8",
+                            SecurityStamp = "e1bd5401-4e22-4700-9081-eb92e4c0c341",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9117,13 +9211,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4d6d7124-7db5-49b5-b33c-d0792349e590",
+                            ConcurrencyStamp = "9d7778d3-f19f-4ead-b038-9df5b774d6e8",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEK/D29Dfo13KEiMLTznOXsCYy1U5xHOv+MEvqBnxp2wpVFB6LCO3WJiVrG/xuwf9+w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPF0B0C3wVXxhBLNQ8ZyptxQ8zvmJor7aaRlLZPEbayuw9DJk0j65kFIN5DjzuGlDQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a9d46c56-81ce-4d3c-ae23-9979497e0b1c",
+                            SecurityStamp = "78e2deab-9edd-4868-9ba8-ea08a291227e",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9546,6 +9640,25 @@ namespace GMGInventory.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("KYC");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCDocument", b =>
+                {
+                    b.HasOne("GMGInventory.Data.KYCDocumentType", "KYCDocumentType")
+                        .WithMany("KYCDocuments")
+                        .HasForeignKey("KYCDocumentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GMGInventory.Data.KYC", "KYC")
+                        .WithMany("KYCDocuments")
+                        .HasForeignKey("KYCId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KYC");
+
+                    b.Navigation("KYCDocumentType");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.KYCSignatory", b =>
@@ -10859,7 +10972,14 @@ namespace GMGInventory.Data.Migrations
 
                     b.Navigation("KYCClients");
 
+                    b.Navigation("KYCDocuments");
+
                     b.Navigation("KYCSignatories");
+                });
+
+            modelBuilder.Entity("GMGInventory.Data.KYCDocumentType", b =>
+                {
+                    b.Navigation("KYCDocuments");
                 });
 
             modelBuilder.Entity("GMGInventory.Data.LocationCode", b =>

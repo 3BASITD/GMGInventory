@@ -129,7 +129,7 @@ namespace GMGInventory.Application.Repositories
                     var oldFilePath = Path.Combine(uploadsFolder, settings.Value);
 
                     if (File.Exists(oldFilePath))
-                    {
+                    { 
                         File.Delete(oldFilePath);
                     }
                 }

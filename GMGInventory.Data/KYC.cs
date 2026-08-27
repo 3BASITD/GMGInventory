@@ -9,6 +9,7 @@ namespace GMGInventory.Data
             this.KYCBanks = new HashSet<KYCBank>();
             this.KYCClients = new HashSet<KYCClient>();
             this.KYCSignatories = new HashSet<KYCSignatory>();
+            this.KYCDocuments = new HashSet<KYCDocument>();
         }
 
         [Column(TypeName = "nvarchar(100)")]
@@ -60,33 +61,6 @@ namespace GMGInventory.Data
         public virtual CreditTerm CreditTerm { get; set; }
 
         [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationBIRForm2303 { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationMayorBusinessPermit { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationSECDTICertificate { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationLatestAuditedFinancialStatement { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationIncorporationArticleByLaws { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationSecretaryCertificate { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationCompanyPortfolio { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationSignatoriesIdentificationCard { get; set; }
-
-        [Column(TypeName = "datetime2")]
-        public DateTime? ExpirationSampleSalesInvoiceOfficialReceipt { get; set; }
-
-        [Column(TypeName = "datetime2")]
         public DateTime? PrivacyConsent { get; set; }
 
 
@@ -126,5 +100,6 @@ namespace GMGInventory.Data
         public ICollection<KYCBank> KYCBanks { get; set; }
         public ICollection<KYCClient> KYCClients { get; set; }
         public ICollection<KYCSignatory> KYCSignatories { get; set; }
+        public ICollection<KYCDocument> KYCDocuments { get; set; }
     }
 }

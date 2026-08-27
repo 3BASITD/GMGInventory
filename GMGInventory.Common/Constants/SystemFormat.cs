@@ -28,13 +28,16 @@
             return ex.Message;
         }
 
-        public static string ToValidFileName(string input, string replacement = "_")
+        public static string ToValidFileName(string input, string replacement = "_", bool replacespaces = false)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return "untitled";
 
             var invalidChars = Path.GetInvalidFileNameChars();
             var cleaned = string.Join(replacement, input.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
+
+            if (replacespaces)
+                cleaned = cleaned.Replace(" ", replacement);
 
             cleaned = cleaned.Trim().TrimEnd('.');
 

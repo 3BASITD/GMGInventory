@@ -77,42 +77,6 @@ namespace GMGInventory.Common.Models
 
         public int? CreditTermId { get; set; }
 
-        public string? BIRForm2303 => BIRForm2303D == null ? null : BIRForm2303D.Value.ToString(SystemFormat.StringDateTime);
-        public string? BIRForm23033 => BIRForm2303D == null ? null : BIRForm2303D.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? BIRForm2303D { get; set; }
-
-        public string? MayorBusinessPermit => MayorBusinessPermitD == null ? null : MayorBusinessPermitD.Value.ToString(SystemFormat.StringDateTime);
-        public string? MayorBusinessPermit3 => MayorBusinessPermitD == null ? null : MayorBusinessPermitD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? MayorBusinessPermitD { get; set; }
-
-        public string? SecDtiCertificate => SecDtiCertificateD == null ? null : SecDtiCertificateD.Value.ToString(SystemFormat.StringDateTime);
-        public string? SecDtiCertificate3 => SecDtiCertificateD == null ? null : SecDtiCertificateD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? SecDtiCertificateD { get; set; }
-
-        public string? LatestAuditedFinancialStatement => LatestAuditedFinancialStatementD == null ? null : LatestAuditedFinancialStatementD.Value.ToString(SystemFormat.StringDateTime);
-        public string? LatestAuditedFinancialStatement3 => LatestAuditedFinancialStatementD == null ? null : LatestAuditedFinancialStatementD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? LatestAuditedFinancialStatementD { get; set; }
-
-        public string? IncorporationArticleByLaws => IncorporationArticleByLawsD == null ? null : IncorporationArticleByLawsD.Value.ToString(SystemFormat.StringDateTime);
-        public string? IncorporationArticleByLaws3 => IncorporationArticleByLawsD == null ? null : IncorporationArticleByLawsD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? IncorporationArticleByLawsD { get; set; }
-
-        public string? SecretaryCertificate => SecretaryCertificateD == null ? null : SecretaryCertificateD.Value.ToString(SystemFormat.StringDateTime);
-        public string? SecretaryCertificate3 => SecretaryCertificateD == null ? null : SecretaryCertificateD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? SecretaryCertificateD { get; set; }
-
-        public string? CompanyPortfolio => CompanyPortfolioD == null ? null : CompanyPortfolioD.Value.ToString(SystemFormat.StringDateTime);
-        public string? CompanyPortfolio3 => CompanyPortfolioD == null ? null : CompanyPortfolioD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? CompanyPortfolioD { get; set; }
-
-        public string? SignatoriesIdentificationCard => SignatoriesIdentificationCardD == null ? null : SignatoriesIdentificationCardD.Value.ToString(SystemFormat.StringDateTime);
-        public string? SignatoriesIdentificationCard3 => SignatoriesIdentificationCardD == null ? null : SignatoriesIdentificationCardD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? SignatoriesIdentificationCardD { get; set; }
-
-        public string? SampleSalesInvoiceOfficialReceipt => SampleSalesInvoiceOfficialReceiptD == null ? null : SampleSalesInvoiceOfficialReceiptD.Value.ToString(SystemFormat.StringDateTime);
-        public string? SampleSalesInvoiceOfficialReceipt3 => SampleSalesInvoiceOfficialReceiptD == null ? null : SampleSalesInvoiceOfficialReceiptD.Value.ToString(SystemFormat.StringDateTime3);
-        public DateTime? SampleSalesInvoiceOfficialReceiptD { get; set; }
-
         public string? PrivacyConsent => PrivacyConsentD == null ? null : PrivacyConsentD.Value.ToString(SystemFormat.StringDateTime);
         public string? PrivacyConsent3 => PrivacyConsentD == null ? null : PrivacyConsentD.Value.ToString(SystemFormat.StringDateTime3);
         public DateTime? PrivacyConsentD { get; set; }
@@ -230,5 +194,18 @@ namespace GMGInventory.Common.Models
         public string? Branch { get; set; }
         public string? AccountNumber { get; set; }
         public string? ContactNumber { get; set; }
+    }
+
+    public class KYCDocumentModel
+    {
+        public int? Id { get; set; }
+        public int? KYCId { get; set; }
+        public string? DocumentType { get; set; }
+        public int? DocumentTypeId { get; set; }
+        public string? FileName { get; set; }
+        public IFormFile? File { get; set; }
+        public string? ExpirationDate => ExpirationDateD == null ? null : ExpirationDateD.Value.ToString(SystemFormat.StringDate);
+        public DateTime? ExpirationDateD { get; set; }
+        public bool? IsExpired => ExpirationDateD == null ? null : ExpirationDateD.Value.Date <= DateTime.Today;
     }
 }

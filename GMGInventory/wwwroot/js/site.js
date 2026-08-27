@@ -195,6 +195,18 @@
         onchange: true
     });
 
+    $.validator.methods.accept = function (value, element, param) {
+        if (this.optional(element)) return "dependency-mismatch";
+
+        var extensions = $(element).attr("accept").split(",");
+        var file = element.files[0];
+
+        if (!file) return false;
+
+        var extension = "." + file.name.split(".").pop().toLowerCase();
+        return $.inArray(extension, extensions) !== -1;
+    };
+
     //$('.mask-decimal').mask('9,999,999.00', {
     //    reverse: true
     //});

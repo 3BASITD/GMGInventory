@@ -80,6 +80,9 @@ namespace GMGInventory.Common.Models
                                  : Last2MonthsQuantityD > 0 ? StockOnHandD - (Last2MonthsQuantityD / 2)
                                  : LastYearQuantityD > 0 ? StockOnHandD - (LastYearQuantityD / 12)
                                  : StockOnHandD - OverallQuantityD);
+
+
+                //Ave. Monthly demand x (Lead Time + Buffer) x (1 + Demand Variability)) - (Stock on Hand + Stock on Order)
             }
         }
 
