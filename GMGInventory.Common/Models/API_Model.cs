@@ -116,6 +116,7 @@ namespace GMGInventory.Common.Models
         public int? ItemId { get; set; }
         public string? ItemCode { get; set; }
         public int Quantity { get; set; }
+        public string? BinLocation { get; set; }
     }
 
     public class APISalesReturn

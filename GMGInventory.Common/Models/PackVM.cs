@@ -160,6 +160,7 @@ namespace GMGInventory.Common.Models
         public int? PackTypeId { get; set; }
         public string? PackTypeName { get; set; }
         public decimal ExtendedPriceD { get; set; }
+        public string? BinLocation { get; set; }
     }
 
     public class PackDetailsPVM

@@ -609,8 +609,10 @@ namespace GMGInventory.Application.Repositories
                                                    .FirstOrDefault()
                                 let inventory = context.ItemInventories
                                                        .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true)
-                                                       .OrderByDescending(s => s.DateCreated)
-                                                       .FirstOrDefault()
+                                                       .Sum(s => (int?)s.Quantity) ?? 0
+                                let inventoryAllocated = context.ItemInventories
+                                                                .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true)
+                                                                .Sum(s => (int?)s.AllocatedQuantity) ?? 0
                                 let packedQuantity = context.PackLineItems
                                                             .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
                                                                      && s.ItemId == order.ItemId
@@ -628,7 +630,7 @@ namespace GMGInventory.Application.Repositories
                                 orderby order.LineNumber ascending
                                 select new SalesOrderItemVM
                                 {
-                                    AllocatedQuantityD = inventory == null ? 0 : inventory.AllocatedQuantity,
+                                    AllocatedQuantityD = inventoryAllocated,
                                     Discount1D = order.Discount1,
                                     Discount2D = order.Discount2,
                                     Discount3D = order.Discount3 == null ? 0 : order.Discount3!.Value,
@@ -636,7 +638,7 @@ namespace GMGInventory.Application.Repositories
                                     Discount5D = order.Discount5 == null ? 0 : order.Discount5!.Value,
                                     CustomerBrandDiscountId = order.CustomerBrandDiscountId,
                                     Id = order.Id,
-                                    InventoryCountD = inventory == null ? 0 : inventory.Quantity,
+                                    InventoryCountD = inventory,
                                     InvoicedQuantityD = invoicedQuantity,
                                     ItemCode = order.Item.Code,
                                     ItemId = order.Item.Id,

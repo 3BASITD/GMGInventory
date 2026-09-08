@@ -16,5 +16,6 @@ namespace GMGInventory.Common.Models
         public int AllocatedQuantityD { get; set; }
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
+        public string? BinLocation { get; set; }
     }
 }

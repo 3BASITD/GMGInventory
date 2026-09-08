@@ -28,7 +28,7 @@ namespace GMGInventory.Application.Contracts
         Task ReactivateAsync(int id);
         Task AddAsync(ItemCommonVM itemVM);
         Task<ResponseModel> ItemPromoAddAsync(ItemPromoVM itemPromoVM);
-        Task<ResponseModel> ReactivateItemPromoAsync(int Id,int itemId, DateTime Start, DateTime End);
+        Task<ResponseModel> ReactivateItemPromoAsync(int Id, int itemId, DateTime Start, DateTime End);
         Task<ResponseModel> DeleteOrDeactivateItemPromoAsync(int Id);
         Task UpdateAsync(ItemCommonVM itemVM);
         Task DeleteAsync(int id);
@@ -48,5 +48,7 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> SaveImageAsync(ItemImageFormVM form);
         Task<ResponseModelData<FileVM>> UploadFile(IFormFile file);
         Task<string> SaveItemFromFile(ItemFileVM itemFile);
+
+        Task<Select2Model<JsonItemOptionsModel>> GetBinLocations(string search, int page);
     }
 }

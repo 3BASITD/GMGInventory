@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Office.CustomXsn;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
@@ -176,7 +177,10 @@ namespace GMGInventory.Application.Services
 
                             var itemInventory = await context.ItemInventories
                                                              .Where(s => s.ItemId == item.Id
-                                                                      && s.WarehouseId == warehouse.Id)
+                                                                      && s.WarehouseId == warehouse.Id
+                                                                      && s.BinLocation != null
+                                                                      && s.BinLocation.Trim().ToLower() == stock.bin_location.ToLower()
+                                                                      )
                                                              .FirstOrDefaultAsync();
                             if (itemInventory == null)
                             {
@@ -185,7 +189,8 @@ namespace GMGInventory.Application.Services
                                     ItemId = item.Id,
                                     WarehouseId = warehouse.Id,
                                     Quantity = quantity,
-                                    AllocatedQuantity = allocatedQuantity
+                                    AllocatedQuantity = allocatedQuantity,
+                                    BinLocation = stock.bin_location
                                 };
                                 await context.ItemInventories.AddAsync(itemInventory);
                                 await context.SaveChangesAsync(currentUserId);
@@ -213,11 +218,14 @@ namespace GMGInventory.Application.Services
                                     Remarks = "Added new stock"
                                 });
                             }
-                            else if (itemInventory.Quantity != quantity || itemInventory.AllocatedQuantity != allocatedQuantity)
+                            else if (itemInventory.Quantity != quantity || itemInventory.AllocatedQuantity != allocatedQuantity || itemInventory.BinLocation == null || itemInventory.BinLocation != null)
                             {
+
                                 var oldQuantity = itemInventory.Quantity;
                                 var oldAllocatedQuantity = itemInventory.AllocatedQuantity;
 
+
+                                itemInventory.BinLocation = stock.bin_location;
                                 itemInventory.Quantity = quantity;
                                 itemInventory.AllocatedQuantity = allocatedQuantity;
                                 context.ItemInventories.Update(itemInventory);

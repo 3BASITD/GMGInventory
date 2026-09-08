@@ -253,6 +253,7 @@ namespace GMGInventory.Common.Models
         public int AllocatedQuantityD { get; set; }
         public string? LocationCode { get; set; }
         public int? LocationCodeId { get; set; }
+        public string? BinLocation { get; set; }
     }
 
     public class ItemDetailPurchaseVM

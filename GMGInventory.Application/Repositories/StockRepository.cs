@@ -25,6 +25,7 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<StockVM>> GetStocks()
         {
             var stocks = from stock in context.ItemInventories
+                         where stock.BinLocation != null
                          select new StockVM
                          {
                              ItemId = stock.Item.Id,
@@ -32,8 +33,7 @@ namespace GMGInventory.Application.Repositories
                              ItemName = stock.Item.Name,
                              WarehouseId = stock.Warehouse.Id,
                              Warehouse = stock.Warehouse.Name,
-                             LocationCodeId = stock.LocationCode == null ? null : stock.LocationCode.Id,
-                             LocationCode = stock.LocationCode == null ? null : stock.LocationCode.Name,
+                             BinLocation = stock.BinLocation == null ? null : stock.BinLocation,
                              AllocatedQuantityD = stock.AllocatedQuantity,
                              QuantityD = stock.Quantity
                          };

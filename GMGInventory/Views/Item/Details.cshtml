@@ -256,7 +256,7 @@
                                         <tr>
                                             <th>Code</th>
                                             <th>Name</th>
-                                            <th>Location Code</th>
+                                            <th>Bin Location</th>
                                             <th>Allocated Quantity</th>
                                             <th>Quantity</th>
                                             <th></th>
@@ -1277,9 +1277,9 @@
                 { data: "name", name: "Name" },
                 {
                     data: function (data, type, dataToSet) {
-                        return data.locationCode || "<span class='text-muted'>N/A</span>";
+                        return data.binLocation || "<span class='text-muted'>N/A</span>";
                     },
-                    name: "LocationCode"
+                    name: "BinLocation"
                 },
                 { data: "allocatedQuantity", name: "AllocatedQuantity", className: "text-end" },
                 { data: "quantity", name: "Quantity", className: "text-end" },

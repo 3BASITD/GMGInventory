@@ -82,6 +82,7 @@ namespace GMGInventory.Common.Models
     public class APIBCT_Stock
     {
         public string item_code { get; set; }
+        public string bin_location { get; set; }
         public string warehouse_id { get; set; }
         public int stock { get; set; }
         public int total_allocated_qty { get; set; }

@@ -15,6 +15,8 @@ namespace GMGInventory.Data
         public int Quantity { get; set; }
         public int AllocatedQuantity { get; set; }
 
+        public string? BinLocation { get; set; }
+
         [ForeignKey("LocationCodeId")]
         public int? LocationCodeId { get; set; }
         public LocationCode LocationCode { get; set; }

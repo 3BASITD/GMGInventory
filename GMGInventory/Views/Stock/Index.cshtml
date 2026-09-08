@@ -66,7 +66,7 @@
                     <th>Item Code</th>
                     <th>Item Name</th>
                     <th>Warehouse</th>
-                    <th>Location Code</th>
+                    <th>Bin Location</th>
                     <th>Allocated Quantity</th>
                     <th>Quantity</th>
                     <th></th>
@@ -150,12 +150,7 @@
                     },
                     name: "Warehouse"
                 },
-                {
-                    data: function (data, type, dataToSet) {
-                        return data.locationCode || "<span class='text-muted'>N/A</span>";
-                    },
-                    name: "LocationCode"
-                },
+                { data: "binLocation", name: "BinLocation" },
                 { data: "allocatedQuantity", name: "AllocatedQuantity", className: "text-end" },
                 { data: "quantity", name: "Quantity", className: "text-end" },
                 {

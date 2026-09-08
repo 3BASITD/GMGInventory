@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using GMGInventory.Application.Contracts;
+using GMGInventory.Application.Repositories;
 using GMGInventory.Application.Services;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -25,6 +26,11 @@ namespace GMGInventory.Controllers
         public async Task<IActionResult> GetOptionsPromo(string search, int page, DateTime orderDate)
         {
             return Json(await itemRepository.GetOptionsPromo(search, page, orderDate));
+        }
+
+        public async Task<IActionResult> GetBinLocation(string search, int page)
+        {
+            return Json(await itemRepository.GetBinLocations(search, page));
         }
 
         public async Task<IActionResult> GetUnservedOptions(string search, int page, int SalesOrderId)

@@ -3,6 +3,7 @@ using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -391,8 +392,19 @@ namespace GMGInventory.Application.Repositories
         {
             if (filter.IsTable != false)
             {
+                var inventoryAgg = from inv in context.ItemInventories
+                                   where inv.BinLocation != null
+                                   group inv by new { inv.ItemId, inv.WarehouseId, inv.Warehouse.Name } into g
+                                   select new
+                                   {
+                                       g.Key.ItemId,
+                                       WarehouseId = (int?)g.Key.WarehouseId,
+                                       WarehouseName = g.Key.Name,
+                                       Quantity = (int?)g.Sum(x => x.Quantity)
+                                   };
+
                 var itemsVM = from item in context.Items.AsNoTracking()
-                              join inventory in context.ItemInventories on item.Id equals inventory.ItemId into gin
+                              join inventory in inventoryAgg on item.Id equals inventory.ItemId into gin
                               from inventory in gin.DefaultIfEmpty()
                               let price = item.ItemPrices
                                               .Where(s => s.DateCreated.Date <= DateTime.Now)
@@ -413,9 +425,9 @@ namespace GMGInventory.Application.Repositories
                                   PartNumber = (item.PartNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   InterchangeNumber = (item.InterchangeNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
                                   ModelNumber = (item.ModelNumber + "").Replace("\n", "").Replace("\r", "").Trim(),
-                                  BeginningCostD = item.BeginningCost,
+                                  BeginningCostD = item.BeginningCost == null ? 0 : item.BeginningCost,
                                   ItemClass = item.ItemClass.Code.Replace("\n", "").Replace("\r", "").Trim(),
-                                  ItemClassId = item.ItemClassId,
+                                  ItemClassId = item.ItemClassId == null ? 0 : item.ItemClassId,
                                   Category = item.Category.Code.Replace("\n", "").Replace("\r", "").Trim(),
                                   CategoryId = item.CategoryId,
                                   ItemType = item.ItemType.Code.Replace("\n", "").Replace("\r", "").Trim(),
@@ -425,10 +437,10 @@ namespace GMGInventory.Application.Repositories
                                   Size = item.Size.Replace("\n", "").Replace("\r", "").Trim(),
                                   Unit = item.Unit.Name.Replace("\n", "").Replace("\r", "").Trim(),
                                   UnitId = item.UnitId,
-                                  QuantityD = inventory == null ? null : inventory.Quantity,
+                                  QuantityD = inventory.Quantity == null ? 0 : inventory.Quantity,
                                   RetailPriceD = price == null ? null : price.RetailSellingPrice,
                                   NetPriceD = price == null ? null : price.NetSellingPrice,
-                                  Warehouse = inventory == null ? null : inventory.Warehouse.Name,
+                                  Warehouse = inventory.WarehouseName == null ? "N/A" : inventory.WarehouseName ,
                                   WarehouseId = inventory == null ? null : inventory.WarehouseId,
                                   IsActive = item.IsActive,
                                   Image = item.Image
@@ -1034,6 +1046,7 @@ namespace GMGInventory.Application.Repositories
         {
             var inventoryVM = from inv in context.ItemInventories
                               where inv.ItemId == id
+                              && inv.BinLocation !=null
                               select new ItemDetailWarehouseVM
                               {
                                   Code = inv.Warehouse.Code,
@@ -1042,8 +1055,7 @@ namespace GMGInventory.Application.Repositories
                                   QuantityD = inv.Quantity,
                                   AllocatedQuantityD = inv.AllocatedQuantity,
                                   WarehouseId = inv.Warehouse.Id,
-                                  LocationCodeId = inv.LocationCode == null ? null : inv.LocationCode.Id,
-                                  LocationCode = inv.LocationCode == null ? null : inv.LocationCode.Name
+                                  BinLocation = inv.BinLocation
                               };
             return await inventoryVM.ToListAsync();
         }
@@ -1969,6 +1981,27 @@ namespace GMGInventory.Application.Repositories
             if (value.Length <= maxLength) return value;
             messages?.Add($"{fieldName ?? "Field"} truncated");
             return value.Substring(0, maxLength);
+        }
+
+        public async Task<Select2Model<JsonItemOptionsModel>> GetBinLocations(string search, int page)
+        {
+            var items = from binsloc in context.ItemInventories
+                        join item in context.Items on binsloc.ItemId equals item.Id
+                        where item.Code == search
+                        orderby item.Code ascending
+                        select new JsonItemOptionsModel
+                        {
+                            Id = binsloc.Id.ToString(),
+                            Text = binsloc.BinLocation,
+                           
+                        };
+            var itemsFiltered = await items.ToListAsync();
+            return new Select2Model<JsonItemOptionsModel>
+            {
+                //incomplete_results = false,
+                items = itemsFiltered,
+                total_count = items.Count()
+            };
         }
     }
 }

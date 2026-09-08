@@ -81,16 +81,17 @@
                                     <th></th>
                                     <th>Package Number</th>
                                     <th>Package Type</th>
-                                    <th>Item Code</th>
+                                    <th>Item Code</th>                                 
                                     <th>Item Part Number</th>
                                     <th>Item Name</th>
+                                    <th>Bin Location</th>
                                     <th>Extended Price</th>
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="7" class="text-end">Total</th>
+                                    <th colspan="8" class="text-end">Total</th>
                                     <th class="total-quantity">0</th>
                                 </tr>
                             </tfoot>
@@ -192,6 +193,8 @@
         $("#pack-so-number").on("select2:select", function () {
             window.location = "@Url.Action("Create", "Pack", new { id = "" })/" + $("#pack-so-number").val() + "?page=Pack";
         });
+
+
 
         // Load Select2 Pack Type
         $.ajax({
@@ -362,6 +365,7 @@
                                 itemCode: row_data.itemCode,
                                 itemPartNumber: row_data.itemPartNumber,
                                 itemName: row_data.itemName,
+                                binLocation: "",
                                 quantity: quantityToPack,
                                 extendedPriceD: row_data.grossPriceD
                             };
@@ -423,6 +427,37 @@
             }
         });
 
+        function initBinLocationSelect2($select, itemCode) {
+            if ($select.hasClass("select2-hidden-accessible")) {
+                return; // already initialized
+            }
+
+            $select.select2({
+                placeholder: 'Select Bin Location',
+                allowClear: true,
+                width: '100%',
+                ajax: {
+                    url: '@Url.Action("GetBinLocation", "Item")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            search: itemCode
+                        };
+                    },
+                    processResults: function(data, params) {
+                        params.search = params.search;
+                        return {
+                            results: data.items, // adjust to match your controller's JSON shape
+                            pagination: { more: data.more }
+                        };
+                    },
+                    cache: true
+                }
+            });
+        }
+
+
         var itemDT = $('.table-item').DataTable({
             data: [],
             filter: true,
@@ -446,6 +481,13 @@
                 { data: "itemCode", name: "ItemCode" },
                 { data: "itemPartNumber", name: "ItemPartNumber" },
                 { data: "itemName", name: "ItemName" },
+                {
+                    data: function(data, type, dataToSet) {
+                        return '<select class="form-control form-control-sm binlocation" name="BinLocation" style="width: 100%"></select>';
+                    },
+                    name: "Bin Location",
+                    className: "form-cell text-end"
+                },
                 { data: "extendedPriceD", name: "ExtendedPriceD" },
                 {data: function (data, type, dataToSet) {
                        
@@ -466,12 +508,12 @@
             rowGroup: {
                 startRender: function (rows, group) {
                     return $('<tr/>')
-                        .append('<td colspan="6"><strong>Package ' + group + '</strong></td>');
+                        .append('<td colspan="7"><strong>Package ' + group + '</strong></td>');
                 },
                 endRender: function (rows, group) {
                     return $('<tr/>')
                         .append('<td></td>')
-                        .append('<td colspan="4" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
+                        .append('<td colspan="5" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
                 dataSrc: function (row) {
@@ -607,6 +649,31 @@
                 
 
             });
+
+            $(".binlocation").each(function() {
+                var $select = $(this);
+                var rowData = itemDT.row($select.closest("tr")).data();
+                if (rowData) {
+                    initBinLocationSelect2($select, rowData.itemCode);
+
+                    // restore previously selected bin location after a redraw
+                    if (rowData.binLocation) {
+                        var $option = new Option(rowData.binLocationText || rowData.binLocation, rowData.binLocation, true, true);
+                        $select.append($option).trigger('change');
+                    }
+                }
+            });
+
+            $(".binlocation").off("select2:select select2:clear").on("select2:select select2:clear", function(e) {
+                var $row = $(this).closest("tr");
+                var rowdata = itemDT.row($row).data();
+                if (!rowdata) return;
+
+                var selected = $(this).select2("data")[0];
+
+                rowdata.binLocation = $(this).val() || "";
+                rowdata.binLocationText = selected ? selected.text : "";
+            });
         });
 
         $(".createBtn").on("click", function() {
@@ -702,6 +769,7 @@
                     boxNumber: row_data.boxNumber,
                     packTypeId: row_data.packType,
                     itemId: row_data.itemId,
+                    binLocation: row_data.binLocationText,
                     quantity: row_data.quantity,
                     extendedPriceD: row_data.extendedPriceD
                 });
@@ -720,6 +788,18 @@
                 //    toastr.warning("Some items have exceeded the served quantity. Please update the served quantity on sales order", "Warning");
             } else if (itemsToPack.filter(s => parseInt(s.quantity) === 0).length > 0) {
                 toastr.warning("Some items have 0 quantity. Can't pack an item with 0 quantity", "Warning");
+            } else if (itemsToPack.filter(s => !s.binLocation).length > 0) {
+                toastr.warning("Some items are missing a bin location. Please select one for each item", "Warning");
+
+                itemDT.rows().every(function() {
+                    var row_data = this.data();
+                    var $select = $(this.node()).find(".binlocation");
+                    if (!row_data.binLocation) {
+                        $select.next(".select2-container").find(".select2-selection").addClass("border-danger");
+                    } else {
+                        $select.next(".select2-container").find(".select2-selection").removeClass("border-danger");
+                    }
+                });
             } else {
                 $.ajax({
                     type: "POST",

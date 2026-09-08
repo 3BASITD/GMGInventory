@@ -225,7 +225,7 @@ namespace GMGInventory.Application.Repositories
                         where ((dt != null && pack.PackDate.Date == dt.Value.Date)
                         || (dt == null && (pack.BarcotechRequestDate == null
                         || pack.BarcotechRequestDate > dtYesterday)))
-                     && pack.Status.Code.Trim().ToLower() == "posted"
+                             && pack.Status.Code.Trim().ToLower() == "posted"
                         select new APIPack
                         {
                             Id = pack.Id,
@@ -243,7 +243,11 @@ namespace GMGInventory.Application.Repositories
                                             BoxNumber = item.BoxNumber,
                                             ItemId = item.Item.Id,
                                             ItemCode = item.Item.Code,
-                                            Quantity = item.Quantity
+                                            Quantity = item.Quantity,
+                                            BinLocation = item.BinLocation != null ? item.BinLocation : item.Item.ItemInventories
+                                                          .Where(inv => inv.WarehouseId == pack.WarehouseId && inv.BinLocation != null)
+                                                          .Select(inv => inv.BinLocation)
+                                                          .FirstOrDefault()
                                         }
                         };
             var resultPacks = await packs.ToListAsync();
@@ -422,8 +426,11 @@ namespace GMGInventory.Application.Repositories
                     continue;
                 }
 
-                var sinv = context.ItemInventories.Where(s => s.Warehouse.IsMain == true && s.ItemId == sitem.Id).FirstOrDefault();
-                if (sinv == null || sinv.Quantity < item.Quantity)
+                int qty = 0;
+                var sinv = context.ItemInventories.Where(s => s.ItemId == sitem.Id && s.Warehouse.IsMain == true).Sum(s => (int?)s.Quantity);
+
+                qty = sinv ?? 0;
+                if (qty == 0 || qty < item.Quantity)
                 {
                     var tempId = item.ItemId?.ToString();
                     invalids.Add($"Insufficient Quantity on Stock: {item.Quantity} of {(tempId ?? item.ItemCode ?? item.ItemName)}");
@@ -482,7 +489,8 @@ namespace GMGInventory.Application.Repositories
                     PackId = pack.Id,
                     PackTypeId = item.PackTypeId!.Value,
                     Quantity = item.Quantity,
-                    GrossPriceD = item.ExtendedPriceD
+                    GrossPriceD = item.ExtendedPriceD,
+                    BinLocation = item.BinLocation
 
                 };
                 await context.PackLineItems.AddAsync(packItem);

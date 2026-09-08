@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GMGInventory.Data
 {
@@ -21,6 +22,9 @@ namespace GMGInventory.Data
 
         public string? BarcotechOutboundId { get; set; }
         public decimal GrossPriceD { get; set; }
+
+        [StringLength(50)]
+        public string? BinLocation { get; set; }
 
     }
 }
