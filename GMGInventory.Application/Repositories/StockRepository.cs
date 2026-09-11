@@ -25,7 +25,6 @@ namespace GMGInventory.Application.Repositories
         private async Task<IList<StockVM>> GetStocks()
         {
             var stocks = from stock in context.ItemInventories
-                         where stock.BinLocation != null
                          select new StockVM
                          {
                              ItemId = stock.Item.Id,

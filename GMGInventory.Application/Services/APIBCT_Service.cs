@@ -34,6 +34,269 @@ namespace GMGInventory.Application.Services
             this.currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
         }
 
+        //public async Task<IList<BarcotechStockSyncVM>> SyncStock(int? ItemId)
+        //{
+        //    try
+        //    {
+        //        var url = await context.SystemSettings.Where(s => s.Name == "BarcotechURLStock").Select(s => s.Value).FirstOrDefaultAsync();
+        //        if (url == null)
+        //        {
+        //            var msg = "API URL for Stock not set";
+        //            await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+        //            return new List<BarcotechStockSyncVM> {
+        //                new BarcotechStockSyncVM {
+        //                    Item = "ERR",
+        //                    Warehouse = "ERR",
+        //                    OldQuantity = 0,
+        //                    NewQuantity = 0,
+        //                    OldAllocatedQuantity = 0,
+        //                    NewAllocatedQuantity = 0,
+        //                    Remarks = msg
+        //                }
+        //            };
+        //        }
+
+        //        if (ItemId != null)
+        //        {
+        //            var item = await context.Items
+        //                                    .Where(s => s.Id == ItemId)
+        //                                    .FirstOrDefaultAsync();
+        //            if (item == null)
+        //            {
+        //                var msg = "Invalid item, record cannot be found";
+        //                await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+        //                return new List<BarcotechStockSyncVM> { 
+        //                    new BarcotechStockSyncVM {
+        //                        Item = "ERR",
+        //                        Warehouse = "ERR",
+        //                        OldQuantity = 0,
+        //                        NewQuantity = 0,
+        //                        OldAllocatedQuantity = 0,
+        //                        NewAllocatedQuantity = 0,
+        //                        Remarks = msg
+        //                    } 
+        //                };
+        //            }
+        //            url += "?item_code=" + item.Code;
+        //        }
+
+        //        var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+        //        var response = await client.SendAsync(request);
+        //        response.EnsureSuccessStatusCode();
+        //        var json = await response.Content.ReadAsStringAsync();
+
+        //        //var jsonr = JsonSerializer.Deserialize<APIBCT_Stock>(json)!;
+
+        //        var root = JsonNode.Parse(json);
+        //        var dataNode = root?["data"];
+
+        //        var stocks = new List<APIBCT_Stock>();
+        //        switch (dataNode)
+        //        {
+        //            case JsonObject dataObj:
+        //                stocks = dataObj.SelectMany(x => x.Value?["items"]?.Deserialize<List<APIBCT_Stock>>() ?? Enumerable.Empty<APIBCT_Stock>()).ToList();
+        //                break;
+
+        //            case JsonArray dataArray:
+        //                stocks = dataArray.Deserialize<List<APIBCT_Stock>>() ?? new List<APIBCT_Stock>();
+        //                break;
+        //        }
+
+        //        if (ItemId != null && stocks.Count == 0)
+        //        {
+        //            var msg = "Invalid item, no stock record from WMS";
+        //            await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+        //            return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
+        //                Item = "ERR",
+        //                Warehouse = "ERR",
+        //                OldQuantity = 0,
+        //                NewQuantity = 0,
+        //                OldAllocatedQuantity = 0,
+        //                NewAllocatedQuantity = 0,
+        //                Remarks = msg
+        //            } };
+        //        }
+
+        //        if (stocks.Count == 0)
+        //        {
+        //            var msg = "No new stock update";
+        //            return new List<BarcotechStockSyncVM> { new BarcotechStockSyncVM {
+        //                Item = "NUL",
+        //                Warehouse = "NUL",
+        //                OldQuantity = 0,
+        //                NewQuantity = 0,
+        //                OldAllocatedQuantity = 0,
+        //                NewAllocatedQuantity = 0,
+        //                Remarks = msg
+        //            } };
+        //        }
+
+        //        var stockChanges = new List<BarcotechStockSyncVM>();
+        //        foreach (var stock in stocks)
+        //        {
+
+        //            var item = await context.Items.Where(s => s.Code.Trim().ToLower() == stock.item_code.ToLower()).FirstOrDefaultAsync();
+        //            if (item == null)
+        //            {
+        //                var msg = $"Invalid Item: {stock.item_code} not found";
+        //                await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+        //                stockChanges.Add(new BarcotechStockSyncVM
+        //                {
+        //                    Item = stock.item_code,
+        //                    Warehouse = stock.warehouse_id,
+        //                    OldQuantity = 0,
+        //                    NewQuantity = 0,
+        //                    OldAllocatedQuantity = 0,
+        //                    NewAllocatedQuantity = 0,
+        //                    Remarks = msg
+        //                });
+        //            }
+        //            else
+        //            {
+        //                var warehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == stock.warehouse_id.ToLower()).FirstOrDefaultAsync();
+        //                if (warehouse == null)
+        //                {
+        //                    var msg = $"Invalid Warehouse: {stock.warehouse_id} not found";
+        //                    await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+        //                    stockChanges.Add(new BarcotechStockSyncVM
+        //                    {
+        //                        Item = stock.item_code,
+        //                        Warehouse = stock.warehouse_id,
+        //                        OldQuantity = 0,
+        //                        NewQuantity = 0,
+        //                        OldAllocatedQuantity = 0,
+        //                        NewAllocatedQuantity = 0,
+        //                        Remarks = msg
+        //                    });
+        //                }
+        //                else
+        //                {
+        //                    var quantity = stock.stock;
+        //                    var allocatedQuantity = stock.total_allocated_qty;
+
+        //                    var itemInventory = await context.ItemInventories
+        //                                                     .Where(s => s.ItemId == item.Id
+        //                                                              && s.WarehouseId == warehouse.Id
+        //                                                              && s.BinLocation != null
+        //                                                              && s.BinLocation.Trim().ToLower() == stock.bin_location.ToLower()
+        //                                                              )
+        //                                                     .FirstOrDefaultAsync();
+        //                    if (itemInventory == null)
+        //                    {
+        //                        itemInventory = new ItemInventory
+        //                        {
+        //                            ItemId = item.Id,
+        //                            WarehouseId = warehouse.Id,
+        //                            Quantity = quantity,
+        //                            AllocatedQuantity = allocatedQuantity,
+        //                            BinLocation = stock.bin_location
+        //                        };
+        //                        await context.ItemInventories.AddAsync(itemInventory);
+        //                        await context.SaveChangesAsync(currentUserId);
+
+        //                        var countHistory = new PhysicalCountHistory
+        //                        {
+        //                            ItemId = item.Id,
+        //                            QuantityFrom = 0,
+        //                            QuantityTo = quantity,
+        //                            Remarks = "Fetched from Barcotech",
+        //                            WarehouseId = warehouse.Id
+        //                        };
+        //                        context.PhysicalCountHistories.Add(countHistory);
+        //                        await context.SaveChangesAsync(currentUserId);
+
+        //                        await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Manual Fetched for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+        //                        stockChanges.Add(new BarcotechStockSyncVM
+        //                        {
+        //                            Item = stock.item_code,
+        //                            Warehouse = stock.warehouse_id,
+        //                            OldQuantity = 0,
+        //                            NewQuantity = quantity,
+        //                            OldAllocatedQuantity = 0,
+        //                            NewAllocatedQuantity = allocatedQuantity,
+        //                            Remarks = "Added new stock"
+        //                        });
+        //                    }
+        //                    else if (itemInventory.Quantity != quantity || itemInventory.AllocatedQuantity != allocatedQuantity || itemInventory.BinLocation == null || itemInventory.BinLocation != null)
+        //                    {
+
+        //                        var oldQuantity = itemInventory.Quantity;
+        //                        var oldAllocatedQuantity = itemInventory.AllocatedQuantity;
+
+
+        //                        itemInventory.BinLocation = stock.bin_location;
+        //                        itemInventory.Quantity = quantity;
+        //                        itemInventory.AllocatedQuantity = allocatedQuantity;
+        //                        context.ItemInventories.Update(itemInventory);
+        //                        await context.SaveChangesAsync(currentUserId);
+
+        //                        var countHistory = new PhysicalCountHistory
+        //                        {
+        //                            ItemId = item.Id,
+        //                            QuantityFrom = oldQuantity,
+        //                            QuantityTo = quantity,
+        //                            Remarks = "Fetched Stock from Barcotech",
+        //                            WarehouseId = warehouse.Id
+        //                        };
+        //                        context.PhysicalCountHistories.Add(countHistory);
+        //                        await context.SaveChangesAsync(currentUserId);
+
+        //                        await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Manual Fetch for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
+        //                        stockChanges.Add(new BarcotechStockSyncVM
+        //                        {
+        //                            Item = stock.item_code,
+        //                            Warehouse = stock.warehouse_id,
+        //                            OldQuantity = oldQuantity,
+        //                            NewQuantity = quantity,
+        //                            OldAllocatedQuantity = oldAllocatedQuantity,
+        //                            NewAllocatedQuantity = allocatedQuantity,
+        //                            Remarks = "Updated old stock"
+        //                        });
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        return stockChanges;
+        //    }
+        //    catch (HttpRequestException ex)
+        //    {
+        //        var msg = "Unable to connect to Barcotech server";
+
+        //        await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+
+        //        return new List<BarcotechStockSyncVM>
+        //        {
+        //            new BarcotechStockSyncVM
+        //            {
+        //                Item = "ERR",
+        //                Warehouse = "ERR",
+        //                OldQuantity = 0,
+        //                NewQuantity = 0,
+        //                Remarks = msg + ": " + ex.Message
+        //            }
+        //        };
+        //    }
+        //    catch (TaskCanceledException)
+        //    {
+        //        var msg = "Connection timeout while connecting to Barcotech server";
+
+        //        await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
+
+        //        return new List<BarcotechStockSyncVM>
+        //        {
+        //            new BarcotechStockSyncVM
+        //            {
+        //                Item = "ERR",
+        //                Warehouse = "ERR",
+        //                OldQuantity = 0,
+        //                NewQuantity = 0,
+        //                Remarks = msg
+        //            }
+        //        };
+        //    }
+        //}
         public async Task<IList<BarcotechStockSyncVM>> SyncStock(int? ItemId)
         {
             try
@@ -65,7 +328,7 @@ namespace GMGInventory.Application.Services
                     {
                         var msg = "Invalid item, record cannot be found";
                         await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
-                        return new List<BarcotechStockSyncVM> { 
+                        return new List<BarcotechStockSyncVM> {
                             new BarcotechStockSyncVM {
                                 Item = "ERR",
                                 Warehouse = "ERR",
@@ -74,7 +337,7 @@ namespace GMGInventory.Application.Services
                                 OldAllocatedQuantity = 0,
                                 NewAllocatedQuantity = 0,
                                 Remarks = msg
-                            } 
+                            }
                         };
                     }
                     url += "?item_code=" + item.Code;
@@ -132,57 +395,82 @@ namespace GMGInventory.Application.Services
                     } };
                 }
 
-                var stockChanges = new List<BarcotechStockSyncVM>();
-                foreach (var stock in stocks)
-                {
+                var itemCodes = stocks.Select(s => s.item_code.Trim().ToLower()).Distinct().ToList();
+                var warehouseCodes = stocks.Select(s => s.warehouse_id.Trim().ToLower()).Distinct().ToList();
 
-                    var item = await context.Items.Where(s => s.Code.Trim().ToLower() == stock.item_code.ToLower()).FirstOrDefaultAsync();
-                    if (item == null)
+                var itemLookup = (await context.Items
+                        .Where(i => itemCodes.Contains(i.Code.Trim().ToLower()))
+                        .ToListAsync())
+                    .ToDictionary(i => i.Code.Trim().ToLower(), i => i);
+
+                var warehouseLookup = (await context.Warehouses
+                        .Where(w => warehouseCodes.Contains(w.Code.Trim().ToLower()))
+                        .ToListAsync())
+                    .ToDictionary(w => w.Code.Trim().ToLower(), w => w);
+
+                var itemIds = itemLookup.Values.Select(i => i.Id).ToList();
+                var warehouseIds = warehouseLookup.Values.Select(w => w.Id).ToList();
+
+                var inventoryLookup = (await context.ItemInventories
+                        .Where(inv => itemIds.Contains(inv.ItemId) && warehouseIds.Contains(inv.WarehouseId))
+                        .ToListAsync())
+                    .ToDictionary(inv => $"{inv.ItemId}|{inv.WarehouseId}|{(inv.BinLocation ?? "").Trim().ToLower()}", inv => inv);
+
+                var stockChanges = new List<BarcotechStockSyncVM>();
+                const int batchSize = 1000;
+                var addedCount = 0;
+                var updatedCount = 0;
+
+                foreach (var batch in stocks.Chunk(batchSize))
+                {
+                    var strategy = context.Database.CreateExecutionStrategy();
+                    var batchResults = await strategy.ExecuteAsync(async () =>
                     {
-                        var msg = $"Invalid Item: {stock.item_code} not found";
-                        await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
-                        stockChanges.Add(new BarcotechStockSyncVM
+                        var results = new List<BarcotechStockSyncVM>();
+                        using var tx = await context.Database.BeginTransactionAsync();
+
+                        foreach (var stock in batch)
                         {
-                            Item = stock.item_code,
-                            Warehouse = stock.warehouse_id,
-                            OldQuantity = 0,
-                            NewQuantity = 0,
-                            OldAllocatedQuantity = 0,
-                            NewAllocatedQuantity = 0,
-                            Remarks = msg
-                        });
-                    }
-                    else
-                    {
-                        var warehouse = await context.Warehouses.Where(s => s.Code.Trim().ToLower() == stock.warehouse_id.ToLower()).FirstOrDefaultAsync();
-                        if (warehouse == null)
-                        {
-                            var msg = $"Invalid Warehouse: {stock.warehouse_id} not found";
-                            await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Error", msg);
-                            stockChanges.Add(new BarcotechStockSyncVM
+                            var itemCode = stock.item_code.Trim().ToLower();
+                            var warehouseCode = stock.warehouse_id.Trim().ToLower();
+
+                            if (!itemLookup.TryGetValue(itemCode, out var item))
                             {
-                                Item = stock.item_code,
-                                Warehouse = stock.warehouse_id,
-                                OldQuantity = 0,
-                                NewQuantity = 0,
-                                OldAllocatedQuantity = 0,
-                                NewAllocatedQuantity = 0,
-                                Remarks = msg
-                            });
-                        }
-                        else
-                        {
+                                var msg = $"Invalid Item: {stock.item_code} not found";
+                                results.Add(new BarcotechStockSyncVM
+                                {
+                                    Item = stock.item_code,
+                                    Warehouse = stock.warehouse_id,
+                                    OldQuantity = 0,
+                                    NewQuantity = 0,
+                                    OldAllocatedQuantity = 0,
+                                    NewAllocatedQuantity = 0,
+                                    Remarks = msg
+                                });
+                                continue;
+                            }
+
+                            if (!warehouseLookup.TryGetValue(warehouseCode, out var warehouse))
+                            {
+                                var msg = $"Invalid Warehouse: {stock.warehouse_id} not found";
+                                results.Add(new BarcotechStockSyncVM
+                                {
+                                    Item = stock.item_code,
+                                    Warehouse = stock.warehouse_id,
+                                    OldQuantity = 0,
+                                    NewQuantity = 0,
+                                    OldAllocatedQuantity = 0,
+                                    NewAllocatedQuantity = 0,
+                                    Remarks = msg
+                                });
+                                continue;
+                            }
+
                             var quantity = stock.stock;
                             var allocatedQuantity = stock.total_allocated_qty;
+                            var binKey = $"{item.Id}|{warehouse.Id}|{(stock.bin_location ?? "").Trim().ToLower()}";
 
-                            var itemInventory = await context.ItemInventories
-                                                             .Where(s => s.ItemId == item.Id
-                                                                      && s.WarehouseId == warehouse.Id
-                                                                      && s.BinLocation != null
-                                                                      && s.BinLocation.Trim().ToLower() == stock.bin_location.ToLower()
-                                                                      )
-                                                             .FirstOrDefaultAsync();
-                            if (itemInventory == null)
+                            if (!inventoryLookup.TryGetValue(binKey, out var itemInventory))
                             {
                                 itemInventory = new ItemInventory
                                 {
@@ -192,22 +480,20 @@ namespace GMGInventory.Application.Services
                                     AllocatedQuantity = allocatedQuantity,
                                     BinLocation = stock.bin_location
                                 };
-                                await context.ItemInventories.AddAsync(itemInventory);
-                                await context.SaveChangesAsync(currentUserId);
+                                context.ItemInventories.Add(itemInventory);
+                                inventoryLookup[binKey] = itemInventory;
 
-                                var countHistory = new PhysicalCountHistory
+                                context.PhysicalCountHistories.Add(new PhysicalCountHistory
                                 {
                                     ItemId = item.Id,
                                     QuantityFrom = 0,
                                     QuantityTo = quantity,
                                     Remarks = "Fetched from Barcotech",
                                     WarehouseId = warehouse.Id
-                                };
-                                context.PhysicalCountHistories.Add(countHistory);
-                                await context.SaveChangesAsync(currentUserId);
+                                });
 
-                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Manual Fetched for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
-                                stockChanges.Add(new BarcotechStockSyncVM
+                                addedCount++;
+                                results.Add(new BarcotechStockSyncVM
                                 {
                                     Item = stock.item_code,
                                     Warehouse = stock.warehouse_id,
@@ -218,32 +504,28 @@ namespace GMGInventory.Application.Services
                                     Remarks = "Added new stock"
                                 });
                             }
-                            else if (itemInventory.Quantity != quantity || itemInventory.AllocatedQuantity != allocatedQuantity || itemInventory.BinLocation == null || itemInventory.BinLocation != null)
+                            else if (itemInventory.Quantity != quantity
+                                   || itemInventory.AllocatedQuantity != allocatedQuantity
+                                   || (itemInventory.BinLocation ?? "").Trim().ToLower() != (stock.bin_location ?? "").Trim().ToLower())
                             {
-
                                 var oldQuantity = itemInventory.Quantity;
                                 var oldAllocatedQuantity = itemInventory.AllocatedQuantity;
-
 
                                 itemInventory.BinLocation = stock.bin_location;
                                 itemInventory.Quantity = quantity;
                                 itemInventory.AllocatedQuantity = allocatedQuantity;
-                                context.ItemInventories.Update(itemInventory);
-                                await context.SaveChangesAsync(currentUserId);
 
-                                var countHistory = new PhysicalCountHistory
+                                context.PhysicalCountHistories.Add(new PhysicalCountHistory
                                 {
                                     ItemId = item.Id,
                                     QuantityFrom = oldQuantity,
                                     QuantityTo = quantity,
                                     Remarks = "Fetched Stock from Barcotech",
                                     WarehouseId = warehouse.Id
-                                };
-                                context.PhysicalCountHistories.Add(countHistory);
-                                await context.SaveChangesAsync(currentUserId);
+                                });
 
-                                await SaveSyncStatus("Stock", itemInventory.Id.ToString(), "Success", $"Manual Fetch for <a href='Item/Details/{item.Id}'>{item.Code}</a>");
-                                stockChanges.Add(new BarcotechStockSyncVM
+                                updatedCount++;
+                                results.Add(new BarcotechStockSyncVM
                                 {
                                     Item = stock.item_code,
                                     Warehouse = stock.warehouse_id,
@@ -254,9 +536,21 @@ namespace GMGInventory.Application.Services
                                     Remarks = "Updated old stock"
                                 });
                             }
+                            // else: no meaningful change — skip write entirely
                         }
-                    }
+
+                        await context.SaveChangesAsync(currentUserId);
+                        await tx.CommitAsync();
+                        return results;
+                    });
+
+                    stockChanges.AddRange(batchResults);
+                    context.ChangeTracker.Clear();
                 }
+
+                await SaveSyncStatus("Stock", (ItemId ?? int.MinValue).ToString(), "Success",
+                    $"Synced {stockChanges.Count} records ({addedCount} added, {updatedCount} updated)");
+
 
                 return stockChanges;
             }
