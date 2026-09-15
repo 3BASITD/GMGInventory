@@ -512,7 +512,8 @@ namespace GMGInventory.Application.Repositories
                                              ItemId = item.RequestItem.ItemId != null
                                                     ? item.RequestItem.Item.Id
                                                     : -1,
-                                             Quantity = item.Quantity
+                                             Quantity = item.Quantity,
+                                             PurchaseRequestNumber = item.RequestItem.PurchaseRequest.DocumentNumber
                                          }
                          };
             var resultOrders = await orders.ToListAsync();
