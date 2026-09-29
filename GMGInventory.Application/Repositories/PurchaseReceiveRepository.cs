@@ -632,7 +632,7 @@ namespace GMGInventory.Application.Repositories
                                 if (itemInventory != null)
                                 {
                                     itemInventory.Quantity += receiving.Quantity;
-                                    //context.ItemInventories.Update(itemInventory);
+                                    itemInventory.BinLocation = itemInventory.BinLocation ?? "TEMP-001";
                                 }
                                 else
                                 {
@@ -640,7 +640,8 @@ namespace GMGInventory.Application.Repositories
                                     {
                                         ItemId = itemId ?? 0,
                                         Quantity = receiving.Quantity,
-                                        WarehouseId = warehouseId
+                                        WarehouseId = warehouseId,
+                                        BinLocation = "TEMP-001"
                                     };
 
 

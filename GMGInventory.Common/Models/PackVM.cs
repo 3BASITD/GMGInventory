@@ -135,6 +135,8 @@ namespace GMGInventory.Common.Models
         public string ExtendedPrice2  { get; set; }
         public decimal ExtendedPriceD2 { get; set; }
         public int SalesOrderLineItemId { get; set; }
+
+        public bool? IsPromo { get; set; }
     }
 
     public class PackFormVM : PackFormAPIVM
@@ -161,6 +163,7 @@ namespace GMGInventory.Common.Models
         public string? PackTypeName { get; set; }
         public decimal ExtendedPriceD { get; set; }
         public string? BinLocation { get; set; }
+        public bool?  IsPromo { get; set; }
     }
 
     public class PackDetailsPVM

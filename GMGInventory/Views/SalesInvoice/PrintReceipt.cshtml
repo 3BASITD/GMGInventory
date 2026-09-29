@@ -16,7 +16,12 @@
     <style>
         * {
             font-size: 15px;
+
+
         }
+
+
+
     </style>
 </head>
 <body>
@@ -27,9 +32,12 @@
 
         var company = TempData["CompanyTemplate"]?.ToString() ?? "BAS";
         var topMargin = TempData["MarginTop"]?.ToString() ?? "24";
-        var itemHeight = company == "3BAS" ? "310" : "380";//280
-        var headerItemSpace = company == "3BAS" ? "80" : "40";//50
+        var itemHeight = company == "3BAS" ? "310" : "350";//280
+        var headerItemSpace = company == "3BAS" ? "5" : "0";//50
         var maxItems = company == "3BAS" ? 8 : 17;
+
+        var itemdetailsHeight = company == "3BAS" ? "0" : "65";
+       
 
         if (company == "3BAS") topMargin = "94";//124
 
@@ -56,16 +64,16 @@
                         <td style="width: 50px;"></td>
                         <td style="width: 125px;"></td>
                         <td></td>
-                        <td colspan="2">@Model.InvoiceDateD.ToString("MMMM dd, yyyy")</td>
+                        <td colspan="2" style="padding-top:@(company == "3BAS" ? 0 : 25)px !important">@Model.InvoiceDateD.ToString("MMMM dd, yyyy")</td>
                     </tr>
                     <tr>
                         <td colspan="4"></td>
-                        <td style="width: 100px;padding-top: 18px;">@Model.PaymentTerms</td>
+                        <td style="width: 100px;">@(company != "3BAS" ? Model.PaymentTerms : "")</td>
                     </tr>
                     <tr>
                         <td style="width: 50px;"></td>
                         <td style="width: 125px;"></td>
-                        <td colspan="2" style="padding: 3px;">@Model.CustomerName</td>
+                        <td colspan="2" style="padding-top: @(company == "3BAS" ? 0 : 5)px;">@Model.CustomerName</td>
                         <td style="width: 100px; padding-top: 4px;">@Model.Agent</td>
                     </tr>
                     <tr>
@@ -74,17 +82,43 @@
                         <td style="width: 100px; padding-top: 4px;">@Model.SONumber</td>
                     </tr>
                     <tr>
-                        <td style="width: 50px;"></td>
-                        <td style="width: 125px;"></td>
-                        <td colspan="3" style="padding-top: 4px;">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
+                        <td style="width: 50px;padding-left:70px;padding-top:10px"></td>
+                        <td style="width: 50px;padding-left: 100px"></td>
+                        <td style="width: 50px;padding-top:3px;">@(string.IsNullOrWhiteSpace(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
+                        <td></td>
                     </tr>
+                    <tr>
+                        <td style="width: 50px;"></td>
+                        <td style="width: 50px;padding-left: 100px;padding-top:5px;">@(company == "3BAS" ? Model.PaymentTerms : "")</td>
+                        <td style="width: 50px;"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50px;"></td>
+                        <td style="width: 50px;"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+@*                     <tr>
+                        <td style="width: 50px;padding-left: 100px;padding-top:15px;"></td>
+                        <td style="width: 50px;"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50px;"></td>
+                        
+                        <td></td>
+                    </tr> *@
+                    
+
                 </tbody>
             </table>
             <div style="height: @(itemHeight)px;">
                 <table style="margin-top: @(headerItemSpace)px;">
                     <tbody>
                         <tr>
-                            <td style="width: 90px;"></td>
+                            <td style="width: 90px;margin-left: 0px; "></td>
                             <td></td>
                             <td style="width: 75px;"></td>
                             <td style="width: 90px;"></td>
@@ -93,17 +127,21 @@
                         @{
                             int rowctr = 0, otherQuantity = 0;
                             decimal otherGrossPrice = 0;
+                            string promo = "Free";
                             @foreach (var item in Model.Items)
                             {
+                                if (item.Discount1D != 0 || item.Discount2D != 0) promo = "DSC";
                                 rowctr++;
                                 if (rowctr < maxItems || Model.Items.Count == maxItems)
                                 {
+
                                     <tr>
-                                        <td class="auto-font-size" style="width: 90px; padding-right: 5px;">@item.PartNumber</td>
-                                        <td class="auto-font-size" style="padding-right: 10px;">@item.ItemName</td>
-                                        <td style="width: 75px;">@item.Quantity @item.Unit</td>
-                                        <td style="width: 90px;" class="currency">@item.NetPrice</td>
+                                        <td class="auto-font-size" style="width: 60px;margin-left:0px !important">@item.PartNumber</td>
+                                        <td class="auto-font-size" style="padding-left: 0px;width: 75px;">@item.ItemName</td>
+                                        <td style="width: 75px;">@item.Quantity @item.Unit </td>
+                                        <td style="width: 90px;" class="currency">@(item.IsPromo == true ? promo : item.NetPrice)</td>
                                         <td style="width: 115px;" class="currency">@item.GrossPriceNoDiscount</td>
+
                                     </tr>
                                 }
                                 else
@@ -137,49 +175,61 @@
                     </tbody>
                 </table>
             </div>
-            <table>
-                <tbody>
+            <table style="margin-top:@(itemdetailsHeight)px">
+                <tbody >
                     <tr>
-                        <td colspan="5" class="currency">Total:</td>
+                        <td colspan="4" class="currency">Total:</td>
                         <td style="width: 115px;" class="currency">@Model.Total</td>
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency">LESS @Model.DiscountPercent:</td>
-                        <td style="width: 115px;" class="currency">@Model.DiscountAmount</td>
+                        <!--<td colspan="5" class="currency">LESS @Model.DiscountPercent:</td> -->
+                        <!--<td style="width: 115px;" class="currency">@Model.DiscountAmount</td>-->
+                        <td colspan="4" class="currency"></td>
+                        <td style="width: 115px;" class="currency">@Model.LessVat</td> <!-- Less VAT -->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency"></td>
-                        <td style="width: 115px;" class="currency">@Model.DiscountedTotal</td> <!-- Total Sales(VAT Inclusive) -->
+                        <td colspan="4" class="currency"></td>
+                        <td style="width: 115px;" class="currency">@Model.AmountNetVat</td> <!--Amount Net Vat-->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency"></td>
-                        <td style="width: 115px;" class="currency">@Model.VATExclusive</td> <!--Less: VAT -->
+                        <td colspan="4" class="currency">@(@Model.DiscountPercentD == 0 ? "" : "DSC")</td>
+                        <td style="width: 115px;" class="currency">@Model.DiscountAmount</td>  <!--Discounted Amount-->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency"></td>
-                        <td style="width: 115px;" class="currency"></td> <!-- Amount: Net of VAT -->
+                        <td colspan="4" class="currency"></td>
+                        <td style="width: 115px;" class="currency">@Model.WithHoldingTaxD</td> <!-- Withholding Tax -->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency"></td>
+                        <td colspan="4" class="currency"></td>
+                        <td style="width: 115px;" class="currency">@Model.AddVatD</td> <!-- Added Vat -->
+                        <td style="width: 10px;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="currency"></td>
+                        <td style="width: 115px;" class="currency">@Model.TotalAmoutDueD</td> <!-- Total Amount Due -->
+                        <td style="width: 10px;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="currency"></td>
                         <td style="width: 115px;" class="currency"></td> <!-- Less: Discount -->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency"></td>
+                        <td colspan="4" class="currency"></td>
                         <td style="width: 115px;" class="currency"></td> <!-- SC/PWD/... -->
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="currency"></td>
+                        <td colspan="4" class="currency"></td>
                         <td style="width: 115px;" class="currency"></td> <!-- Less Withholding Tax -->
                         <td style="width: 10px;"></td>
                     </tr>
-                    <tr>
+                   @*  <tr>
                         <td colspan="5" class="currency"></td>
                         <td style="width: 115px;" class="currency">@Model.VATAmount</td> <!-- Add: VAT -->
                         <td style="width: 10px;"></td>
@@ -188,7 +238,7 @@
                         <td colspan="5" class="currency"></td>
                         <td style="width: 115px;" class="currency">@Model.DiscountedTotal</td> <!-- TOTAL AMOUNT DUE -->
                         <td style="width: 10px;"></td>
-                    </tr>
+                    </tr> *@
                 </tbody>
             </table>
         </div>
@@ -197,19 +247,19 @@
     {
         <!-- DELIVERY RECEIPT -->
         <span style="font-size: 20px;">@Model.SONumber</span>
-        <table class="for-dr" style="margin-top: 15px;">
+        <table class="for-dr" style="padding-top: 0px;">
             <tbody>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
                     <td class="auto-font-size">@Model.CustomerName</td>
                     <td style="width: 40px;"></td> <!-- INDENT -->
-                    <td style="width: 180px;">@Model.InvoiceDateD.ToString("MM/dd/yy")</td>
+                    <td style="width: 180px;padding-top:2px;">@Model.InvoiceDateD.ToString("MM/dd/yy")</td>
                 </tr>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
-                    <td class="auto-font-size">@(string.IsNullOrEmpty(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
+                    <td class="auto-font-size" style="padding-top: 0px;">@(string.IsNullOrEmpty(Model.CustomerAddress) ? "N/A" : Model.CustomerAddress)</td>
                     <td style="width: 40px;"></td> <!-- INDENT -->
-                    <td style="width: 180px;">@(string.IsNullOrWhiteSpace(Model.PaymentTerms) ? "N/A" : Model.PaymentTerms)</td>
+                    <td style="width: 180px;" style="padding-top: 0px;">@(string.IsNullOrWhiteSpace(Model.PaymentTerms) ? "N/A" : Model.PaymentTerms)</td>
                 </tr>
                 <tr>
                     <td style="width: 100px;"></td> <!-- INDENT -->
@@ -235,8 +285,12 @@
                     @{
                         int rowctr = 0, otherQuantity = 0;
                         decimal otherGrossPrice = 0;
+                        string promo = "Free";
                         @foreach (var item in Model.Items)
                         {
+                            if (item.Discount1D != 0 || item.Discount2D != 0) promo = "Discounted";
+                                
+
                             rowctr++;
                             if (rowctr < 12 || Model.Items.Count == 12)
                             {
@@ -245,8 +299,8 @@
                                     <td style="width: 40px;">@item.Unit</td>
                                     <td class="auto-font-size" style="width: 150px;">@item.PartNumber</td>
                                     <td class="auto-font-size" colspan="2">@item.ItemName</td>
-                                    <td style="width: 75px;" class="currency">@item.NetPrice</td>
-                                    <td style="width: 75px;" class="currency">@item.GrossPriceNoDiscount</td>
+                                    <td style="width: 75px;" class="currency">@(item.IsPromo == true ? promo : item.NetPrice)</td>
+                                    <td style="width: 75px;" class="currency"> @(item.IsPromo == true ? (promo == "Discounted" ? item.GrossPrice : "") : item.GrossPriceNoDiscount)</td>
                                 </tr>
                             }
                             else

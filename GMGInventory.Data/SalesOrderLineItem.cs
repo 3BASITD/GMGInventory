@@ -52,5 +52,7 @@ namespace GMGInventory.Data
         [ForeignKey("ItemPromoId")]
         public int? ItemPromoId { get; set; }
         public ItemPromo ItemPromo { get; set; }
+
+        public bool? IsPromo { get; set; }
     }
 }

@@ -267,11 +267,12 @@ namespace GMGInventory.Application.Repositories
         public async Task<IList<PackItemVM>> GetItemsAsync(int packId)
         {
             var itemVM = from pack in context.PackLineItems
-                                              .Include(s => s.Item)
-                         join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
-
+                                .Include(s => s.Item)
                          where pack.PackId == packId
-                         && pack.Item.Id == order.Item.Id
+                         let order = context.SalesOrderLineItems
+                             .Where(o => o.SalesOrder.Id == pack.Pack.SalesOrder.Id && o.Item.Id == pack.Item.Id)
+                             .OrderBy(o => o.Id) // pick a deterministic one - adjust as needed
+                             .FirstOrDefault()
                          orderby pack.BoxNumber ascending, pack.PackTypeId ascending
                          select new PackItemVM
                          {
@@ -287,7 +288,8 @@ namespace GMGInventory.Application.Repositories
                              SalesOrderLineItemId = order.Id,
                              Unit = pack.Item.Unit.Code,
                              ExtendedPrice2 = pack.GrossPriceD.ToString("N2"),
-                             ExtendedPriceD2 = Math.Round(pack.GrossPriceD, 2)
+                             ExtendedPriceD2 = Math.Round(pack.GrossPriceD, 2),
+                             IsPromo = pack.IsPromo
                          };
             return await itemVM.ToListAsync();
         }
@@ -309,6 +311,7 @@ namespace GMGInventory.Application.Repositories
                          where pack.PackId == packId
                          && pack.Item.Id == order.Item.Id
                          && invoicedQuantity < packedQuantity
+                          && pack.IsPromo == order.IsPromo
 
                          group new { pack, order, price } by new { pack.ItemId, order.Discount1, order.Discount2, order.SellingPrice } into grp
                          select new PackItemVM
@@ -320,7 +323,8 @@ namespace GMGInventory.Application.Repositories
                              ItemName = grp.First().pack.Item.Name + (grp.First().order.ItemPromo == null ? "" : " (" + grp.First().order.ItemPromo.Name + ")"),
                              Quantity = grp.Sum(s => s.pack.Quantity),
                              SellingPriceD = grp.First().order.SellingPrice,
-                             SellingPriceType = grp.First().price.RetailSellingPrice > grp.First().price.NetSellingPrice ? "Gross" : "Net"
+                             SellingPriceType = grp.First().price.RetailSellingPrice > grp.First().price.NetSellingPrice ? "Gross" : "Net",
+                             IsPromo = grp.First().pack.IsPromo
                          };
             return await itemVM.ToListAsync();
         }
@@ -490,7 +494,8 @@ namespace GMGInventory.Application.Repositories
                     PackTypeId = item.PackTypeId!.Value,
                     Quantity = item.Quantity,
                     GrossPriceD = item.ExtendedPriceD,
-                    BinLocation = item.BinLocation
+                    BinLocation = item.BinLocation,
+                    IsPromo = item.IsPromo
 
                 };
                 await context.PackLineItems.AddAsync(packItem);
@@ -498,7 +503,7 @@ namespace GMGInventory.Application.Repositories
 
                 if (form.SavingAs.ToLower() == "post")
                 {
-                    await AdjustingQuantity(item.ItemId!.Value, warehouseId, item.Quantity, "Pack Posted");
+                    await AdjustingQuantity(item.ItemId!.Value, warehouseId, item.Quantity, "Pack Posted", item.BinLocation!);
                 }
             }
 
@@ -570,14 +575,15 @@ namespace GMGInventory.Application.Repositories
                     ItemId = item.ItemId!.Value,
                     PackId = packVM.Id,
                     PackTypeId = item.PackTypeId!.Value,
-                    Quantity = item.Quantity
+                    Quantity = item.Quantity,
+                    IsPromo = item.IsPromo
                 };
                 await context.PackLineItems.AddAsync(packItem);
                 //await context.SaveChangesAsync(currentUserId);
 
                 if (form.SavingAs.ToLower() == "post")
                 {
-                    await AdjustingQuantity(item.ItemId!.Value, warehouseId, item.Quantity, "Pack Posted");
+                    await AdjustingQuantity(item.ItemId!.Value, warehouseId, item.Quantity, "Pack Posted", item.BinLocation!);
                 }
             }
 
@@ -585,11 +591,11 @@ namespace GMGInventory.Application.Repositories
             return packVM.Id;
         }
 
-        private async Task AdjustingQuantity(int ItemId, int WarehouseId, int Quantity, string Action)
+        private async Task AdjustingQuantity(int ItemId, int WarehouseId, int Quantity, string Action, string BinLocation)
         {
 
             var itemInventory = await context.ItemInventories
-                                             .Where(s => s.ItemId == ItemId && s.WarehouseId == WarehouseId)
+                                             .Where(s => s.ItemId == ItemId && s.WarehouseId == WarehouseId && s.BinLocation == BinLocation)
                                              .FirstOrDefaultAsync();
 
             if (itemInventory != null)
@@ -690,7 +696,7 @@ namespace GMGInventory.Application.Repositories
 
                     foreach (var item in packItems)
                     {
-                        await AdjustingQuantity(item.ItemId, warehouseId, item.Quantity * -1, "Pack Cancelled");
+                        await AdjustingQuantity(item.ItemId, warehouseId, item.Quantity * -1, "Pack Cancelled", item.BinLocation!);
                     }
 
                     return new ResponseModel { Status = "Success", Message = "Pack successfully cancelled" };

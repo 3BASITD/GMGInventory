@@ -10,4 +10,12 @@
         UploadDownload,
         Print
     }
+
+    public enum WareHouseName
+    { 
+        SEVERINO,
+        PASIG1,
+        PASIG2,
+        CETACIO
+    }
 }

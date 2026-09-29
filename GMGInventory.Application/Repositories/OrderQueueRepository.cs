@@ -1,4 +1,5 @@
 ﻿using GMGInventory.Application.Contracts;
+using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
 using GMGInventory.Data.OrderAppDB;
@@ -310,8 +311,30 @@ namespace GMGInventory.Application.Repositories
             }
             else
             {
+                var warehouse = context.Warehouses
+                                         .Where(s => s.IsMain == true).FirstOrDefault();
+
+                string startwith = "";
+                if (warehouse.Name == WareHouseName.PASIG1.ToString())
+                {
+                    startwith = "PSG1";
+                }
+                else if (warehouse.Name == WareHouseName.PASIG2.ToString())
+                {
+                    startwith = "PSG2";
+                }
+                else if (warehouse.Name == WareHouseName.CETACIO.ToString())
+                {
+                    startwith = "CT38";
+                }
+                else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
+                {
+                    startwith = "SEV";
+                }
+
+
                 var latestOrder = context.SalesOrders
-                                     .Where(s => s.SalesOrderNumber.StartsWith("SO")
+                                     .Where(s => s.SalesOrderNumber.StartsWith(startwith)
                                               && !s.SalesOrderNumber.Contains("-D"))
                                      .OrderByDescending(s => s.SalesOrderNumber)
                                      .Select(s => s.SalesOrderNumber)
@@ -329,8 +352,53 @@ namespace GMGInventory.Application.Repositories
                     latestOrder = splitLatestOrder[0];
                 }
 
-                var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
-                var soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+                int? latestOrderNumber = 0;
+
+                if (latestOrder != null)
+                {
+                    if (latestOrder.Contains("SO"))
+                    {
+                        latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
+                    }
+                    else if (latestOrder.Contains("PSG1"))
+                    {
+                        latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
+                    }
+                    else if (latestOrder.Contains("PSG2"))
+                    {
+                        latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
+                    }
+                    else if (latestOrder.Contains("CT38"))
+                    {
+                        latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
+                    }
+                    else if (latestOrder.Contains("SEV"))
+                    {
+                        latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
+                    }
+                }
+
+                string soNumber = "";
+
+                if (warehouse != null && latestOrder != null)
+                {
+                    if (warehouse.Name == WareHouseName.PASIG1.ToString())
+                    {
+                        soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
+                    }
+                    else if (warehouse.Name == WareHouseName.PASIG2.ToString())
+                    {
+                        soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
+                    }
+                    else if (warehouse.Name == WareHouseName.CETACIO.ToString())
+                    {
+                        soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 20);
+                    }
+                    else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
+                    {
+                        soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
+                    }
+                }
 
                 int statusId = context.Statuses
                                       .Where(s => s.Name.ToLower() == "sales order draft")

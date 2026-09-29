@@ -26,5 +26,7 @@ namespace GMGInventory.Data
         [StringLength(50)]
         public string? BinLocation { get; set; }
 
+        public bool? IsPromo { get; set; }
+
     }
 }

@@ -21,6 +21,7 @@ namespace GMGInventory.Data
         public decimal UnitPrice { get; set; }
 
         public int Quantity { get; set; }
+        public bool? IsPromo { get; set; }
 
         public ICollection<SalesReturnLineItem> SalesReturnLineItems { get; set; }
     }

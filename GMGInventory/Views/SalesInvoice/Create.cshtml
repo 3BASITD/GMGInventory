@@ -128,13 +128,14 @@
                                         <th>Discount 1</th>
                                         <th>Discount 2</th>
                                         <th>Extended Price</th>
+                                        <th>Promo</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
                                         <th class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
-                                        <th colspan="5"></th>
+                                        <th colspan="6"></th>
                                         <th class="total-extended">0.00</th>
                                     </tr>
                                 </tfoot>
@@ -172,6 +173,7 @@
                                     <th>Discount 1</th>
                                     <th>Discount 2</th>
                                     <th>Extended Price</th>
+                                    <th>Promo</th>
                                 </tr>
                             </thead>
                         </table>
@@ -271,7 +273,18 @@
                 { data: "grossPrice", name: "GrossPrice", className: "text-end" },
                 { data: "discount1", name: "Discount1", className: "text-end" },
                 { data: "discount2", name: "Discount2", className: "text-end" },
-                { data: "extendedPrice", name: "ExtendedPrice", className: "text-end" }
+                { data: "extendedPrice", name: "ExtendedPrice", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="checkbox" id="add-promo_' + data.lineNumber
+                            + '" name="add-promo" value="true" class="add-promo" onclick="return false;"'
+                            + (data.isPromo ? ' checked' : '')
+                            + ' />';
+                    },
+                    name: "Promo",
+                    className: "text-end"
+                }
+
             ],
             order: [[1, "asc"]]
         });
@@ -291,13 +304,15 @@
                     /*if (firstItem.sellingPriceType != rowdata.sellingPriceType || firstItem.discount1 != rowdata.discount1 || firstItem.discount2 != rowdata.discount2) {
                                 toastr.error("You can only add an item with the same data of the first added item. " + firstItem.sellingPriceType + " Selling Price, " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
                     }*/ 
-                        if (parseFloat(firstItem.discount1) != parseFloat(rowdata.discount1) || parseFloat(firstItem.discount2) != parseFloat(rowdata.discount2)) {
-                            toastr.error("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
-                        } else {
-                            itemDT.row.add(rowdata).draw();
+                        // if (parseFloat(firstItem.discount1) != parseFloat(rowdata.discount1) || parseFloat(firstItem.discount2) != parseFloat(rowdata.discount2)) {
+                        //     toastr.error("You can only add an item with the same data of the first added item. " + firstItem.discount1 + "% Discount 1, and " + firstItem.discount2 + "% Discount 2", "Error");
+                        // } else {
+                         
+                        // }
+
+                           itemDT.row.add(rowdata).draw();
                             packDT.row($(this).parents('tr')).remove().draw();
                             toastr.success("Added " + rowdata.itemCode + " on Invoice Item(s)", "Success");
-                        }
                     } else {
                         itemDT.row.add(rowdata).draw();
                         packDT.row($(this).parents('tr')).remove().draw();
@@ -341,7 +356,17 @@
                 { data: "sellingPrice", name: "SellingPrice", className: "form-cell text-end" },
                 { data: "discount1", name: "Discount1", className: "form-cell text-end" },
                 { data: "discount2", name: "Discount2", className: "form-cell text-end" },
-                { data: "extendedPrice", name: "ExtendedPrice", className: "form-cell text-end extendedprice" }
+                { data: "extendedPrice", name: "ExtendedPrice", className: "form-cell text-end extendedprice" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="checkbox" id="add-promo_' + data.lineNumber
+                            + '" name="add-promo" value="true" class="add-promo" onclick="return false;"'
+                            + (data.isPromo ? ' checked' : '')
+                            + ' />';
+                    },
+                    name: "Promo",
+                    className: "text-end"
+                }
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
@@ -405,7 +430,8 @@
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
                 item_to_invoice.push({
                     item: row_data.itemId,
-                    quantity: row_quantity
+                    quantity: row_quantity,
+                    isPromo: row_data.isPromo
                 });
             });
             return item_to_invoice;

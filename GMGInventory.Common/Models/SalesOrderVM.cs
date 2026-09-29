@@ -244,6 +244,9 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Date Modified")]
         public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
+
+        [Display(Name = "Purchase Request Number")]
+        public string? PRNumber { get; set; }
     }
 
     public class SalesOrderPrintVM //: SalesOrderDetailsVM
@@ -412,6 +415,8 @@ namespace GMGInventory.Common.Models
                 return Math.Round(discounted5, 2);
             }
         }
+        public bool? IsPromo { get; set; }
+        public string? BinLocation { get; set; }
     }
 
     public class SalesOrderFormVM
@@ -465,5 +470,6 @@ namespace GMGInventory.Common.Models
         }
         public int? CustomerBrandDiscountId { get; set; }
         public int? ItemPromoId { get; set; }
+        public bool? isPromo { get; set; }
     }
 }

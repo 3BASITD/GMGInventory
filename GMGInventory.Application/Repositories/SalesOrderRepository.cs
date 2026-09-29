@@ -254,6 +254,17 @@ namespace GMGInventory.Application.Repositories
                                       where soli.Quantity > (pli == null ? 0 : pli.Quantity)
                                       select soli.SalesOrderId;
 
+            var purchaseRequest = from pritem in context.PurchaseRequestLineItems
+                                  join pr in context.PurchaseRequests on pritem.PurchaseRequestId equals pr.Id
+                                  join poli in context.PurchaseOrderNewLineItems on pritem.Id equals poli.RequestItemId
+                                  join po in context.PurchaseOrderNews on poli.PurchaseOrderId equals po.Id
+                                  where pritem.SalesOrderId == Id
+                                  select new 
+                                  { 
+                                      PRDocumentNumber= pr.DocumentNumber,
+                                      PODocumentNumber = po.DocumentNumber
+                                  };
+
             var orderVM = (from order in context.SalesOrders
                            join userc in userManager.Users on order.UserCreated equals userc.Id
                            join userm in userManager.Users on order.UserModified equals userm.Id into um
@@ -277,6 +288,7 @@ namespace GMGInventory.Application.Repositories
                            let resubmitfrom = context.SalesOrders
                                                      .Where(s => s.ResubmitId == order.Id)
                                                      .FirstOrDefault()
+                           let purchaserequest = purchaseRequest.FirstOrDefault()
                            where order.Id == Id
                            select new SalesOrderDetailsVM
                            {
@@ -326,7 +338,6 @@ namespace GMGInventory.Application.Repositories
                                                    + debitAmount
                                                    + freightAmount,
                                OverallDiscountD = order.OverallDiscount,
-                               PONumber = order.PurchaseOrder,
                                PriorityD = order.Customer.Priority,
                                RegionId = order.Region.Id,
                                Region = order.Region.Name,
@@ -348,7 +359,9 @@ namespace GMGInventory.Application.Repositories
                                UserCreated = userc.FirstName + " " + userc.LastName,
                                DateCreatedD = order.DateCreated,
                                UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
-                               DateModifiedD = order.DateModified == null ? null : order.DateModified!.Value
+                               DateModifiedD = order.DateModified == null ? null : order.DateModified!.Value,
+                               PONumber = purchaserequest == null ? null : purchaserequest.PODocumentNumber,
+                               PRNumber = purchaserequest == null ? null : purchaserequest.PRDocumentNumber
                            });
 
             return await orderVM.FirstOrDefaultAsync();
@@ -597,11 +610,19 @@ namespace GMGInventory.Application.Repositories
             var itemVM = await (from order in context.SalesOrderLineItems
                                                      .Include(s => s.Item)
                                                      .ThenInclude(s => s.Unit)
+                                                     
                                 from promo in context.ItemPromo
                                                     .Where(pr => pr.Id == order.ItemPromoId)
                                                     .OrderByDescending(pr => pr.DateCreated)
                                                     .Take(1)
                                                     .DefaultIfEmpty()
+                                let items = context.ItemInventories
+                                                   .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true)
+                                                   .Select(s => new
+                                                   {
+                                                       BinLocation = s.BinLocation
+                                                   })
+                                                   .FirstOrDefault()
                                 let price = context.ItemPrices
                                                    .Where(s => s.ItemId == order.ItemId
                                                             && s.DateCreated <= order.SalesOrder.ApprovedDate)
@@ -654,7 +675,10 @@ namespace GMGInventory.Application.Repositories
                                     RetailPriceD = price == null ? 0 : price.RetailSellingPrice,
                                     SellingPriceD = order.SellingPrice,
                                     Unit = order.Item.Unit.Code,
-                                    ItemPromoId = order.ItemPromoId
+                                    ItemPromoId = order.ItemPromoId,
+                                    IsPromo = order.IsPromo,
+                                    BinLocation = items.BinLocation,
+
                                 }).ToListAsync();
 
             return itemVM;
@@ -806,8 +830,12 @@ namespace GMGInventory.Application.Repositories
 
                 if (previous == null)
                 {
+                    var warehouse = context.Warehouses
+                                          .Where(s => s.IsMain == true).FirstOrDefault();
+
+
                     var latestOrder = context.SalesOrders
-                                             .OrderByDescending(s => s.SalesOrderNumber)
+                                             .OrderByDescending(s => s.Id)
                                              .Select(s => s.SalesOrderNumber)
                                              .FirstOrDefault();
 
@@ -823,8 +851,59 @@ namespace GMGInventory.Application.Repositories
                         latestOrder = splitLatestOrder[0];
                     }
 
-                    var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
-                    soNumber = string.Format("{0:SO00000000}", latestOrderNumber + 1);
+                   // var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
+
+                   
+
+                    int? latestOrderNumber = 0;
+
+                    if (latestOrder != null)
+                    {
+                        if (latestOrder.Contains("SO"))
+                        {
+                            latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
+                        }
+                        else if (latestOrder.Contains("PSG1"))
+                        {
+                            latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
+                        }
+                        else if (latestOrder.Contains("PSG2"))
+                        {
+                            latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
+                        }
+                        else if (latestOrder.Contains("CT38"))
+                        {
+                            latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
+                        }
+                        else if (latestOrder.Contains("SEV"))
+                        {
+                            latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
+                        }
+                    }
+
+
+
+                    if (warehouse != null && latestOrder != null)
+                    {
+                        if (warehouse.Name == WareHouseName.PASIG1.ToString())
+                        {
+                            soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
+                        }
+                        else if (warehouse.Name == WareHouseName.PASIG2.ToString())
+                        {
+                            soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
+                        }
+                        else if (warehouse.Name == WareHouseName.CETACIO.ToString())
+                        {
+                            soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 20);
+                        }
+                        else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
+                        {
+                            soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
+                        }
+                    }
+
+
                 }
                 else if (!previous.SalesOrderNumber.Contains("-D"))
                 {
@@ -953,7 +1032,8 @@ namespace GMGInventory.Application.Repositories
                                    SalesOrderId = salesOrderId,
                                    SellingPrice = s.UnitPrice,
                                    CustomerBrandDiscountId = s.CustomerBrandDiscountId,
-                                   ItemPromoId = s.ItemPromoId
+                                   ItemPromoId = s.ItemPromoId,
+                                   IsPromo = s.isPromo
 
                                });
             context.SalesOrderLineItems.AddRange(itemsVM);
@@ -964,7 +1044,7 @@ namespace GMGInventory.Application.Repositories
             foreach (var di in ditems)
             {
                 // update all available in db
-                var dbitem = await citemsVM.Where(s => s.ItemId == di.Item).FirstAsync();
+                var dbitem = await citemsVM.Where(s => s.ItemId == di.Item && s.LineNumber == di.LineNumber).FirstAsync();
                 dbitem.LineNumber = di.LineNumber;
                 dbitem.Discount1 = di.Discount1;
                 dbitem.Discount2 = di.Discount2;
@@ -975,7 +1055,7 @@ namespace GMGInventory.Application.Repositories
                 dbitem.SellingPrice = di.UnitPrice;
                 dbitem.CustomerBrandDiscountId = di.CustomerBrandDiscountId;
                 dbitem.ItemPromoId = di.ItemPromoId;
-
+                dbitem.IsPromo = di.isPromo;
                 context.SalesOrderLineItems.Update(dbitem);
             }
 

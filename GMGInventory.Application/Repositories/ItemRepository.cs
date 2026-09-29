@@ -1678,7 +1678,7 @@ namespace GMGInventory.Application.Repositories
                 var worksheet = workbook.Worksheets.First();
 
                 var headers = worksheet.Row(1).Cells().Select(c => c.GetString().Trim()).ToList();
-                var requiredHeaders = new[] { "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse", "Model Number", "Item Class", "Category", "Item Type", "Brand", "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price", "Is Active" };
+                var requiredHeaders = new[] { "Code", "Name", "Old SKU", "Part Number", "Interchange Number", "Warehouse", "Model Number", "Item Class", "Category", "Item Type", "Brand", "Size", "Unit", "Quantity on Hand", "Beginning Cost", "Gross Price", "Net Price", "Is Active", "Bin Location" };
 
                 var missingColumns = new List<string>();
                 foreach (var col in requiredHeaders)
@@ -1715,6 +1715,7 @@ namespace GMGInventory.Application.Repositories
                 int grossPriceCol = headers.IndexOf("Gross Price") + 1;
                 int netPriceCol = headers.IndexOf("Net Price") + 1;
                 int isActiveCol = headers.IndexOf("Is Active") + 1;
+                int binLocation = headers.IndexOf("Bin Location") + 1;
 
                 var xclitems = new List<ItemFileVM>();
                 foreach (var row in worksheet.RowsUsed().Skip(1))
@@ -1738,7 +1739,8 @@ namespace GMGInventory.Application.Repositories
                         BeginningCost = decimal.TryParse(row.Cell(beginningCostCol).GetString().Replace(",", ""), out decimal cost) ? cost : -999999,
                         GrossPrice = decimal.TryParse(row.Cell(grossPriceCol).GetString().Replace(",", ""), out decimal gprice) ? gprice : -999999,
                         NetPrice = decimal.TryParse(row.Cell(netPriceCol).GetString().Replace(",", ""), out decimal nprice) ? nprice : -999999,
-                        IsActive = row.Cell(isActiveCol).GetString().Trim().ToLower() == "yes"
+                        IsActive = row.Cell(isActiveCol).GetString().Trim().ToLower() == "yes",
+                        BinLocation = row.Cell(binLocation).GetString(),
                     };
 
                     xclitem.Status = await SaveItemFromFile(xclitem);
@@ -1926,11 +1928,16 @@ namespace GMGInventory.Application.Repositories
                 }
 
                 var itemInventory = await context.ItemInventories
-                                                 .Where(s => s.Item.Id == item.Id && s.Warehouse.Id == warehouse.Id)
+                                                 .Where(s => s.ItemId == item.Id
+                                                          && s.WarehouseId == warehouse.Id
+                                                          && s.BinLocation != null
+                                                          && s.BinLocation.Trim().ToLower() == itemFile.BinLocation.ToLower()
+                                                          )
                                                  .FirstOrDefaultAsync();
                 if (itemInventory != null)
                 {
                     itemInventory.Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0;
+                    itemInventory.BinLocation = itemFile.BinLocation;
                     context.ItemInventories.Update(itemInventory);
                     msg.Add("Item inventory updated");
                 }
@@ -1940,7 +1947,8 @@ namespace GMGInventory.Application.Repositories
                     {
                         ItemId = item.Id,
                         WarehouseId = warehouse.Id,
-                        Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0
+                        Quantity = itemFile.Quantity != -999999 ? itemFile.Quantity : 0,
+                        BinLocation = itemFile.BinLocation
                     };
                     await context.ItemInventories.AddAsync(itemInventory);
                     msg.Add("Item inventory added");

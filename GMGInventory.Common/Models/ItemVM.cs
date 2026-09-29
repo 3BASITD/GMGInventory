@@ -239,6 +239,7 @@ namespace GMGInventory.Common.Models
         public decimal GrossPrice { get; set; }
         public decimal NetPrice { get; set; }
         public string? Status { get; set; }
+        public string? BinLocation { get; set; }
     }
 
     public class ItemDetailWarehouseVM

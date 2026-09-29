@@ -171,13 +171,14 @@
                                         <th>Unit Price</th>
                                         <th>Discount</th>
                                         <th>Extended Price</th> <!-- mas ok sana sabihing Gross Price kaso ayaw nila -->
+                                        <th>Promo</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
                                         <th colspan="2" class="text-end">Total</th>
                                         <th class="total-quantity">0</th>
-                                        <th colspan="7"></th>
+                                        <th colspan="8"></th>
                                         <th class="total-gross-price">0.00</th>
                                     </tr>
                                 </tfoot>
@@ -203,6 +204,14 @@
             <form id="form-item">
                 <div class="modal-body">
                     <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="add-promo" class="form-label mb-0">Promo</label>
+                                <input type="checkbox" id="add-promo" name="add-promo" value="true">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">       
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label for="add-code" class="form-label mb-0">Code</label>
@@ -762,6 +771,11 @@
         function AddItem() {
             var rowIndexes = [];
             itemDT.rows(function (idx, data, node) {
+                if($("#add-promo").prop("checked") == true)
+                {
+                    return true;
+                }
+
                 if (data.id == $("#add-code").select2("data")[0].id) {
                     rowIndexes.push(idx);
                 }
@@ -792,7 +806,8 @@
                     discount5D: $("#add-discount5").val() || 0,
                     grossPrice: Round2Decimal($("#add-gross-price").val() || "0.00"),
                     customerBrandDiscountId: $("#add-discount-id").val(),
-                    itemPromoId: $("#add-code").select2("data")[0].itemPromoId
+                    itemPromoId: $("#add-code").select2("data")[0].itemPromoId,
+                    isPromo:$("input#add-promo").prop("checked")
                 }).order([1, 'asc']).draw();
                 clearItemForm();
                 toastr.success("Added " + $("#add-code").select2("data")[0].text + " on Sales Order Item(s)", "Success");
@@ -826,7 +841,11 @@
                     $("#order-credit-limit").val(data.creditLimit);
                     $("#order-credit-term").val(data.creditTerms);
 
-                    $("#order-region").val(data.region);
+
+                    $("#order-region").prop('disabled', false);
+                    $("#order-region").val(data.regionId).trigger('change');
+                    $("#order-region").prop('disabled', true);
+                    
                     $("#order-delivery-date").val(data.requiredDeliveryDate3);
 
                     if(data.forwarderId) {
@@ -852,6 +871,7 @@
                     $("#order-with-nondefect").val(data.withREYCONonDefective + "");
 
                     $("#order-with-jitlpdelivery").val(data.withREYCOJITLPDeliveryId).trigger('change');
+
                 }
             });
 
@@ -884,7 +904,8 @@
                             discount5D: v.discount5D || 0,
                             grossPrice: v.grossPrice,
                             itemPromoId: v.itemPromoId,
-                            customerBrandDiscountId: v.customerBrandDiscountId
+                            customerBrandDiscountId: v.customerBrandDiscountId,
+                            isPromo: v.isPromo
                         }).draw();
                     });
                 }
@@ -995,7 +1016,17 @@
                     },
                     name: "Discount1"
                 },
-                { data: "grossPrice", name: "Gross", className: "form-cell text-end grossprice" }
+                { data: "grossPrice", name: "Gross", className: "form-cell text-end grossprice" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="checkbox" id="add-promo_' + data.lineNumber
+                            + '" name="add-promo" value="true" class="add-promo" onclick="return false;"'
+                            + (data.isPromo ? ' checked' : '')
+                            + ' />';
+                    },
+                    name: "Promo",
+                    className: "form-cell text-end"
+                },
             ],
             order: [[1, "asc"]],
             footerCallback: function (row, data, start, end, display) {
@@ -1165,6 +1196,8 @@
                 var row_discount3 = parseFloat($(this.node()).find(".discount3").val());
                 var row_discount4 = parseFloat($(this.node()).find(".discount4").val());
                 var row_discount5 = parseFloat($(this.node()).find(".discount5").val());
+              
+
                 
                 item_to_order.push({
                     lineNumber: row_data.lineNumber,
@@ -1177,7 +1210,8 @@
                     discount4: row_discount4,
                     discount5: row_discount5,
                     customerBrandDiscountId: row_data.customerBrandDiscountId,
-                    itemPromoId: row_data.itemPromoId
+                    itemPromoId: row_data.itemPromoId,
+                    isPromo: row_data.isPromo
                 });
             });
             return item_to_order;

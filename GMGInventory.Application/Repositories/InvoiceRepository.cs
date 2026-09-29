@@ -253,6 +253,18 @@ namespace GMGInventory.Application.Repositories
                                             ? (100 - (items.Sum(s => s.GrossPriceD) / items.Sum(s => s.GrossPriceNoDiscountD) * 100))
                                             : 0;
             invoiceDetails.TotalAmountD = items.Sum(s => s.GrossPriceNoDiscountD);
+            invoiceDetails.AmountNetVatD =Math.Round(invoiceDetails.TotalAmountD / 1.12m, 2, MidpointRounding.AwayFromZero);
+            invoiceDetails.LessVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
+            invoiceDetails.WithHoldingTaxD = Math.Round(invoiceDetails.AmountNetVatD * 0.01m, 2, MidpointRounding.AwayFromZero);
+            invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
+            if (invoiceDetails.DiscountAmountD == 0)
+            {
+                invoiceDetails.TotalAmoutDueD = invoiceDetails.TotalAmountD - invoiceDetails.WithHoldingTaxD;
+            }
+            else
+            {
+                invoiceDetails.TotalAmoutDueD = invoiceDetails.TotalAmountD - invoiceDetails.WithHoldingTaxD - invoiceDetails.DiscountAmountD;
+            }
             return invoiceDetails;
         }
 
@@ -429,6 +441,8 @@ namespace GMGInventory.Application.Repositories
                          let price = context.ItemPrices.Where(s => s.ItemId == orderl.ItemId && s.DateCreated <= order.DateCreated).OrderByDescending(s => s.DateCreated).First()
                          where invoicel.InvoiceId == invoiceId
                          && orderl.ItemId == invoicel.ItemId
+                         && orderl.IsPromo == invoicel.IsPromo
+
                          select new InvoiceItemVM
                          {
                              Discount1D = orderl.Discount1,
@@ -445,7 +459,9 @@ namespace GMGInventory.Application.Repositories
                              Unit = item.Unit.Code,
                              SellingPriceType = price.RetailSellingPrice > price.NetSellingPrice ? "Gross" : "Net",
                              ReferenceNumber = invoicel.Invoice.ControlNumber,
-                             ItemPromoId = orderl.ItemPromoId
+                             ItemPromoId = orderl.ItemPromoId,
+                             IsPromo = invoicel.IsPromo
+
                          };
             return await itemVM.ToListAsync();
         }
@@ -619,14 +635,16 @@ namespace GMGInventory.Application.Repositories
             foreach (var item in form.Items)
             {
                 var soItem = await context.SalesOrderLineItems
-                                          .Where(s => s.SalesOrderId == salesOrderId && s.ItemId == item.Item)
+                                          .Where(s => s.SalesOrderId == salesOrderId && s.ItemId == item.Item && s.IsPromo == item.isPromo)
                                           .FirstAsync();
                 InvoiceLineItem lineItem = new()
                 {
                     InvoiceId = invoiceId,
                     ItemId = item.Item,
                     Quantity = item.Quantity,
-                    UnitPrice = soItem.SellingPrice
+                    UnitPrice = soItem.SellingPrice,
+                    IsPromo = item.isPromo
+
                 };
                 await context.InvoiceLineItems.AddAsync(lineItem);
                 await context.SaveChangesAsync(currentUserId);

@@ -1,5 +1,6 @@
 ﻿using GMGInventory.Common.Constants;
 using System.ComponentModel.DataAnnotations;
+using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 
 namespace GMGInventory.Common.Models
@@ -76,6 +77,8 @@ namespace GMGInventory.Common.Models
         public string Balance => string.Format(SystemFormat.StringDecimalComma, BalanceD);
         //public decimal? BalanceD { get; set; }
         public decimal BalanceD => TotalAmountD - (TBRD ?? 0) - (CreditD ?? 0) + (DebitD ?? 0) - (PaidAmountD ?? 0m) + (FreightChargeD ?? 0);
+
+   
     }
 
     public class InvoiceDetailsVM : APIHM_VM
@@ -159,6 +162,18 @@ namespace GMGInventory.Common.Models
         [Display(Name = "Date Modified")]
         public string? DateModified => DateModifiedD?.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
+
+        public string LessVat => string.Format(SystemFormat.StringDecimalComma, LessVatD);
+        public decimal LessVatD { get; set; }
+        public string AmountNetVat => string.Format(SystemFormat.StringDecimalComma, AmountNetVatD);
+        public decimal AmountNetVatD { get; set; }
+        public string WithHoldingTax => string.Format(SystemFormat.StringDecimalComma, WithHoldingTaxD);
+        public decimal WithHoldingTaxD { get; set; }
+        public string AddVat => string.Format(SystemFormat.StringDecimalComma, AddVatD);
+        public decimal AddVatD { get; set; }
+
+        public string TotalAmoutDue => string.Format(SystemFormat.StringDecimalComma, TotalAmoutDueD);
+        public decimal TotalAmoutDueD { get; set; }
     }
 
     public class InvoiceDetailsWithItemsVM : InvoiceDetailsVM
@@ -245,7 +260,8 @@ namespace GMGInventory.Common.Models
         public string GrossPriceNoDiscount => string.Format(SystemFormat.StringDecimalComma, GrossPriceNoDiscountD);
         public decimal GrossPriceNoDiscountD => QuantityD * NetPriceD;
         public string ReferenceNumber { get; set; }
-        public int? ItemPromoId { get; set; } 
+        public int? ItemPromoId { get; set; }
+        public bool? IsPromo { get; set; }
     }
 
     //public class InvoiceFormUpdateVM
@@ -278,5 +294,6 @@ namespace GMGInventory.Common.Models
     {
         public int Item { get; set; }
         public int Quantity { get; set; }
+        public bool? isPromo { get; set; }
     }
 }

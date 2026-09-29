@@ -7,6 +7,7 @@
     var submittedDisplay = DateTime.TryParse(Model.Details.SubmittedDate, out var submittedDate)
     ? submittedDate.ToString("MMMM dd, yyyy")
     : Model.Details.SubmittedDate;
+
 }
 
 <!DOCTYPE html>
@@ -18,19 +19,26 @@
     <link rel="icon" href="~/images/box.ico" />
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="true" />
     <style>
-        @@media print {
+/*         @@media print {
             @@page {
                 margin-left: 1.0in !important;
                 margin-right: 1.0in !important;
             }
-        }
+        } */
 
 
         table.formatted dd, table.formatted strong.detail {
             font-size: 12px;
-            margin: 5px 0;
+            margin-top: 0;
+            padding-top:0 !important;
             letter-spacing: 2px;
             font-weight: bold;
+        }
+
+            .so-date-row, .so-submit-row, .so-so-row, .so-pr-row, .so-po-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
     </style>
@@ -39,9 +47,9 @@
     <table class="formatted">
         <thead>
             <tr>
-                <td colspan="10" style="padding:0;">
+                <td colspan="10" style="padding:10px;">
                     <div class="sub-header">
-                        <div class="sub-col center w-150px">
+                        <div class="sub-col center w-150px" style=" border-right: none !important">
                             @if (TempData["CompanyLogo"]?.ToString() == "BAS")
                             {
                                 <img src="~/images/BAS-02.png" class="logo" />
@@ -51,7 +59,7 @@
                                 <img src="~/images/GMG-01.png" class="logo" />
                             }
                         </div>
-                        <div class="sub-col center w-60pc p-50">
+                        <div class="sub-col center w-60pc p-50" style=" border-right: none !important">
                             <span class="title">Document Classification:</span>
                             <span class="desc">
                                 @title.ToUpper()
@@ -61,15 +69,27 @@
                                 }
                             </span>
                         </div>
-                        <div class="sub-col center w-40pc">
-                            <span class="title">SO Date:</span>
-                            <span class="desc">@Model.Details.OrderDate</span>
-                            <hr />
-                            <span class="title">Submitted Date:</span>
-                            <span class="desc">@submittedDisplay</span>
-                            <hr />
-                            <span class="title">SO No.:</span>
-                            <span class="desc">@Model.Details.SONumber</span>
+                        <div class="sub-col w-40pc" style="padding-top: 0px; padding-right: 5px; vertical-align: top;">
+                            <div class="so-submit-row" style="padding-bottom: 5px">
+                                <span class="title desc">Submitted Date:</span>
+                                <span class="desc">@submittedDisplay</span>
+                            </div>
+                            <div class="so-date-row" style="padding-bottom: 5px">
+                                <span class="title desc">SO Date:</span>
+                                <span class="desc">@Model.Details.OrderDate</span>
+                            </div>
+                            <div class="so-so-row" style="padding-bottom: 5px">
+                                <span class="title desc">SO No.:</span>
+                                <span class="desc">@Model.Details.SONumber</span>
+                            </div>
+                            <div class="so-pr-row" style="padding-bottom: 5px">
+                                <span class="title desc">PR No.:</span>
+                                <span class="desc">@Model.Details.PRNumber</span>
+                            </div>
+                            <div class="so-po-row" style="padding-bottom: 5px">
+                                <span class="title desc">PO No.:</span>
+                                <span class="desc">@Model.Details.PONumber</span>
+                            </div>
                         </div>
                     </div>
                 </td>
@@ -172,41 +192,37 @@
                     </dl>
                 </td>
             </tr>
-            <tr>
+            <tr colspan="10">
                 <th style="min-width: 10px;">#</th>
-                <th style="min-width: 50px;">PART NUMBER</th>
-                <th style="min-width: 25px;">SIZE</th>
+                <th style="min-width: 50px;">ITEM CODE</th>
+                <th style="min-width: 25px;">PART NUMBER</th>
                 <th>ITEM DESCRIPTION</th>
                 <th style="min-width: 50px;">QTY</th>
                 <th style="min-width: 25px;">UOM</th>
-                <th style="min-width: 50px;">UNIT PRICE</th>
-                <th style="min-width: 50px;">DISCOUNT</th>
+                <th style="min-width: 50px;">LOCATION CODE</th>
                 <th style="min-width: 50px;">TOTAL</th>
-                <th style="min-width: 50px;">UNSERVED</th>
+                <th style="min-width: 50px;">PROMO</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model.Items)
             {
-                <tr>
+                <tr colspan="10">
                     <td class="center-text"><nobr>@item.LineNumber</nobr></td>
+                    <td>@item.ItemCode</td>
                     <td>@(string.IsNullOrWhiteSpace(item.ItemPartNumber) ? "-" : item.ItemPartNumber)</td>
-                    <td>@item.ItemSize</td>
                     <td>@item.ItemName</td>
                     <td class="center-text"><nobr>@item.Quantity</nobr></td>
                     <td>@item.Unit</td>
-                    <td class="right-text">@item.SellingPrice</td>
-                    @{
-                        var discounts = new List<string>();
-                        if (item.Discount1D > 0) discounts.Add(item.Discount1+ "%");
-                        if (item.Discount2D > 0) discounts.Add(item.Discount2 + "%");
-                        if (item.Discount3D > 0) discounts.Add(item.Discount3 + "%");
-                        if (item.Discount4D > 0) discounts.Add(item.Discount4 + "%");
-                        if (item.Discount5D > 0) discounts.Add(item.Discount5 + "%");
-                    }
-                    <td class="right-text">@string.Join("; ", discounts)</td>
+                    <td class="right-text">@item.BinLocation</td>
                     <td class="right-text"><nobr>@item.GrossPrice</nobr></td>
-                    <td class="right-text"><nobr>@item.UnservedQuantity</nobr></td>
+                    <td class="center-text">
+                        <span style="display:inline-block;width:14px;height:14px;border:1px solid #000;text-align:center;line-height:12px;">
+                           @(item.IsPromo.GetValueOrDefault() ? "✔" : "")
+                        </span>
+                    </td>
+                    <td></td>
                 </tr>
             }
             @{
@@ -251,8 +267,8 @@
                 <th class="center-text"><nobr>@Model.TotalQuantity</nobr></th>
                 <th></th>
                 <th></th>
-                <th></th>
                 <th class="right-text"><nobr>@Model.TotalGrossPrice</nobr></th>
+                <th></th>
                 <th></th>
             </tr>
             <tr>

@@ -87,11 +87,12 @@
                                     <th>Bin Location</th>
                                     <th>Extended Price</th>
                                     <th>Quantity</th>
+                                    <th>Promo</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="8" class="text-end">Total</th>
+                                    <th colspan="9" class="text-end">Total</th>
                                     <th class="total-quantity">0</th>
                                 </tr>
                             </tfoot>
@@ -153,6 +154,7 @@
                                     <th>Packed Quantity</th>
                                     <th>Remaining Quantity</th>
                                     <th>Extended Price</th>
+                                    <th>Promo</th>
                                 </tr>
                             </thead>
                         </table>
@@ -266,7 +268,17 @@
                 { data: "netPrice", name: "NetPrice", className: "text-end" },
                 { data: "packedQuantity", name: "PackedQuantity", className: "text-end" },
                 { data: "remainingQuantity", name: "RemainingQuantity", className: "text-end" },
-                { data: "grossPrice", name: "GrossPrice", className: "text-end" }
+                { data: "grossPrice", name: "GrossPrice", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="checkbox" id="add-promo_' + data.lineNumber
+                            + '" name="add-promo" value="true" class="add-promo" onclick="return false;"'
+                            + (data.isPromo ? ' checked' : '')
+                            + ' />';
+                    },
+                    name: "Promo",
+                    className: "text-end"
+                }
             ],
             order: [[1, "asc"]],
             // createdRow: function (row, data, dataIndex) {
@@ -367,7 +379,8 @@
                                 itemName: row_data.itemName,
                                 binLocation: "",
                                 quantity: quantityToPack,
-                                extendedPriceD: row_data.grossPriceD
+                                extendedPriceD: row_data.grossPriceD,
+                                isPromo: row_data.isPromo
                             };
 
                             hasItemToAdd = true;
@@ -496,7 +509,18 @@
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="checkbox" id="add-promo_' + data.lineNumber
+                            + '" name="add-promo" value="true" class="add-promo" onclick="return false;"'
+                            + (data.isPromo ? ' checked' : '')
+                            + ' />';
+                    },
+                    name: "Promo",
+                    className: "text-end"
                 }
+
             ],
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api(), data;
@@ -513,7 +537,7 @@
                 endRender: function (rows, group) {
                     return $('<tr/>')
                         .append('<td></td>')
-                        .append('<td colspan="5" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
+                        .append('<td colspan="6" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
                 dataSrc: function (row) {
@@ -771,7 +795,8 @@
                     itemId: row_data.itemId,
                     binLocation: row_data.binLocationText,
                     quantity: row_data.quantity,
-                    extendedPriceD: row_data.extendedPriceD
+                    extendedPriceD: row_data.extendedPriceD,
+                    isPromo: row_data.isPromo
                 });
             });
             return item_to_pack;

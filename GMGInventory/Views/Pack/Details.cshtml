@@ -254,11 +254,12 @@
                                     <th>Item Name</th>
                                     <th>Extended Price</th>
                                     <th>Quantity</th>
+                                    <th>Promo</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="7" class="text-end">Total</th>
+                                    <th colspan="8" class="text-end">Total</th>
                                     <th>0</th>
                                 </tr>
                             </tfoot>
@@ -636,6 +637,16 @@
                     },
                     name: "Quantity",
                     className: "form-cell text-end"
+                },
+                {
+                    data: function (data, type, dataToSet) {
+                        return '<input type="checkbox" id="add-promo_' + data.lineNumber
+                            + '" name="add-promo" value="true" class="add-promo" onclick="return false;"'
+                            + (data.isPromo ? ' checked' : '')
+                            + ' />';
+                    },
+                    name: "Promo",
+                    className: "text-end"
                 }
 
             ],
@@ -654,7 +665,7 @@
                 endRender: function (rows, group) {
                     return $('<tr/>')
                         .append('<td></td>')
-                        .append('<td colspan="4" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
+                        .append('<td colspan="5" class="text-end">Total Quantity for <strong>Package ' + group + '</strong></td>')
                         .append('<td class="text-end">' + rows.data().pluck("quantity").reduce(function (a, b) { return parseInt(a) + parseInt(b); }, 0) + '</td>');
                 },
                 dataSrc: function (row) {
@@ -896,6 +907,7 @@
                     packTypeId: row_data.packType,
                     itemId: row_data.itemId,
                     quantity: row_data.quantity,
+                    isPromo: row_data.isPromo
                 });
             });
             return item_to_pack;
