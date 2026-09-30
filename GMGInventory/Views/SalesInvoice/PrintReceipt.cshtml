@@ -183,10 +183,15 @@
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <!--<td colspan="5" class="currency">LESS @Model.DiscountPercent:</td> -->
-                        <!--<td style="width: 115px;" class="currency">@Model.DiscountAmount</td>-->
+                        <td colspan="4" class="currency">LESS @Model.DiscountPercent:</td>
+                        <td style="width: 115px;" class="currency">@Model.DiscountAmount</td>
+                        @*<td colspan="4" class="currency"></td>
+                        <td style="width: 115px;" class="currency">@Model.LessVat</td> <!-- Less VAT --> *@
+                        <td style="width: 10px;"></td>
+                    </tr>
+                    <tr>
                         <td colspan="4" class="currency"></td>
-                        <td style="width: 115px;" class="currency">@Model.LessVat</td> <!-- Less VAT -->
+                        <td style="width: 115px;" class="currency">@Model.Total</td> 
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
@@ -195,13 +200,16 @@
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="currency">@(@Model.DiscountPercentD == 0 ? "" : "DSC")</td>
-                        <td style="width: 115px;" class="currency">@Model.DiscountAmount</td>  <!--Discounted Amount-->
+                        @*<td colspan="4" class="currency">@(@Model.DiscountPercentD == 0 ? "" : "DSC")</td>
+                        <td style="width: 115px;" class="currency">@Model.DiscountAmount</td>  <!--Discounted Amount--> *@
+                        <td colspan="4" class="currency"></td>
+                        <td style="width: 115px;" class="currency">
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
                         <td colspan="4" class="currency"></td>
-                        <td style="width: 115px;" class="currency">@Model.WithHoldingTaxD</td> <!-- Withholding Tax -->
+                         <td style="width: 115px;" class="currency">
+                        @* <td style="width: 115px;" class="currency">@Model.WithHoldingTaxD</td> <!-- Withholding Tax --> *@
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
@@ -211,7 +219,8 @@
                     </tr>
                     <tr>
                         <td colspan="4" class="currency"></td>
-                        <td style="width: 115px;" class="currency">@Model.TotalAmoutDueD</td> <!-- Total Amount Due -->
+                        @* <td style="width: 115px;" class="currency">@Model.TotalAmoutDueD</td> <!-- Total Amount Due --> *@
+                        <td style="width: 115px;" class="currency">@Model.Total</td>
                         <td style="width: 10px;"></td>
                     </tr>
                     <tr>
