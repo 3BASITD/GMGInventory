@@ -1041,22 +1041,51 @@ namespace GMGInventory.Application.Repositories
             // update item
             // get items available in db
             var ditems = Items.Where(s => items.Contains(s.Item));
+
             foreach (var di in ditems)
             {
-                // update all available in db
-                var dbitem = await citemsVM.Where(s => s.ItemId == di.Item && s.LineNumber == di.LineNumber).FirstAsync();
-                dbitem.LineNumber = di.LineNumber;
-                dbitem.Discount1 = di.Discount1;
-                dbitem.Discount2 = di.Discount2;
-                dbitem.Discount3 = di.Discount3;
-                dbitem.Discount4 = di.Discount4;
-                dbitem.Discount5 = di.Discount5;
-                dbitem.Quantity = di.Quantity;
-                dbitem.SellingPrice = di.UnitPrice;
-                dbitem.CustomerBrandDiscountId = di.CustomerBrandDiscountId;
-                dbitem.ItemPromoId = di.ItemPromoId;
-                dbitem.IsPromo = di.isPromo;
-                context.SalesOrderLineItems.Update(dbitem);
+                var dbitem = await citemsVM
+                    .Where(s => s.ItemId == di.Item && s.LineNumber == di.LineNumber)
+                    .FirstOrDefaultAsync();
+
+                if (dbitem == null)
+                {
+                    // new item: doesn't exist in the old details yet
+                    dbitem = new SalesOrderLineItem
+                    {
+                        // SalesOrderId = order.Id,   // set your parent key here
+                        SalesOrderId = salesOrderId,
+                        ItemId = di.Item,
+                        LineNumber = di.LineNumber,
+                        Discount1 = di.Discount1,
+                        Discount2 = di.Discount2,
+                        Discount3 = di.Discount3,
+                        Discount4 = di.Discount4,
+                        Discount5 = di.Discount5,
+                        Quantity = di.Quantity,
+                        SellingPrice = di.UnitPrice,
+                        CustomerBrandDiscountId = di.CustomerBrandDiscountId,
+                        ItemPromoId = di.ItemPromoId,
+                        IsPromo = di.isPromo
+                    };
+                    context.SalesOrderLineItems.Add(dbitem);
+                }
+                else
+                {
+                    // existing item: update its values
+                    dbitem.LineNumber = di.LineNumber;
+                    dbitem.Discount1 = di.Discount1;
+                    dbitem.Discount2 = di.Discount2;
+                    dbitem.Discount3 = di.Discount3;
+                    dbitem.Discount4 = di.Discount4;
+                    dbitem.Discount5 = di.Discount5;
+                    dbitem.Quantity = di.Quantity;
+                    dbitem.SellingPrice = di.UnitPrice;
+                    dbitem.CustomerBrandDiscountId = di.CustomerBrandDiscountId;
+                    dbitem.ItemPromoId = di.ItemPromoId;
+                    dbitem.IsPromo = di.isPromo;
+                    context.SalesOrderLineItems.Update(dbitem);
+                }
             }
 
             // delete item
