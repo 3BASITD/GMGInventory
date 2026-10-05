@@ -21,7 +21,7 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form);
         Task SaveItemsAsync(IList<SalesOrderFormItemVM> Items, int salesOrderId);
         Task<ResponseModel> DeleteDraft(int Id);
-        Task<bool> ApproveAsync(int salesOrderId);
+        Task<bool> ApproveAsync(int salesOrderId, string slaReason);
         Task<bool> DisapproveAsync(int salesOrderId, string reason);
         Task<bool> UpdateServedSOItem(int salesOrderLineItemId, int quantity);
     }

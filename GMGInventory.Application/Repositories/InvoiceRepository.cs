@@ -252,19 +252,24 @@ namespace GMGInventory.Application.Repositories
             invoiceDetails.DiscountPercentD = items.Count() > 0 && items.Sum(s => s.GrossPriceD + s.GrossPriceNoDiscountD) > 0
                                             ? (100 - (items.Sum(s => s.GrossPriceD) / items.Sum(s => s.GrossPriceNoDiscountD) * 100))
                                             : 0;
+
             invoiceDetails.TotalAmountD = items.Sum(s => s.GrossPriceNoDiscountD);
-            invoiceDetails.AmountNetVatD =Math.Round(invoiceDetails.TotalAmountD / 1.12m, 2, MidpointRounding.AwayFromZero);
-            invoiceDetails.LessVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
+            invoiceDetails.TotalAmoutDueD = invoiceDetails.DiscountAmountD == 0 ? invoiceDetails.TotalAmountD
+                                            : invoiceDetails.TotalAmountD - invoiceDetails.DiscountAmountD;
             invoiceDetails.WithHoldingTaxD = Math.Round(invoiceDetails.AmountNetVatD * 0.01m, 2, MidpointRounding.AwayFromZero);
-            invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
-            if (invoiceDetails.DiscountAmountD == 0)
-            {
-                invoiceDetails.TotalAmoutDueD = invoiceDetails.TotalAmountD - invoiceDetails.WithHoldingTaxD;
-            }
-            else
-            {
-                invoiceDetails.TotalAmoutDueD = invoiceDetails.TotalAmountD - invoiceDetails.WithHoldingTaxD - invoiceDetails.DiscountAmountD;
-            }
+            invoiceDetails.AmountNetVatD =Math.Round(invoiceDetails.TotalAmoutDueD / 1.12m, 2, MidpointRounding.AwayFromZero);
+            invoiceDetails.LessVatD = Math.Truncate(invoiceDetails.AmountNetVatD * 0.12m * 100) / 100;
+            invoiceDetails.AddVatD = Math.Truncate(invoiceDetails.AmountNetVatD * 0.12m * 100) / 100;
+
+            //if (invoiceDetails.DiscountAmountD == 0)
+            //{
+            //    invoiceDetails.TotalAmoutDueD = invoiceDetails.TotalAmountD - invoiceDetails.WithHoldingTaxD;
+            //}
+            //else
+            //{
+            //    invoiceDetails.TotalAmoutDueD = invoiceDetails.TotalAmountD - invoiceDetails.DiscountAmountD;
+            //}
+
             return invoiceDetails;
         }
 

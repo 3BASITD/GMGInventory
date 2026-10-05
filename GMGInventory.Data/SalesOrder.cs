@@ -91,6 +91,9 @@ namespace GMGInventory.Data
         [Column(TypeName = "nvarchar(150)")]
         public string? DisapprovedReason { get; set; }
 
+        [Column(TypeName = "nvarchar(250)")]
+        public string? SlaReason { get; set; }
+
 
         [ForeignKey("ResubmitId")]
         public int? ResubmitId { get; set; }
