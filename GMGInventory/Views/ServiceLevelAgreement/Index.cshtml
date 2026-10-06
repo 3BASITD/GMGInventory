@@ -22,7 +22,8 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Prior Availability</th>
+                    <th>Hour Availability</th>
+                    <th>Region</th>
                     <th></th>
                 </tr>
             </thead>
@@ -43,8 +44,10 @@
                 <dl class="row">
                     <dt class="col-sm-5">Name</dt>
                     <dd class="col-sm-7 details-name"></dd>
-                    <dt class="col-sm-5">Prior Availability</dt>
+                    <dt class="col-sm-5">Hour Availability</dt>
                     <dd class="col-sm-7 details-availability"></dd>
+                    <dt class="col-sm-5">Region</dt>
+                    <dd class="col-sm-7 details-region"></dd>
                     <dt class="col-sm-5">Created By</dt>
                     <dd class="col-sm-7 details-created-by"></dd>
                     <dt class="col-sm-5">Date Created</dt>
@@ -86,8 +89,21 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
+                                    <label for="order-region" class="form-label mb-0">Region</label>
+                                    <select id="order-region" style="width: 100%"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                            @*  <div class="form-group">
                                     <label for="add-prior" class="form-label mb-0">Prior Availability <small class="text-info" data-microtip-title="Available until this time" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
                                     <input type="time" id="add-prior" name="Prior" class="form-control form-control-sm" />
+                                </div> *@
+                                <div class="form-group">
+                                    <label for="add-prior" class="form-label mb-0">Hour Availability <small class="text-info" data-microtip-title="Available until this time" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
+                                    <input type="number" id="add-hour" name="Hour" class="form-control form-control-sm" />
                                 </div>
                             </div>
                         </div>
@@ -130,8 +146,20 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
+                                    <label for="order-region" class="form-label mb-0">Region</label>
+                                    <select id="edit-region" name="Region" style="width: 100%"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                            @*  <div class="form-group">
                                     <label for="edit-prior" class="form-label mb-0">Prior Availability <small class="text-info" data-microtip-title="Available until this time" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
                                     <input type="time" id="edit-prior" name="Prior" class="form-control form-control-sm" />
+                                </div> *@
+                                <div class="form-group">
+                                    <label for="add-prior" class="form-label mb-0">Hour Availability <small class="text-info" data-microtip-title="Available until this time" data-microtip-position="right" role="tooltip"><span class="fas fa-info-circle"></span></small></label>
+                                    <input type="number" id="edit-hour" name="Hour" class="form-control form-control-sm" />
                                 </div>
                             </div>
                         </div>
@@ -183,7 +211,8 @@
             },
             columns: [
                 { data: "name", name: "Name" },
-                { data: "priorAvailability", name: "PriorAvailability" },
+                { data: "hourAvailability", name: "HourAvailability" },
+                { data: "region", name: "Region" },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -217,7 +246,8 @@
                 var data = serviceLevelAgreementDT.row($(this).parents('tr')).data();
 
                 $(".details-name").html(data.name);
-                $(".details-availability").html(data.priorAvailability);
+                $(".details-availability").html(data.hourAvailability);
+                $(".details-region").html(data.region);
                 $(".details-created-by").html(data.userCreated);
                 $(".details-created-date").html(data.dateCreated);
                 $(".details-modified-by").html(data.userModified || '<em class="text-muted">N/A</em>');
@@ -232,8 +262,8 @@
 
                     $("#edit-name").data("Id", data.id);
                     $("#edit-name").val(data.name);
-                    $("#edit-prior").val(data.priorAvailability3);
-
+                    $("#edit-hour").val(data.hourAvailabilityD);
+                   $("#edit-region").val(data.regionId).trigger("change");
                     $("#editModal").modal("show");
                 });
             }
@@ -305,7 +335,8 @@
             $("#addForm").validate({
                 rules: {
                     Name: { required: true, maxlength: 100 },
-                    Prior: { required: true }
+                    Hour: { required: true },
+                    Region: { required: true }
                 },
                 messages: {
                     Number: { required: "Name is required", maxlength: "Name must not exceed 100 characters." },
@@ -323,7 +354,8 @@
                     url: "@Url.Action("AddServiceLevelAgreement")",
                     data: {
                         Name: $("#add-name").val(),
-                        PriorAvailabilityD: $("#add-prior").val()
+                        HourAvailabilityD: $("#add-hour").val(),
+                        RegionId: $("#order-region").val()
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
@@ -345,7 +377,8 @@
             $("#editForm").validate({
                 rules: {
                     Name: { required: true, maxlength: 100 },
-                    Prior: { required: true }
+                    Hour: { required: true },
+                    Region: { required: true }
                 },
                 messages: {
                     Number: { required: "Name is required", maxlength: "Name must not exceed 100 characters." },
@@ -364,7 +397,10 @@
                     data: {
                         Id: $("#edit-name").data("Id"),
                         Name: $("#edit-name").val(),
-                        PriorAvailabilityD: $("#edit-prior").val()
+                       // PriorAvailabilityD: $("#edit-prior").val()
+                        HourAvailabilityD: $("#edit-hour").val(),
+                        RegionId: $("#edit-region").val()
+
                     },
                     success: function (data, status, xhr) {
                         if (data.status == "Error") {
@@ -378,5 +414,31 @@
                 });
             }
         }
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#order-region").select2({
+                    minimumResultsForSearch: -1,
+                    ajax: null, //already fetched outside
+                    data: data,
+                    //minimumResultsForSearch: Infinity
+                });
+            }
+        });
+
+         $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetOptions", "Region")",
+            success: function (data, status, xhr) {
+                $("#edit-region").select2({
+                    minimumResultsForSearch: -1,
+                    ajax: null, //already fetched outside
+                    data: data,
+                    //minimumResultsForSearch: Infinity
+                });
+            }
+        });
     </script>
 }

@@ -5,6 +5,20 @@
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
+<style>
+    .table-order tbody tr.sla-near-due > td {
+        background-color: #ffe0b3 !important;   /* orange */
+        --bs-table-bg: #ffe0b3;
+        --bs-table-accent-bg: #ffe0b3;
+    }
+
+    .table-order tbody tr.sla-overdue > td {
+        background-color: #f8c6c6 !important;   /* red */
+        --bs-table-bg: #f8c6c6;
+        --bs-table-accent-bg: #f8c6c6;
+    }
+</style>
+
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
@@ -61,9 +75,6 @@
                         @Html.DisplayNameFor(model => model.PurchaseRequestDetail)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CustomerCode)
-                    </th>
-                    <th>
                         @Html.DisplayNameFor(model => model.CustomerName)
                     </th>
                     <th>
@@ -71,9 +82,6 @@
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.CustomerAddress)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Area)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Region)
@@ -92,6 +100,9 @@
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SlaStatus)
                     </th>
                     <th></th>
                 </tr>
@@ -511,6 +522,14 @@
             filter: true,
             responsive: true,
             autoWidth: false,
+            // Highlight rows by SLA status: orange = Near Due, red = Overdue
+            createdRow: function (row, data) {
+                if (data.slaStatus === "Near Due") {
+                    $(row).addClass("sla-near-due");
+                } else if (data.slaStatus === "Overdue") {
+                    $(row).addClass("sla-overdue");
+                }
+            },
             search: {
                 return: true,
             },
@@ -533,13 +552,14 @@
                     name: "PurchaseRequestDetail",
                     responsivePriority: 12
                 },
-                {
-                    data: function (data, type, dataToSet) {
-                        return `<a href="/Customer/Details/${data.customerId}" class="link-info" target="_blank">${data.customerCode}</a>`;
-                    },
-                    name: "CustomerCode",
-                    responsivePriority: 3
-                },
+               // {
+               //    data: function (data, type, dataToSet) {
+               //         return `<a href="/Customer/Details/${data.customerId}" class="link-info" target="_blank">${data.customerCode}</a>`;
+               //     },
+               //     name: "CustomerCode",
+               //     responsivePriority: 3
+               // },
+                // {data:"timeRemainingD", name:"TimeRemainingD", responsivePriority: 3},
                 { data: "customerName", name: "CustomerName", responsivePriority: 13 },
                 { data: "priority", name: "Priority", responsivePriority: 14 },
                 {
@@ -548,8 +568,7 @@
                     },
                     name: "CustomerAddress",
                     responsivePriority: 15
-                },
-                { data: "area", name: "Area", responsivePriority: 4 },
+                },         
                 { data: "region", name: "Region", responsivePriority: 5 },
                 { data: "orderDate", name: "OrderDate", responsivePriority: 6 },
                 { data: "requiredDeliveryDate", name: "RequiredDeliveryDate", responsivePriority: 7 },
@@ -562,6 +581,7 @@
                 },
                 { data: "totalAmount", name: "TotalAmount", className: "text-end", responsivePriority: 9 },
                 { data: "status", name: "Status", responsivePriority: 10 },
+                { data: "slaStatus", name: "SlaStatus", responsivePriority: 4 },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {
@@ -577,7 +597,8 @@
                         return actions + "</div>";
                     },
                     responsivePriority: 1
-                }
+                },
+                
             ],
             order: defaultDTState.order
         });

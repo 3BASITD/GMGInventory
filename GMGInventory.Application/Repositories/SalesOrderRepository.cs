@@ -197,6 +197,9 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<SalesOrderDetailsVM?> GetDetailsAsync(int? Id)
         {
+            var now = DateTime.Now;
+            const double nearDueThreshold = 0.70;
+
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
@@ -361,7 +364,17 @@ namespace GMGInventory.Application.Repositories
                                UserModified = userm == null ? null : userm.FirstName + " " + userm.LastName,
                                DateModifiedD = order.DateModified == null ? null : order.DateModified!.Value,
                                PONumber = purchaserequest == null ? null : purchaserequest.PODocumentNumber,
-                               PRNumber = purchaserequest == null ? null : purchaserequest.PRDocumentNumber
+                               PRNumber = purchaserequest == null ? null : purchaserequest.PRDocumentNumber,
+                               SlaStatus = (order.Status.Id == 2 || order.Status.Id == 3)
+                                                        && order.ServiceLevelAgreement.HourAvailability > 0
+                                                      ? (EF.Functions.DateDiffMinute(order.DateCreated, now)
+                                                            >= order.ServiceLevelAgreement.HourAvailability * 60
+                                                            ? "Overdue"
+                                                            : EF.Functions.DateDiffMinute(order.DateCreated, now)
+                                                                >= order.ServiceLevelAgreement.HourAvailability * 60 * nearDueThreshold
+                                                                ? "Near Due"
+                                                                : "On Track")
+                                                      : ""
                            });
 
             return await orderVM.FirstOrDefaultAsync();
@@ -396,6 +409,8 @@ namespace GMGInventory.Application.Repositories
             if (DateFrom > DateTo) (DateFrom, DateTo) = (DateTo, DateFrom);
             var FiledBy = filter.FiledBy == null ? "everyone" : filter.FiledBy.ToLower();
 
+            var now = DateTime.Now;
+            const double nearDueThreshold = 0.70;
 
             var filteredOrder = from order in context.SalesOrders
                                 where (filter.AgentId == null || order.AgentId == filter.AgentId)
@@ -412,6 +427,8 @@ namespace GMGInventory.Application.Repositories
                                       from pli in p.DefaultIfEmpty()
                                       where soli.Quantity > (pli == null ? 0 : pli.Quantity)
                                       select soli.SalesOrderId;
+
+
 
 
             var orderVM = (from order in filteredOrder
@@ -464,6 +481,7 @@ namespace GMGInventory.Application.Repositories
                                                                               .Distinct()
                                                                               .Select(s => $"<a href='/PurchaseRequest/Details/{s.Id}' class='link-info' target='_blank'>{s.Number}</a>-[{s.Status}]")),
                                ServiceLevelAgreement = order.ServiceLevelAgreement.Name,
+                               ServiceLevelAgreementHr = order.ServiceLevelAgreement.HourAvailability,
                                WithLP = order.WithLP,
                                WithREYCONonDefective = order.WithREYCONonDefective,
                                WithREYCOJITLPDelivery = order.WithREYCOJITLPDelivery.Name,
@@ -471,7 +489,19 @@ namespace GMGInventory.Application.Repositories
                                Remarks = order.Remarks,
                                OrderQueueNumber = order.SalesOrderItemSources
                                                        .Select(s => s.SourceOrderNumber)
-                                                       .FirstOrDefault()
+                                                       .FirstOrDefault(),
+                               TimeRemainingD = order.ServiceLevelAgreement.HourAvailability
+                                   - EF.Functions.DateDiffMinute(order.DateCreated, now) / 60.0,
+                               SlaStatus = (order.Status.Id == 2 || order.Status.Id == 3)
+                                                        && order.ServiceLevelAgreement.HourAvailability > 0
+                                                      ? (EF.Functions.DateDiffMinute(order.DateCreated, now)
+                                                            >= order.ServiceLevelAgreement.HourAvailability * 60
+                                                            ? "Overdue"
+                                                            : EF.Functions.DateDiffMinute(order.DateCreated, now)
+                                                                >= order.ServiceLevelAgreement.HourAvailability * 60 * nearDueThreshold
+                                                                ? "Near Due"
+                                                                : "On Track")
+                                                      : null
                            });
             return orderVM.ToList();
         }
@@ -982,6 +1012,7 @@ namespace GMGInventory.Application.Repositories
                 orderVM.WithREYCONonDefective = form.WithREYCONonDefective;
                 orderVM.WithREYCOJITLPDeliveryId = form.WithREYCOJITLPDelivery;
                 orderVM.SpecialInstruction = form.SpecialInstruction;
+                orderVM.SpecialInstruction = form.SpecialInstruction;
 
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);
@@ -1133,7 +1164,7 @@ namespace GMGInventory.Application.Repositories
             return new ResponseModel { Status = "Success", Message = "Successfully deleted sales order" };
         }
 
-        public async Task<bool> ApproveAsync(int salesOrderId)
+        public async Task<bool> ApproveAsync(int salesOrderId, string slaReason)
         {
             var orderVM = context.SalesOrders.Where(s => s.Id == salesOrderId).FirstOrDefault();
             if (orderVM == null)
@@ -1149,6 +1180,7 @@ namespace GMGInventory.Application.Repositories
                 orderVM.DisapprovedBy = null;
                 orderVM.DisapprovedDate = null;
                 orderVM.StatusId = statusId;
+                orderVM.SlaReason = slaReason;
 
                 context.SalesOrders.Update(orderVM);
                 await context.SaveChangesAsync(currentUserId);

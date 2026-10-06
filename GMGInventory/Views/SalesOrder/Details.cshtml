@@ -659,6 +659,18 @@
                                 @(string.IsNullOrWhiteSpace(Model.SpecialInstruction) ? Html.Raw("<span class=\"text-muted\">N/A</span>") : Model.SpecialInstruction)
                             </b>
                         }
+                       <div class="text-sm">
+                        @if (Model!.SlaStatus.ToLower().Contains("overdue") && userAccess.CanEdit)
+                        {
+                            <span class="text-muted">
+                               @Html.DisplayNameFor(model => model.SlaStatus)
+                            </span>
+                            <b class="d-block form-gayahin">
+                               @Model.SlaStatus
+                            </b>
+                        }
+                       
+                        
                     </div>
                 </div>
             </div>
@@ -952,6 +964,7 @@
 {
     <form id="approve-form" asp-action="Approve">
         <input type="hidden" id="approve-id" name="Id" value="@Model.Id" />
+        <input type="hidden" id="approve-slareason" name="SlaReason" />
     </form>
 
     <form id="disapprove-form" asp-action="Disapprove">
@@ -1173,13 +1186,20 @@
         });
 
         // Load service level agreement data for select2
-        $("#order-sla").select2({
-            minimumResultsForSearch: -1,
-            placeholder: '<empty>',
-            ajax: {
-                url: "@Url.Action("GetOptions2", "ServiceLevelAgreement")"
-            }
-        });
+            $("#order-sla").select2({
+                minimumResultsForSearch: -1,
+                placeholder: '<empty>',
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "ServiceLevelAgreement")",
+                    data: function (params) {
+                        let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                        return Object.assign(base, {
+                            search: $("#order-region").val()
+                        });
+                    }
+
+                }
+            });
 
         // Load service level agreement data for select2
         $.ajax({
@@ -1234,7 +1254,8 @@
                 DeliveryDate: { required: true, greaterThanOrEqualDate: "#order-date" },
                 Remarks: { maxlength: 500 },
                 Instruction: { maxlength: 250 },
-                SLA: { required: true }
+                SLA: { required: true },
+                SlaReason: { required: true }
             },
             messages: {
                 AgentCode: { required: "Please select agent" },
@@ -1247,7 +1268,8 @@
                 },
                 Remarks: { maxlength: "Remarks must not exceed 500 characters." },
                 Instruction: { maxlength: "Remarks must not exceed 250 characters." },
-                SLA: { required: "Please select sla" }
+                SLA: { required: "Please select sla" },
+                SlaReason: { required: "Please enter a SLA reaon of over due" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();
@@ -1336,6 +1358,7 @@
                         WithREYCOJITLPDelivery: $("#order-with-jitlpdelivery").val(),
                         SpecialInstruction: $("#order-instruction").val(),
                         Status: $("#action-type").val(),
+                        SlaReason: $("#action-slareason").val(),
                         Items: itemsToReplenish
                     },
                     success: function (data, status, xhr) {
@@ -2039,16 +2062,51 @@
 
         if (user_access.canApproveDisapprove) {
             $('.btn-details-approve').click(function (e) {
-                swal({
+
+                // Works if slaStatus is "Overdue" (any casing) or boolean true
+                const isOverdue = String(so_details.slaStatus).trim().toLowerCase() === 'overdue';
+
+                const options = {
                     title: "Approve Sales Order",
                     text: "Continue to approve this sales order?",
                     icon: "success",
                     buttons: true,
                     successMode: true
-                }).then((confirm) => {
-                    if (confirm) {
-                        $('#approve-form').submit();
+                };
+
+                // Only show the reason input when the SLA is overdue
+                if (isOverdue) {
+                    options.content = {
+                        element: "input",
+                        attributes: {
+                            placeholder: "Reason for Overdue",
+                            type: "text"
+                        }
+                    };
+                }
+
+                swal(options).then((confirm) => {
+                    // Cancelled or dismissed
+                    if (confirm === null || confirm === false) {
+                        return;
                     }
+
+                    if (isOverdue) {
+                        const reason = String(confirm).trim();
+
+                        // Require a reason when overdue
+                        if (!reason) {
+                            swal("Reason required", "Please enter a reason for the overdue SLA.", "warning");
+                            return;
+                        }
+
+                        $("#approve-slareason").val(reason);
+                    } else {
+                        // Not overdue: don't send a stale value
+                        $("#approve-slareason").val("");
+                    }
+
+                    $('#approve-form').submit();
                 });
             });
 

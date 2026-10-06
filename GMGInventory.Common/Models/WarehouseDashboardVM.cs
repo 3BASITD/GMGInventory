@@ -11,6 +11,9 @@ namespace GMGInventory.Common.Models
         public string Customer { get; set; }
         public string PickingStatus { get; set; }
         public string PackingStatus { get; set; }
+        public string? SlaStatus { get; set; }
+        public string SoStatus { get; set; }
+        public string? Invoices { get; set; }
     }
 
     public class OrderFulfillmentVM

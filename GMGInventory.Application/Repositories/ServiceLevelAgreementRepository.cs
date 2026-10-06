@@ -28,10 +28,19 @@ namespace GMGInventory.Application.Repositories
         {
             var timeNow = DateTime.Now.TimeOfDay;
             var midNight = new TimeSpan(0, 0, 0);
+
+            //search = search == "3" ? search : search == "2" ? search = "3" : search == "4" ? search = "1" : search;
+            if (search == "3" || search == "2")
+            {
+                search = "3"
+            }
+            if else(search == "4")
+            {
+                search = "1"
+            }
+
             var SLAs = from sla in context.ServiceLevelAgreements
-                       where sla.IsActive == true
-                       && (sla.PriorAvailability >= timeNow || sla.PriorAvailability == midNight)
-                       && (string.IsNullOrWhiteSpace(search) || sla.Name.ToLower().Contains(search.ToLower()))
+                       where sla.IsActive == true && sla.RegionId == int.Parse(search)
                        select new JsonOptionsModel
                        {
                            Id = sla.Id.ToString(),
@@ -50,13 +59,17 @@ namespace GMGInventory.Application.Repositories
         {
             var serviceLevelAgreements = from serviceLevelAgreement in context.ServiceLevelAgreements
                                          join userc in userManager.Users on serviceLevelAgreement.UserCreated equals userc.Id
+                                         join region in context.Regions on serviceLevelAgreement.RegionId equals region.Id
                                          join userm in userManager.Users on serviceLevelAgreement.UserModified equals userm.Id into m
                                          from userm in m.DefaultIfEmpty()
                                          select new ServiceLevelAgreementVM
                                          {
                                              Id = serviceLevelAgreement.Id,
                                              Name = serviceLevelAgreement.Name,
-                                             PriorAvailabilityD = serviceLevelAgreement.PriorAvailability,
+                                             //PriorAvailabilityD = serviceLevelAgreement.PriorAvailability,
+                                             HourAvailability = serviceLevelAgreement.HourAvailability.ToString() + " hrs",
+                                             RegionId = serviceLevelAgreement.RegionId,
+                                             Region = region.Name,
                                              IsActive = serviceLevelAgreement.IsActive,
                                              UserCreated = userc.FirstName + " " + userc.LastName,
                                              DateCreatedD = serviceLevelAgreement.DateCreated,
@@ -115,6 +128,8 @@ namespace GMGInventory.Application.Repositories
                 {
                     Name = serviceLevelAgreement.Name,
                     PriorAvailability = serviceLevelAgreement.PriorAvailabilityD,
+                    HourAvailability = serviceLevelAgreement.HourAvailabilityD,
+                    RegionId = serviceLevelAgreement.RegionId,
                     IsActive = true
                 };
                 await context.ServiceLevelAgreements.AddAsync(newServiceLevelAgreement);
@@ -142,13 +157,15 @@ namespace GMGInventory.Application.Repositories
                     return new ResponseModel { Status = "Error", Message = "Name already exist" };
 
                 if (Equals(oldServiceLevelAgreement.Name, serviceLevelAgreement.Name)
-                 && Equals(oldServiceLevelAgreement.PriorAvailability, serviceLevelAgreement.PriorAvailabilityD))
+                 && Equals(oldServiceLevelAgreement.HourAvailability, serviceLevelAgreement.HourAvailabilityD))
                     return new ResponseModel { Status = "Error", Message = "Nothing to update" };
 
                 string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
                 oldServiceLevelAgreement.Name = serviceLevelAgreement.Name;
-                oldServiceLevelAgreement.PriorAvailability = serviceLevelAgreement.PriorAvailabilityD;
+                //oldServiceLevelAgreement.PriorAvailability = serviceLevelAgreement.PriorAvailabilityD;
+                oldServiceLevelAgreement.HourAvailability = serviceLevelAgreement.HourAvailabilityD;
+                oldServiceLevelAgreement.RegionId = serviceLevelAgreement.RegionId;
 
                 context.ServiceLevelAgreements.Update(oldServiceLevelAgreement);
                 await context.SaveChangesAsync(currentUserId);

@@ -2,6 +2,20 @@
     ViewData["Title"] = "Warehouse Dashboard";
 }
 
+<style>
+    .table-fulfillment tbody tr.sla-near-due > td {
+        background-color: #ffe0b3 !important;   /* orange */
+        --bs-table-bg: #ffe0b3;
+        --bs-table-accent-bg: #ffe0b3;
+    }
+
+    .table-fulfillment tbody tr.sla-overdue > td {
+        background-color: #f8c6c6 !important;   /* red */
+        --bs-table-bg: #f8c6c6;
+        --bs-table-accent-bg: #f8c6c6;
+    }
+</style>
+
 <div class="card" id="ordersCard">
     <div class="card-header">
         <h3 class="card-title">@ViewData["Title"]</h3>
@@ -13,9 +27,7 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-info" role="alert">
-            <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
-        </div>
+
         <div class="row">
             <div class="col-lg-5">
                 <div class="card shadow-sm">
@@ -79,13 +91,16 @@
                                 <tr>
                                     <th>SO Number</th>
                                     <th>Customer</th>
-                                    <th>Picking <span class="picking-count" data-microtip-title="NOT STARTED / ONGOING / DONE" data-microtip-position="bottom" role="tooltip"></span></th>
-                                    <th>Packing <span class="packing-count" data-microtip-title="NOT STARTED / ONGOING / DONE" data-microtip-position="bottom" role="tooltip"></span></th>
+                                    <th>Invoices</th>
+                                     <th>SO Status</th>
+@*                                     <th>Picking <span class="picking-count" data-microtip-title="NOT STARTED / ONGOING / DONE" data-microtip-position="bottom" role="tooltip"></span></th>
+                                    <th>Packing <span class="packing-count" data-microtip-title="NOT STARTED / ONGOING / DONE" data-microtip-position="bottom" role="tooltip"></span></th> *@
+                                    <th>SLA Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="4" class="text-center">
+                                    <td colspan="5" class="text-center">
                                         <em class="text-muted">Nothing to show for selected date</em>
                                     </td>
                                 </tr>
@@ -276,6 +291,7 @@
                     date: $(".fulfillment-date").data("date"),
                     includeDone: $(".fulfillment-all").data("include-done")
                 },
+
                 beforeSend: function (jqXHR, settings) {
                     settings.noLoader = true;
                     
@@ -285,6 +301,7 @@
                     var rows = "";
                     if (data.orders && data.orders.length > 0) {
                         data.orders.forEach((order, index) => {
+                             var slaStatus = order.slaStatus == "Near Due" ? "sla-near-due" : order.slaStatus == "Overdue" ? "sla-overdue" : "sla";
                             var rowClass = index % 2 === 0 ? "even" : "odd";
                             var pickingStatus = order.pickingStatus == "NOT STARTED" ? "<span class='badge badge-secondary'>NOT STARTED</span>"
                                               : order.pickingStatus == "PENDING" ? "<span class='badge badge-secondary'>PENDING</span>"
@@ -296,13 +313,18 @@
                                               : order.packingStatus == "ONGOING" ? "<span class='badge badge-warning'>ONGOING</span>"
                                               : order.packingStatus == "DONE" ? "<span class='badge badge-success'>DONE</span>"
                                               : "<span class='badge badge-danger'>MISSING</span>";
-                            //pickingStatus = "<span class='badge badge-danger'>COMING SOON</span>";
+                          
+                            //pickingStatus = "<span class='badge badge-danger'>COMING SOON</span>"      
+                            //      to be added in  line 326
+                            //      // <td>${pickingStatus}</td>
+                                    // <td>${packingStatus}</td>;
                             rows += `
-                                <tr class="${rowClass}">
+                                <tr class="${rowClass} ${slaStatus}">
                                     <td><a href="/SalesOrder/Details/${order.salesOrderId}" class="link-info" target="_blank" style="white-space:nowrap;">${order.salesOrderNumber}</a></td>
                                     <td><a href="/Customer/Details/${order.customerId}" class="link-info" target="_blank">${order.customer}</a></td>
-                                    <td>${pickingStatus}</td>
-                                    <td>${packingStatus}</td>
+                                    <td>${order.invoices}</td>
+                                    <td>${order.soStatus}</td>
+                                     <td>${order.slaStatus}</td>
                                 </tr>
                             `;
                         });
@@ -312,7 +334,7 @@
                         var selected_date = $(".fulfillment-date").data("date");
                         rows = `
                             <tr>
-                                <td colspan="4" class="text-center">
+                                <td colspan="5" class="text-center">
                                     <em class="text-muted">Nothing to show for ${selected_date}</em>
                                 </td>
                             </tr>

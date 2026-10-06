@@ -219,7 +219,7 @@ namespace GMGInventory.Controllers
 
 
             ResponseModel responseModel = new ResponseModel();
-            if (await salesOrderRepository.ApproveAsync(Id))
+            if (await salesOrderRepository.ApproveAsync(Id, ""))
             {
                 responseModel.Status = "Success";
                 responseModel.Message = "Order successfully approved";
@@ -234,14 +234,14 @@ namespace GMGInventory.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Approve(int Id)
+        public async Task<IActionResult> Approve(int Id, string? SlaReason)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.ApproveDisapprove);
             if (redirectResult != null) return redirectResult;
 
             if (ModelState.IsValid)
             {
-                if (await salesOrderRepository.ApproveAsync(Id))
+                if (await salesOrderRepository.ApproveAsync(Id, SlaReason))
                 {
                     TempData["SuccessMessage"] = "Sales order approved successfully";
                 }

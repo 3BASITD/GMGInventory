@@ -66,6 +66,8 @@ namespace GMGInventory.Common.Models
         [Display(Name = "SLA")]
         public string? ServiceLevelAgreement { get; set; }
 
+        public int? ServiceLevelAgreementHr { get; set; }
+
         [Display(Name = "With L/P")]
         public bool WithLP { get; set; }
 
@@ -83,6 +85,15 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Order Queue Reference")]
         public string? OrderQueueNumber { get; set; }
+
+        public string? TimeRemaining { get; set; }
+        public double? TimeRemainingD { get; set; }
+
+        [Display(Name = "SLA Status")]
+        public string? SlaStatus { get; set; }
+
+        [Display(Name = "SLA Reason")]
+        public string? SlaReason { get; set; }
     }
 
     public class SalesOrderFilterVM : ListFilterCommonModel
@@ -247,6 +258,13 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "Purchase Request Number")]
         public string? PRNumber { get; set; }
+
+
+        [Display(Name = "SLA Status")]
+        public string? SlaStatus { get; set; }
+
+        [Display(Name = "SLA Reason")]
+        public string? SlaReason { get; set; }
     }
 
     public class SalesOrderPrintVM //: SalesOrderDetailsVM
@@ -440,6 +458,7 @@ namespace GMGInventory.Common.Models
         public string Remarks { get; set; }
         public int? ResubmitId { get; set; }
         public string Status { get; set; }
+        public string? SlaReason { get; set; }
         public IList<SalesOrderFormItemVM> Items { get; set; }
     }
 
