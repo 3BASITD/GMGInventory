@@ -30,7 +30,8 @@ namespace GMGInventory.Application.Repositories
                              join user in userManager.Users on s.SalesOrder.UserCreated equals user.Id
                              where (s.SalesOrder.Status.Name.Trim().ToLower() == "packing draft"
                                 || s.SalesOrder.Status.Name.Trim().ToLower() == "packing submitted"
-                                || s.SalesOrder.Status.Name.Trim().ToLower() == "fully packed")
+                                || s.SalesOrder.Status.Name.Trim().ToLower() == "fully packed"
+                                || s.SalesOrder.Status.Name.Trim().ToLower() == "sales order approved")
                              && (filter.Brand == null || s.Item.Brand.Id == filter.Brand)
                              && (filter.Region2 == null || regions == null || regions.Contains(s.SalesOrder.Region.Code))
                              && filter.StartDate.Date <= s.SalesOrder.SalesOrderDate.Date
@@ -80,7 +81,8 @@ namespace GMGInventory.Application.Repositories
         //                : null;
         //    var regionSelected = await context.Regions.Where(s => s.Id == filter.Region).Select(s => s.Name).FirstOrDefaultAsync();
         //    var salesOrder = from l in context.SalesOrderLineItems
-        //                     join packed in context.PackLineItems on new { l.SalesOrderId, l.ItemId } equals new { packed.Pack.SalesOrderId, packed.ItemId }
+        //                     join packed in context.PackLineItems on new { l.SalesOrderId, l.ItemId } equals new { packed.Pack.SalesOrderId, packed.ItemId } into gpacked
+        //                     from packed in gpacked.DefaultIfEmpty()
         //                     join returned in context.SalesReturnLineItems on new { SalesOrderId = (int?)l.SalesOrderId, l.ItemId }
         //                                                               equals new { returned.SalesReturn.SalesOrderId, returned.ItemId } into greturned
         //                     from returned in greturned.DefaultIfEmpty()
@@ -99,8 +101,9 @@ namespace GMGInventory.Application.Repositories
         //                     //                                       && s.InvoiceLineItem.Invoice.SalesOrderId == l.SalesOrderId
         //                     //                                       && s.ItemId == l.ItemId)
         //                     //                              .Sum(s => (int?)s.Quantity) ?? 0
-        //                     where (l.SalesOrder.Status.Name == "PACKING DRAFT" || l.SalesOrder.Status.Name == "PACKING SUBMITTED" || l.SalesOrder.Status.Name == "FULLY PACKED")
+        //                     where (l.SalesOrder.Status.Name == "PACKING DRAFT" || l.SalesOrder.Status.Name == "PACKING SUBMITTED" || l.SalesOrder.Status.Name == "FULLY PACKED" || l.SalesOrder.Status.Name == "SALES ORDER APPROVED")
         //                     //&& l.Quantity - (packed.Quantity - returnedQuantity) > 0
+        //                     && ((l.Quantity - ((packed == null ? 0 : packed.Quantity) - (returned == null ? 0 : returned.Quantity))) > 0)
         //                     && (filter.Region2 == null || regions == null || regions.Contains(l.SalesOrder.Customer.Area.Region.Code))
         //                     && filter.StartDate <= l.SalesOrder.DateCreated.Date
         //                     && l.SalesOrder.DateCreated.Date <= filter.EndDate
@@ -119,13 +122,13 @@ namespace GMGInventory.Application.Repositories
         //                         OldSKU = l.Item.OldCode,
         //                         ItemName = l.Item.Name,
         //                         OrderDateD = l.SalesOrder.DateCreated,
-        //                         PackedQuantityD = packed.Quantity,
+        //                         PackedQuantityD = packed == null ? 0 : packed.Quantity,
         //                         QuantityD = l.Quantity,
         //                         QuantityOnHandD = inventory,
         //                         SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
         //                         SalesOrderId = l.SalesOrder.Id,
         //                         UnitPriceD = l.SellingPrice,
-        //                         UnservedQuantityD = l.Quantity - (packed.Quantity - (returned == null ? 0 : returned.Quantity))
+        //                         UnservedQuantityD = l.Quantity - ((packed == null ? 0 : packed.Quantity) - (returned == null ? 0 : returned.Quantity))
         //                     };
         //    return await salesOrder.ToListAsync();
         //}
