@@ -519,6 +519,7 @@
                                     <th>Discount 1</th>
                                     <th>Discount 2</th>
                                     <th>Extended Price</th>
+                                    <th>Promo</th>
                                 </tr>
                             </thead>
                         </table>
@@ -655,7 +656,8 @@
                 { data: "grossPrice", name: "GrossPrice", className: "text-end" },
                 { data: "discount1", name: "Discount1", className: "text-end" },
                 { data: "discount2", name: "Discount2", className: "text-end" },
-                { data: "extendedPrice", name: "ExtendedPrice", className: "text-end" }
+                { data: "extendedPrice", name: "ExtendedPrice", className: "text-end" },
+                { data: "isPromo", name: "Promo", className: "text-end" }
             ],
             order: [[1, "asc"]]
         });
@@ -853,10 +855,11 @@
         }
 
         $(".btn-create").on("click", function () {
-            itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
+            itemDT.rows().every(function () {
                 var row_data = this.data();
                 packDT.rows(function (idx, data, node) {
-                    return data.itemId == row_data.itemId;
+                    return data.itemId == row_data.itemId
+                        && !!data.isPromo === !!row_data.isPromo;
                 }).remove().draw();
             });
         });
@@ -906,7 +909,8 @@
                 var row_quantity = parseInt($(this.node()).find(".quantity").val());
                 item_to_invoice.push({
                     item: row_data.itemId,
-                    quantity: row_quantity
+                    quantity: row_quantity,
+                    isPromo: row_data.isPromo
                 });
             });
             return item_to_invoice;

@@ -56,7 +56,8 @@ namespace GMGInventory.Application.Repositories
                             so.DateCreated,
                             so.DateModified,
                             so.ServiceLevelAgreement.HourAvailability,
-                            stat.Name
+                            stat.Name,
+                            so.ApprovedDate
 
                         };
 
@@ -64,7 +65,7 @@ namespace GMGInventory.Application.Repositories
             //               join inv in context.Invoices on item.Id equals inv.SalesOrderId
 
             var fulfillments = from item in items
-                               group item by new { item.Id, item.SalesOrderNumber, item.CustomerId, item.Customer, item.PickStatus, item.DateCreated, item.DateModified, item.HourAvailability, item.StatusId, item.Name } into g
+                               group item by new { item.Id, item.SalesOrderNumber, item.CustomerId, item.Customer, item.PickStatus, item.DateCreated, item.DateModified, item.HourAvailability, item.StatusId, item.Name, item.ApprovedDate } into g
                                orderby g.Key.DateModified == null ? g.Key.DateCreated : g.Key.DateModified descending
                                select new WarehouseDashboardVM
                                {
@@ -76,6 +77,7 @@ namespace GMGInventory.Application.Repositories
                                    PackingStatus = g.Sum(s => s.pQuantity) == 0 ? "NOT STARTED"
                                                  : g.Sum(s => s.soQuantity - s.pQuantity <= 0 ? 0 : s.soQuantity - s.pQuantity) > 0 ? "ONGOING"
                                                  : "DONE",
+
                                    //SlaStatus = (g.Key.StatusId == 2 || g.Key.StatusId == 3)
                                    //                     && g.Key.HourAvailability > 0
                                    //                   ? (EF.Functions.DateDiffMinute(g.Key.DateCreated, now)
@@ -85,18 +87,12 @@ namespace GMGInventory.Application.Repositories
                                    //                             >= g.Key.HourAvailability * 60 * nearDueThreshold
                                    //                             ? "Near Due"
                                    //                             : "On Track")
-                                   //                   : null,
-                                   SlaStatus = (g.Key.StatusId == 2 || g.Key.StatusId == 3)
-                                                        && g.Key.HourAvailability > 0
-                                                      ? (EF.Functions.DateDiffMinute(g.Key.DateCreated, now)
-                                                            >= g.Key.HourAvailability * 60
-                                                            ? "Overdue"
-                                                            : EF.Functions.DateDiffMinute(g.Key.DateCreated, now)
-                                                                >= g.Key.HourAvailability * 60 * nearDueThreshold
-                                                                ? "Near Due"
-                                                                : "On Track")
-                                                      : "",
-                                   SoStatus = g.Key.Name
+                                   //                   : "",
+                                   SoStatus = g.Key.Name,
+                                   SoStatusId = g.Key.StatusId,
+                                   HourAvailability = g.Key.HourAvailability,
+                                   ApproveDate = g.Key.ApprovedDate,
+                                   DateCreated = g.Key.DateCreated
 
                                };
 
@@ -118,10 +114,47 @@ namespace GMGInventory.Application.Repositories
 
                 foreach (var o in orders)
                 {
+                    var isSubmitted = o.SoStatusId == 2;
+                    var isApproved = o.SoStatusId == 3;
+
+                    if ((!isSubmitted && !isApproved) || o.HourAvailability <= 0)
+                    {
+                        o.SlaStatus = string.Empty;
+                        o.Invoices = invoiceLookup.TryGetValue(o.SalesOrderId, out var invs)
+                                    ? invs == null ? string.Empty : invs
+                                    : string.Empty;
+                        continue;
+                    }
+
+                    var limitMinutes = o.HourAvailability * 60;
+
+                    if (isApproved && o.ApproveDate.HasValue)
+                    {
+                        // SLA clock stops at approval time
+                        var minutesToApprove = (o.ApproveDate.Value - o.DateCreated).TotalMinutes;
+
+                        o.SlaStatus = minutesToApprove <= limitMinutes ? string.Empty : "Overdue";
+
+                        // optional: freeze remaining time at the moment of approval
+                        //o.TimeRemainingD = o.ServiceLevelAgreementHr - minutesToApprove / 60.0;
+                    }
+                    else
+                    {
+                        // still waiting for approval: the clock is running against now
+                        var elapsedMinutes = (now - o.DateCreated).TotalMinutes;
+
+                        if (elapsedMinutes >= limitMinutes)
+                            o.SlaStatus = "Overdue";
+                        else if (elapsedMinutes >= limitMinutes * nearDueThreshold)
+                            o.SlaStatus = "Near Due";
+                        else
+                            o.SlaStatus = "On Track";
+                    }
+
                     o.Invoices = invoiceLookup.TryGetValue(o.SalesOrderId, out var inv)
-                        ? inv
+                        ? inv == null ? string.Empty : inv
                         : string.Empty;
-                    o.SlaStatus = o.Invoices != "" ? "DONE" : o.SlaStatus;
+                    o.SlaStatus = o.Invoices != string.Empty ? "DONE" : o.SlaStatus;
                 }
             }
 

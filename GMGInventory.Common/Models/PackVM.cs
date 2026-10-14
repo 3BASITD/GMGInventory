@@ -137,6 +137,7 @@ namespace GMGInventory.Common.Models
         public int SalesOrderLineItemId { get; set; }
 
         public bool? IsPromo { get; set; }
+        public int LineNumber { get; set; }
     }
 
     public class PackFormVM : PackFormAPIVM

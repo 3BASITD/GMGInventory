@@ -13,7 +13,11 @@ namespace GMGInventory.Common.Models
         public string PackingStatus { get; set; }
         public string? SlaStatus { get; set; }
         public string SoStatus { get; set; }
+        public int SoStatusId { get; set; }
         public string? Invoices { get; set; }
+        public DateTime? ApproveDate { get; set; }
+        public DateTime DateCreated { get; set; }
+        public int HourAvailability { get; set; }
     }
 
     public class OrderFulfillmentVM

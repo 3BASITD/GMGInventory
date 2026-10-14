@@ -2,6 +2,7 @@
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
 using GMGInventory.Data;
+using GMGInventory.Data.Migrations;
 using GMGInventory.Data.OrderAppDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -423,6 +424,7 @@ namespace GMGInventory.Application.Repositories
                                   }).ToList();
 
                 var soNumberAdded = new List<string>();
+                int salesOrderId = 0;
 
                 foreach (var itemToAdd in itemsToAdd)
                 {
@@ -445,6 +447,7 @@ namespace GMGInventory.Application.Repositories
 
                     await context.SalesOrders.AddAsync(salesOrder);
                     await context.SaveChangesAsync(currentUser);
+                    salesOrderId = salesOrder.Id;
 
                     var lineNumber = 1;
 
@@ -481,6 +484,16 @@ namespace GMGInventory.Application.Repositories
                         lineNumber++;
                     }
                 }
+
+                var kpi = new KPI
+                {
+                    SalesOrderId = salesOrderId,
+                    UserCreated = currentUser,
+                    KpiStart = DateTime.Now,
+                };
+                await context.KPIs.AddAsync(kpi);
+                await context.SaveChangesAsync(currentUser);
+
                 return new ResponseModel
                 {
                     Status = "Success",
