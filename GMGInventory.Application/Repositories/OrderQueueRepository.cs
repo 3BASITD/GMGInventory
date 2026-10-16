@@ -490,6 +490,7 @@ namespace GMGInventory.Application.Repositories
                     SalesOrderId = salesOrderId,
                     UserCreated = currentUser,
                     KpiStart = DateTime.Now,
+                    Department = "SA"
                 };
                 await context.KPIs.AddAsync(kpi);
                 await context.SaveChangesAsync(currentUser);

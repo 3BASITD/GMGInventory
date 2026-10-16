@@ -12,7 +12,9 @@ namespace GMGInventory.Controllers
 {
     [Authorize]
     public class SalesOrderController(IAccessRepository accessRepository
+                                    , ISystemSettingRepository settingRepository
                                     , ISalesOrderRepository salesOrderRepository) : BaseController(accessRepository)
+
     {
         private readonly ControllerHelper chelper = new();
 
@@ -50,9 +52,9 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
-        
-            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
 
+            ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
+           
             return View();
         }
 
@@ -74,12 +76,14 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
             ViewData["UserAccessSpecial"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrderSpecial)).Convert();
-
+         
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (order == null)
             {
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewData["SystemSettings"] = await settingRepository.GetSystemSettings();
 
             var dtNow = DateTime.Now;
             var newChecker = dtNow.AddMinutes(-1) <= order.OrderDateD && order.OrderDateD <= dtNow;
@@ -150,6 +154,7 @@ namespace GMGInventory.Controllers
 
             ViewData["UserAccess"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrder)).Convert();
             ViewData["UserAccessSpecial"] = new ViewsAccessData(await GetAccessAsync(PageNames.SalesOrderSpecial)).Convert();
+            ViewData["SystemSettings"] = await settingRepository.GetSystemSettings();
 
             var order = await salesOrderRepository.GetDetailsAsync(Id);
             if (Id != null && (order == null || order.DisapprovedBy == null || order.DisapprovedDateD == null))
@@ -165,6 +170,18 @@ namespace GMGInventory.Controllers
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Add);
             if (redirectResult != null) return redirectResult;
+
+            if (form.Status == "Submitted")
+            {
+                var cutoffStr = await settingRepository.GetValue("SubmitCutoff");
+
+                if (!TimeSpan.TryParse(cutoffStr, out var cutoff))
+                    cutoff = new TimeSpan(14, 0, 0);   // fallback if missing/malformed
+
+                var now = DateTime.Now.TimeOfDay;
+                if (now < new TimeSpan(7, 0, 0) || now >= cutoff)
+                    return Json(new { status = "Error", message = $"Submission is closed (cutoff {cutoff:hh\\:mm}). It reopens at 07:00." });
+            }
 
 
             var response = await salesOrderRepository.SaveAsync(form);
@@ -203,7 +220,7 @@ namespace GMGInventory.Controllers
 
             var response = await salesOrderRepository.DeleteDraft(Id);
 
-            if(response.Status == "Success")
+            if (response.Status == "Success")
             {
                 TempData["SuccessMessage"] = response.Message;
             }
@@ -317,7 +334,11 @@ namespace GMGInventory.Controllers
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("WithREYCONonDefective")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("WithREYCOJITLPDelivery")),
                 new DataColumn(chelper.DisplayName<SalesOrderVM>("SpecialInstruction")),
-                new DataColumn(chelper.DisplayName<SalesOrderVM>("Remarks"))
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("Remarks")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("SA Name")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("SA KPI")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("OPS Name")),
+                new DataColumn(chelper.DisplayName<SalesOrderVM>("OPS KPI")),
             ]);
             var sos = await salesOrderRepository.GetListAsync(filter);
             foreach (var so in sos)
@@ -338,7 +359,11 @@ namespace GMGInventory.Controllers
                             so.WithREYCONonDefective ? "Yes" : "No",
                             so.WithREYCOJITLPDelivery,
                             so.SpecialInstruction,
-                            so.Remarks);
+                            so.Remarks,
+                            so.SaName,
+                            so.SaKpi,
+                            so.OpsName,
+                            so.OpsKpi);
             }
 
             using XLWorkbook wb = new();
@@ -349,5 +374,22 @@ namespace GMGInventory.Controllers
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         DateTime.Now.ToString("yyyyMMdd") + " Sales Order.xlsx");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdatePod(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Delete);
+            if (redirectResult != null) return redirectResult;
+
+            var response = await salesOrderRepository.UpdatePod(Id);
+
+            if (response.Status == "Success")
+            {
+                TempData["SuccessMessage"] = response.Message;
+            }
+
+            return Json(response);
+        }
+
     }
 }

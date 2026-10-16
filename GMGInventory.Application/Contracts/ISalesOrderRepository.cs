@@ -24,5 +24,6 @@ namespace GMGInventory.Application.Contracts
         Task<bool> ApproveAsync(int salesOrderId, string slaReason);
         Task<bool> DisapproveAsync(int salesOrderId, string reason);
         Task<bool> UpdateServedSOItem(int salesOrderLineItemId, int quantity);
+        Task<ResponseModel> UpdatePod(int Id);
     }
 }

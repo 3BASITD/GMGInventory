@@ -517,7 +517,7 @@
                     
                     <div class="tab-pane fade" id="other" role="tabpanel">
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-4">
                                 <div class="d-flex justify-content-end">
                                     <button class="btn btn-primary" onclick="SaveOthers()">
                                         <i class="fas fa-save mr-1"></i>
@@ -536,6 +536,14 @@
                                             <input type="radio" class="btn-check" id="kyc-required-yes" value="Yes" @(GetValue("KYCRequired") != "true" ? "" : "checked") name="KYCRequired">
                                             <label class="btn btn-outline-success" for="kyc-required-yes">Enabled</label>
                                         </div>
+                                    </div>
+                                </div>
+                               <div class="mb-3">
+                                    <label class="form-label" for="Cut-off">
+                                        Submit Cut-off
+                                    </label>
+                                     <div class="d-block">
+                                    <input type="time" id="cut-off" name="SubmitCutoff" min="09:00" max="17:00" step="900">
                                     </div>
                                 </div>
                             </div>
@@ -759,7 +767,9 @@
 
         function SaveOthers() {
             var settings = [
-                    { name: "KYCRequired", value: $("#kyc-required-yes").prop("checked") ? "true" : "false" }
+                    { name: "KYCRequired", value: $("#kyc-required-yes").prop("checked") ? "true" : "false",
+                      name: "SubmitCutoff", value: $("#cut-off").val()
+                    }
                 ];
             $.ajax({
                 type: "POST",

@@ -21,14 +21,17 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly IDeliveryMonitoringRepository _deliveryMonitoringRepository;
 
         public SalesOrderRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager)
+            , UserManager<User> userManager
+            , IDeliveryMonitoringRepository deliveryMonitoringRepository)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            _deliveryMonitoringRepository = deliveryMonitoringRepository;
         }
 
         public async Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page)
@@ -443,7 +446,17 @@ namespace GMGInventory.Application.Repositories
                                       where soli.Quantity > (pli == null ? 0 : pli.Quantity)
                                       select soli.SalesOrderId;
 
+            var saKpi = from so in context.SalesOrders
+                        join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
+                        join user in users on kpi.UserCreated equals user.Id
+                        where kpi.Department == "SA"
+                        select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " +  user.LastName};
 
+            var opsKpi = from so in context.SalesOrders
+                         join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
+                         join user in users on kpi.UserCreated equals user.Id
+                         where kpi.Department == "OPS"
+                         select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
 
 
             var orderVM = (from order in filteredOrder
@@ -508,6 +521,11 @@ namespace GMGInventory.Application.Repositories
                                TimeRemainingD = order.ServiceLevelAgreement.HourAvailability
                                    - EF.Functions.DateDiffMinute(order.DateCreated, now) / 60.0,
                                ApproveDateD = order.ApprovedDate,
+                               SaName = saKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
+                               SaKpi = (saKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
+                               OpsName = opsKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
+                               OpsKpi = (opsKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
+
                                //SlaStatus = (order.Status.Id == 2 || order.Status.Id == 3)
                                //                         && order.ServiceLevelAgreement.HourAvailability > 0
                                //                       ? (EF.Functions.DateDiffMinute(order.DateCreated, now)
@@ -1253,16 +1271,19 @@ namespace GMGInventory.Application.Repositories
 
                 context.SalesOrders.Update(orderVM);
 
-
-                var kpis = new KPI
+                if (kpi != null)
                 {
-                    SalesOrderId = kpi.SalesOrderId,
-                    UserCreated = currentUserId,
-                    KpiStart = kpi.KpiEnd,
-                    KpiEnd = DateTime.Now,
-                    Department = "OPS"
-                };
-                await context.KPIs.AddAsync(kpis);
+                    var kpis = new KPI
+                    {
+                        SalesOrderId = kpi.SalesOrderId,
+                        UserCreated = currentUserId,
+                        KpiStart = kpi.KpiEnd,
+                        KpiEnd = DateTime.Now,
+                        Department = "OPS"
+                    };
+
+                    await context.KPIs.AddAsync(kpis);
+                }
                 await context.SaveChangesAsync(currentUserId);
                 return true;
             }
@@ -1389,15 +1410,35 @@ namespace GMGInventory.Application.Repositories
         public async Task<ResponseModel> UpdatePod(int Id)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            
             var order = await context.SalesOrders
-                                     .Include(s => s.Status)
-                                     .Where(s => s.Id == Id)
-                                     .FirstOrDefaultAsync();
-           
+                         .Include(s => s.Status)
+                         .FirstOrDefaultAsync(s => s.Id == Id); ;
+            if (order == null)
+                return new ResponseModel { Status = "Error", Message = "Sales order not found" };
 
-            await context.SaveChangesAsync(currentUserId);
+            var pack = await context.Packs
+                           .FirstOrDefaultAsync(s => s.SalesOrderId == Id);
 
-            return new ResponseModel { Status = "Success", Message = "Successfully deleted sales order" };
+            if (pack == null)
+                return new ResponseModel { Status = "Error", Message = "Pack not found" };
+
+            var delivery = new DeliveryMonitoringFormVM
+            {
+                SalesOrderId = order.Id,
+                DeliveryDate = order.RequiredDeliveryDate,
+                ReceiveDate = DateTime.Now,
+                DeliveryMethodId = 1,
+                ForwarderId = order.ForwarderId,
+                PackId = pack.Id,
+                DeliveryStatusId = 3,
+            };
+
+            var result = await _deliveryMonitoringRepository.SaveDeliveryAsync(delivery);
+            if (result.Status != "Success")
+                return result; 
+
+            return new ResponseModel { Status = "Success", Message = "Successfully updated proof of order" };
         }
     }
 }

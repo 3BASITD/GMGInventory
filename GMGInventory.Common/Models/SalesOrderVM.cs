@@ -97,6 +97,10 @@ namespace GMGInventory.Common.Models
 
         public string ApproveDate => ApproveDateD?.ToString(SystemFormat.StringDate);
         public DateTime? ApproveDateD { get; set; }
+        public string? SaName { get; set; }
+        public string? SaKpi { get; set; }
+        public string? OpsName { get; set; }
+        public string? OpsKpi { get; set; }
     }
 
     public class SalesOrderFilterVM : ListFilterCommonModel

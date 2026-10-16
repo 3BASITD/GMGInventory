@@ -344,7 +344,7 @@ namespace GMGInventory.Application.Repositories
                                                        .Sum(s => (int?)s.Quantity) ?? 0
                          where pack.PackId == packId
                          && pack.Item.Id == order.Item.Id
-                         //&& invoicedQuantity < packedQuantity
+                         && invoicedQuantity < packedQuantity
                          && pack.IsPromo == order.IsPromo
 
                          group new { pack, order, price } by new { pack.ItemId, order.Discount1, order.Discount2, order.SellingPrice, order.IsPromo } into grp
