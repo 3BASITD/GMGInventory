@@ -148,12 +148,13 @@ namespace GMGInventory.Application.Repositories
                                  Status4D = invoice.Status.Name,
                                  Status4Date = invoice.InvoiceDate,
                                  Status5D = delivery.SalesOrderDeliveryStatus.Name,
-                                 Status5Date = delivery.DeliveryDate != null ? delivery.DeliveryDate
-                                             : delivery.PickupDate != null ? delivery.PickupDate
-                                             : delivery.ReceiveDate != null ? delivery.ReceiveDate
-                                             : delivery.DateModified != null ? delivery.DateModified
-                                             : delivery.DateCreated,
-                                 DeliveryId = delivery.Id,
+                                 Status5Date = delivery.ReceiveDate != null ? delivery.ReceiveDate : delivery.DateCreated,
+                                 //Status5Date = delivery.DeliveryDate != null ? delivery.DeliveryDate
+                                 //            : delivery.PickupDate != null ? delivery.PickupDate
+                                 //            : delivery.ReceiveDate != null ? delivery.ReceiveDate
+                                 //            : delivery.DateModified != null ? delivery.DateModified
+                                 //            : delivery.DateCreated,
+                                 //DeliveryId = delivery.Id,
                                  DeliveryStatusId = delivery.SalesOrderDeliveryStatus.Id,
                                  DeliveryStatus = delivery.SalesOrderDeliveryStatus.Name,
                                  PickupDateD = delivery.PickupDate,
