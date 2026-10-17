@@ -378,7 +378,7 @@ namespace GMGInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdatePod(int Id)
         {
-            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.Delete);
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.DeliveryMonitoring, AccessTypes.Edit);
             if (redirectResult != null) return redirectResult;
 
             var response = await salesOrderRepository.UpdatePod(Id);
