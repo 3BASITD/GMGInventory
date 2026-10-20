@@ -276,7 +276,7 @@ namespace GMGInventory.Application.Repositories
                                                 DocNum = s.PurchaseOrder.DocumentNumber
                                             })
                                             .Distinct()
-                            where request.PurchaseRequestId == purchaseRequestId
+                            where request.PurchaseRequestId == purchaseRequestId && (soli.IsPromo == null || soli.IsPromo == false)
                             select new PurchaseRequestLineItemVM
                             {
                                 Id = request.Id,
@@ -367,6 +367,7 @@ namespace GMGInventory.Application.Repositories
                                                                        && s.ItemId == order.ItemId)
                                                               .Sum(s => (int?)s.Quantity) ?? 0
                                 where order.SalesOrderId == SalesOrderId
+                                 && (order.IsPromo == null || order.IsPromo == false)
                                 orderby order.LineNumber ascending
                                 select new ItemFromSalesOrderVM
                                 {
