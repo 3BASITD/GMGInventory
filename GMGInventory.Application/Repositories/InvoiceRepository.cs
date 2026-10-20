@@ -263,8 +263,7 @@ namespace GMGInventory.Application.Repositories
             invoiceDetails.LessVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
             invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
 
-            invoiceDetails.TotalAmoutDueD = invoiceDetails.DiscountAmountD == 0 ? invoiceDetails.TotalAmountD - invoiceDetails.WithHoldingTaxD
-                                            : invoiceDetails.TotalAmountD - invoiceDetails.DiscountAmountD - invoiceDetails.WithHoldingTaxD;
+            invoiceDetails.TotalAmoutDueD = invoiceDetails.DiscountAmountD == 0 ? invoiceDetails.TotalAmountD : invoiceDetails.TotalAmountD - invoiceDetails.DiscountAmountD;
 
             
 
