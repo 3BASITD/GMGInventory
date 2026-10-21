@@ -257,13 +257,14 @@ namespace GMGInventory.Application.Repositories
                                             : 0;
 
             invoiceDetails.TotalAmountD = items.Sum(s => s.GrossPriceNoDiscountD);
-
-            invoiceDetails.AmountNetVatD = Math.Round(invoiceDetails.TotalAmountD / 1.12m, 2, MidpointRounding.AwayFromZero);
-            invoiceDetails.WithHoldingTaxD = Math.Round(invoiceDetails.AmountNetVatD * 0.01m, 2, MidpointRounding.AwayFromZero);
-            invoiceDetails.LessVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
-            invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
-
             invoiceDetails.TotalAmoutDueD = invoiceDetails.DiscountAmountD == 0 ? invoiceDetails.TotalAmountD : invoiceDetails.TotalAmountD - invoiceDetails.DiscountAmountD;
+
+            invoiceDetails.AmountNetVatD = invoiceDetails.TotalAmoutDueD / 1.12m;
+            invoiceDetails.WithHoldingTaxD = invoiceDetails.AmountNetVatD * 0.01m;
+            invoiceDetails.LessVatD = invoiceDetails.AmountNetVatD * 0.12m;
+            invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.ToZero);
+
+           
 
             
 
