@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -450,7 +451,7 @@ namespace GMGInventory.Application.Repositories
                         join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
                         join user in users on kpi.UserCreated equals user.Id
                         where kpi.Department == "SA"
-                        select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " +  user.LastName};
+                        select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
 
             var opsKpi = from so in context.SalesOrders
                          join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
@@ -545,6 +546,7 @@ namespace GMGInventory.Application.Repositories
                 var isSubmitted = vm.Status == "SUBMITTED";
                 var isApproved = vm.Status == "APPROVED";
 
+
                 if ((!isSubmitted && !isApproved) || vm.ServiceLevelAgreementHr <= 0)
                 {
                     vm.SlaStatus = null;
@@ -556,7 +558,7 @@ namespace GMGInventory.Application.Repositories
                 if (isApproved && vm.ApproveDateD.HasValue)
                 {
                     // SLA clock stops at approval time
-                    var minutesToApprove = (vm.ApproveDateD.Value - vm.OrderDateD).TotalMinutes;
+                    var minutesToApprove = BusinessMinutesBetween(vm.OrderDateD, vm.ApproveDateD.Value);
 
                     vm.SlaStatus = minutesToApprove <= limitMinutes ? "Done" : "Overdue";
 
@@ -566,7 +568,7 @@ namespace GMGInventory.Application.Repositories
                 else
                 {
                     // still waiting for approval: the clock is running against now
-                    var elapsedMinutes = (now - vm.OrderDateD).TotalMinutes;
+                    var elapsedMinutes = BusinessMinutesBetween(vm.OrderDateD, now);
 
                     if (elapsedMinutes >= limitMinutes)
                         vm.SlaStatus = "Overdue";
@@ -1410,7 +1412,7 @@ namespace GMGInventory.Application.Repositories
         public async Task<ResponseModel> UpdatePod(int Id)
         {
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
-            
+
             var order = await context.SalesOrders
                          .Include(s => s.Status)
                          .FirstOrDefaultAsync(s => s.Id == Id); ;
@@ -1436,9 +1438,35 @@ namespace GMGInventory.Application.Repositories
 
             var result = await _deliveryMonitoringRepository.SaveDeliveryAsync(delivery);
             if (result.Status != "Success")
-                return result; 
+                return result;
 
             return new ResponseModel { Status = "Success", Message = "Successfully updated proof of order" };
         }
+
+        public double BusinessMinutesBetween(DateTime start, DateTime end)
+        {
+            var workStart = new TimeSpan(8, 0, 0);
+            var workEnd = new TimeSpan(17, 0, 0);
+
+            if (end <= start) return 0;
+
+            double total = 0;
+
+            for (var day = start.Date; day <= end.Date; day = day.AddDays(1))
+            {
+                if (day.DayOfWeek == DayOfWeek.Sunday) continue;
+
+                var windowStart = day + workStart;
+                var windowEnd = day + workEnd;
+
+                var s = start > windowStart ? start : windowStart;
+                var e = end < windowEnd ? end : windowEnd;
+
+                if (e > s) total += (e - s).TotalMinutes;
+            }
+
+            return total;
+        }
+
     }
 }

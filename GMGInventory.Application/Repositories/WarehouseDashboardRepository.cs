@@ -15,12 +15,15 @@ namespace GMGInventory.Application.Repositories
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<User> userManager;
+        private readonly ISalesOrderRepository _salesOrderRepository;
 
         public WarehouseDashboardRepository(ApplicationDbContext context
-                                          , UserManager<User> userManager)
+                                          , UserManager<User> userManager
+                                          , ISalesOrderRepository salesOrderRepository)
         {
             this.context = context;
             this.userManager = userManager;
+            _salesOrderRepository = salesOrderRepository;
         }
 
         public async Task<OrderFulfillmentVM> GetOrderFulfillments(DateTime dt, bool IncludeDone)
@@ -131,9 +134,9 @@ namespace GMGInventory.Application.Repositories
                     if (isApproved && o.ApproveDate.HasValue)
                     {
                         // SLA clock stops at approval time
-                        var minutesToApprove = (o.ApproveDate.Value - o.DateCreated).TotalMinutes;
+                        var minutesToApprove = _salesOrderRepository.BusinessMinutesBetween(o.DateCreated, o.ApproveDate.Value);
 
-                        o.SlaStatus = minutesToApprove <= limitMinutes ? string.Empty : "Overdue";
+                        o.SlaStatus = minutesToApprove <= limitMinutes ? "Done" : "Overdue";
 
                         // optional: freeze remaining time at the moment of approval
                         //o.TimeRemainingD = o.ServiceLevelAgreementHr - minutesToApprove / 60.0;
@@ -141,7 +144,7 @@ namespace GMGInventory.Application.Repositories
                     else
                     {
                         // still waiting for approval: the clock is running against now
-                        var elapsedMinutes = (now - o.DateCreated).TotalMinutes;
+                        var elapsedMinutes = _salesOrderRepository.BusinessMinutesBetween(o.DateCreated,now);
 
                         if (elapsedMinutes >= limitMinutes)
                             o.SlaStatus = "Overdue";
