@@ -346,7 +346,7 @@ namespace GMGInventory.Application.Repositories
                                                join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
                                                let discount1 = (100 - orderli.Discount1) / 100
                                                let discount2 = (100 - orderli.Discount2) / 100
-                                               where invli.ItemId == orderli.ItemId
+                                               where invli.ItemId == orderli.ItemId && invli.IsPromo == orderli.IsPromo
                                                select invli.Quantity * invli.UnitPrice * discount1 * discount2).Sum(),
                                HashMicroMoveId = inv.HashMicroMoveId,
                                HashMicroMoveName = inv.HashMicroMoveName,
