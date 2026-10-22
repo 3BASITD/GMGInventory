@@ -9,33 +9,7 @@ namespace GMGInventory.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<TimeSpan>(
-                name: "PriorAvailability",
-                table: "ServiceLevelAgreements",
-                type: "time",
-                nullable: true,
-                oldClrType: typeof(TimeSpan),
-                oldType: "time");
 
-            migrationBuilder.AddColumn<int>(
-                name: "HourAvailability",
-                table: "ServiceLevelAgreements",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
-            migrationBuilder.AddColumn<int>(
-                name: "RegionId",
-                table: "ServiceLevelAgreements",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
-            migrationBuilder.AddColumn<string>(
-                name: "SlaReason",
-                table: "SalesOrders",
-                type: "nvarchar(250)",
-                nullable: true);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
@@ -54,27 +28,6 @@ namespace GMGInventory.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "HourAvailability",
-                table: "ServiceLevelAgreements");
-
-            migrationBuilder.DropColumn(
-                name: "RegionId",
-                table: "ServiceLevelAgreements");
-
-            migrationBuilder.DropColumn(
-                name: "SlaReason",
-                table: "SalesOrders");
-
-            migrationBuilder.AlterColumn<TimeSpan>(
-                name: "PriorAvailability",
-                table: "ServiceLevelAgreements",
-                type: "time",
-                nullable: false,
-                defaultValue: new TimeSpan(0, 0, 0, 0, 0),
-                oldClrType: typeof(TimeSpan),
-                oldType: "time",
-                oldNullable: true);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",

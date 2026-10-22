@@ -94,6 +94,13 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "SLA Reason")]
         public string? SlaReason { get; set; }
+
+        public string ApproveDate => ApproveDateD?.ToString(SystemFormat.StringDate);
+        public DateTime? ApproveDateD { get; set; }
+        public string? SaName { get; set; }
+        public string? SaKpi { get; set; }
+        public string? OpsName { get; set; }
+        public string? OpsKpi { get; set; }
     }
 
     public class SalesOrderFilterVM : ListFilterCommonModel
@@ -265,6 +272,7 @@ namespace GMGInventory.Common.Models
 
         [Display(Name = "SLA Reason")]
         public string? SlaReason { get; set; }
+        public bool HaveInvoice { get; set; }
     }
 
     public class SalesOrderPrintVM //: SalesOrderDetailsVM

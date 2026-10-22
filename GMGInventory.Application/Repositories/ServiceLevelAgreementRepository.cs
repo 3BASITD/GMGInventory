@@ -34,7 +34,7 @@ namespace GMGInventory.Application.Repositories
             {
                 search = "3";
             }
-            else if(search == "4")
+            else if (search == "4")
             {
                 search = "1";
             }

@@ -296,12 +296,46 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<IList<PackItemVM>> GetItemsWithPriceAsync(int packId)
         {
+
+            //// 1. Pack lines exist (you already know this is 7)
+            //var step1 = await context.PackLineItems
+            //    .Where(p => p.PackId == packId)
+            //    .CountAsync();
+
+            //// 2. Does the pack's sales order exist, and does it have order lines?
+            //var salesOrderId = await context.Packs
+            //    .Where(p => p.Id == packId)
+            //    .Select(p => (int?)p.SalesOrder.Id)
+            //    .FirstOrDefaultAsync();
+
+            //var step2 = await context.SalesOrderLineItems
+            //    .Where(o => o.SalesOrder.Id == salesOrderId)
+            //    .CountAsync();
+
+            //// 3. Join + item match only (no IsPromo, no invoice check)
+            //var step3 = await (from pack in context.PackLineItems
+            //                   join order in context.SalesOrderLineItems
+            //                       on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
+            //                   where pack.PackId == packId && pack.ItemId == order.ItemId
+            //                   select new { pack.ItemId, PackPromo = pack.IsPromo, OrderPromo = order.IsPromo })
+            //                  .ToListAsync();
+
+            //// 4. Packed vs invoiced quantities
+            //var step4 = await context.InvoiceLineItems
+            //    .Where(i => i.Invoice.PackId == packId)
+            //    .Select(i => new { i.ItemId, i.Quantity })
+            //    .ToListAsync();
+
+
+
+
+
             var itemVM = from pack in context.PackLineItems
                          join order in context.SalesOrderLineItems on pack.Pack.SalesOrder.Id equals order.SalesOrder.Id
                          let price = context.ItemPrices
                                             .Where(s => s.ItemId == pack.Item.Id && s.DateCreated <= pack.DateCreated)
                                             .OrderByDescending(s => s.DateCreated)
-                                            .First()
+                                            .FirstOrDefault()
                          let packedQuantity = context.PackLineItems
                                                      .Where(s => s.PackId == packId && s.ItemId == order.ItemId)
                                                      .Sum(s => (int?)s.Quantity) ?? 0
@@ -311,9 +345,9 @@ namespace GMGInventory.Application.Repositories
                          where pack.PackId == packId
                          && pack.Item.Id == order.Item.Id
                          && invoicedQuantity < packedQuantity
-                          && pack.IsPromo == order.IsPromo
+                         && pack.IsPromo == order.IsPromo
 
-                         group new { pack, order, price } by new { pack.ItemId, order.Discount1, order.Discount2, order.SellingPrice } into grp
+                         group new { pack, order, price } by new { pack.ItemId, order.Discount1, order.Discount2, order.SellingPrice, order.IsPromo } into grp
                          select new PackItemVM
                          {
                              Discount1D = grp.First().order.Discount1,
@@ -323,8 +357,10 @@ namespace GMGInventory.Application.Repositories
                              ItemName = grp.First().pack.Item.Name + (grp.First().order.ItemPromo == null ? "" : " (" + grp.First().order.ItemPromo.Name + ")"),
                              Quantity = grp.Sum(s => s.pack.Quantity),
                              SellingPriceD = grp.First().order.SellingPrice,
-                             SellingPriceType = grp.First().price.RetailSellingPrice > grp.First().price.NetSellingPrice ? "Gross" : "Net",
-                             IsPromo = grp.First().pack.IsPromo
+                             SellingPriceType = grp.First().price != null
+                                                && grp.First().price.RetailSellingPrice > grp.First().price.NetSellingPrice
+                                                ? "Gross" : "Net",
+                             IsPromo = grp.First().order.IsPromo
                          };
             return await itemVM.ToListAsync();
         }

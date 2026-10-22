@@ -1,5 +1,8 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -7,6 +10,7 @@ using GMGInventory.Data;
 using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Dynamic.Core;
@@ -18,14 +22,17 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<User> userManager;
+        private readonly IDeliveryMonitoringRepository _deliveryMonitoringRepository;
 
         public SalesOrderRepository(ApplicationDbContext context
             , IHttpContextAccessor httpContextAccessor
-            , UserManager<User> userManager)
+            , UserManager<User> userManager
+            , IDeliveryMonitoringRepository deliveryMonitoringRepository)
         {
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
             this.userManager = userManager;
+            _deliveryMonitoringRepository = deliveryMonitoringRepository;
         }
 
         public async Task<Select2Model<JsonPurchaseOrderOptionsModel>> GetOptions(string search, int page)
@@ -89,16 +96,16 @@ namespace GMGInventory.Application.Repositories
         public async Task<Select2Model<JsonSalesOrderOptionsModel>> GetSalesOrderUnservedOnlyOptions(string search, int page, int? regionId)
         {
             var orders = from order in context.SalesOrders
-                         //let oli = from soli in order.SalesOrderLineItems
-                         //          let ii = context.ItemInventories
-                         //                .Where(s => s.ItemId == soli.ItemId
-                         //                         && s.Warehouse.IsMain == true)
-                         //                .Sum(s => (int?)s.Quantity) ?? 0
-                         //          select new
-                         //          {
-                         //              soli.Quantity,
-                         //              Stock = ii
-                         //          }
+                             //let oli = from soli in order.SalesOrderLineItems
+                             //          let ii = context.ItemInventories
+                             //                .Where(s => s.ItemId == soli.ItemId
+                             //                         && s.Warehouse.IsMain == true)
+                             //                .Sum(s => (int?)s.Quantity) ?? 0
+                             //          select new
+                             //          {
+                             //              soli.Quantity,
+                             //              Stock = ii
+                             //          }
                          where order.Status.Code.ToLower() != "submitted"
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
@@ -200,6 +207,17 @@ namespace GMGInventory.Application.Repositories
             var now = DateTime.Now;
             const double nearDueThreshold = 0.70;
 
+            bool hasInvoice = false;
+
+            var invoice = context.InvoiceLineItems
+                                    .Where(s => s.Invoice.SalesOrderId == Id)
+                                    .Any(s => s.Invoice.Status.Code.Trim().ToLower() == "invoiced" || s.Invoice.Status.Code.Trim().ToLower() == "draft");
+
+            if (invoice)
+            {
+                hasInvoice = true;
+            }
+
             var customerInvoices = from inv in context.InvoiceLineItems
                                    where (inv.Invoice.Status.Code.Trim().ToLower() == "invoiced" || inv.Invoice.Status.Code.Trim().ToLower() == "draft")
                                    join oli in context.SalesOrderLineItems on new { inv.Invoice.SalesOrderId, inv.ItemId }
@@ -262,9 +280,9 @@ namespace GMGInventory.Application.Repositories
                                   join poli in context.PurchaseOrderNewLineItems on pritem.Id equals poli.RequestItemId
                                   join po in context.PurchaseOrderNews on poli.PurchaseOrderId equals po.Id
                                   where pritem.SalesOrderId == Id
-                                  select new 
-                                  { 
-                                      PRDocumentNumber= pr.DocumentNumber,
+                                  select new
+                                  {
+                                      PRDocumentNumber = pr.DocumentNumber,
                                       PODocumentNumber = po.DocumentNumber
                                   };
 
@@ -374,7 +392,8 @@ namespace GMGInventory.Application.Repositories
                                                                 >= order.ServiceLevelAgreement.HourAvailability * 60 * nearDueThreshold
                                                                 ? "Near Due"
                                                                 : "On Track")
-                                                      : ""
+                                                      : "",
+                               HaveInvoice = hasInvoice
                            });
 
             return await orderVM.FirstOrDefaultAsync();
@@ -428,7 +447,17 @@ namespace GMGInventory.Application.Repositories
                                       where soli.Quantity > (pli == null ? 0 : pli.Quantity)
                                       select soli.SalesOrderId;
 
+            var saKpi = from so in context.SalesOrders
+                        join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
+                        join user in users on kpi.UserCreated equals user.Id
+                        where kpi.Department == "SA"
+                        select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
 
+            var opsKpi = from so in context.SalesOrders
+                         join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
+                         join user in users on kpi.UserCreated equals user.Id
+                         where kpi.Department == "OPS"
+                         select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
 
 
             var orderVM = (from order in filteredOrder
@@ -492,18 +521,65 @@ namespace GMGInventory.Application.Repositories
                                                        .FirstOrDefault(),
                                TimeRemainingD = order.ServiceLevelAgreement.HourAvailability
                                    - EF.Functions.DateDiffMinute(order.DateCreated, now) / 60.0,
-                               SlaStatus = (order.Status.Id == 2 || order.Status.Id == 3)
-                                                        && order.ServiceLevelAgreement.HourAvailability > 0
-                                                      ? (EF.Functions.DateDiffMinute(order.DateCreated, now)
-                                                            >= order.ServiceLevelAgreement.HourAvailability * 60
-                                                            ? "Overdue"
-                                                            : EF.Functions.DateDiffMinute(order.DateCreated, now)
-                                                                >= order.ServiceLevelAgreement.HourAvailability * 60 * nearDueThreshold
-                                                                ? "Near Due"
-                                                                : "On Track")
-                                                      : null
+                               ApproveDateD = order.ApprovedDate,
+                               SaName = saKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
+                               SaKpi = (saKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
+                               OpsName = opsKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
+                               OpsKpi = (opsKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
+
+                               //SlaStatus = (order.Status.Id == 2 || order.Status.Id == 3)
+                               //                         && order.ServiceLevelAgreement.HourAvailability > 0
+                               //                       ? (EF.Functions.DateDiffMinute(order.DateCreated, now)
+                               //                             >= order.ServiceLevelAgreement.HourAvailability * 60
+                               //                             ? "Overdue"
+                               //                             : EF.Functions.DateDiffMinute(order.DateCreated, now)
+                               //                                 >= order.ServiceLevelAgreement.HourAvailability * 60 * nearDueThreshold
+                               //                                 ? "Near Due"
+                               //                                 : "On Track")
+                               //                       : null
                            });
-            return orderVM.ToList();
+
+            var result = orderVM.ToList();
+
+            foreach (var vm in result)
+            {
+                var isSubmitted = vm.Status == "SUBMITTED";
+                var isApproved = vm.Status == "APPROVED";
+
+
+                if ((!isSubmitted && !isApproved) || vm.ServiceLevelAgreementHr <= 0)
+                {
+                    vm.SlaStatus = null;
+                    continue;
+                }
+
+                var limitMinutes = vm.ServiceLevelAgreementHr * 60;
+
+                if (isApproved && vm.ApproveDateD.HasValue)
+                {
+                    // SLA clock stops at approval time
+                    var minutesToApprove = BusinessMinutesBetween(vm.OrderDateD, vm.ApproveDateD.Value);
+
+                    vm.SlaStatus = minutesToApprove <= limitMinutes ? "Done" : "Overdue";
+
+                    // optional: freeze remaining time at the moment of approval
+                    vm.TimeRemainingD = vm.ServiceLevelAgreementHr - minutesToApprove / 60.0;
+                }
+                else
+                {
+                    // still waiting for approval: the clock is running against now
+                    var elapsedMinutes = BusinessMinutesBetween(vm.OrderDateD, now);
+
+                    if (elapsedMinutes >= limitMinutes)
+                        vm.SlaStatus = "Overdue";
+                    else if (elapsedMinutes >= limitMinutes * nearDueThreshold)
+                        vm.SlaStatus = "Near Due";
+                    else
+                        vm.SlaStatus = "On Track";
+                }
+            }
+
+            return result;
         }
 
         public async Task<IList<APISalesOrder>> GetListAPI(DateTime? dt)
@@ -640,7 +716,7 @@ namespace GMGInventory.Application.Repositories
             var itemVM = await (from order in context.SalesOrderLineItems
                                                      .Include(s => s.Item)
                                                      .ThenInclude(s => s.Unit)
-                                                     
+
                                 from promo in context.ItemPromo
                                                     .Where(pr => pr.Id == order.ItemPromoId)
                                                     .OrderByDescending(pr => pr.DateCreated)
@@ -881,9 +957,9 @@ namespace GMGInventory.Application.Repositories
                         latestOrder = splitLatestOrder[0];
                     }
 
-                   // var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
+                    // var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
 
-                   
+
 
                     int? latestOrderNumber = 0;
 
@@ -1020,6 +1096,8 @@ namespace GMGInventory.Application.Repositories
 
             await SaveItemsAsync(form.Items, orderVM.Id);
 
+            await SaveKpi(orderVM.Id, currentUserId, statusId);
+
             return new ResponseModel<int>
             {
                 Status = "Success",
@@ -1073,10 +1151,14 @@ namespace GMGInventory.Application.Repositories
             // get items available in db
             var ditems = Items.Where(s => items.Contains(s.Item));
 
+            var dbItems = await context.SalesOrderLineItems
+                        .Where(s => s.SalesOrderId == salesOrderId)
+                        .ToListAsync();
+
             foreach (var di in ditems)
             {
                 var dbitem = await citemsVM
-                    .Where(s => s.ItemId == di.Item && s.LineNumber == di.LineNumber)
+                    .Where(s => s.ItemId == di.Item && s.IsPromo == di.isPromo)
                     .FirstOrDefaultAsync();
 
                 if (dbitem == null)
@@ -1121,10 +1203,14 @@ namespace GMGInventory.Application.Repositories
 
             // delete item
             // get items not in form
-            var fitems = Items.Select(s => s.Item);
-            var ritems = citemsVM.Where(s => fitems.Contains(s.ItemId) == false);
+            //var fitems = Items.Select(s => s.Item);
+            //var ritems = citemsVM.Where(s => fitems.Contains(s.ItemId) == false);
             // remove unavailable items
-            context.SalesOrderLineItems.RemoveRange(ritems);
+            var toRemove = dbItems
+                .Where(d => !Items.Any(f => f.Item == d.ItemId && f.isPromo == d.IsPromo))
+                .ToList();
+
+            context.SalesOrderLineItems.RemoveRange(toRemove);
 
             await context.SaveChangesAsync(currentUserId);
         }
@@ -1167,6 +1253,9 @@ namespace GMGInventory.Application.Repositories
         public async Task<bool> ApproveAsync(int salesOrderId, string slaReason)
         {
             var orderVM = context.SalesOrders.Where(s => s.Id == salesOrderId).FirstOrDefault();
+
+            var kpi = context.KPIs.Where(a => a.SalesOrderId == salesOrderId).FirstOrDefault();
+
             if (orderVM == null)
             {
                 return false;
@@ -1183,8 +1272,21 @@ namespace GMGInventory.Application.Repositories
                 orderVM.SlaReason = slaReason;
 
                 context.SalesOrders.Update(orderVM);
-                await context.SaveChangesAsync(currentUserId);
 
+                if (kpi != null)
+                {
+                    var kpis = new KPI
+                    {
+                        SalesOrderId = kpi.SalesOrderId,
+                        UserCreated = currentUserId,
+                        KpiStart = kpi.KpiEnd,
+                        KpiEnd = DateTime.Now,
+                        Department = "OPS"
+                    };
+
+                    await context.KPIs.AddAsync(kpis);
+                }
+                await context.SaveChangesAsync(currentUserId);
                 return true;
             }
         }
@@ -1279,5 +1381,92 @@ namespace GMGInventory.Application.Repositories
                 return true;
             }
         }
+
+        public async Task SaveKpi(int Id, string userId, int statusId)
+        {
+            var kpi = await context.KPIs.Where(s => s.SalesOrderId == Id).FirstOrDefaultAsync();
+
+            if (kpi == null)
+            {
+
+                var kpis = new KPI
+                {
+                    SalesOrderId = Id,
+                    UserCreated = userId,
+                    KpiStart = DateTime.Now,
+                    KpiEnd = statusId == 1 ? DateTime.Parse("1900-01-01") : DateTime.Now,
+                    Department = "SA"
+                };
+                await context.KPIs.AddAsync(kpis);
+                await context.SaveChangesAsync(userId);
+            }
+            else
+            {
+                kpi.KpiEnd = DateTime.Now;
+
+                context.KPIs.Update(kpi);
+                await context.SaveChangesAsync(userId);
+            }
+        }
+
+        public async Task<ResponseModel> UpdatePod(int Id)
+        {
+            string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+            var order = await context.SalesOrders
+                         .Include(s => s.Status)
+                         .FirstOrDefaultAsync(s => s.Id == Id); ;
+            if (order == null)
+                return new ResponseModel { Status = "Error", Message = "Sales order not found" };
+
+            var pack = await context.Packs
+                           .FirstOrDefaultAsync(s => s.SalesOrderId == Id);
+
+            if (pack == null)
+                return new ResponseModel { Status = "Error", Message = "Pack not found" };
+
+            var delivery = new DeliveryMonitoringFormVM
+            {
+                SalesOrderId = order.Id,
+                DeliveryDate = order.RequiredDeliveryDate,
+                ReceiveDate = DateTime.Now,
+                DeliveryMethodId = 1,
+                ForwarderId = order.ForwarderId,
+                PackId = pack.Id,
+                DeliveryStatusId = 3,
+            };
+
+            var result = await _deliveryMonitoringRepository.SaveDeliveryAsync(delivery);
+            if (result.Status != "Success")
+                return result;
+
+            return new ResponseModel { Status = "Success", Message = "Successfully updated proof of order" };
+        }
+
+        public double BusinessMinutesBetween(DateTime start, DateTime end)
+        {
+            var workStart = new TimeSpan(8, 0, 0);
+            var workEnd = new TimeSpan(17, 0, 0);
+
+            if (end <= start) return 0;
+
+            double total = 0;
+
+            for (var day = start.Date; day <= end.Date; day = day.AddDays(1))
+            {
+                if (day.DayOfWeek == DayOfWeek.Sunday) continue;
+
+                var windowStart = day + workStart;
+                var windowEnd = day + workEnd;
+
+                var s = start > windowStart ? start : windowStart;
+                var e = end < windowEnd ? end : windowEnd;
+
+                if (e > s) total += (e - s).TotalMinutes;
+            }
+
+            return total;
+        }
+
     }
 }

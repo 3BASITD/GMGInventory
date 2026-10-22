@@ -26,6 +26,22 @@
                        Model.DisapprovedDate != null &&
                        Model.ResubmitId == null &&
                        canAdd;
+
+    bool HasInvoice = Model.HaveInvoice;
+    var settings = ViewData["SystemSettings"] as IEnumerable<SystemSettingVM>;
+    var submitCutoffStr = settings?
+        .FirstOrDefault(s => s.Name == "SubmitCutoff")?.Value ?? "15:00";
+
+    if (!TimeSpan.TryParse(submitCutoffStr, out var submitCutoff))
+    {
+        submitCutoff = new TimeSpan(15, 0, 0);
+        submitCutoffStr = "15:00";
+    }
+
+    var submitReopen = new TimeSpan(7, 0, 0);
+    var nowTime = DateTime.Now.TimeOfDay;
+    bool canSubmit = nowTime >= submitReopen && nowTime < submitCutoff;
+  
 }
 
 @section Breadcrumb {
@@ -133,10 +149,23 @@
                     <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
                         <span class="fas fa-save"></span> Save as Draft
                     </button>
-                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
-                        <span class="fas fa-paper-plane"></span> Submit
-                    </button>
-                    <input type="hidden" id="action-type" name="ActionType" value="">
+                    @if(canSubmit)
+                    {
+                        <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submitted">
+                            <span class="fas fa-paper-plane"></span> Submit
+                        </button>                           
+                    }
+                    else
+                    {
+                        <button type="button"
+                                class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                                data-microtip-title="@(canSubmit ? "" : $"Submission is closed (cutoff {submitCutoffStr}). Reopens at 07:00.")"
+                                data-microtip-position="bottom"
+                                role="tooltip">
+                            <span class="fas fa-paper-plane"></span> Submit
+                        </button>                                  
+                    }
+                        <input type="hidden" id="action-type" name="ActionType" value="">
                 }
                 else
                 {
@@ -171,6 +200,15 @@
                             data-microtip-position="bottom"
                             role="tooltip">
                         <span class="fas fa-box-open mr-0"></span>
+                    </button>
+                }
+
+                @if(HasInvoice)
+                {
+                    <button type="button"
+                            class="btn btn-primary btn-sm float-right ml-2"
+                            onclick="UpdatePod()">
+                        <span class="fas fa-box"></span> POD
                     </button>
                 }
 
@@ -979,6 +1017,31 @@
         var so_details = @Html.Raw(Json.Serialize(Model));
         var currentCustomer = so_details.customerId;
 
+        // ===== Submit cutoff =====
+        var submitCutoff = "@submitCutoffStr";   // e.g. "14:00"
+        var submitReopen = "07:00";
+
+        function toMinutes(t) {
+            var p = t.split(":");
+            return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+        }
+
+        function isSubmitOpen() {
+            var now = new Date();
+            var mins = now.getHours() * 60 + now.getMinutes();
+            return mins >= toMinutes(submitReopen) && mins < toMinutes(submitCutoff);
+        }
+
+        function refreshSubmitButton() {
+            var open = isSubmitOpen();
+            $("#btn-submit-order")
+                .prop("disabled", !open)
+                .attr("title", open ? "" : "Submission is closed (cutoff " + submitCutoff + "). Reopens at " + submitReopen + ".");
+        }
+
+        refreshSubmitButton();
+        setInterval(refreshSubmitButton, 30 * 1000);
+
         if (user_access.canEdit && so_details.status.toLowerCase().includes("draft")) {
             // Load agent data for select2
             $("#order-agent-code").select2({
@@ -1327,6 +1390,11 @@
         }
 
         function SaveOrder() {
+            if ($("#action-type").val() === "Submitted" && !isSubmitOpen()) {
+                toastr.warning("Submission is closed. The cutoff is " + submitCutoff + " and it reopens at " + submitReopen + ".", "Submit Closed");
+                return;
+            }
+
             var itemsToReplenish = GetItemsToOrder();
             var total_gross_price = 0
             itemDT.rows().every(function (rowIdx, tableLoop, rowLoop) {
@@ -2059,6 +2127,33 @@
                 });
             };
         }
+
+           function UpdatePod() {
+                swal({
+                    title: "Update Proof of Delivery",
+                    text: "Are you sure you want to update the proof of delivery for this sales order?",
+                    icon: "success",
+                    buttons: true,
+                    successMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("UpdatePod")",
+                            data: {
+                                Id: so_details.id
+                            },
+                            success: function (data, status, xhr) {
+                                if (data.status == "Error") {
+                                    toastr.error(data.message, "Error");
+                                } else {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    }
+                });
+            };
 
         if (user_access.canApproveDisapprove) {
             $('.btn-details-approve').click(function (e) {

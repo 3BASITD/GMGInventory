@@ -4236,6 +4236,45 @@ namespace GMGInventory.Data.Migrations
                     b.ToTable("ItemTypes");
                 });
 
+            modelBuilder.Entity("GMGInventory.Data.KPI", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("KpiEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("KpiStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserModified")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KPIs");
+                });
+
             modelBuilder.Entity("GMGInventory.Data.KYC", b =>
                 {
                     b.Property<int>("Id")
@@ -9218,13 +9257,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "157dcbb0-5e81-43cb-90e6-37c831378353",
+                            ConcurrencyStamp = "cd0df4e2-c1f5-4394-a3d9-f348e74e7e57",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAENeQDDkH12O5OXRw4MhD9GnqiaIZk1tDPXn+syoAqAZV+XFuYk8d4iKl0xQxzLxb7A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELyCFJfK6S2rNpZWk6AII88LxMlLWmtzRruXad8J4E6xTQ5b9kGluWTpz/ZK5Th1vw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1eef81af-3f9f-4edf-b3a7-c91f9b588c9b",
+                            SecurityStamp = "ec929db9-d58a-457f-90e2-645ac631cb55",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9239,13 +9278,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fe81ac7a-0d88-453b-bf4a-7d8906d9b836",
+                            ConcurrencyStamp = "e7215e88-3bb8-42dc-b134-fd9a7a36cb2e",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAECyi3mxhOHk9PhjuySOWBv5VG1giXXYltVzekVcBeg/T1DmpnMCMT3KLBmNZMEpTyQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJGj3xPmxnHhMnxAdK0snraw5Tnqg36y8ymeBp54gzEV0uTsvnME2UECBwYUndlr5g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "96fb4ec0-bfa3-45aa-bba4-2206691c47ce",
+                            SecurityStamp = "7ed7707f-51d2-4eb1-91d7-02fdfee0bd6d",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

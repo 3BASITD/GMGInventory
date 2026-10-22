@@ -10,6 +10,20 @@
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 
     var userAccessSpecial = (ViewsAccessVM)ViewData["UserAccessSpecial"]!;
+
+    var settings = ViewData["SystemSettings"] as IEnumerable<SystemSettingVM>;
+    var submitCutoffStr = settings?
+        .FirstOrDefault(s => s.Name == "SubmitCutoff")?.Value ?? "15:00";
+
+    if (!TimeSpan.TryParse(submitCutoffStr, out var submitCutoff))
+    {
+        submitCutoff = new TimeSpan(15, 0, 0);
+        submitCutoffStr = "15:00";
+    }
+
+    var submitReopen = new TimeSpan(7, 0, 0);
+    var nowTime = DateTime.Now.TimeOfDay;
+    bool canSubmit = nowTime >= submitReopen && nowTime < submitCutoff;
 }
 
 @section Breadcrumb {
@@ -24,9 +38,23 @@
                 <button type="submit" class="btn btn-secondary btn-sm float-right ml-2" data-action="Draft">
                     <span class="fas fa-save"></span> Save as Draft
                 </button>
-                <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submit">
-                    <span class="fas fa-save"></span> @(TempData["SalesOrderId"] != null ? "Resubmit" : "Submit")
-                </button>
+                @if(canSubmit)
+                {
+                    <button type="submit" class="btn btn-primary btn-sm float-right ml-2" data-action="Submit">
+                        <span class="fas fa-save"></span> @(TempData["SalesOrderId"] != null ? "Resubmit" : "Submit")
+                    </button>
+                }
+                else
+                 {
+                        <button type="button"
+                                class="btn btn-primary btn-sm float-right ml-2 ui-state-disabled"
+                                data-microtip-title="@(canSubmit ? "" : $"Submission is closed (cutoff {submitCutoffStr}). Reopens at 07:00.")"
+                                data-microtip-position="bottom"
+                                role="tooltip">
+                            <span class="fas fa-save"></span> Submit
+                        </button>                                  
+                 }
+
                 <input type="hidden" id="action-type" name="ActionType" value="">
                 <a class="btn btn-light btn-sm float-right" asp-action="Index">
                     <span class="fas fa-arrow-left"></span> Back to List
@@ -54,7 +82,7 @@
                     </div>
                     <div class="form-group">
                         <label for="order-delivery-date" class="form-label mb-0">Required Delivery Date</label>
-                        <input type="date" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
+                        <input type="datetime-local" id="order-delivery-date" name="DeliveryDate" class="form-control form-control-sm" />
                     </div>
                     <div class="form-group">
                         <label for="order-sla" class="form-label mb-0">Service Level Agreement</label>

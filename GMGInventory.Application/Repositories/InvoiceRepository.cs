@@ -6,6 +6,7 @@ using GMGInventory.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
 
 namespace GMGInventory.Application.Repositories
@@ -203,6 +204,8 @@ namespace GMGInventory.Application.Repositories
             var invoiceVM = (from invoice in context.Invoices
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Customer).ThenInclude(s => s.CreditTerm)
                                                     .Include(s => s.SalesOrder).ThenInclude(s => s.Agent)
+                             join soli in context.SalesOrderLineItems on invoice.SalesOrderId equals soli.SalesOrderId
+                             join item in context.Items on soli.ItemId equals item.Id
                              join userc in userManager.Users on invoice.UserCreated equals userc.Id
                              join userm in userManager.Users on invoice.UserModified equals userm.Id into um
                              from userm in um.DefaultIfEmpty()
@@ -242,7 +245,7 @@ namespace GMGInventory.Application.Repositories
                                  UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                                  DateCreatedD = invoice.DateCreated,
                                  UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                                 DateModifiedD = invoice.DateModified
+                                 DateModifiedD = invoice.DateModified,
                              });
             var invoiceDetails = await invoiceVM.FirstAsync();
             var items = await GetItemsAsync(Id);
@@ -254,12 +257,16 @@ namespace GMGInventory.Application.Repositories
                                             : 0;
 
             invoiceDetails.TotalAmountD = items.Sum(s => s.GrossPriceNoDiscountD);
-            invoiceDetails.TotalAmoutDueD = invoiceDetails.DiscountAmountD == 0 ? invoiceDetails.TotalAmountD
-                                            : invoiceDetails.TotalAmountD - invoiceDetails.DiscountAmountD;
-            invoiceDetails.WithHoldingTaxD = Math.Round(invoiceDetails.AmountNetVatD * 0.01m, 2, MidpointRounding.AwayFromZero);
-            invoiceDetails.AmountNetVatD =Math.Round(invoiceDetails.TotalAmoutDueD / 1.12m, 2, MidpointRounding.AwayFromZero);
-            invoiceDetails.LessVatD = Math.Truncate(invoiceDetails.AmountNetVatD * 0.12m * 100) / 100;
-            invoiceDetails.AddVatD = Math.Truncate(invoiceDetails.AmountNetVatD * 0.12m * 100) / 100;
+            invoiceDetails.TotalAmoutDueD = invoiceDetails.DiscountAmountD == 0 ? invoiceDetails.TotalAmountD : invoiceDetails.TotalAmountD - invoiceDetails.DiscountAmountD;
+
+            invoiceDetails.AmountNetVatD = invoiceDetails.TotalAmoutDueD / 1.12m;
+            invoiceDetails.WithHoldingTaxD = invoiceDetails.AmountNetVatD * 0.01m;
+            invoiceDetails.LessVatD = invoiceDetails.AmountNetVatD * 0.12m;
+            invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.ToZero);
+
+           
+
+            
 
             //if (invoiceDetails.DiscountAmountD == 0)
             //{
@@ -339,7 +346,7 @@ namespace GMGInventory.Application.Repositories
                                                join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
                                                let discount1 = (100 - orderli.Discount1) / 100
                                                let discount2 = (100 - orderli.Discount2) / 100
-                                               where invli.ItemId == orderli.ItemId
+                                               where invli.ItemId == orderli.ItemId && invli.IsPromo == orderli.IsPromo
                                                select invli.Quantity * invli.UnitPrice * discount1 * discount2).Sum(),
                                HashMicroMoveId = inv.HashMicroMoveId,
                                HashMicroMoveName = inv.HashMicroMoveName,
@@ -441,13 +448,20 @@ namespace GMGInventory.Application.Repositories
                          join item in context.Items on invoicel.ItemId equals item.Id
                          join invoice in context.Invoices on invoicel.InvoiceId equals invoice.Id
                          join order in context.SalesOrders on invoice.SalesOrderId equals order.Id
-                         join orderl in context.SalesOrderLineItems on order.Id equals orderl.SalesOrderId
-                         let pack = context.PackLineItems.Where(s => s.PackId == invoice.PackId && s.ItemId == item.Id).Sum(s => (int?)s.Quantity) ?? 0
-                         let price = context.ItemPrices.Where(s => s.ItemId == orderl.ItemId && s.DateCreated <= order.DateCreated).OrderByDescending(s => s.DateCreated).First()
-                         where invoicel.InvoiceId == invoiceId
-                         && orderl.ItemId == invoicel.ItemId
-                         && orderl.IsPromo == invoicel.IsPromo
-
+                         let orderl = context.SalesOrderLineItems
+                             .Where(s => s.SalesOrderId == order.Id
+                                      && s.ItemId == invoicel.ItemId
+                                      && s.IsPromo == invoicel.IsPromo)
+                             .OrderBy(s => s.Id)
+                             .FirstOrDefault()
+                         let pack = context.PackLineItems
+                             .Where(s => s.PackId == invoice.PackId && s.ItemId == item.Id)
+                             .Sum(s => (int?)s.Quantity) ?? 0
+                         let price = context.ItemPrices
+                             .Where(s => s.ItemId == invoicel.ItemId && s.DateCreated <= order.DateCreated)
+                             .OrderByDescending(s => s.DateCreated)
+                             .FirstOrDefault()
+                         where invoicel.InvoiceId == invoiceId && orderl != null
                          select new InvoiceItemVM
                          {
                              Discount1D = orderl.Discount1,
@@ -458,16 +472,20 @@ namespace GMGInventory.Application.Repositories
                              ItemName = item.Name + (orderl.ItemPromo == null ? "" : " (" + orderl.ItemPromo.Name + ")"),
                              OldItemCode = item.OldCode == null || item.OldCode == "" ? "-" : item.OldCode + "",
                              PartNumber = item.PartNumber == null || item.PartNumber == "" ? "-" : item.PartNumber + "",
+                             BrandName = item.Brand == null || item.Brand.Name == null || item.Brand.Name == "" ? "-" : item.Brand.Name + "",
                              NetPriceD = invoicel.UnitPrice,
                              QuantityD = invoicel.Quantity,
                              QuantityOfPack = pack,
                              Unit = item.Unit.Code,
-                             SellingPriceType = price.RetailSellingPrice > price.NetSellingPrice ? "Gross" : "Net",
+                             SellingPriceType = price != null && price.RetailSellingPrice > price.NetSellingPrice ? "Gross" : "Net",
                              ReferenceNumber = invoicel.Invoice.ControlNumber,
                              ItemPromoId = orderl.ItemPromoId,
-                             IsPromo = invoicel.IsPromo
+                             IsPromo = invoicel.IsPromo,
+                             Model = item.ModelNumber,
+                             Size = item.Size,
 
                          };
+
             return await itemVM.ToListAsync();
         }
 
@@ -756,47 +774,118 @@ namespace GMGInventory.Application.Repositories
                     await context.SaveChangesAsync(currentUserId);
 
                     //await AddInvoiceItems(invoice.Id, invoice.SalesOrderId, form);
-                    var soitems = context.SalesOrderLineItems.Where(s => s.Id == invoice.SalesOrderId);
-                    var citems = await context.InvoiceLineItems
-                                              .Where(s => s.InvoiceId == invoice.Id)
-                                              .ToListAsync();
+                    //var soitems = context.SalesOrderLineItems.Where(s => s.Id == invoice.SalesOrderId);
+                    //var citems = await context.InvoiceLineItems
+                    //                          .Where(s => s.InvoiceId == invoice.Id)
+                    //                          .ToListAsync();
+
+                    var soLines = await context.SalesOrderLineItems
+                        .Where(s => s.SalesOrderId == invoice.SalesOrderId)
+                        .ToListAsync();
+
+                    var dbItems = await context.InvoiceLineItems
+                        .Where(s => s.InvoiceId == invoice.Id)
+                        .ToListAsync();
+
+                    // Add or update
+                    foreach (var fi in form.Items)
+                    {
+                        var dbItem = dbItems.FirstOrDefault(s => s.ItemId == fi.Item && s.IsPromo == fi.isPromo);
+
+                        if (dbItem != null)
+                        {
+                            dbItem.Quantity = fi.Quantity;   // tracked, no Update() needed
+                        }
+                        else
+                        {
+                            var soLine = soLines.FirstOrDefault(s => s.ItemId == fi.Item && s.IsPromo == fi.isPromo);
+                            if (soLine == null)
+                            {
+                                return new ResponseModel<int>
+                                {
+                                    Status = "Error",
+                                    Message = "Item not found on the sales order."
+                                };
+                            }
+
+                            context.InvoiceLineItems.Add(new InvoiceLineItem
+                            {
+                                InvoiceId = invoice.Id,
+                                ItemId = fi.Item,
+                                Quantity = fi.Quantity,
+                                UnitPrice = soLine.SellingPrice,
+                                IsPromo = fi.isPromo
+                            });
+                        }
+                    }
 
                     // add item
                     // check items not in db
-                    var items = citems.Select(s => s.ItemId);
-                    // add excluding items already available
-                    var newitems = from i in form.Items
-                                   join s in context.SalesOrderLineItems on i.Item equals s.ItemId
-                                   where items.Contains(i.Item) == false
-                                   && s.SalesOrderId == invoice.SalesOrderId
-                                   select new InvoiceLineItem
-                                   {
-                                       InvoiceId = invoice.Id,
-                                       ItemId = i.Item,
-                                       Quantity = i.Quantity,
-                                       UnitPrice = s.SellingPrice
-                                   };
-                    context.InvoiceLineItems.AddRange(newitems);
+                    //var items = citems.Select(s => s.ItemId);
+                    //// add excluding items already available
+                    //var newitems = from i in form.Items
+                    //               join s in context.SalesOrderLineItems on i.Item equals s.ItemId
+                    //               where items.Contains(i.Item) == false
+                    //               && s.SalesOrderId == invoice.SalesOrderId
+                    //               select new InvoiceLineItem
+                    //               {
+                    //                   InvoiceId = invoice.Id,
+                    //                   ItemId = i.Item,
+                    //                   Quantity = i.Quantity,
+                    //                   UnitPrice = s.SellingPrice
+                    //               };
+                    //context.InvoiceLineItems.AddRange(newitems);
 
-                    // update item
-                    // get items available in db
-                    var existitems = form.Items.Where(s => items.Contains(s.Item));
-                    foreach (var ei in existitems)
-                    {
-                        // update all available in db
-                        var dbitem = citems.Where(s => s.ItemId == ei.Item).First();
-                        dbitem.Quantity = ei.Quantity;
-
-                        context.InvoiceLineItems.Update(dbitem);
-                    }
+                    //// update item
+                    //// get items available in db
+                    //var existitems = form.Items.Where(s => items.Contains(s.Item));
+                    //foreach (var ei in existitems)
+                    //{
+                    //    // update all available in db
+                    //    var dbitem = citems
+                    //        .Where(s => s.ItemId == ei.Item && s.IsPromo == ei.isPromo)
+                    //        .FirstOrDefault();
+                    //    if (dbitem == null)
+                    //    {
+                    //        dbitem = new InvoiceLineItem
+                    //        {
+                    //            IsPromo = ei.isPromo,
+                    //            ItemId = ei.Item,
+                    //            Quantity = ei.Quantity
+                    //        };
+                    //        context.InvoiceLineItems.Add(dbitem);
+                    //    }
+                    //    else
+                    //    {
+                    //        dbitem.Quantity = ei.Quantity;
+                    //        context.InvoiceLineItems.Update(dbitem);
+                    //    }
+                    //}
 
                     // delete item
                     // get items not in form
-                    var fitems = form.Items.Select(s => s.Item);
-                    var ritems = citems.Where(s => fitems.Contains(s.ItemId) == false);
-                    // remove unavailable items
-                    context.InvoiceLineItems.RemoveRange(ritems);
+                    //var fitems = form.Items.Select(s => s.Item);
+                    //var ritems = citems.Where(s => fitems.Contains(s.ItemId) == false);
+                    //// remove unavailable items
+                    //context.InvoiceLineItems.RemoveRange(ritems);
 
+                    //await context.SaveChangesAsync(currentUserId);
+
+                    //return new ResponseModel<int>
+                    //{
+                    //    Status = "Success",
+                    //    Message = "Sales Invoice successfully " + (form.SavingAs == "post" ? "posted"
+                    //                                             : form.SavingAs == "update" ? "updated"
+                    //                                             : "saved"),
+                    //    NewRow = invoice.Id
+                    //};
+
+                    var toRemove = dbItems
+                          .Where(d => !form.Items.Any(f => f.Item == d.ItemId && f.isPromo == d.IsPromo))
+                          .ToList();
+                    context.InvoiceLineItems.RemoveRange(toRemove);
+
+                    // One save for header + items
                     await context.SaveChangesAsync(currentUserId);
 
                     return new ResponseModel<int>

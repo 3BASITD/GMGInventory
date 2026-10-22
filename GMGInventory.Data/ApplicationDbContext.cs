@@ -198,6 +198,7 @@ namespace GMGInventory.Data
         public DbSet<KYCDocument> KYCDocuments { get; set; }
         public DbSet<KYCDocumentType> KYCDocumentTypes { get; set; }
         public DbSet<KYCSignatory> KYCSignatories { get; set; }
+        public DbSet<KPI> KPIs { get; set; }
         public DbSet<LocationCode> LocationCodes { get; set; }
         public DbSet<Pack> Packs { get; set; }
         public DbSet<PackLineItem> PackLineItems { get; set; }
