@@ -32,11 +32,11 @@ namespace GMGInventory.Application.Repositories
             //search = search == "3" ? search : search == "2" ? search = "3" : search == "4" ? search = "1" : search;
             if (search == "3" || search == "2")
             {
-                search = "3"
+                search = "3";
             }
-            if else(search == "4")
+            else if(search == "4")
             {
-                search = "1"
+                search = "1";
             }
 
             var SLAs = from sla in context.ServiceLevelAgreements

@@ -4,14 +4,14 @@
     var purchaseHistories = (List<OrderRecommendationHistoryVM>?)ViewData["PurchaseHistory"];
     var issuanceHistories = (List<OrderRecommendationHistoryVM>?)ViewData["IssuanceHistory"];
 }
-
+@* 
 <div class="alert alert-warning" role="alert">
     <span class="fas fa-exclamation-triangle mr-3"></span><strong>COMMING SOON</strong> We’re currently working on this page to bring you new features and improvements. Please check back again soon.
-</div>
+</div> *@
 
-<div class="alert alert-info" role="alert">
+@* <div class="alert alert-info" role="alert">
     <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
-</div>
+</div> *@
 
 <div class="card card-default">
     <div class="card-header">
@@ -43,7 +43,8 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th>Item Number</th>
+                    @* <th>Item Number</th> *@
+                    <th>Item Code</th>
                     <th>Part Number</th>
                     <th>Item Name</th>
                     <th>Stock on Hand</th>
@@ -220,7 +221,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6">
+                    @* <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-preset" class="form-label mb-0">Date Range</label>
                             <select id="filter-preset" class="form-control form-control-sm">
@@ -232,9 +233,20 @@
                                 <option value="">Custom Range</option>
                             </select>
                         </div>
+                    </div> *@
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-days" class="form-label mb-0">Target Days</label>
+                            <select id="filter-days" class="form-control form-control-sm">
+                                <option value="7">7 Days</option>
+                                <option value="30">30 Days</option>
+                                <option value="60">60 Days</option>
+                                <option value="365">365 Days</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
+               @*  <div class="row">
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="filter-from" class="form-label mb-0">Date From</label>
@@ -247,7 +259,7 @@
                             <input type="date" id="filter-to" class="form-control form-control-sm" />
                         </div>
                     </div>
-                </div>
+                </div> *@
             </div>
             <div class="px-3 pb-2 text-muted small modal-note">
                 Your filter, sort, and search will be saved for 1 hour
@@ -419,9 +431,10 @@
             ItemClassId: "",
             Brand: "",
             BrandId: "",
-            Preset: "L7D",
-            DateFrom: DateForInput(getFilterDefaultDateFrom()),
-            DateTo: DateForInput(getFilterDefaultDateTo())
+            // Preset: "L7D",
+            // DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            // DateTo: DateForInput(getFilterDefaultDateTo())
+            TargetDays: "7"
         };
 
         function checkDTChanged() {
@@ -434,9 +447,10 @@
                    $("#filter-movement").val() != defaultDTState.MovementId ||
                    $("#filter-class").val() != defaultDTState.ItemId ||
                    $("#filter-brand").val() != defaultDTState.BrandId ||
-                   $("#filter-preset").val() != defaultDTState.Preset ||
-                   $('#filter-from').val() != defaultDTState.DateFrom ||
-                   $('#filter-to').val() != defaultDTState.DateTo;
+                   // $("#filter-preset").val() != defaultDTState.Preset ||
+                   // $('#filter-from').val() != defaultDTState.DateFrom ||
+                   // $('#filter-to').val() != defaultDTState.DateTo;
+                   $('#filter-days').val() != defaultDTState.TargetDays;
         }
 
         function checkDefaultFilter() {
@@ -453,8 +467,9 @@
             $('#filter-movement').val(defaultDTState.ItemId);
             $('#filter-class').val(defaultDTState.ItemClassId).trigger('change');
             $('#filter-brand').val(defaultDTState.BrandId).trigger('change');
-            $('#filter-preset').val(defaultDTState.Preset);
-            applyFilterPreset(defaultDTState.Preset);
+            // $('#filter-preset').val(defaultDTState.Preset);
+            // applyFilterPreset(defaultDTState.Preset);
+            $('#filter-days').val(defaultDTState.TargetDays);
             
             if (recommendationDT) {
                 recommendationDT.state.clear();
@@ -492,9 +507,10 @@
                 data.ItemClassId = $('#filter-class').val();
                 data.Brand = $('#filter-brand option:selected').text();
                 data.BrandId = $('#filter-brand').val();
-                data.Preset = $('#filter-preset').val();
-                data.DateFrom = $('#filter-from').val();
-                data.DateTo = $('#filter-to').val();
+                // data.Preset = $('#filter-preset').val();
+                // data.DateFrom = $('#filter-from').val();
+                // data.DateTo = $('#filter-to').val();
+                data.TargetDays = $('#filter-days').val();
             },
             stateLoadParams: function (settings, data) {
                 $('#filter-movement').val(data.MovementId);
@@ -504,7 +520,7 @@
                         id: data.ItemClassId,
                         text: data.ItemClass
                     });
-                    $("#filter-Class").append(itemClassOption).trigger('change');
+                    $("#filter-class").append(itemClassOption).trigger('change');
                 }
                 if(data.BrandId) {
                     var brandOption = new Option(data.Brand, data.BrandId, true, true);
@@ -514,11 +530,12 @@
                     });
                     $("#filter-brand").append(brandOption).trigger('change');
                 }
-                $('#filter-preset').val(data.Preset).trigger('change');
-                $('#filter-from').prop('readonly', data.Preset != "");
-                $('#filter-from').val(data.DateFrom);
-                $('#filter-to').prop('readonly', data.Preset != "");
-                $('#filter-to').val(data.DateTo);
+                // $('#filter-preset').val(data.Preset).trigger('change');
+                // $('#filter-from').prop('readonly', data.Preset != "");
+                // $('#filter-from').val(data.DateFrom);
+                // $('#filter-to').prop('readonly', data.Preset != "");
+                // $('#filter-to').val(data.DateTo);
+                $('#filter-days').val(data.TargetDays);
             },
             ajax: {
                 url: "@Url.Action("GetOrderRecommendationDT")",
@@ -532,8 +549,10 @@
                     var brandId = $("#filter-brand").val();
                     if (brandId) data.BrandId = brandId;
 
-                    data.DateFrom = $("#filter-from").val();
-                    data.DateTo = $("#filter-to").val();
+                    // data.DateFrom = $("#filter-from").val();
+                    // data.DateTo = $("#filter-to").val();
+
+                    data.TargetDays = $('#filter-days').val();
                 },
                 type: "POST",
                 beforeSend: function (jqXHR, settings) {
@@ -562,15 +581,22 @@
                         }
                     }
                 },
-                { data: "itemNumber", name: "ItemNumber" },
+                // { data: "itemNumber", name: "ItemNumber" },
                 {
                     data: function (data, type, dataToSet) {
-                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.partNumber + "</a>";
+                        return "<a href='/Item/Details/" + data.itemId + "' class='link-info' target='_blank'>" + data.itemCode + "</a>";
                     },
-                    name: "PartNumber"
+                    name: "ItemCode"
                 },
+                { data: "partNumber", name: "PartNumber" },
                 { data: "itemName", name: "ItemName" },
-                { data: "stockOnHand", name: "StockOnHand", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.stockOnHand > 0 ? data.stockOnHand : "<span class='text-muted'>0</span>";
+                    },
+                    name: "StockOnHand", 
+                    className: "text-end"
+                },
                 {
                     data: function (data, type, dataToSet) {
                         return data.locationCode || "<span class='text-muted'>N/A</span>";
@@ -589,19 +615,19 @@
                         <b>INVOICES</b>
                         <table style='width:100%; border-collapse:collapse;'>
                             <tr>
-                                <td>Last 7 days</td>
+                                <td>Latest 7 days</td>
                                 <td style='text-align:right;'>${data.lastWeekQuantity}</td>
                             </tr>
                             <tr>
-                                <td>Last 30 days</td>
+                                <td>Latest 30 days</td>
                                 <td style='text-align:right;'>${data.lastMonthQuantity}</td>
                             </tr>
                             <tr>
-                                <td>Last 60 days</td>
+                                <td>Latest 60 days</td>
                                 <td style='text-align:right;'>${data.last2MonthsQuantity}</td>
                             </tr>
                             <tr>
-                                <td>Last 365 days&emsp;</td>
+                                <td>Latest 365 days&emsp;</td>
                                 <td style='text-align:right;'>${data.lastYearQuantity}</td>
                             </tr>
                             <tr>
@@ -620,7 +646,13 @@
                     },
                     name: "ItemClass"
                 },
-                { data: "suggestedOrderQuantity", name: "SuggestedOrderQuantity", className: "text-end" },
+                {
+                    data: function (data, type, dataToSet) {
+                        return data.suggestedOrderQuantity > 0 ? data.suggestedOrderQuantity : "<span class='text-muted'>0</span>";
+                    },
+                    name: "SuggestedOrderQuantity",
+                    className: "text-end"
+                },
                 {
                     orderable: false,
                     data: function (data, type, dataToSet) {

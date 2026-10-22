@@ -5,9 +5,10 @@
     var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
 }
 
-<div class="alert alert-info" role="alert">
+@* <div class="alert alert-info" role="alert">
     <span class="fas fa-exclamation-triangle mr-3"></span>You are using a v4 enhancement feature. This message will be removed once v4 is completed and made available as a fully paid version.
-</div>
+</div> *@
+
 <div class="card card-default">
     <div class="card-header">
         <span class="card-title">@ViewData["Title"]</span>
@@ -204,12 +205,12 @@
         });
 
         iclassDT.on("draw", function () {
-            swal({
-                icon: 'warning',
-                title: 'v4 Enhancement',
-                text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgZnVsbHkgcGFpZCB2ZXJzaW9uLg=="),
-                button: 'Continue'
-            });
+            // swal({
+            //     icon: 'warning',
+            //     title: 'v4 Enhancement',
+            //     text: atob("WW91IGFyZSB1c2luZyBhIHY0IGVuaGFuY2VtZW50IGZlYXR1cmUuIFRoaXMg") + atob("bWVzc2FnZSB3aWxsIGJlIHJlbW92ZWQgb25jZSB2NCBpcyBjb21wbGV0ZWQg") + atob("YW5kIG1hZGUgYXZhaWxhYmxlIGFzIGEgZnVsbHkgcGFpZCB2ZXJzaW9uLg=="),
+            //     button: 'Continue'
+            // });
 
             if (user_access.canEdit) {
                 $(".btn-edit").click(function (e) {
