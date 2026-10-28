@@ -26,113 +26,51 @@ namespace GMGInventory.Application.Repositories
             var regions = filter.Region2 == "ML" ? new[] { "MM", "LUZ" }
                         : filter.Region2 == "VM" ? new[] { "VIS", "MIN" }
                         : null;
-            var salesOrder = from s in context.SalesOrderLineItems
-                             join user in userManager.Users on s.SalesOrder.UserCreated equals user.Id
-                             where (s.SalesOrder.Status.Name.Trim().ToLower() == "packing draft"
-                                || s.SalesOrder.Status.Name.Trim().ToLower() == "packing submitted"
-                                || s.SalesOrder.Status.Name.Trim().ToLower() == "fully packed"
-                                || s.SalesOrder.Status.Name.Trim().ToLower() == "sales order approved")
-                             && (filter.Brand == null || s.Item.Brand.Id == filter.Brand)
-                             && (filter.Region2 == null || regions == null || regions.Contains(s.SalesOrder.Region.Code))
-                             && filter.StartDate.Date <= s.SalesOrder.SalesOrderDate.Date
-                             && s.SalesOrder.SalesOrderDate.Date <= filter.EndDate.Date
-                             let packed = context.PackLineItems
-                                                 .Where(p => p.Pack.SalesOrderId == s.SalesOrderId
-                                                          && s.ItemId == p.ItemId)
-                                                 .Sum(p => (int?)p.Quantity) ?? 0
-                             let returned = context.SalesReturnLineItems
-                                                   .Where(r => r.SalesReturn.SalesOrderId == s.SalesOrderId
-                                                            && s.ItemId == r.ItemId)
-                                                   .Sum(r => (int?)r.Quantity) ?? 0
+            var regionSelected = await context.Regions.Where(s => s.Id == filter.Region).Select(s => s.Name).FirstOrDefaultAsync();
+            var salesOrder = from l in context.SalesOrderLineItems
+                             join packed in context.PackLineItems on new { l.SalesOrderId, l.ItemId } equals new { packed.Pack.SalesOrderId, packed.ItemId } into gpacked
+                             from packed in gpacked.DefaultIfEmpty()
+                             join returned in context.SalesReturnLineItems on new { SalesOrderId = (int?)l.SalesOrderId, l.ItemId }
+                                                                       equals new { returned.SalesReturn.SalesOrderId, returned.ItemId } into greturned
+                             from returned in greturned.DefaultIfEmpty()
+                             join user in userManager.Users on l.SalesOrder.UserCreated equals user.Id
                              let inventory = context.ItemInventories
-                                                    .Where(i => i.ItemId == s.ItemId
-                                                             && i.Warehouse.IsMain == true)
-                                                    .Sum(i => (int?)i.Quantity) ?? 0
-                             where s.Quantity - (packed - returned) > 0
+                                                    .Where(s => s.ItemId == l.ItemId
+                                                             && s.Warehouse.IsMain == true)
+                                                    .Sum(s => (int?)s.Quantity) ?? 0
+                             where (l.SalesOrder.Status.Name == "PACKING DRAFT" 
+                                 || l.SalesOrder.Status.Name == "PACKING SUBMITTED"
+                                 || l.SalesOrder.Status.Name == "FULLY PACKED" 
+                                 || l.SalesOrder.Status.Name == "SALES ORDER APPROVED")
+                             && ((l.Quantity - ((packed == null ? 0 : packed.Quantity) - (returned == null ? 0 : returned.Quantity))) > 0)
+                             && (filter.Region2 == null || regions == null || regions.Contains(l.SalesOrder.Customer.Area.Region.Code))
+                             && filter.StartDate <= l.SalesOrder.DateCreated.Date
+                             && l.SalesOrder.DateCreated.Date <= filter.EndDate
                              select new UnservedItemVM
                              {
-                                 Agent = s.SalesOrder.Agent.Code,
-                                 AgentId = s.SalesOrder.Agent.Id,
+                                 Agent = l.SalesOrder.Agent.Code,
+                                 AgentId = l.SalesOrder.Agent.Id,
                                  CreatedBy = user.FirstName + " " + user.LastName,
-                                 Customer = s.SalesOrder.Customer.Name,
-                                 CustomerId = s.SalesOrder.Customer.Id,
-                                 Discount1D = s.Discount1,
-                                 Discount2D = s.Discount2,
-                                 Id = s.SalesOrder.Id,
-                                 Item = s.Item.Code,
-                                 ItemId = s.Item.Id,
-                                 OldSKU = s.Item.OldCode,
-                                 ItemName = s.Item.Name,
-                                 OrderDateD = s.SalesOrder.SalesOrderDate,
-                                 PackedQuantityD = packed,
-                                 QuantityD = s.Quantity,
+                                 Customer = l.SalesOrder.Customer.Name,
+                                 CustomerId = l.SalesOrder.Customer.Id,
+                                 Discount1D = l.Discount1,
+                                 Discount2D = l.Discount2,
+                                 Id = l.SalesOrder.Id,
+                                 Item = l.Item.Code,
+                                 ItemId = l.Item.Id,
+                                 OldSKU = l.Item.OldCode,
+                                 ItemName = l.Item.Name,
+                                 OrderDateD = l.SalesOrder.DateCreated,
+                                 PackedQuantityD = packed == null ? 0 : packed.Quantity,
+                                 QuantityD = l.Quantity,
                                  QuantityOnHandD = inventory,
-                                 SalesOrderNumber = s.SalesOrder.SalesOrderNumber,
-                                 SalesOrderId = s.SalesOrder.Id,
-                                 UnitPriceD = s.SellingPrice,
-                                 UnservedQuantityD = s.Quantity - (packed - returned)
+                                 SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
+                                 SalesOrderId = l.SalesOrder.Id,
+                                 UnitPriceD = l.SellingPrice,
+                                 UnservedQuantityD = l.Quantity - ((packed == null ? 0 : packed.Quantity) - (returned == null ? 0 : returned.Quantity))
                              };
             return await salesOrder.ToListAsync();
         }
-        //public async Task<IList<UnservedItemVM>> GetListAsync(UnservedItemFilter filter)
-        //{
-        //    var regions = filter.Region2 == "ML" ? new[] { "MM", "LUZ" }
-        //                : filter.Region2 == "VM" ? new[] { "VIS", "MIN" }
-        //                : null;
-        //    var regionSelected = await context.Regions.Where(s => s.Id == filter.Region).Select(s => s.Name).FirstOrDefaultAsync();
-        //    var salesOrder = from l in context.SalesOrderLineItems
-        //                     join packed in context.PackLineItems on new { l.SalesOrderId, l.ItemId } equals new { packed.Pack.SalesOrderId, packed.ItemId } into gpacked
-        //                     from packed in gpacked.DefaultIfEmpty()
-        //                     join returned in context.SalesReturnLineItems on new { SalesOrderId = (int?)l.SalesOrderId, l.ItemId }
-        //                                                               equals new { returned.SalesReturn.SalesOrderId, returned.ItemId } into greturned
-        //                     from returned in greturned.DefaultIfEmpty()
-        //                     join user in userManager.Users on l.SalesOrder.UserCreated equals user.Id
-        //                     let inventory = context.ItemInventories
-        //                                            .Where(s => s.ItemId == l.ItemId
-        //                                                     && s.Warehouse.IsMain == true)
-        //                                            .Sum(s => (int?)s.Quantity) ?? 0
-        //                     //let packedQuantity = context.PackLineItems
-        //                     //                            .Where(s => s.Pack.SalesOrderId == l.SalesOrderId
-        //                     //                                     && s.ItemId == l.ItemId
-        //                     //                                     && s.Pack.Status.Code.Trim().ToLower() == "posted")
-        //                     //                            .Sum(s => (int?)s.Quantity) ?? 0
-        //                     //let returnedQuantity = context.SalesReturnLineItems
-        //                     //                              .Where(s => s.InvoiceLineItem != null
-        //                     //                                       && s.InvoiceLineItem.Invoice.SalesOrderId == l.SalesOrderId
-        //                     //                                       && s.ItemId == l.ItemId)
-        //                     //                              .Sum(s => (int?)s.Quantity) ?? 0
-        //                     where (l.SalesOrder.Status.Name == "PACKING DRAFT" || l.SalesOrder.Status.Name == "PACKING SUBMITTED" || l.SalesOrder.Status.Name == "FULLY PACKED" || l.SalesOrder.Status.Name == "SALES ORDER APPROVED")
-        //                     //&& l.Quantity - (packed.Quantity - returnedQuantity) > 0
-        //                     && ((l.Quantity - ((packed == null ? 0 : packed.Quantity) - (returned == null ? 0 : returned.Quantity))) > 0)
-        //                     && (filter.Region2 == null || regions == null || regions.Contains(l.SalesOrder.Customer.Area.Region.Code))
-        //                     && filter.StartDate <= l.SalesOrder.DateCreated.Date
-        //                     && l.SalesOrder.DateCreated.Date <= filter.EndDate
-        //                     select new UnservedItemVM
-        //                     {
-        //                         Agent = l.SalesOrder.Agent.Code,
-        //                         AgentId = l.SalesOrder.Agent.Id,
-        //                         CreatedBy = user.FirstName + " " + user.LastName,
-        //                         Customer = l.SalesOrder.Customer.Name,
-        //                         CustomerId = l.SalesOrder.Customer.Id,
-        //                         Discount1D = l.Discount1,
-        //                         Discount2D = l.Discount2,
-        //                         Id = l.SalesOrder.Id,
-        //                         Item = l.Item.Code,
-        //                         ItemId = l.Item.Id,
-        //                         OldSKU = l.Item.OldCode,
-        //                         ItemName = l.Item.Name,
-        //                         OrderDateD = l.SalesOrder.DateCreated,
-        //                         PackedQuantityD = packed == null ? 0 : packed.Quantity,
-        //                         QuantityD = l.Quantity,
-        //                         QuantityOnHandD = inventory,
-        //                         SalesOrderNumber = l.SalesOrder.SalesOrderNumber,
-        //                         SalesOrderId = l.SalesOrder.Id,
-        //                         UnitPriceD = l.SellingPrice,
-        //                         UnservedQuantityD = l.Quantity - ((packed == null ? 0 : packed.Quantity) - (returned == null ? 0 : returned.Quantity))
-        //                     };
-        //    return await salesOrder.ToListAsync();
-        //}
-
 
         public async Task<ForDataTables<UnservedItemVM>> GetListDataTablesAsync(DataTablesRequestForm form, UnservedItemFilter filter)
         {

@@ -69,20 +69,25 @@ namespace GMGInventory.Common.Models
             }
         }
 
+        [Display(Name = "Target Days")]
+        public string TargetDays => string.Format(SystemFormat.StringIntegerComma, TargetDaysD);
+        public int TargetDaysD { get; set; }
+
         [Display(Name = "Suggested Order Quantity")]
         public string SuggestedOrderQuantity => string.Format(SystemFormat.StringIntegerComma, SuggestedOrderQuantityD);
         public int SuggestedOrderQuantityD
         {
             get
             {
-                return Math.Max(0, LastWeekQuantityD > 0 ? StockOnHandD - LastWeekQuantityD
-                                 : LastMonthQuantityD > 0 ? StockOnHandD - LastMonthQuantityD
-                                 : Last2MonthsQuantityD > 0 ? StockOnHandD - (Last2MonthsQuantityD / 2)
-                                 : LastYearQuantityD > 0 ? StockOnHandD - (LastYearQuantityD / 12)
-                                 : StockOnHandD - OverallQuantityD);
+                var targetQuantity = TargetDaysD == 7 ? LastWeekQuantityD
+                                   : TargetDaysD == 30 ? LastMonthQuantityD
+                                   : TargetDaysD == 60 ? Last2MonthsQuantityD
+                                   : TargetDaysD == 365 ? LastYearQuantityD
+                                   : 0;
+                return Math.Max(0, targetQuantity - StockOnHandD);
 
-
-                //Ave. Monthly demand x (Lead Time + Buffer) x (1 + Demand Variability)) - (Stock on Hand + Stock on Order)
+                // project scope supposed formula, some variables not explained because the personnel who suggested already not part of the company
+                // Ave. Monthly demand x (Lead Time + Buffer) x (1 + Demand Variability)) - (Stock on Hand + Stock on Order)
             }
         }
 
@@ -106,10 +111,9 @@ namespace GMGInventory.Common.Models
     public class OrderRecommendationFilterVM
     {
         public string MovementCategory { get; set; }
-        public DateTime? DateFrom { get; set; }
-        public DateTime? DateTo { get; set; }
         public int? ItemClassId { get; set; }
         public int? BrandId { get; set; }
+        public int? TargetDays { get; set; }
     }
     public class OrderRecommendationHistoryVM
     {

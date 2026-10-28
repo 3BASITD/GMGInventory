@@ -26,10 +26,6 @@ namespace GMGInventory.Application.Repositories
 
         private async Task<IList<OrderRecommendationVM>> GetOrderRecommendations(OrderRecommendationFilterVM filter)
         {
-            if (filter.DateFrom == null) filter.DateFrom = DateTime.Today.AddDays(-6);
-            if (filter.DateTo == null) filter.DateTo = DateTime.Today;
-            if (filter.DateFrom > filter.DateTo) (filter.DateFrom, filter.DateTo) = (filter.DateTo, filter.DateFrom);
-
             var dtNow = DateTime.Today;
 
             var lastWeekStart = dtNow.AddDays(-7);
@@ -134,7 +130,8 @@ namespace GMGInventory.Application.Repositories
                                         Last2MonthsQuantityD = l2m.Quantity ?? 0,
                                         LastYearQuantityD = ly.Quantity ?? 0,
                                         OverallQuantityD = oa.Quantity ?? 0,
-                                        BeginningCostD = item.BeginningCost
+                                        BeginningCostD = item.BeginningCost,
+                                        TargetDaysD = filter.TargetDays ?? 0
                                     }).ToListAsync();
 
             quantities = quantities.Where(s => filter.MovementCategory == null || s.MovementCategory == filter.MovementCategory).ToList();
