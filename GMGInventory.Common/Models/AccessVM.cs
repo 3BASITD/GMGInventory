@@ -11,6 +11,7 @@ namespace GMGInventory.Common.Models
         public bool CanApproveDisapprove { get; set; }
         public bool CanUploadDownload { get; set; }
         public bool CanPrint { get; set; }
+        public bool CanForceClose { get; set; }
     }
 
     public class AccessVM
@@ -41,6 +42,8 @@ namespace GMGInventory.Common.Models
         public string? UserModified { get; set; }
         public string DateModified => DateModifiedD == null ? "-" : DateModifiedD.Value.ToString(SystemFormat.StringDateTime);
         public DateTime? DateModifiedD { get; set; }
+        public bool HasForceClose { get; set; }
+        public bool CanForceClose { get; set; }
     }
 
     public class RolesPagesVM

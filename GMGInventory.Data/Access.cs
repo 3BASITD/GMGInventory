@@ -31,5 +31,7 @@ namespace GMGInventory.Data
         public bool? CanUploadDownload { get; set; }
 
         public bool? CanPrint { get; set; }
+
+        public bool? CanForceClose { get; set; }
     }
 }

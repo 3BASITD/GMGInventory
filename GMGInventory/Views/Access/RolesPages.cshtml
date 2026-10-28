@@ -59,6 +59,11 @@
                                             <span class="fas fa-print"></span>
                                         </span>
                                     </th>
+                                    <th>
+                                        <span data-microtip-title="Can Force Close" data-microtip-position="bottom" role="tooltip">
+                                            <span class="fas fa-exclamation-triangle"></span>
+                                        </span>
+                                    </th>
                                 </tr>
                                 <tr>
                                     <th>All</th>
@@ -82,6 +87,9 @@
                                     </th>
                                     <th>
                                         <input type="checkbox" name="all.CanPrint" class="canprint-all" />
+                                    </th>
+                                    <th>
+                                        <input type="checkbox" name="all.ForceClose" class="forceclose-all" />
                                     </th>
                                 </tr>
                             </thead>
@@ -203,6 +211,20 @@
                                                 }
                                             }
                                         </td>
+                                        <td>
+                                            @if (Model.Accesses[i].HasForceClose)
+                                            {
+                                                <input type="hidden" name="[@i].HasForceClose" value="true" />
+                                                @if (Model.Accesses[i].CanForceClose)
+                                                {
+                                                    <input type="checkbox" name="accesses[@i].CanForceClose" value="true" checked="checked" class="forceclose" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" name="accesses[@i].CanForceClose" value="true" class="forceclose" />
+                                                }
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -224,7 +246,7 @@
 
 <script>
     $(document).ready(function () {
-        const groups = ['canview', 'canadd', 'canedit', 'candelete', 'canapprovedisapprove', 'canuploaddownload', 'canprint'];
+        const groups = ['canview', 'canadd', 'canedit', 'candelete', 'canapprovedisapprove', 'canuploaddownload', 'canprint','forceclose'];
 
         groups.forEach(function (group) {
             $('.' + group + '-all').on('change', function () {

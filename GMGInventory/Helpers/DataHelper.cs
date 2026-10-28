@@ -15,7 +15,8 @@ namespace GMGInventory.Helpers
                 CanDelete = access.CanDelete,
                 CanApproveDisapprove = access.CanApproveDisapprove == true,
                 CanUploadDownload = access.CanUploadDownload == true,
-                CanPrint = access.CanPrint == true
+                CanPrint = access.CanPrint == true,
+                CanForceClose = access.CanForceClose == true
             };
         }
     }

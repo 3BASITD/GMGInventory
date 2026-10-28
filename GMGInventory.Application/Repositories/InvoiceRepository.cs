@@ -262,7 +262,7 @@ namespace GMGInventory.Application.Repositories
             invoiceDetails.AmountNetVatD = invoiceDetails.TotalAmoutDueD / 1.12m;
             invoiceDetails.WithHoldingTaxD = invoiceDetails.AmountNetVatD * 0.01m;
             invoiceDetails.LessVatD = invoiceDetails.AmountNetVatD * 0.12m;
-            invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.ToZero);
+            invoiceDetails.AddVatD = Math.Round(invoiceDetails.AmountNetVatD * 0.12m, 2, MidpointRounding.AwayFromZero);
 
            
 

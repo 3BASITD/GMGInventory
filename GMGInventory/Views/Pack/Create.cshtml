@@ -214,7 +214,8 @@
         var orderDT = $('.table-order').DataTable({
             ajax: {
                 url: '@Url.Action("GetItemsJson", "SalesOrder")',
-                data: { salesOrderId: $("#salesOrderId").val() },
+                data: { salesOrderId: $("#salesOrderId").val(),
+                        caller: "PACK"},
                 dataSrc: function (json) {
                     return JSON.parse(JSON.stringify(json));
                 },
@@ -313,6 +314,44 @@
                     }
                 });
             }
+        });
+
+
+        // ---------------------------------------------------------------
+        // Reload the order lines every time the modal opens, so changes made
+        // elsewhere (e.g. Sales Order became Force Close) are picked up.
+        // ---------------------------------------------------------------
+        function reloadOrderItems() {
+            // snapshot unsaved client-side changes before the table is replaced
+            pendingDeltas = {};
+            orderDT.rows().every(function () {
+                var d = this.data();
+                if (d._baseRemaining === undefined) return;
+
+                var remaining = (parseInt(d.remainingQuantityD) || 0) - d._baseRemaining;
+                var packed = (parseInt(d.packedQuantityD) || 0) - d._basePacked;
+                var inventory = (parseInt(d.inventoryCountD) || 0) - d._baseInventory;
+
+                if (remaining !== 0 || packed !== 0 || inventory !== 0) {
+                    pendingDeltas[String(d.id)] = {
+                        remaining: remaining,
+                        packed: packed,
+                        inventory: inventory
+                    };
+                }
+            });
+
+            // false = keep current paging/order position
+            orderDT.ajax.reload(null, false);
+        }
+
+        $("#addModal").on("show.bs.modal", function () {
+            reloadOrderItems();
+        });
+
+        $("#addModal").on("shown.bs.modal", function () {
+            // table was hidden while loading, so fix the column widths
+            orderDT.columns.adjust();
         });
 
         orderDT.on("draw", function () {

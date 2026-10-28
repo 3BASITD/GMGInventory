@@ -120,12 +120,12 @@ namespace GMGInventory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetItemsJson(int salesOrderId)
+        public async Task<IActionResult> GetItemsJson(int salesOrderId, string? caller)
         {
             var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.View);
             if (redirectResult != null) return redirectResult;
 
-            return Json(await salesOrderRepository.GetItemsAsync(salesOrderId));
+            return Json(await salesOrderRepository.GetItemsAsync(salesOrderId, caller));
         }
 
         [HttpPost]
@@ -226,6 +226,27 @@ namespace GMGInventory.Controllers
             }
 
             return Json(response);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForceClose(int Id)
+        {
+            var redirectResult = await CheckAccessAndRedirectAsync(PageNames.SalesOrder, AccessTypes.ForceClose);
+            if (redirectResult != null) return redirectResult;
+
+            if (ModelState.IsValid)
+            {
+                if (await salesOrderRepository.ForceClose(Id))
+                {
+                    TempData["SuccessMessage"] = "Sales order force close successfully";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Force close sales order failed";
+                }
+            }
+            return RedirectToAction(nameof(Details), new { id = Id });
         }
 
         [HttpPost]

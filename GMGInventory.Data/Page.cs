@@ -33,6 +33,7 @@ namespace GMGInventory.Data
 
         public bool HasUploadDownload { get; set; }
         public bool HasPrint { get; set; }
+        public bool HasForceClose { get; set; }
 
         public ICollection<Access> Accesses { get; set; }
     }

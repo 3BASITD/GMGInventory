@@ -8,7 +8,8 @@
         Delete,
         ApproveDisapprove,
         UploadDownload,
-        Print
+        Print,
+        ForceClose
     }
 
     public enum WareHouseName

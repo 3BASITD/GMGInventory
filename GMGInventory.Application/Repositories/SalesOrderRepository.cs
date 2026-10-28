@@ -68,6 +68,7 @@ namespace GMGInventory.Application.Repositories
                          where order.Status.Code.ToLower() != "submitted"
                          && order.Status.Code.ToLower() != "disapproved"
                          && order.Status.Code.ToLower() != "draft"
+                         && order.Status.Code.ToLower() != "force close"
                          && (string.IsNullOrWhiteSpace(search)
                          || (order.SalesOrderNumber.Trim().ToLower().Contains(search.Trim().ToLower())))
                          orderby order.SalesOrderNumber ascending
@@ -411,7 +412,7 @@ namespace GMGInventory.Application.Repositories
                 return new SalesOrderPrintVM
                 {
                     Details = details,
-                    Items = await GetItemsAsync(Id ?? 0)
+                    Items = await GetItemsAsync(Id ?? 0, null)
                 };
             }
         }
@@ -711,7 +712,7 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
-        public async Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId)
+        public async Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId, string? caller)
         {
             var itemVM = await (from order in context.SalesOrderLineItems
                                                      .Include(s => s.Item)
@@ -753,7 +754,7 @@ namespace GMGInventory.Application.Repositories
                                                               .Where(s => s.InvoiceLineItem!.Invoice.SalesOrderId == order.SalesOrderId
                                                                        && s.ItemId == order.ItemId)
                                                               .Sum(s => (int?)s.Quantity) ?? 0
-                                where order.SalesOrderId == salesOrderId
+                                where order.SalesOrderId == salesOrderId && (caller != "PACK" || order.SalesOrder.Status.Code.ToLower() != "force close")
                                 orderby order.LineNumber ascending
                                 select new SalesOrderItemVM
                                 {
@@ -811,7 +812,7 @@ namespace GMGInventory.Application.Repositories
         {
             int totalRecord = 0;
             int filterRecord = 0;
-            var data = (await GetItemsAsync(salesOrderId)).AsQueryable();
+            var data = (await GetItemsAsync(salesOrderId, null)).AsQueryable();
             //get total count of data in table
             totalRecord = data.Count();
             // search data when search value found
@@ -936,78 +937,79 @@ namespace GMGInventory.Application.Repositories
 
                 if (previous == null)
                 {
-                    var warehouse = context.Warehouses
-                                          .Where(s => s.IsMain == true).FirstOrDefault();
+                    soNumber = SONumber();
+                    //var warehouse = context.Warehouses
+                    //                      .Where(s => s.IsMain == true).FirstOrDefault();
 
 
-                    var latestOrder = context.SalesOrders
-                                             .OrderByDescending(s => s.Id)
-                                             .Select(s => s.SalesOrderNumber)
-                                             .FirstOrDefault();
+                    //var latestOrder = context.SalesOrders
+                    //                         .OrderByDescending(s => s.Id)
+                    //                         .Select(s => s.SalesOrderNumber)
+                    //                         .FirstOrDefault();
 
-                    if (latestOrder != null && latestOrder.Contains('.'))
-                    {
-                        var splitLatestOrder = latestOrder.Split('.');
-                        latestOrder = splitLatestOrder[0];
-                    }
+                    //if (latestOrder != null && latestOrder.Contains('.'))
+                    //{
+                    //    var splitLatestOrder = latestOrder.Split('.');
+                    //    latestOrder = splitLatestOrder[0];
+                    //}
 
-                    if (latestOrder != null && latestOrder.Contains('-'))
-                    {
-                        var splitLatestOrder = latestOrder.Split("-");
-                        latestOrder = splitLatestOrder[0];
-                    }
+                    //if (latestOrder != null && latestOrder.Contains('-'))
+                    //{
+                    //    var splitLatestOrder = latestOrder.Split("-");
+                    //    latestOrder = splitLatestOrder[0];
+                    //}
 
-                    // var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
-
-
-
-                    int? latestOrderNumber = 0;
-
-                    if (latestOrder != null)
-                    {
-                        if (latestOrder.Contains("SO"))
-                        {
-                            latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
-                        }
-                        else if (latestOrder.Contains("PSG1"))
-                        {
-                            latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
-                        }
-                        else if (latestOrder.Contains("PSG2"))
-                        {
-                            latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
-                        }
-                        else if (latestOrder.Contains("CT38"))
-                        {
-                            latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
-                        }
-                        else if (latestOrder.Contains("SEV"))
-                        {
-                            latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
-                        }
-                    }
+                    //// var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
 
 
 
-                    if (warehouse != null && latestOrder != null)
-                    {
-                        if (warehouse.Name == WareHouseName.PASIG1.ToString())
-                        {
-                            soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
-                        }
-                        else if (warehouse.Name == WareHouseName.PASIG2.ToString())
-                        {
-                            soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
-                        }
-                        else if (warehouse.Name == WareHouseName.CETACIO.ToString())
-                        {
-                            soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 20);
-                        }
-                        else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
-                        {
-                            soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
-                        }
-                    }
+                    //int? latestOrderNumber = 0;
+
+                    //if (latestOrder != null)
+                    //{
+                    //    if (latestOrder.Contains("SO"))
+                    //    {
+                    //        latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
+                    //    }
+                    //    else if (latestOrder.Contains("PSG1"))
+                    //    {
+                    //        latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
+                    //    }
+                    //    else if (latestOrder.Contains("PSG2"))
+                    //    {
+                    //        latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
+                    //    }
+                    //    else if (latestOrder.Contains("CT38"))
+                    //    {
+                    //        latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
+                    //    }
+                    //    else if (latestOrder.Contains("SEV"))
+                    //    {
+                    //        latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
+                    //    }
+                    //}
+
+
+
+                    //if (warehouse != null && latestOrder != null)
+                    //{
+                    //    if (warehouse.Name == WareHouseName.PASIG1.ToString())
+                    //    {
+                    //        soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
+                    //    }
+                    //    else if (warehouse.Name == WareHouseName.PASIG2.ToString())
+                    //    {
+                    //        soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
+                    //    }
+                    //    else if (warehouse.Name == WareHouseName.CETACIO.ToString())
+                    //    {
+                    //        soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 1);
+                    //    }
+                    //    else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
+                    //    {
+                    //        soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
+                    //    }
+                    //}
 
 
                 }
@@ -1017,8 +1019,7 @@ namespace GMGInventory.Application.Repositories
                 }
                 else
                 {
-                    var tempSalesOrderNumber = previous.SalesOrderNumber.Split("-D");
-                    soNumber = tempSalesOrderNumber[0];
+                    soNumber = SONumber();
                     soResubbmitedBy = currentUserId;
                     soResubbmitedDate = DateTime.UtcNow;
                 }
@@ -1250,6 +1251,39 @@ namespace GMGInventory.Application.Repositories
             return new ResponseModel { Status = "Success", Message = "Successfully deleted sales order" };
         }
 
+        public async Task<bool> ForceClose(int Id)
+        {
+            var orderVM = context.SalesOrders.Where(s => s.Id == Id).FirstOrDefault();
+            if (orderVM == null)
+            {
+                return false;
+            }
+            else
+            {
+                var tempSalesOrderNumber = orderVM.SalesOrderNumber + "-F";
+                var latestDisapprovedOrder = context.SalesOrders
+                                         .Where(s => s.SalesOrderNumber.StartsWith(tempSalesOrderNumber))
+                                         .OrderByDescending(s => s.SalesOrderNumber)
+                                         .Select(s => s.SalesOrderNumber)
+                                         .FirstOrDefault();
+                var latestDisapprovedOrderNumber = latestDisapprovedOrder == null
+                                                 ? 0
+                                                 : int.Parse(latestDisapprovedOrder.Replace(tempSalesOrderNumber, ""));
+                var disapprovedOrderNumber = tempSalesOrderNumber + string.Format("{0:00}", latestDisapprovedOrderNumber + 1);
+
+                string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+                int statusId = await context.Statuses.Where(s => s.Name.ToLower() == "force close").Select(s => s.Id).FirstAsync();
+                orderVM.SalesOrderNumber = disapprovedOrderNumber;
+                orderVM.StatusId = statusId;
+
+                context.SalesOrders.Update(orderVM);
+                await context.SaveChangesAsync(currentUserId);
+
+
+                return true;
+            }
+        }
+
         public async Task<bool> ApproveAsync(int salesOrderId, string slaReason)
         {
             var orderVM = context.SalesOrders.Where(s => s.Id == salesOrderId).FirstOrDefault();
@@ -1466,6 +1500,42 @@ namespace GMGInventory.Application.Repositories
             }
 
             return total;
+        }
+
+        public string SONumber()
+        {
+            var warehouse = context.Warehouses
+                                           .Where(s => s.IsMain == true).FirstOrDefault();
+            if (warehouse == null)
+                throw new InvalidOperationException("No main warehouse configured.");
+
+            string prefix;
+            int width;
+
+            if (warehouse.Name == WareHouseName.PASIG1.ToString()) { prefix = "PSG1"; width = 6; }
+            else if (warehouse.Name == WareHouseName.PASIG2.ToString()) { prefix = "PSG2"; width = 6; }
+            else if (warehouse.Name == WareHouseName.CETACIO.ToString()) { prefix = "CT38"; width = 6; }
+            else if (warehouse.Name == WareHouseName.SEVERINO.ToString()) { prefix = "SEV"; width = 7; }
+            else throw new InvalidOperationException($"Unknown warehouse '{warehouse.Name}'.");
+
+            var latest = context.SalesOrders
+                                .Where(s => s.SalesOrderNumber.StartsWith(prefix))
+                                .OrderByDescending(s => s.Id)
+                                .Select(s => s.SalesOrderNumber)
+                                .FirstOrDefault();
+
+            int next = 1;
+            if (latest != null)
+            {
+                // strip suffix like ".1" or "-A"
+                var end = latest.IndexOfAny(new[] { '.', '-' });
+                var core = end >= 0 ? latest[..end] : latest;
+
+                if (int.TryParse(core.Substring(prefix.Length), out var n))
+                    next = n + 1;
+            }
+
+            return $"{prefix}{next.ToString().PadLeft(width, '0')}";
         }
 
     }

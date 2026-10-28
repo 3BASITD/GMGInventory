@@ -72,7 +72,9 @@ namespace GMGInventory.Application.Repositories
                                UserCreated = a == null ? "" : a.UserCreated,
                                UserModified = a == null ? null : a.UserModified,
                                DateCreatedD = a == null ? DateTime.Now : a.DateCreated,
-                               DateModifiedD = a == null ? null : a.DateModified
+                               DateModifiedD = a == null ? null : a.DateModified,
+                               HasForceClose = p.HasForceClose,
+                               CanForceClose = a != null && a.CanForceClose == true
                            };
             return new RolesPagesVM
             {
@@ -138,6 +140,7 @@ namespace GMGInventory.Application.Repositories
                                     CanDelete = access.CanDelete,
                                     CanApproveDisapprove = access.CanApproveDisapprove,
                                     CanUploadDownload = access.CanUploadDownload,
+                                    CanForceClose = access.CanForceClose,
                                     CanPrint = access.CanPrint,
                                     UserCreated = currentUserId,
                                     DateCreated = DateTime.Now
@@ -182,8 +185,9 @@ namespace GMGInventory.Application.Repositories
                                     CanApproveDisapprove = access.CanApproveDisapprove,
                                     CanUploadDownload = access.CanUploadDownload,
                                     CanPrint = access.CanPrint,
+                                    CanForceClose = access.CanForceClose,
                                     UserCreated = currentUserId,
-                                    DateCreated = DateTime.Now
+                                    DateCreated = DateTime.Now,
                                 };
                                 context.Accesses.Add(newAccess);
                             }
@@ -198,6 +202,7 @@ namespace GMGInventory.Application.Repositories
                                 acc.CanPrint = access.CanPrint;
                                 acc.UserModified = currentUserId;
                                 acc.DateModified = DateTime.Now;
+                                acc.CanForceClose = access.CanForceClose;
                                 context.Accesses.Update(acc);
                             }
                         }
@@ -318,6 +323,7 @@ namespace GMGInventory.Application.Repositories
                             || a.CanApproveDisapprove == true
                             || a.CanUploadDownload == true
                             || a.CanPrint == true
+                            || a.CanForceClose == true
                            )
                            select p.Name;
             return await accesses.ToListAsync();
@@ -338,6 +344,7 @@ namespace GMGInventory.Application.Repositories
                 AccessTypes.ApproveDisapprove => access.CanApproveDisapprove == true,
                 AccessTypes.UploadDownload => access.CanUploadDownload == true,
                 AccessTypes.Print => access.CanPrint == true,
+                AccessTypes.ForceClose => access.CanForceClose == true,
                 _ => false
             };
         }
@@ -387,7 +394,9 @@ namespace GMGInventory.Application.Repositories
                                UserCreated = a == null ? "" : a.UserCreated,
                                UserModified = a == null ? null : a.UserModified,
                                DateCreatedD = a == null ? DateTime.Now : a.DateCreated,
-                               DateModifiedD = a == null ? null : a.DateModified
+                               DateModifiedD = a == null ? null : a.DateModified,
+                               HasForceClose = p.HasForceClose,
+                               CanForceClose = a != null && a.CanForceClose == true,
                            };
             return await accesses.ToListAsync();
         }

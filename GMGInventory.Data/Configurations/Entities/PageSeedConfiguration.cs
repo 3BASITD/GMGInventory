@@ -65,6 +65,7 @@ namespace GMGInventory.Data.Configurations.Entities
                     HasEdit = true,
                     HasDelete = true,
                     HasApproveDisapprove = true,
+                    HasForceClose = true,
                     HasPrint = true
                 },
                 new() {

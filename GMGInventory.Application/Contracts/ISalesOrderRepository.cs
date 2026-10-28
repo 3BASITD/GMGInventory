@@ -15,7 +15,7 @@ namespace GMGInventory.Application.Contracts
         Task<ForDataTables<SalesOrderVM>> GetListDTAsync(DataTablesRequestForm form, SalesOrderFilterVM filter);
         Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter);
         Task<IList<APISalesOrder>> GetListAPI(DateTime? dt);
-        Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId);
+        Task<IList<SalesOrderItemVM>> GetItemsAsync(int salesOrderId, string? caller);
         Task<IList<CustomerBrandDiscountVM>> GetBrandDiscountAsync(int customerId, int brandId);
         Task<ForDataTables<SalesOrderItemVM>> GetItemsDTAsync(DataTablesRequestForm form, int salesOrderId);
         Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form);
@@ -26,5 +26,6 @@ namespace GMGInventory.Application.Contracts
         Task<bool> UpdateServedSOItem(int salesOrderLineItemId, int quantity);
         Task<ResponseModel> UpdatePod(int Id);
         double BusinessMinutesBetween(DateTime start, DateTime end);
+        Task<bool> ForceClose(int Id);
     }
-}
+} 
