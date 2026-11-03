@@ -499,4 +499,44 @@ namespace GMGInventory.Common.Models
         public int? ItemPromoId { get; set; }
         public bool? isPromo { get; set; }
     }
+
+    public class SalesOrderListRowVM
+    {
+        public int Id { get; set; }
+        public string? SONumber { get; set; }
+        public DateTime OrderDateD { get; set; }
+        public int CustomerId { get; set; }
+        public string? CustomerCode { get; set; }
+        public string? CustomerName { get; set; }
+        public int PriorityD { get; set; }
+        public string? Area { get; set; }
+        public string? Region { get; set; }
+        public string? Status { get; set; }
+        public decimal? TotalAmountD { get; set; }
+        public string? CustomerAddress { get; set; }
+        public DateTime RequiredDeliveryDateD { get; set; }
+        public string? Forwarder { get; set; }
+        public string? ApprovedFirstName { get; set; }
+        public string? ApprovedLastName { get; set; }
+        public string? ApprovedNickname { get; set; }
+        public string? DisapprovedFirstName { get; set; }
+        public string? DisapprovedLastName { get; set; }
+        public string? DisapprovedNickname { get; set; }
+        public DateTime? ApprovedDisapprovedDateD { get; set; }
+        public DateTime? ApproveDateD { get; set; }
+        public bool IsAllPacked { get; set; }
+        public string? PurchaseRequestRaw { get; set; }
+        public string? ServiceLevelAgreement { get; set; }
+        public int? ServiceLevelAgreementHr { get; set; }
+        public bool? WithLP { get; set; }
+        public bool? WithREYCONonDefective { get; set; }
+        public string? WithREYCOJITLPDelivery { get; set; }
+        public string? SpecialInstruction { get; set; }
+        public string? Remarks { get; set; }
+        public string? OrderQueueNumber { get; set; }
+        public string? SaName { get; set; }
+        public string? SaKpi { get; set; }
+        public string? OpsName { get; set; }
+        public string? OpsKpi { get; set; }
+    }
 }

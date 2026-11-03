@@ -1,7 +1,9 @@
-﻿using GMGInventory.Data.Configurations.Entities;
+﻿using GMGInventory.Common.Models;
+using GMGInventory.Data.Configurations.Entities;
 using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace GMGInventory.Data
 {
@@ -43,6 +45,13 @@ namespace GMGInventory.Data
             builder.ApplyConfiguration(new PurchaseStatusSeedConfiguration());
 
             builder.ApplyConfiguration(new KYCDocumentTypeSeedConfiguration());
+
+            builder.Entity<SalesOrderListRowVM>(e =>
+            {
+                e.HasNoKey();
+                e.ToView(null);
+            });
+
         }
 
         public DbSet<AuditLog> AuditLogs { get; set; }

@@ -11,6 +11,7 @@ using GMGInventory.Data.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Dynamic.Core;
@@ -417,128 +418,236 @@ namespace GMGInventory.Application.Repositories
             }
         }
 
+        //public async Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter)
+        //{
+        //    var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
+        //    var currentUserId = currentUser.Id;
+
+        //    var users = userManager.Users;
+
+        //    var DateFrom = filter.DateFrom == null ? DateTime.Today.AddYears(-1) : filter.DateFrom.Value.Date;
+        //    var DateTo = filter.DateTo == null ? DateTime.Today : filter.DateTo.Value.Date;
+        //    if (DateFrom > DateTo) (DateFrom, DateTo) = (DateTo, DateFrom);
+        //    var FiledBy = filter.FiledBy == null ? "everyone" : filter.FiledBy.ToLower();
+
+        //    var now = DateTime.Now;
+        //    const double nearDueThreshold = 0.70;
+
+        //    var filteredOrder = from order in context.SalesOrders
+        //                        where (filter.AgentId == null || order.AgentId == filter.AgentId)
+        //                        && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
+        //                        && (filter.RegionId == null || order.Region.Id == filter.RegionId)
+        //                        && DateFrom <= order.SalesOrderDate.Date
+        //                        && order.SalesOrderDate.Date <= DateTo
+        //                        && (filter.Status == null || filter.Status == order.Status.Id)
+        //                        && (filter.FiledBy == null || FiledBy != "me" || (FiledBy == "me" && order.UserCreated == currentUserId))
+        //                        select order;
+
+        //    var orderIncompletePack = from soli in context.SalesOrderLineItems
+        //                              join pli in context.PackLineItems on new { soli.SalesOrderId, soli.ItemId } equals new { pli.Pack.SalesOrderId, pli.ItemId } into p
+        //                              from pli in p.DefaultIfEmpty()
+        //                              where soli.Quantity > (pli == null ? 0 : pli.Quantity)
+        //                              select soli.SalesOrderId;
+
+        //    var saKpi = from so in context.SalesOrders
+        //                join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
+        //                join user in users on kpi.UserCreated equals user.Id
+        //                where kpi.Department == "SA"
+        //                select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
+
+        //    var opsKpi = from so in context.SalesOrders
+        //                 join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
+        //                 join user in users on kpi.UserCreated equals user.Id
+        //                 where kpi.Department == "OPS"
+        //                 select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
+
+
+        //    var orderVM = (from order in filteredOrder
+        //                   join approvedby in users on order.ApprovedBy equals approvedby.Id into ab
+        //                   from approvedby in ab.DefaultIfEmpty()
+        //                   join disapprovedby in users on order.DisapprovedBy equals disapprovedby.Id into db
+        //                   from disapprovedby in db.DefaultIfEmpty()
+        //                   select new SalesOrderVM
+        //                   {
+        //                       CustomerId = order.Customer.Id,
+        //                       CustomerCode = order.Customer.Code,
+        //                       CustomerName = order.Customer.Name,
+        //                       Id = order.Id,
+        //                       OrderDateD = order.DateCreated,
+        //                       SONumber = order.SalesOrderNumber,
+        //                       Status = order.Status.Code,
+        //                       TotalAmountD = order.SalesOrderLineItems.Sum(s =>
+        //                                        s.Quantity
+        //                                        * s.SellingPrice
+        //                                        * (100 - s.Discount1) / 100
+        //                                        * (100 - s.Discount2) / 100
+        //                                        * (100 - (s.Discount3 == null ? 0 : s.Discount3.Value)) / 100
+        //                                        * (100 - (s.Discount4 == null ? 0 : s.Discount4.Value)) / 100
+        //                                        * (100 - (s.Discount5 == null ? 0 : s.Discount5.Value)) / 100
+        //                                    ) - order.OverallDiscount,
+        //                       CustomerAddress = order.Customer
+        //                                              .ShippingAddresses
+        //                                              .Where(s => s.IsDefault == true)
+        //                                              .Select(s => s.Address)
+        //                                              .FirstOrDefault() ?? null,
+        //                       PriorityD = order.Customer.Priority,
+        //                       Region = order.Region.Name,
+        //                       Area = order.Customer.Area.Name,
+        //                       RequiredDeliveryDateD = order.RequiredDeliveryDate,
+        //                       Forwarder = order.Forwarder != null ? order.Forwarder.Name : null,
+        //                       ApprovedDisapprovedBy = approvedby != null
+        //                                             ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname)
+        //                                             : disapprovedby != null
+        //                                             ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname)
+        //                                             : null,
+        //                       ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate,
+        //                       IsAllPacked = !orderIncompletePack.Contains(order.Id),
+        //                       PurchaseRequestDetail = string.Join(", ", order.PurchaseRequestLineItems
+        //                                                                      .Select(s => new
+        //                                                                      {
+        //                                                                          Id = s.PurchaseRequest.Id,
+        //                                                                          Number = s.PurchaseRequest.DocumentNumber,
+        //                                                                          Status = s.PurchaseRequest.Status.Name
+        //                                                                      })
+        //                                                                      .Distinct()
+        //                                                                      .Select(s => $"<a href='/PurchaseRequest/Details/{s.Id}' class='link-info' target='_blank'>{s.Number}</a>-[{s.Status}]")),
+        //                       ServiceLevelAgreement = order.ServiceLevelAgreement.Name,
+        //                       ServiceLevelAgreementHr = order.ServiceLevelAgreement.HourAvailability,
+        //                       WithLP = order.WithLP,
+        //                       WithREYCONonDefective = order.WithREYCONonDefective,
+        //                       WithREYCOJITLPDelivery = order.WithREYCOJITLPDelivery.Name,
+        //                       SpecialInstruction = order.SpecialInstruction,
+        //                       Remarks = order.Remarks,
+        //                       OrderQueueNumber = order.SalesOrderItemSources
+        //                                               .Select(s => s.SourceOrderNumber)
+        //                                               .FirstOrDefault(),
+        //                       TimeRemainingD = order.ServiceLevelAgreement.HourAvailability
+        //                           - EF.Functions.DateDiffMinute(order.DateCreated, now) / 60.0,
+        //                       ApproveDateD = order.ApprovedDate,
+        //                       SaName = saKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
+        //                       SaKpi = (saKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
+        //                       OpsName = opsKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
+        //                       OpsKpi = (opsKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
+
+        //                       //SlaStatus = (order.Status.Id == 2 || order.Status.Id == 3)
+        //                       //                         && order.ServiceLevelAgreement.HourAvailability > 0
+        //                       //                       ? (EF.Functions.DateDiffMinute(order.DateCreated, now)
+        //                       //                             >= order.ServiceLevelAgreement.HourAvailability * 60
+        //                       //                             ? "Overdue"
+        //                       //                             : EF.Functions.DateDiffMinute(order.DateCreated, now)
+        //                       //                                 >= order.ServiceLevelAgreement.HourAvailability * 60 * nearDueThreshold
+        //                       //                                 ? "Near Due"
+        //                       //                                 : "On Track")
+        //                       //                       : null
+        //                   });
+
+        //    var result = orderVM.ToList();
+
+        //    foreach (var vm in result)
+        //    {
+        //        var isSubmitted = vm.Status == "SUBMITTED";
+        //        var isApproved = vm.Status == "APPROVED";
+
+
+        //        if ((!isSubmitted && !isApproved) || vm.ServiceLevelAgreementHr <= 0)
+        //        {
+        //            vm.SlaStatus = null;
+        //            continue;
+        //        }
+
+        //        var limitMinutes = vm.ServiceLevelAgreementHr * 60;
+
+        //        if (isApproved && vm.ApproveDateD.HasValue)
+        //        {
+        //            // SLA clock stops at approval time
+        //            var minutesToApprove = BusinessMinutesBetween(vm.OrderDateD, vm.ApproveDateD.Value);
+
+        //            vm.SlaStatus = minutesToApprove <= limitMinutes ? "Done" : "Overdue";
+
+        //            // optional: freeze remaining time at the moment of approval
+        //            vm.TimeRemainingD = vm.ServiceLevelAgreementHr - minutesToApprove / 60.0;
+        //        }
+        //        else
+        //        {
+        //            // still waiting for approval: the clock is running against now
+        //            var elapsedMinutes = BusinessMinutesBetween(vm.OrderDateD, now);
+
+        //            if (elapsedMinutes >= limitMinutes)
+        //                vm.SlaStatus = "Overdue";
+        //            else if (elapsedMinutes >= limitMinutes * nearDueThreshold)
+        //                vm.SlaStatus = "Near Due";
+        //            else
+        //                vm.SlaStatus = "On Track";
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
         public async Task<IList<SalesOrderVM>> GetListAsync(SalesOrderFilterVM filter)
         {
             var currentUser = await userManager.GetUserAsync(httpContextAccessor?.HttpContext?.User);
-            var currentUserId = currentUser.Id;
-
-            var users = userManager.Users;
-
-            var DateFrom = filter.DateFrom == null ? DateTime.Today.AddYears(-1) : filter.DateFrom.Value.Date;
-            var DateTo = filter.DateTo == null ? DateTime.Today : filter.DateTo.Value.Date;
-            if (DateFrom > DateTo) (DateFrom, DateTo) = (DateTo, DateFrom);
-            var FiledBy = filter.FiledBy == null ? "everyone" : filter.FiledBy.ToLower();
+            var filedBy = filter.FiledBy?.ToLower() ?? "everyone";
 
             var now = DateTime.Now;
             const double nearDueThreshold = 0.70;
 
-            var filteredOrder = from order in context.SalesOrders
-                                where (filter.AgentId == null || order.AgentId == filter.AgentId)
-                                && (filter.CustomerId == null || order.CustomerId == filter.CustomerId)
-                                && (filter.RegionId == null || order.Region.Id == filter.RegionId)
-                                && DateFrom <= order.SalesOrderDate.Date
-                                && order.SalesOrderDate.Date <= DateTo
-                                && (filter.Status == null || filter.Status == order.Status.Id)
-                                && (filter.FiledBy == null || FiledBy != "me" || (FiledBy == "me" && order.UserCreated == currentUserId))
-                                select order;
+            var parameters = new[]
+            {
+                new SqlParameter("@DateFrom",   (object?)filter.DateFrom?.Date ?? DBNull.Value),
+                new SqlParameter("@DateTo",     (object?)filter.DateTo?.Date   ?? DBNull.Value),
+                new SqlParameter("@AgentId",    (object?)filter.AgentId    ?? DBNull.Value),
+                new SqlParameter("@CustomerId", (object?)filter.CustomerId ?? DBNull.Value),
+                new SqlParameter("@RegionId",   (object?)filter.RegionId   ?? DBNull.Value),
+                new SqlParameter("@StatusId",   (object?)filter.Status     ?? DBNull.Value),
+                new SqlParameter("@FiledByMe",  filedBy == "me"),
+                new SqlParameter("@UserId",     currentUser.Id),
+            };
 
-            var orderIncompletePack = from soli in context.SalesOrderLineItems
-                                      join pli in context.PackLineItems on new { soli.SalesOrderId, soli.ItemId } equals new { pli.Pack.SalesOrderId, pli.ItemId } into p
-                                      from pli in p.DefaultIfEmpty()
-                                      where soli.Quantity > (pli == null ? 0 : pli.Quantity)
-                                      select soli.SalesOrderId;
+            var rows = await context.Set<SalesOrderListRowVM>()
+                .FromSqlRaw(@"EXEC dbo.SP_SO_GETLIST @DateFrom, @DateTo, @AgentId, @CustomerId, @RegionId, @StatusId, @FiledByMe, @UserId", parameters)
+                .AsNoTracking()
+                .ToListAsync();
 
-            var saKpi = from so in context.SalesOrders
-                        join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
-                        join user in users on kpi.UserCreated equals user.Id
-                        where kpi.Department == "SA"
-                        select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
-
-            var opsKpi = from so in context.SalesOrders
-                         join kpi in context.KPIs on so.Id equals kpi.SalesOrderId
-                         join user in users on kpi.UserCreated equals user.Id
-                         where kpi.Department == "OPS"
-                         select new { Id = so.Id, Duration = kpi.KpiEnd - kpi.KpiStart, User = user.FirstName + " " + user.LastName };
-
-
-            var orderVM = (from order in filteredOrder
-                           join approvedby in users on order.ApprovedBy equals approvedby.Id into ab
-                           from approvedby in ab.DefaultIfEmpty()
-                           join disapprovedby in users on order.DisapprovedBy equals disapprovedby.Id into db
-                           from disapprovedby in db.DefaultIfEmpty()
-                           select new SalesOrderVM
-                           {
-                               CustomerId = order.Customer.Id,
-                               CustomerCode = order.Customer.Code,
-                               CustomerName = order.Customer.Name,
-                               Id = order.Id,
-                               OrderDateD = order.DateCreated,
-                               SONumber = order.SalesOrderNumber,
-                               Status = order.Status.Code,
-                               TotalAmountD = order.SalesOrderLineItems.Sum(s =>
-                                                s.Quantity
-                                                * s.SellingPrice
-                                                * (100 - s.Discount1) / 100
-                                                * (100 - s.Discount2) / 100
-                                                * (100 - (s.Discount3 == null ? 0 : s.Discount3.Value)) / 100
-                                                * (100 - (s.Discount4 == null ? 0 : s.Discount4.Value)) / 100
-                                                * (100 - (s.Discount5 == null ? 0 : s.Discount5.Value)) / 100
-                                            ) - order.OverallDiscount,
-                               CustomerAddress = order.Customer
-                                                      .ShippingAddresses
-                                                      .Where(s => s.IsDefault == true)
-                                                      .Select(s => s.Address)
-                                                      .FirstOrDefault() ?? null,
-                               PriorityD = order.Customer.Priority,
-                               Region = order.Region.Name,
-                               Area = order.Customer.Area.Name,
-                               RequiredDeliveryDateD = order.RequiredDeliveryDate,
-                               Forwarder = order.Forwarder != null ? order.Forwarder.Name : null,
-                               ApprovedDisapprovedBy = approvedby != null
-                                                     ? SystemFormat.Name(approvedby.FirstName, approvedby.LastName, approvedby.Nickname)
-                                                     : disapprovedby != null
-                                                     ? SystemFormat.Name(disapprovedby.FirstName, disapprovedby.LastName, disapprovedby.Nickname)
-                                                     : null,
-                               ApprovedDisapprovedDateD = order.ApprovedDate ?? order.DisapprovedDate,
-                               IsAllPacked = !orderIncompletePack.Contains(order.Id),
-                               PurchaseRequestDetail = string.Join(", ", order.PurchaseRequestLineItems
-                                                                              .Select(s => new
-                                                                              {
-                                                                                  Id = s.PurchaseRequest.Id,
-                                                                                  Number = s.PurchaseRequest.DocumentNumber,
-                                                                                  Status = s.PurchaseRequest.Status.Name
-                                                                              })
-                                                                              .Distinct()
-                                                                              .Select(s => $"<a href='/PurchaseRequest/Details/{s.Id}' class='link-info' target='_blank'>{s.Number}</a>-[{s.Status}]")),
-                               ServiceLevelAgreement = order.ServiceLevelAgreement.Name,
-                               ServiceLevelAgreementHr = order.ServiceLevelAgreement.HourAvailability,
-                               WithLP = order.WithLP,
-                               WithREYCONonDefective = order.WithREYCONonDefective,
-                               WithREYCOJITLPDelivery = order.WithREYCOJITLPDelivery.Name,
-                               SpecialInstruction = order.SpecialInstruction,
-                               Remarks = order.Remarks,
-                               OrderQueueNumber = order.SalesOrderItemSources
-                                                       .Select(s => s.SourceOrderNumber)
-                                                       .FirstOrDefault(),
-                               TimeRemainingD = order.ServiceLevelAgreement.HourAvailability
-                                   - EF.Functions.DateDiffMinute(order.DateCreated, now) / 60.0,
-                               ApproveDateD = order.ApprovedDate,
-                               SaName = saKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
-                               SaKpi = (saKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
-                               OpsName = opsKpi.Where(s => s.Id == order.Id).Select(s => s.User).FirstOrDefault(),
-                               OpsKpi = (opsKpi.Where(s => s.Id == order.Id).Select(s => s.Duration).FirstOrDefault() ?? TimeSpan.Zero).ToString(@"hh\:mm\:ss"),
-
-                               //SlaStatus = (order.Status.Id == 2 || order.Status.Id == 3)
-                               //                         && order.ServiceLevelAgreement.HourAvailability > 0
-                               //                       ? (EF.Functions.DateDiffMinute(order.DateCreated, now)
-                               //                             >= order.ServiceLevelAgreement.HourAvailability * 60
-                               //                             ? "Overdue"
-                               //                             : EF.Functions.DateDiffMinute(order.DateCreated, now)
-                               //                                 >= order.ServiceLevelAgreement.HourAvailability * 60 * nearDueThreshold
-                               //                                 ? "Near Due"
-                               //                                 : "On Track")
-                               //                       : null
-                           });
+            var orderVM = rows.Select(r => new SalesOrderVM
+            {
+                Id = r.Id,
+                SONumber = r.SONumber,
+                OrderDateD = r.OrderDateD,
+                CustomerId = r.CustomerId,
+                CustomerCode = r.CustomerCode,
+                CustomerName = r.CustomerName,
+                PriorityD = r.PriorityD,
+                Area = r.Area,
+                Region = r.Region,
+                Status = r.Status,
+                TotalAmountD = r.TotalAmountD ?? 0,
+                CustomerAddress = r.CustomerAddress,
+                RequiredDeliveryDateD = r.RequiredDeliveryDateD,
+                Forwarder = r.Forwarder,
+                ApprovedDisapprovedBy = r.ApprovedFirstName != null
+                    ? SystemFormat.Name(r.ApprovedFirstName, r.ApprovedLastName, r.ApprovedNickname)
+                    : r.DisapprovedFirstName != null
+                        ? SystemFormat.Name(r.DisapprovedFirstName, r.DisapprovedLastName, r.DisapprovedNickname)
+                        : null,
+                ApprovedDisapprovedDateD = r.ApprovedDisapprovedDateD,
+                ApproveDateD = r.ApproveDateD,
+                IsAllPacked = r.IsAllPacked,
+                PurchaseRequestDetail = BuildPurchaseRequestLinks(r.PurchaseRequestRaw),
+                ServiceLevelAgreement = r.ServiceLevelAgreement,
+                ServiceLevelAgreementHr = r.ServiceLevelAgreementHr ?? 0,
+                WithLP = r.WithLP ?? false,
+                WithREYCONonDefective = r.WithREYCONonDefective ?? false,
+                WithREYCOJITLPDelivery = r.WithREYCOJITLPDelivery,
+                SpecialInstruction = r.SpecialInstruction,
+                Remarks = r.Remarks,
+                OrderQueueNumber = r.OrderQueueNumber,
+                SaName = r.SaName,
+                SaKpi = r.SaKpi ?? "00:00:00",
+                OpsName = r.OpsName,
+                OpsKpi = r.OpsKpi ?? "00:00:00",
+                // TimeRemainingD / SlaStatus: keep your existing post-processing loop (see business-hours logic)
+            }).ToList();
 
             var result = orderVM.ToList();
 
@@ -581,6 +690,16 @@ namespace GMGInventory.Application.Repositories
             }
 
             return result;
+        }
+
+        private static string BuildPurchaseRequestLinks(string raw)
+        {
+            if (string.IsNullOrEmpty(raw)) return string.Empty;
+            return string.Join(", ", raw.Split(';').Select(x =>
+            {
+                var p = x.Split('|');
+                return $"<a href='/PurchaseRequest/Details/{p[0]}' class='link-info' target='_blank'>{p[1]}</a>-[{p[2]}]";
+            }));
         }
 
         public async Task<IList<APISalesOrder>> GetListAPI(DateTime? dt)
