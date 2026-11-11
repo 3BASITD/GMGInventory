@@ -22,6 +22,119 @@ namespace GMGInventory.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("GMGInventory.Common.Models.SalesOrderListRowVM", b =>
+                {
+                    b.Property<DateTime?>("ApproveDateD")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ApprovedDisapprovedDateD")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ApprovedFirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApprovedLastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApprovedNickname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Area")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapprovedFirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapprovedLastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisapprovedNickname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Forwarder")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAllPacked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OpsKpi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OpsName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OrderDateD")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OrderQueueNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PriorityD")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PurchaseRequestRaw")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RequiredDeliveryDateD")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SONumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SaKpi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SaName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceLevelAgreement")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ServiceLevelAgreementHr")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SpecialInstruction")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("TotalAmountD")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("WithLP")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("WithREYCOJITLPDelivery")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("WithREYCONonDefective")
+                        .HasColumnType("bit");
+
+                    b.ToView(null);
+                });
+
             modelBuilder.Entity("GMGInventory.Data.Access", b =>
                 {
                     b.Property<int>("Id")
@@ -40,6 +153,9 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("CanEdit")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("CanForceClose")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("CanPrint")
@@ -1145,6 +1261,18 @@ namespace GMGInventory.Data.Migrations
                             CanView = true,
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PageId = 89,
+                            RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
+                            UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
+                        },
+                        new
+                        {
+                            Id = 90,
+                            CanAdd = false,
+                            CanDelete = false,
+                            CanEdit = false,
+                            CanView = true,
+                            DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PageId = 90,
                             RoleId = "4ADE7270-CC24-43A0-98A5-BD8095F93BD2",
                             UserCreated = "CDE19596-2C9E-4ECE-837C-85950E9E907D"
                         });
@@ -4251,20 +4379,18 @@ namespace GMGInventory.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Department")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("KpiEnd")
+                    b.Property<DateTime?>("KpiEnd")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("KpiStart")
+                    b.Property<DateTime?>("KpiStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SalesOrderId")
+                    b.Property<int?>("SalesOrderId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserCreated")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserModified")
@@ -4922,6 +5048,9 @@ namespace GMGInventory.Data.Migrations
                     b.Property<bool>("HasEdit")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("HasForceClose")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("HasPrint")
                         .HasColumnType("bit");
 
@@ -4955,6 +5084,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
@@ -4969,6 +5099,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -4983,6 +5114,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -4997,6 +5129,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = true,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5011,6 +5144,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5025,6 +5159,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5039,6 +5174,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5053,6 +5189,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5067,6 +5204,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5081,6 +5219,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5095,6 +5234,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5109,6 +5249,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5123,6 +5264,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5137,6 +5279,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5151,6 +5294,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5165,6 +5309,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5179,6 +5324,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5193,6 +5339,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = true,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5207,6 +5354,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5221,6 +5369,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5235,6 +5384,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5249,6 +5399,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5263,6 +5414,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5277,6 +5429,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5291,6 +5444,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5305,6 +5459,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5319,6 +5474,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5333,6 +5489,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5347,6 +5504,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5361,6 +5519,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5375,6 +5534,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5389,6 +5549,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5403,6 +5564,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5417,6 +5579,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5431,6 +5594,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = true,
                             HasEdit = true,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5445,6 +5609,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = false,
                             HasView = true,
@@ -5459,6 +5624,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5473,6 +5639,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5487,6 +5654,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5501,6 +5669,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5515,6 +5684,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5529,6 +5699,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5543,6 +5714,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5557,6 +5729,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5571,6 +5744,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5585,6 +5759,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5599,6 +5774,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5613,6 +5789,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5627,6 +5804,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5641,6 +5819,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5655,6 +5834,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5669,6 +5849,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5683,6 +5864,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5697,6 +5879,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5711,6 +5894,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5725,6 +5909,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5739,6 +5924,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5753,6 +5939,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5767,6 +5954,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5781,6 +5969,7 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = true,
                             HasUploadDownload = true,
                             HasView = true,
@@ -5795,10 +5984,26 @@ namespace GMGInventory.Data.Migrations
                             HasApproveDisapprove = false,
                             HasDelete = false,
                             HasEdit = false,
+                            HasForceClose = false,
                             HasPrint = false,
                             HasUploadDownload = true,
                             HasView = true,
                             Name = "Purchase Receiving Report",
+                            OrderNumber = 0,
+                            PageGroupId = 0
+                        },
+                        new
+                        {
+                            Id = 90,
+                            HasAdd = false,
+                            HasApproveDisapprove = false,
+                            HasDelete = false,
+                            HasEdit = false,
+                            HasForceClose = false,
+                            HasPrint = false,
+                            HasUploadDownload = true,
+                            HasView = true,
+                            Name = "Agent Itirenary",
                             OrderNumber = 0,
                             PageGroupId = 0
                         });
@@ -5862,6 +6067,11 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = 9,
                             Name = "PROCUREMENT REPORT"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "AGENT ITIRENARY REPORT"
                         });
                 });
 
@@ -9257,13 +9467,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "CDE19596-2C9E-4ECE-837C-85950E9E907D",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cd0df4e2-c1f5-4394-a3d9-f348e74e7e57",
+                            ConcurrencyStamp = "706f016b-b58a-415b-92e2-5742f50a50f0",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-MISNET",
-                            PasswordHash = "AQAAAAIAAYagAAAAELyCFJfK6S2rNpZWk6AII88LxMlLWmtzRruXad8J4E6xTQ5b9kGluWTpz/ZK5Th1vw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBoYddYTuKBGqCbs/F0yArHdBEzpcDOQlwpSltBdI3VAbuhHOlFImeD8jvqCKjyzZQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ec929db9-d58a-457f-90e2-645ac631cb55",
+                            SecurityStamp = "8c02aa8a-34fb-4653-92cb-1dc3e192387d",
                             TwoFactorEnabled = false,
                             UserName = "admin-misnet",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -9278,13 +9488,13 @@ namespace GMGInventory.Data.Migrations
                         {
                             Id = "66A86BDE-9D0F-48F8-9CCF-DDF33673862C",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e7215e88-3bb8-42dc-b134-fd9a7a36cb2e",
+                            ConcurrencyStamp = "3c0f642f-25bf-406d-9ada-f5f09ba38b2a",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN-GMG",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJGj3xPmxnHhMnxAdK0snraw5Tnqg36y8ymeBp54gzEV0uTsvnME2UECBwYUndlr5g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL4XKWZuzDbNHnpu2ecsJSigjqI/Vuhk2ahH2xEGpqf+yXrGNq6VagX+94LhUvXl7Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7ed7707f-51d2-4eb1-91d7-02fdfee0bd6d",
+                            SecurityStamp = "45ae44b2-bc97-439f-ae0c-eec81e69d91e",
                             TwoFactorEnabled = false,
                             UserName = "admin-gmg",
                             DateCreated = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

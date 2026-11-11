@@ -92,7 +92,8 @@ namespace GMGInventory.Common.Constants
         [PageNamesString("System Settings")] SystemSettings,
         [PageNamesString("Delivery Monitoring")] DeliveryMonitoring,
         [PageNamesString("Warehouse Dashboard")] WarehouseDashboard,
-        [PageNamesString("Barcotech (Picking)")] BarcotechPicking
+        [PageNamesString("Barcotech (Picking)")] BarcotechPicking,
+        [PageNamesString("Agent Itirenary")] AgentItirenary,
     }
 
     public static class PageNameExtensions

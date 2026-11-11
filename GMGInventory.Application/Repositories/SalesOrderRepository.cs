@@ -1261,7 +1261,7 @@ namespace GMGInventory.Application.Repositories
                                    SalesOrderId = salesOrderId,
                                    SellingPrice = s.UnitPrice,
                                    CustomerBrandDiscountId = s.CustomerBrandDiscountId,
-                                   ItemPromoId = s.ItemPromoId,
+                                   ItemPromoId = null,
                                    IsPromo = s.isPromo
 
                                });

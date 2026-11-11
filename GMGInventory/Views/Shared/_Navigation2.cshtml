@@ -1178,7 +1178,8 @@ else
             || navPages.Contains(PageNames.DebitMemoListingReport.ToEnumString())
             || navPages.Contains(PageNames.PurchaseOrderReport.ToEnumString())
             || navPages.Contains(PageNames.PurchaseReturnReport.ToEnumString())
-            || navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString()))
+            || navPages.Contains(PageNames.PurchaseReceivingReport.ToEnumString())
+            || navPages.Contains(PageNames.AgentItirenary.ToEnumString()))
         {
             var navReportActive = (new List<string> { "PurchaseRequest", "PurchaseOrder", "PurchaseReceiving", "PurchaseReturnNew" }).Contains(currentController ?? "")
             && (new List<string> { "AgentSalesPerItem", "BrandSales", "BestSellingItem", "Commission", "CustomerSalesRanking", "CustomerSales", "DailySales", "SalesInvoice", "SalesAgentArea", "SalesReportBasis", "SalesReturn", "UnservedItem", "BelowMaintainingItem", "ReceivingListing", "ReceivingListingSupplier", "ReceivingSummary", "StockCard", "StockStatus", "SupplierPurchase", "CreditMemo", "DebitMemo", "Order", "Return", "Receiving" }).Contains(currentAction ?? "");
@@ -1376,6 +1377,15 @@ else
                                         {
                                             <a class="dropdown-item @(currentController == "ProcurementReport" && currentAction == "Return" ? "active" : "")"
                                                asp-area="" asp-controller="ProcurementReport" asp-action="PurchaseReturn">Purchase Return Report</a>
+                                        }
+                                    }
+                                    @if (navPages.Contains(PageNames.AgentItirenary.ToEnumString()))
+                                    {
+                                        <span class="dropdown-header">AGENT ITINERARY</span>
+                                        @if (navPages.Contains(PageNames.AgentItirenary.ToEnumString()))
+                                        {
+                                            <a class="dropdown-item @(currentController == "AgentReport" && currentAction == "AgentItirenary" ? "active" : "")"
+                                               asp-area="" asp-controller="AgentReport" asp-action="AgentItirenary">Agent Itinerary</a>
                                         }
                                     }
                                 </div>

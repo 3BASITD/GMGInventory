@@ -1619,7 +1619,8 @@ namespace GMGInventory.Application.Repositories
                                QuantityD = ili.Quantity,
                                Region = ili.Invoice.SalesOrder.Region.Name,
                                SalesOrderNumber = ili.Invoice.SalesOrder.SalesOrderNumber,
-                               SalesOrderId = ili.Invoice.SalesOrder.Id
+                               SalesOrderId = ili.Invoice.SalesOrder.Id,
+                               GrossPrinceD = ili.UnitPrice
                            };
             return await outbound.ToListAsync();
         }

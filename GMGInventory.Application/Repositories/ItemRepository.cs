@@ -154,12 +154,12 @@ namespace GMGInventory.Application.Repositories
                     .OrderByDescending(pr => pr.DateCreated)
                     .Take(1)
                     .DefaultIfEmpty()
-                from inventory in context.ItemInventories
+                let inventoryQty = context.ItemInventories
                     .Where(inv => inv.ItemId == item.Id && inv.Warehouse.IsMain == true)
-                    .OrderByDescending(pr => pr.DateCreated)
-                    .Take(1)
-                    .DefaultIfEmpty()
-                //.Sum(inv => (int?)inv.Quantity) ?? 0
+                    .Sum(inv => (int?)inv.Quantity) ?? 0
+                let allocatedQty = context.ItemInventories
+                    .Where(inv => inv.ItemId == item.Id && inv.Warehouse.IsMain == true)
+                    .Sum(inv => (int?)inv.AllocatedQuantity) ?? 0
                 where item.IsActive
                    && (string.IsNullOrWhiteSpace(search)
                    || item.Code.ToLower().Contains(search.ToLower())
@@ -170,8 +170,8 @@ namespace GMGInventory.Application.Repositories
                 select new JsonItemOptionsModel
                 {
                     Id = item.Id.ToString(),
-                    InventoryCount = inventory == null ? 0 : inventory.Quantity,
-                    AllocatedQuantityD = inventory == null ? 0 : inventory.AllocatedQuantity,
+                    InventoryCount = inventoryQty,
+                    AllocatedQuantityD = allocatedQty,
                     Text = item.Code,
                     Name = item.Name,
                     OldCode = item.OldCode,
@@ -180,7 +180,7 @@ namespace GMGInventory.Application.Repositories
                     QuantityD = 0,
                     RetailPriceD = price == null ? -999999 : price.RetailSellingPrice,
                     PromoPriceD = promo == null ? -999999 : promo.PromoPrice,
-                    ItemPromoId = promo.Id,
+                    ItemPromoId = promo == null ? 0 : promo.Id,
                     ItemPromoName = promo.Name ?? "",
                     UnitId = item.Unit == null ? -1 : item.Unit.Id,
                     Unit = item.Unit == null ? "" : item.Unit.Code,
@@ -1995,7 +1995,8 @@ namespace GMGInventory.Application.Repositories
         {
             var items = from binsloc in context.ItemInventories
                         join item in context.Items on binsloc.ItemId equals item.Id
-                        where item.Code == search
+                        join wh in context.Warehouses on binsloc.WarehouseId equals wh.Id
+                        where item.Code == search && wh.IsMain == true
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {

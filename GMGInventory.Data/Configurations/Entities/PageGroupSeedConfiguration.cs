@@ -46,6 +46,10 @@ namespace GMGInventory.Data.Configurations.Entities
                 new() {
                     Id = 9,
                     Name = "PROCUREMENT REPORT"
+                },
+                 new() {
+                    Id = 10,
+                    Name = "AGENT ITIRENARY REPORT"
                 }
             };
 

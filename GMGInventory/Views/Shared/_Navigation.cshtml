@@ -285,7 +285,6 @@
                 </a>
                 </li>
                 *@
-
                     <li class="nav-item">
                         <a class="nav-link @(currentController=="SalesReport" && currentAction == "BrandSales" ? "active" : "")"
                            asp-area="" asp-controller="SalesReport" asp-action="BrandSales">
@@ -300,6 +299,7 @@
                             <p>Best Selling Items</p>
                         </a>
                     </li>
+
                     @*
                 <li class="nav-item">
                 <a class="nav-link @(currentController=="SalesReport" && currentAction == "BestSellingItemInvoice" ? "active" : "")"
@@ -498,6 +498,27 @@
                            asp-area="" asp-controller="AccountingReport" asp-action="DebitMemo">
                             <span class="nav-icon fas fa-file"></span>
                             <p>Debit Memo Listing Report</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+           
+            var navAgentItirenaryReportActive = (new List<string> { "AgentItirenary" }).Contains(currentAction ?? "");
+
+            <li class="nav-item @(navAgentItirenaryReportActive ? "menu-open" : "")">
+                <a href="#" class="nav-link @(navAgentItirenaryReportActive ? "active" : "")">
+                    <span class="nav-icon fas fa-file-invoice-dollar"></span>
+                    <p>
+                        AGENT REPORT
+                        <span class="fas fa-angle-left right"></span>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController=="AgentReport" && currentAction == "AgentItirenary" ? "active" : "")"
+                           asp-area="" asp-controller="AgentReport" asp-action="AgentItirenary">
+                            <span class="nav-icon fas fa-file"></span>
+                            <p>Credit Memo Listing Report</p>
                         </a>
                     </li>
                 </ul>

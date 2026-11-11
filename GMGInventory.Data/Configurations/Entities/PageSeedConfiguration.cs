@@ -568,6 +568,12 @@ namespace GMGInventory.Data.Configurations.Entities
                     Name = PageNames.PurchaseReceivingReport.ToEnumString(),
                     HasView = true,
                     HasUploadDownload = true,
+                },
+                 new() {
+                    Id = (int)PageNames.AgentItirenary,
+                    Name = PageNames.AgentItirenary.ToEnumString(),
+                    HasView = true,
+                    HasUploadDownload = true,
                 }
             };
 

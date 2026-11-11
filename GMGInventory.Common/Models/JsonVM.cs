@@ -337,6 +337,7 @@ namespace GMGInventory.Common.Models
     public class ListFilterCustomerModel : ListFilterCommonModel
     {
         public int? Customer { get; set; }
+        public int? Agent { get; set; }
     }
 
     public class ListFilterPurchaseOrderModel : ListFilterCommonModel

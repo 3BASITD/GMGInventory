@@ -628,6 +628,10 @@ namespace GMGInventory.Common.Models
         public string Quantity => string.Format(SystemFormat.StringIntegerComma, QuantityD);
         public int QuantityD { get; set; }
 
+        [Display(Name = "Gross Pince")]
+        public string GrossPrince => string.Format(SystemFormat.StringIntegerComma, GrossPrinceD);
+        public decimal GrossPrinceD { get; set; }
+
         [Display(Name = "Sales Order Number")]
         public string SalesOrderNumber { get; set; }
 

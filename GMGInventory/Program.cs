@@ -128,6 +128,7 @@ builder.Services.AddScoped(typeof(IWarehouseRepository), typeof(WarehouseReposit
 builder.Services.AddScoped(typeof(IWarehouseDashboardRepository), typeof(WarehouseDashboardRepository));
 
 builder.Services.AddScoped(typeof(ITrackerRepository), typeof(TrackerRepository));
+builder.Services.AddScoped(typeof(IAgentReport), typeof(ReportAgentRepository));
 
 builder.Services.AddScoped<IAPIHM_Service, APIHM_Service>();
 builder.Services.AddScoped<IAPIBCT_Service, APIBCT_Service>();

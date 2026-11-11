@@ -1,0 +1,152 @@
+﻿@model AgentMonthlyVM
+@{
+    Layout = null;
+
+    var maxPerDay = 3;
+
+    // Visited = has both longitude and latitude
+    bool IsVisited(AgentItirenaryVM r) =>
+        !string.IsNullOrWhiteSpace(r.Long) && !string.IsNullOrWhiteSpace(r.Lat);
+
+    var from = Model.DateFrom.Date;
+    var to = Model.DateTo.Date;
+
+    // Calendar grid runs Sunday..Saturday and covers the whole period
+    var gridStart = from.AddDays(-(int)from.DayOfWeek);
+    var gridEnd = to.AddDays(6 - (int)to.DayOfWeek);
+
+    var byDay = Model.Rows
+        .Where(r => r.VisitDate.HasValue)
+        .GroupBy(r => r.VisitDate!.Value.Date)
+        .ToDictionary(g => g.Key, g => g.OrderBy(x => x.CustomerName).ToList());
+
+    // How many calendar pages are needed (at least 1)
+    var maxVisitsInADay = byDay.Any() ? byDay.Values.Max(v => v.Count) : 0;
+    var totalPages = Math.Max(1, (int)Math.Ceiling(maxVisitsInADay / (double)maxPerDay));
+
+    var dayNames = new[] { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" };
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Monthly Itinerary</title>
+    <style>
+        @@page { size: A4 landscape; margin: 8mm; }
+        body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; color: #000; }
+
+        .page-block { page-break-after: always; }
+        .page-block:last-of-type { page-break-after: auto; }
+
+        .company { text-align: center; font-size: 15px; font-weight: bold; margin: 0; }
+        .title   { text-align: center; font-size: 12px; font-weight: bold; margin: 10px 0 14px; }
+
+        .info { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+        .info td { font-size: 10px; padding: 0; }
+        .info .right { text-align: right; }
+
+        table.cal { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table.cal th { background: #e6e6e6; border: 1px solid #555; padding: 3px; font-size: 10px; }
+        table.cal td { border: 1px solid #555; vertical-align: top; padding: 3px 4px; height: 80px; }
+        table.cal tr { page-break-inside: avoid; }
+
+        .day { font-weight: bold; font-size: 10px; margin-bottom: 3px; }
+
+        .visit { padding: 3px 0; border-bottom: 1px solid #ddd; }
+        .visit:last-of-type { border-bottom: none; }
+        .cust { font-weight: bold; text-transform: uppercase; font-size: 9.5px; }
+        .status { font-weight: bold; white-space: nowrap; }
+        .status.no  { color: #e11d2e; }
+        .status.yes { color: #15803d; }
+        .purpose { font-size: 8px; color: #777; margin-top: 1px; }
+        .purpose::before { content: "\2022  "; }
+        .more { font-size: 8px; font-weight: bold; color: #555; padding-top: 3px; }
+
+        .pageno { text-align: right; font-size: 9px; color: #555; margin-top: 4px; }
+
+        .side-note { display: none; }
+        @@media screen {
+            body { margin: 20px; }
+            .page-block { margin-bottom: 30px; }
+            .side-note { display: block; position: fixed; top: 6px; right: 10px; font-size: 11px; color: #666; }
+        }
+        @@media print {
+            .side-note { display: none; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="side-note">This page is for printing only. Press Ctrl+P if the Print dialog did not open automatically.</div>
+
+    @for (var page = 0; page < totalPages; page++)
+    {
+        <div class="page-block">
+            <p class="company">3BAS Tiger's Inc.</p>
+            <p class="title">MONTHLY ITINERARY@(page > 0 ? " (CONTINUED)" : "")</p>
+
+            <table class="info">
+                <tr>
+                    <td><b>NAME:</b> @Model.AgentName</td>
+                    <td class="right"><b>PERIOD:</b> @from.ToString("MMM dd, yyyy") - @to.ToString("MMM dd, yyyy")</td>
+                </tr>
+            </table>
+
+            <table class="cal">
+                <thead>
+                    <tr>
+                        @foreach (var n in dayNames)
+                        {
+                            <th>@n</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                @for (var weekStart = gridStart; weekStart <= gridEnd; weekStart = weekStart.AddDays(7))
+                {
+                    <tr>
+                    @for (var i = 0; i < 7; i++)
+                    {
+                        var d = weekStart.AddDays(i);
+                        var inRange = d >= from && d <= to;
+                        <td>
+                        @if (inRange)
+                        {
+                            <div class="day">@d.ToString("dd")</div>
+                            @if (byDay.TryGetValue(d, out var visits))
+                            {
+                                foreach (var v in visits.Skip(page * maxPerDay).Take(maxPerDay))
+                                {
+                                    var visited = IsVisited(v);
+                                    <div class="visit">
+                                        <span class="cust">@v.CustomerName</span>
+                                        (<span class="status @(visited ? "yes" : "no")">@(visited ? "\u2714 Visited" : "\u2716 Not Visited")</span>)
+                                        @if (!string.IsNullOrWhiteSpace(v.PurposeOfVisit))
+                                        {
+                                            <div class="purpose">@v.PurposeOfVisit</div>
+                                        }
+                                    </div>
+                                }
+                                @if (visits.Count > (page + 1) * maxPerDay)
+                                {
+                                    <div class="more">continued on next page...</div>
+                                }
+                            }
+                        }
+                        </td>
+                    }
+                    </tr>
+                }
+                </tbody>
+            </table>
+
+            <div class="pageno">Page @(page + 1) of @totalPages</div>
+        </div>
+    }
+
+    <script>
+        window.onload = function () { window.print(); };
+        window.onafterprint = function () { window.close(); };
+    </script>
+</body>
+</html>

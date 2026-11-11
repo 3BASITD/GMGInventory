@@ -17,5 +17,6 @@ namespace GMGInventory.Data.OrderAppDB
         }
 
         public DbSet<PAO_Orders> Orders { get; set; }
+        public DbSet<PAO_CustomerVisit> CustomerVisit { get; set; }
     }
 }

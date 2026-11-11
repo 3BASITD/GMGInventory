@@ -1,0 +1,454 @@
+﻿@model IEnumerable<AgentItirenaryVM>
+
+@{
+    ViewData["Title"] = "Agent Itinerary Report";
+    var userAccess = (ViewsAccessVM)ViewData["UserAccess"]!;
+}
+
+<div class="card card-default">
+    <div class="card-header">
+        <span class="card-title">@ViewData["Title"]</span>
+        <div class="card-tools">
+            @if (userAccess.CanPrint)
+            {
+               <button type="button" class="btn btn-primary btn-sm float-right printBtnWk ml-2">
+                    <span class="fas fa-print"></span> Weekly Report
+               </button>
+                <button type="button" class="btn btn-primary btn-sm float-right printBtnMth ml-2">
+                    <span class="fas fa-print"></span> Monthly Report
+                </button>
+            }
+            @if (userAccess.CanUploadDownload)
+            {
+                <button type="button" class="btn btn-info btn-sm float-right downloadBtn ml-2">
+                    <span class="fas fa-download"></span> Download
+                </button>
+            }
+            <button class="btn btn-secondary btn-sm float-right btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <span class="fas fa-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-head-fixed table-striped table-hover table-itirenary">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.VisitDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AgentName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CustomerName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesAmount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Long)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Lat)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PurposeOfVisit)
+                    </th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th colspan="6" class="text-end">Total</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Report</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-customer" class="form-label mb-0">Customer Code</label>
+                            <select id="filter-customer" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-customer-name" class="form-label mb-0">Customer Name</label>
+                            <input type="text" id="filter-customer-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-agent" class="form-label mb-0">Agent Code</label>
+                            <select id="filter-agent" style="width:100%">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label for="filter-agent-name" class="form-label mb-0">Agent Name</label>
+                            <input type="text" id="filter-agent-name" class="form-control form-control-sm" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="filter-preset" class="form-label mb-0">Date Range</label>
+                            <select id="filter-preset" class="form-control form-control-sm">
+                                <option value="TD">Today</option>
+                                <option value="L7D">Last 7 Days</option>
+                                <option value="MTD">Month to Date</option>
+                                <option value="LM">Last Month</option>
+                                <option value="YTD">Year to Date</option>
+                                <option value="">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="filter-from" class="form-label mb-0">Date From</label>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="form-group">
+                            <label for="filter-to" class="control-label mb-0">Date To</label>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 pb-2 text-muted small modal-note">
+                Your filter, sort, and search will be saved for 1 hour
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btnReset" onclick="ResetFilter()"><span class="fas fa-undo"></span> Reset to Default</button>
+                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><span class="fas fa-filter"></span> Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var user_access = @Html.Raw(Json.Serialize(userAccess));
+
+            $("#filter-agent").select2({
+                //minimumInputLength: 1,
+                placeholder: '<empty>',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+                },
+                ajax: {
+                    url: "@Url.Action("GetOptions2", "Agent")"
+                }
+            });
+
+            $("#filter-agent").on("select2:select", function () {
+                $(".filter-agent").text($(this).select2("data")[0].name);
+                // $("#order-customer-code").val(null).trigger("change");
+                // $(".order-customer-name").text("N/A");
+                // $(".order-customer-address").text("N/A");
+                // $(".order-customer-balance").text("N/A");
+                // $(".order-credit-term").text("N/A");
+                // $(".order-region").text("N/A");
+                // $(".order-customer-status").text("N/A");
+            });
+
+        // Load Select2 for Customer
+        $("#filter-customer").select2({
+            allowClear: true,
+            placeholder: 'ALL',
+            templateResult: function (repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                return $("<strong>" + repo.text + "</strong> " + (repo.text !== repo.name ? "<em class='fw-light'> - " + repo.name + "</em>" : ""));
+            },
+            ajax: {
+                url: "@Url.Action("GetOptions2Simple", "Customer")",
+                data: function (params) {
+                    let base = $.fn.select2.defaults.defaults.ajax.data(params);
+                    return Object.assign(base, {
+                        // ActiveOnly: false
+                    });
+                }
+            },
+            dropdownParent: $("#filterModal")
+        });
+
+        $("#filter-customer").on("select2:select", function () {
+            $("#filter-customer-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-customer").on("select2:unselecting", function (e) {
+            $("#filter-customer-name").val("");
+        });
+
+        $("#filter-agent").on("select2:select", function () {
+            $("#filter-agent-name").val($(this).select2("data")[0].name);
+        });
+
+        $("#filter-agent").on("select2:unselecting", function (e) {
+            $("#filter-agent-name").val("");
+        });
+
+        var dt_storage = "BAS_DT" + window.location.pathname.replace(/\//g, "_");
+        var dt_duration = 3600000; // 1 hour
+
+        function ApplyFilter() {
+            $("#filterModal").modal("hide");
+            agentDT.ajax.reload(() => {
+                var saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var expiry = parsed.timestamp + dt_duration;
+                    $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                }
+                checkDefaultFilter();
+            });
+        }
+
+        function ResetFilter() {
+            $("#filterModal").modal("hide");
+            resetToDefaultDTFilter();
+            agentDT.ajax.reload(() => {
+                checkDefaultFilter();
+            });
+        }
+
+        var defaultDTState = {
+            order: [[0, "desc"]],
+            page: 0,
+            length: 10,
+            search: { search: "" },
+            CustomerId: "",
+            CustomerCode: "",
+            CustomerName: "",
+            Preset: "L7D",
+            DateFrom: DateForInput(getFilterDefaultDateFrom()),
+            DateTo: DateForInput(getFilterDefaultDateTo())
+        };
+
+        function checkDTChanged() {
+            if (!agentDT) return false;
+
+            return JSON.stringify(agentDT.order()) != JSON.stringify(defaultDTState.order) ||
+                agentDT.page.info().start != defaultDTState.page ||
+                agentDT.page.len() != defaultDTState.length ||
+                (agentDT.search() || "") != defaultDTState.search.search ||
+                $("#filter-customer").val() != defaultDTState.CustomerId ||
+                $("#filter-agent").val() != defaultDTState.AgentId ||
+                $('#filter-from').val() != defaultDTState.DateFrom ||
+                $('#filter-to').val() != defaultDTState.DateTo;
+        }
+
+        function checkDefaultFilter() {
+            $(".btn-filter").toggleClass('btn-filtered', checkDTChanged());
+            $(".btnReset").toggle(checkDTChanged());
+            if (!checkDTChanged()) {
+                $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+            }
+        }
+
+        function resetToDefaultDTFilter() {
+            $('#filter-custoemr').val(defaultDTState.CustomerId).trigger('change');
+            $('#filter-preset').val(defaultDTState.Preset);
+            applyFilterPreset(defaultDTState.Preset);
+
+            localStorage.removeItem(dt_storage);
+
+            if (agentDT) {
+                agentDT.state.clear();
+                agentDT.order(defaultDTState.order);
+                agentDT.page(defaultDTState.page);
+                agentDT.search(defaultDTState.search.search);
+            }
+
+            $(".modal-note").text("Your filter, sort, and search will be saved for 1 hour");
+        }
+
+        // Load List on DataTable
+        var agentDT = $('.table-itirenary').DataTable({
+            stateSave: true,
+            stateSaveCallback: function(settings, data) {
+                var now = new Date().getTime();
+                var dtState = { data: data, timestamp: now, duration: dt_duration, pathname: window.location.pathname };
+                localStorage.setItem(dt_storage, JSON.stringify(dtState));
+            },
+            stateLoadCallback: function(settings) {
+                const saved = localStorage.getItem(dt_storage);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    var age = new Date().getTime() - parsed.timestamp;
+                    var expiry = parsed.timestamp + dt_duration;
+                    if (age < dt_duration) {
+                        $(".modal-note").text("Your filter, sort, and search resets on " + (new Date(expiry)).toLocaleString());
+                        return parsed.data;
+                    } else {
+                        resetToDefaultDTFilter();
+                    }
+                }
+                return null;
+            },
+            stateSaveParams: function(settings, data) {
+                data.CustomerId = $('#filter-customer').val();
+                data.CustomerCode = $('#filter-customer option:selected').text();
+                data.CustomerName = $('#filter-customer-name').val();
+                data.AgentId = $('#filter-customer').val();
+                data.AgentCode = $('#filter-customer option:selected').text();
+                data.AgentName = $('#filter-agent-name').val();
+                data.DateFrom = $('#filter-from').val();
+                data.DateTo = $('#filter-to').val();
+            },
+            stateLoadParams: function(settings, data) {
+                if (data.CustomerId) {
+                    var customerOption = new Option(data.CustomerCode, data.CustomerId, true, true);
+                    $(customerOption).data('data', {
+                        id: data.CustomerId,
+                        text: data.CustomerCode,
+                        name: data.CustomerName
+                    });
+                    $("#filter-customer").append(customerOption).trigger('change');
+                }
+                $('#filter-from').prop('readonly', data.Preset != "");
+                $('#filter-from').val(data.DateFrom);
+                $('#filter-to').prop('readonly', data.Preset != "");
+                $('#filter-to').val(data.DateTo);
+            },
+            ajax: {
+                url: "@Url.Action("GetAgentItineraryDT")",
+                type: "POST",
+                data: function (data) {
+                    var customerId = $("#filter-customer").val();
+                    var agentId =  $("#filter-agent").val();
+                    data.DateFrom = $("#filter-from").val();
+                    data.DateTo = $("#filter-to").val();
+                    if (customerId) data.Customer = customerId;
+                    if (customerId) data.Agent = agentId;
+                },
+                beforeSend: function (jqXHR, settings) {
+                    settings.isDataTableRequest = true;
+                }
+            },
+            processing: true,
+            language: {
+                processing: "<div class='dt-loader'>Processing table, please wait...</div>"
+            },
+            serverSide: true,
+            filter: true,
+            responsive: true,
+            autoWidth: false,
+            search: {
+                return: true,
+            },
+            columns: [
+                {
+                    data: "visitDate",
+                    name: "VisitDate",
+                    render: function (data, type) {
+                        if (!data) return "";
+                        return type === "display" ? data.substring(0, 10) : data;
+                    }
+                },
+                { data: "agentName", name: "AgentName" },   
+                { data: "customerName", name: "CustomerName", className: "text-start" },
+                { data: "salesAmount", name: "SalesAmount", className: "text-end" },
+                { data: "long", name: "Long", className: "text-end" },
+                { data: "lat", name: "Lat", className: "text-end" },
+                { data: "purposeOfVisit", name: "PurposeOfVisit", className: "text-start" }
+            ],
+            footerCallback: function (row, data, start, end, display) {
+                var json = agentDT.ajax.json();
+                var api = this.api(), data;
+
+                $(api.column(3).footer()).html(FormatStringDecimal(json.totalAmount));
+            },
+            order: defaultDTState.order
+        }).on("draw", function() {
+            checkDefaultFilter();
+            $(".table-itirenary thead th").removeClass("text-end");
+            if($("#filter-customer").val() == "") {
+                $(".table-itirenary tfoot").hide();
+            } else {
+                $(".table-itirenary tfoot").show();
+            }
+        });
+
+        // if (user_access.canUploadDownload) {
+        //     $(".downloadBtn").click(function (e) {
+        //         var urlQuery = [];
+        //         urlQuery.push("DateFrom=" + $("#filter-from").val());
+        //         urlQuery.push("DateTo=" + $("#filter-to").val());
+        //         if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+        //         window.location = "@Url.Action("DownloadCreditMemo")?" + urlQuery.join("&");
+        //     });
+        // }
+
+        if (user_access.canPrint) {
+            $(".printBtnWk").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                var urlQuery = [];
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+                if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("PrintAgentWeeklyReport")?' + urlQuery.join("&"), '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+
+            $(".printBtnMth").on("click", function () {
+                $.LoadingOverlay("show", {
+                    image: "",
+                    fontawesome: "fas fa-print"
+                });
+                var urlQuery = [];
+                urlQuery.push("DateFrom=" + $("#filter-from").val());
+                urlQuery.push("DateTo=" + $("#filter-to").val());
+                if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+                if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+                setTimeout(function () {
+                    let win = window.open('@Url.Action("PrintAgentMonthlyReport")?' + urlQuery.join("&"), '');
+                    var wintimer = setInterval(function () {
+                        if (win.closed) {
+                            clearInterval(wintimer);
+                            hideLoader();
+                        }
+                    }, 100);
+                }, 500);
+            });
+        }
+    </script>
+    }
