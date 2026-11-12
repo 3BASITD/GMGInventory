@@ -843,7 +843,7 @@ namespace GMGInventory.Application.Repositories
                                                     .Take(1)
                                                     .DefaultIfEmpty()
                                 let items = context.ItemInventories
-                                                   .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true)
+                                                   .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true && s.BinLocation != null && s.Quantity != 0)
                                                    .Select(s => new
                                                    {
                                                        BinLocation = s.BinLocation
@@ -1017,12 +1017,226 @@ namespace GMGInventory.Application.Repositories
             };
         }
 
+        //public async Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form)
+        //{
+        //    //try
+        //    //{
+        //    string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+
+        //    var agent = await context.Agents.Where(s => s.Id == form.Agent).FirstOrDefaultAsync();
+        //    if (agent == null) return new ResponseModel<int> { Status = "Error", Message = "Agent is invalid" };
+
+        //    var customer = await context.Customers.Where(s => s.Id == form.Customer).FirstOrDefaultAsync();
+        //    if (customer == null) return new ResponseModel<int> { Status = "Error", Message = "Customer is invalid" };
+
+        //    var forwarder = await context.Forwarders.Where(s => s.Id == form.Forwarder).FirstOrDefaultAsync();
+        //    if (forwarder == null) return new ResponseModel<int> { Status = "Error", Message = "Forwarder is invalid" };
+
+        //    var region = await context.Regions.Where(s => s.Id == form.Region).FirstOrDefaultAsync();
+        //    if (region == null) return new ResponseModel<int> { Status = "Error", Message = "Region is invalid" };
+
+        //    var sla = await context.ServiceLevelAgreements.Where(s => s.Id == form.SericeLevelAgreement).FirstOrDefaultAsync();
+        //    if (sla == null) return new ResponseModel<int> { Status = "Error", Message = "Service Level Agreement is invalid" };
+
+
+        //    var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+
+        //    int statusId = context.Statuses
+        //                          .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
+        //                                   || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
+        //                          .Select(s => s.Id)
+        //                          .First();
+        //    if (orderVM == null)
+        //    {
+
+        //        var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
+        //        string soNumber = "";
+        //        string soResubbmitedBy = "";
+        //        DateTime? soResubbmitedDate = null;
+
+        //        if (previous == null)
+        //        {
+        //            //soNumber = SONumber();
+        //            var warehouse = context.Warehouses
+        //                                  .Where(s => s.IsMain == true).FirstOrDefault();
+
+
+        //            var latestOrder = context.SalesOrders
+        //                     .OrderByDescending(s => s.Id)
+        //                     .Select(s => s.SalesOrderNumber)
+        //                     .FirstOrDefault();
+
+        //            if (latestOrder != null && latestOrder.Contains('.'))
+        //            {
+        //                var splitLatestOrder = latestOrder.Split('.');
+        //                latestOrder = splitLatestOrder[0];
+        //            }
+
+        //            if (latestOrder != null && latestOrder.Contains('-'))
+        //            {
+        //                var splitLatestOrder = latestOrder.Split("-");
+        //                latestOrder = splitLatestOrder[0];
+        //            }
+
+        //            // var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
+
+
+
+        //            int? latestOrderNumber = 0;
+
+        //            if (latestOrder != null)
+        //            {
+        //                if (latestOrder.Contains("SO"))
+        //                {
+        //                    latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
+        //                }
+        //                else if (latestOrder.Contains("PSG1"))
+        //                {
+        //                    latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
+        //                }
+        //                else if (latestOrder.Contains("PSG2"))
+        //                {
+        //                    latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
+        //                }
+        //                else if (latestOrder.Contains("CT38"))
+        //                {
+        //                    latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
+        //                }
+        //                else if (latestOrder.Contains("SEV"))
+        //                {
+        //                    latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
+        //                }
+        //            }
+
+
+        //            if (warehouse != null && latestOrder != null)
+        //            {
+        //                if (warehouse.Name == WareHouseName.PASIG1.ToString())
+        //                {
+        //                    soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
+        //                }
+        //                else if (warehouse.Name == WareHouseName.PASIG2.ToString())
+        //                {
+        //                    soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
+        //                }
+        //                else if (warehouse.Name == WareHouseName.CETACIO.ToString())
+        //                {
+        //                    soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 1);
+        //                }
+        //                else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
+        //                {
+        //                    soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
+        //                }
+        //            }
+
+        //            var hasExisting = await context.SalesOrders.Where(s => s.SalesOrderNumber == soNumber).FirstOrDefaultAsync();
+
+        //        }
+        //        else if (!previous.SalesOrderNumber.Contains("-D"))
+        //        {
+        //            return new ResponseModel<int> { Status = "Error", Message = "Invalid resubmission. The previous sales order number is required to be in the valid format of a deactivated sales order" };
+        //        }
+        //        else
+        //        {
+        //            var tempSalesOrderNumber = previous.SalesOrderNumber.Split("-D");
+        //            soNumber = tempSalesOrderNumber[0];
+        //            soResubbmitedBy = currentUserId;
+        //            soResubbmitedDate = DateTime.UtcNow;
+        //        }
+
+
+        //        //if (form.Status.ToLower().Contains("draft")
+        //        // && await context.SalesOrders.AnyAsync(s => s.StatusId == statusId && s.SalesOrderNumber == soNumber))
+        //        //{
+        //        //    return new ResponseModel<int> { Status = "Error", Message = "Failed to add. A draft SO with the same SO Number already exists" };
+        //        //}
+        //        var temp = await context.SalesOrders.Where(s => s.SalesOrderNumber == soNumber && (form.ResubmitId == null || s.Id != form.ResubmitId)).ToListAsync();
+        //        //if (await context.SalesOrders.AnyAsync(s => s.SalesOrderNumber == soNumber && (form.ResubmitId == null || s.Id != form.ResubmitId)))
+        //        if (await context.SalesOrders.AnyAsync(s => s.SalesOrderNumber == soNumber))
+        //            return new ResponseModel<int> { Status = "Error", Message = "Generated a conflicting Sales Order Number, Please try again. If error persist, consult IT" };
+
+        //        orderVM = new SalesOrder
+        //        {
+        //            AgentId = agent.Id,
+        //            CustomerId = customer.Id,
+        //            RequiredDeliveryDate = form.DeliveryDate,
+        //            PurchaseOrder = form.PurchaseOrder,
+        //            Remarks = form.Remarks,
+        //            SalesOrderDate = form.OrderDate,
+        //            SalesOrderNumber = soNumber,
+        //            SubmittedBy = currentUserId,
+        //            SubmittedDate = form.OrderDate,
+        //            ResubmittedBy = soResubbmitedBy,
+        //            ResubmittedDate = soResubbmitedDate,
+        //            StatusId = statusId,
+        //            ForwarderId = form.Forwarder,
+        //            RegionId = form.Region,
+        //            ServiceLevelAgreementId = form.SericeLevelAgreement,
+        //            OverallDiscount = form.OverallDiscount,
+        //            WithLP = form.WithLP,
+        //            WithREYCONonDefective = form.WithREYCONonDefective,
+        //            WithREYCOJITLPDeliveryId = form.WithREYCOJITLPDelivery,
+        //            SpecialInstruction = form.SpecialInstruction
+        //        };
+        //        await context.SalesOrders.AddAsync(orderVM);
+        //        await context.SaveChangesAsync(currentUserId);
+
+        //        if (previous != null)
+        //        {
+        //            context.SalesOrders.Remove(previous);
+
+        //            previous.ResubmitId = orderVM.Id;
+        //            previous.ResubmittedBy = currentUserId;
+        //            previous.ResubmittedDate = DateTime.UtcNow;
+
+        //            context.SalesOrders.Update(previous);
+        //            await context.SaveChangesAsync(currentUserId);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        orderVM.AgentId = agent.Id;
+        //        orderVM.CustomerId = customer.Id;
+        //        orderVM.RequiredDeliveryDate = form.DeliveryDate;
+        //        orderVM.Remarks = form.Remarks;
+        //        orderVM.SalesOrderDate = form.OrderDate;
+        //        orderVM.StatusId = statusId;
+        //        orderVM.ForwarderId = form.Forwarder;
+        //        orderVM.RegionId = form.Region;
+        //        orderVM.ServiceLevelAgreementId = form.SericeLevelAgreement;
+        //        orderVM.OverallDiscount = form.OverallDiscount;
+        //        orderVM.WithLP = form.WithLP;
+        //        orderVM.WithREYCONonDefective = form.WithREYCONonDefective;
+        //        orderVM.WithREYCOJITLPDeliveryId = form.WithREYCOJITLPDelivery;
+        //        orderVM.SpecialInstruction = form.SpecialInstruction;
+        //        orderVM.SpecialInstruction = form.SpecialInstruction;
+
+        //        context.SalesOrders.Update(orderVM);
+        //        await context.SaveChangesAsync(currentUserId);
+        //    }
+
+        //    await SaveItemsAsync(form.Items, orderVM.Id);
+
+        //    await SaveKpi(orderVM.Id, currentUserId, statusId);
+
+        //    return new ResponseModel<int>
+        //    {
+        //        Status = "Success",
+        //        Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.",
+        //        NewRow = orderVM.Id
+        //    };
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    return new ResponseModel<int> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+        //    //}
+        //}
+
         public async Task<ResponseModel<int>> SaveAsync(SalesOrderFormVM form)
         {
-            //try
-            //{
             string currentUserId = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
 
+            // ---------- Validation (unchanged) ----------
             var agent = await context.Agents.Where(s => s.Id == form.Agent).FirstOrDefaultAsync();
             if (agent == null) return new ResponseModel<int> { Status = "Error", Message = "Agent is invalid" };
 
@@ -1038,198 +1252,163 @@ namespace GMGInventory.Application.Repositories
             var sla = await context.ServiceLevelAgreements.Where(s => s.Id == form.SericeLevelAgreement).FirstOrDefaultAsync();
             if (sla == null) return new ResponseModel<int> { Status = "Error", Message = "Service Level Agreement is invalid" };
 
+            // ---------- Everything that writes runs in ONE transaction ----------
+            var strategy = context.Database.CreateExecutionStrategy();
 
-            var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
-
-            int statusId = context.Statuses
-                                  .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
-                                           || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
-                                  .Select(s => s.Id)
-                                  .First();
-            if (orderVM == null)
+            return await strategy.ExecuteAsync(async () =>
             {
+                context.ChangeTracker.Clear(); // clean slate if the strategy retries
 
-                var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
-                string soNumber = "";
-                string soResubbmitedBy = "";
-                DateTime? soResubbmitedDate = null;
+                await using var tx = await context.Database.BeginTransactionAsync();
 
-                if (previous == null)
+                var orderVM = await context.SalesOrders.Where(s => s.Id == form.Id).FirstOrDefaultAsync();
+
+                int statusId = await context.Statuses
+                                      .Where(s => (form.Status.ToLower().Contains("submit") && s.Name.ToLower() == "sales order submitted")
+                                               || (form.Status.ToLower().Contains("draft") && s.Name.ToLower() == "sales order draft"))
+                                      .Select(s => s.Id)
+                                      .FirstAsync();
+
+                if (orderVM == null)
                 {
-                    soNumber = SONumber();
-                    //var warehouse = context.Warehouses
-                    //                      .Where(s => s.IsMain == true).FirstOrDefault();
+                    var previous = await context.SalesOrders.Where(s => s.Id == form.ResubmitId).FirstOrDefaultAsync();
+                    string soNumber;
+                    string soResubbmitedBy = "";
+                    DateTime? soResubbmitedDate = null;
 
+                    if (previous == null)
+                    {
+                        // NEW SO: next number comes from the counter table
+                        var (success, number, error) = await GenerateNewSoNumberAsync(currentUserId);
+                        if (!success)
+                            return new ResponseModel<int> { Status = "Error", Message = error };
 
-                    //var latestOrder = context.SalesOrders
-                    //                         .OrderByDescending(s => s.Id)
-                    //                         .Select(s => s.SalesOrderNumber)
-                    //                         .FirstOrDefault();
+                        soNumber = number;
+                    }
+                    else if (!previous.SalesOrderNumber.Contains("-D"))
+                    {
+                        return new ResponseModel<int> { Status = "Error", Message = "Invalid resubmission. The previous sales order number is required to be in the valid format of a deactivated sales order" };
+                    }
+                    else
+                    {
+                        var tempSalesOrderNumber = previous.SalesOrderNumber.Split("-D");
+                        soNumber = tempSalesOrderNumber[0];
+                        soResubbmitedBy = currentUserId;
+                        soResubbmitedDate = DateTime.UtcNow;
+                    }
 
-                    //if (latestOrder != null && latestOrder.Contains('.'))
-                    //{
-                    //    var splitLatestOrder = latestOrder.Split('.');
-                    //    latestOrder = splitLatestOrder[0];
-                    //}
+                    // Safety net (the unique index is the real guard)
+                    if (await context.SalesOrders.AnyAsync(s => s.SalesOrderNumber == soNumber))
+                        return new ResponseModel<int> { Status = "Error", Message = "Generated a conflicting Sales Order Number, Please try again. If error persist, consult IT" };
 
-                    //if (latestOrder != null && latestOrder.Contains('-'))
-                    //{
-                    //    var splitLatestOrder = latestOrder.Split("-");
-                    //    latestOrder = splitLatestOrder[0];
-                    //}
+                    orderVM = new SalesOrder
+                    {
+                        AgentId = agent.Id,
+                        CustomerId = customer.Id,
+                        RequiredDeliveryDate = form.DeliveryDate,
+                        PurchaseOrder = form.PurchaseOrder,
+                        Remarks = form.Remarks,
+                        SalesOrderDate = form.OrderDate,
+                        SalesOrderNumber = soNumber,
+                        SubmittedBy = currentUserId,
+                        SubmittedDate = form.OrderDate,
+                        ResubmittedBy = soResubbmitedBy,
+                        ResubmittedDate = soResubbmitedDate,
+                        StatusId = statusId,
+                        ForwarderId = form.Forwarder,
+                        RegionId = form.Region,
+                        ServiceLevelAgreementId = form.SericeLevelAgreement,
+                        OverallDiscount = form.OverallDiscount,
+                        WithLP = form.WithLP,
+                        WithREYCONonDefective = form.WithREYCONonDefective,
+                        WithREYCOJITLPDeliveryId = form.WithREYCOJITLPDelivery,
+                        SpecialInstruction = form.SpecialInstruction
+                    };
+                    await context.SalesOrders.AddAsync(orderVM);
+                    await context.SaveChangesAsync(currentUserId);
 
-                    //// var latestOrderNumber = latestOrder == null ? 0 : int.Parse(latestOrder.Replace("SO", ""));
+                    if (previous != null)
+                    {
+                        context.SalesOrders.Remove(previous);
 
+                        previous.ResubmitId = orderVM.Id;
+                        previous.ResubmittedBy = currentUserId;
+                        previous.ResubmittedDate = DateTime.UtcNow;
 
-
-                    //int? latestOrderNumber = 0;
-
-                    //if (latestOrder != null)
-                    //{
-                    //    if (latestOrder.Contains("SO"))
-                    //    {
-                    //        latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
-                    //    }
-                    //    else if (latestOrder.Contains("PSG1"))
-                    //    {
-                    //        latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
-                    //    }
-                    //    else if (latestOrder.Contains("PSG2"))
-                    //    {
-                    //        latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
-                    //    }
-                    //    else if (latestOrder.Contains("CT38"))
-                    //    {
-                    //        latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
-                    //    }
-                    //    else if (latestOrder.Contains("SEV"))
-                    //    {
-                    //        latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
-                    //    }
-                    //}
-
-
-
-                    //if (warehouse != null && latestOrder != null)
-                    //{
-                    //    if (warehouse.Name == WareHouseName.PASIG1.ToString())
-                    //    {
-                    //        soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
-                    //    }
-                    //    else if (warehouse.Name == WareHouseName.PASIG2.ToString())
-                    //    {
-                    //        soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
-                    //    }
-                    //    else if (warehouse.Name == WareHouseName.CETACIO.ToString())
-                    //    {
-                    //        soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 1);
-                    //    }
-                    //    else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
-                    //    {
-                    //        soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
-                    //    }
-                    //}
-
-
-                }
-                else if (!previous.SalesOrderNumber.Contains("-D"))
-                {
-                    return new ResponseModel<int> { Status = "Error", Message = "Invalid resubmission. The previous sales order number is required to be in the valid format of a deactivated sales order" };
+                        context.SalesOrders.Update(previous);
+                        await context.SaveChangesAsync(currentUserId);
+                    }
                 }
                 else
                 {
-                    soNumber = SONumber();
-                    soResubbmitedBy = currentUserId;
-                    soResubbmitedDate = DateTime.UtcNow;
-                }
+                    // EDIT existing SO: no new number needed
+                    orderVM.AgentId = agent.Id;
+                    orderVM.CustomerId = customer.Id;
+                    orderVM.RequiredDeliveryDate = form.DeliveryDate;
+                    orderVM.Remarks = form.Remarks;
+                    orderVM.SalesOrderDate = form.OrderDate;
+                    orderVM.StatusId = statusId;
+                    orderVM.ForwarderId = form.Forwarder;
+                    orderVM.RegionId = form.Region;
+                    orderVM.ServiceLevelAgreementId = form.SericeLevelAgreement;
+                    orderVM.OverallDiscount = form.OverallDiscount;
+                    orderVM.WithLP = form.WithLP;
+                    orderVM.WithREYCONonDefective = form.WithREYCONonDefective;
+                    orderVM.WithREYCOJITLPDeliveryId = form.WithREYCOJITLPDelivery;
+                    orderVM.SpecialInstruction = form.SpecialInstruction;
 
-
-                //if (form.Status.ToLower().Contains("draft")
-                // && await context.SalesOrders.AnyAsync(s => s.StatusId == statusId && s.SalesOrderNumber == soNumber))
-                //{
-                //    return new ResponseModel<int> { Status = "Error", Message = "Failed to add. A draft SO with the same SO Number already exists" };
-                //}
-                var temp = await context.SalesOrders.Where(s => s.SalesOrderNumber == soNumber && (form.ResubmitId == null || s.Id != form.ResubmitId)).ToListAsync();
-                //if (await context.SalesOrders.AnyAsync(s => s.SalesOrderNumber == soNumber && (form.ResubmitId == null || s.Id != form.ResubmitId)))
-                if (await context.SalesOrders.AnyAsync(s => s.SalesOrderNumber == soNumber))
-                    return new ResponseModel<int> { Status = "Error", Message = "Generated a conflicting Sales Order Number, Please try again. If error persist, consult IT" };
-
-                orderVM = new SalesOrder
-                {
-                    AgentId = agent.Id,
-                    CustomerId = customer.Id,
-                    RequiredDeliveryDate = form.DeliveryDate,
-                    PurchaseOrder = form.PurchaseOrder,
-                    Remarks = form.Remarks,
-                    SalesOrderDate = form.OrderDate,
-                    SalesOrderNumber = soNumber,
-                    SubmittedBy = currentUserId,
-                    SubmittedDate = form.OrderDate,
-                    ResubmittedBy = soResubbmitedBy,
-                    ResubmittedDate = soResubbmitedDate,
-                    StatusId = statusId,
-                    ForwarderId = form.Forwarder,
-                    RegionId = form.Region,
-                    ServiceLevelAgreementId = form.SericeLevelAgreement,
-                    OverallDiscount = form.OverallDiscount,
-                    WithLP = form.WithLP,
-                    WithREYCONonDefective = form.WithREYCONonDefective,
-                    WithREYCOJITLPDeliveryId = form.WithREYCOJITLPDelivery,
-                    SpecialInstruction = form.SpecialInstruction
-                };
-                await context.SalesOrders.AddAsync(orderVM);
-                await context.SaveChangesAsync(currentUserId);
-
-                if (previous != null)
-                {
-                    context.SalesOrders.Remove(previous);
-
-                    previous.ResubmitId = orderVM.Id;
-                    previous.ResubmittedBy = currentUserId;
-                    previous.ResubmittedDate = DateTime.UtcNow;
-
-                    context.SalesOrders.Update(previous);
+                    context.SalesOrders.Update(orderVM);
                     await context.SaveChangesAsync(currentUserId);
                 }
-            }
-            else
-            {
-                orderVM.AgentId = agent.Id;
-                orderVM.CustomerId = customer.Id;
-                orderVM.RequiredDeliveryDate = form.DeliveryDate;
-                orderVM.Remarks = form.Remarks;
-                orderVM.SalesOrderDate = form.OrderDate;
-                orderVM.StatusId = statusId;
-                orderVM.ForwarderId = form.Forwarder;
-                orderVM.RegionId = form.Region;
-                orderVM.ServiceLevelAgreementId = form.SericeLevelAgreement;
-                orderVM.OverallDiscount = form.OverallDiscount;
-                orderVM.WithLP = form.WithLP;
-                orderVM.WithREYCONonDefective = form.WithREYCONonDefective;
-                orderVM.WithREYCOJITLPDeliveryId = form.WithREYCOJITLPDelivery;
-                orderVM.SpecialInstruction = form.SpecialInstruction;
-                orderVM.SpecialInstruction = form.SpecialInstruction;
 
-                context.SalesOrders.Update(orderVM);
-                await context.SaveChangesAsync(currentUserId);
-            }
+                await SaveItemsAsync(form.Items, orderVM.Id);
 
-            await SaveItemsAsync(form.Items, orderVM.Id);
+                await SaveKpi(orderVM.Id, currentUserId, statusId);
 
-            await SaveKpi(orderVM.Id, currentUserId, statusId);
+                await tx.CommitAsync();
 
-            return new ResponseModel<int>
-            {
-                Status = "Success",
-                Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.",
-                NewRow = orderVM.Id
-            };
-            //}
-            //catch (Exception ex)
-            //{
-            //    return new ResponseModel<int> { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
-            //}
+                return new ResponseModel<int>
+                {
+                    Status = "Success",
+                    Message = form.Status.ToLower() == "draft" ? "Sales order saved as draft." : "Sales order successfully submitted.",
+                    NewRow = orderVM.Id
+                };
+            });
         }
+
+        private async Task<(bool Success, string Number, string Error)> GenerateNewSoNumberAsync(string currentUserId)
+        {
+            var warehouse = await context.Warehouses.FirstOrDefaultAsync(s => s.IsMain == true);
+
+            var (prefix, digits) = warehouse?.Name switch
+            {
+                nameof(WareHouseName.PASIG1) => ("PSG1", 6),
+                nameof(WareHouseName.PASIG2) => ("PSG2", 6),
+                nameof(WareHouseName.CETACIO) => ("CT38", 6),
+                nameof(WareHouseName.SEVERINO) => ("SEV", 7),
+                _ => ((string?)null, 0)
+            };
+
+            if (prefix == null)
+                return (false, "", "Main warehouse is not configured.");
+
+            // UPDLOCK + ROWLOCK: the counter row stays locked until the surrounding transaction
+            // commits or rolls back, so no other request can read the same value.
+            var counter = await context.SalesOrderCounters
+                .FromSqlInterpolated($@"
+                    SELECT * FROM dbo.SalesOrderCounters WITH (UPDLOCK, ROWLOCK)
+                    WHERE Prefix = {prefix}")
+                    .FirstOrDefaultAsync();
+
+            if (counter == null)
+                return (false, "", $"No counter row found for prefix '{prefix}'. Seed dbo.SalesOrderCounters first.");
+
+            counter.LastNumber++;
+            await context.SaveChangesAsync(currentUserId);   // use SaveChangesAsync() if your overload needs audited entities
+
+            return (true, prefix + counter.LastNumber.ToString().PadLeft(digits, '0'), "");
+        }
+
 
         public async Task SaveItemsAsync(IList<SalesOrderFormItemVM> Items, int salesOrderId)
         {
@@ -1298,7 +1477,7 @@ namespace GMGInventory.Application.Repositories
                         Quantity = di.Quantity,
                         SellingPrice = di.UnitPrice,
                         CustomerBrandDiscountId = di.CustomerBrandDiscountId,
-                        ItemPromoId = di.ItemPromoId,
+                        ItemPromoId = null,
                         IsPromo = di.isPromo
                     };
                     context.SalesOrderLineItems.Add(dbitem);
@@ -1315,7 +1494,7 @@ namespace GMGInventory.Application.Repositories
                     dbitem.Quantity = di.Quantity;
                     dbitem.SellingPrice = di.UnitPrice;
                     dbitem.CustomerBrandDiscountId = di.CustomerBrandDiscountId;
-                    dbitem.ItemPromoId = di.ItemPromoId;
+                    dbitem.ItemPromoId = null;
                     dbitem.IsPromo = di.isPromo;
                     context.SalesOrderLineItems.Update(dbitem);
                 }
@@ -1621,41 +1800,41 @@ namespace GMGInventory.Application.Repositories
             return total;
         }
 
-        public string SONumber()
-        {
-            var warehouse = context.Warehouses
-                                           .Where(s => s.IsMain == true).FirstOrDefault();
-            if (warehouse == null)
-                throw new InvalidOperationException("No main warehouse configured.");
+        //public string SONumber()
+        //{
+        //    var warehouse = context.Warehouses
+        //                                   .Where(s => s.IsMain == true).FirstOrDefault();
+        //    if (warehouse == null)
+        //        throw new InvalidOperationException("No main warehouse configured.");
 
-            string prefix;
-            int width;
+        //    string prefix;
+        //    int width;
 
-            if (warehouse.Name == WareHouseName.PASIG1.ToString()) { prefix = "PSG1"; width = 6; }
-            else if (warehouse.Name == WareHouseName.PASIG2.ToString()) { prefix = "PSG2"; width = 6; }
-            else if (warehouse.Name == WareHouseName.CETACIO.ToString()) { prefix = "CT38"; width = 6; }
-            else if (warehouse.Name == WareHouseName.SEVERINO.ToString()) { prefix = "SEV"; width = 7; }
-            else throw new InvalidOperationException($"Unknown warehouse '{warehouse.Name}'.");
+        //    if (warehouse.Name == WareHouseName.PASIG1.ToString()) { prefix = "PSG1"; width = 6; }
+        //    else if (warehouse.Name == WareHouseName.PASIG2.ToString()) { prefix = "PSG2"; width = 6; }
+        //    else if (warehouse.Name == WareHouseName.CETACIO.ToString()) { prefix = "CT38"; width = 6; }
+        //    else if (warehouse.Name == WareHouseName.SEVERINO.ToString()) { prefix = "SEV"; width = 7; }
+        //    else throw new InvalidOperationException($"Unknown warehouse '{warehouse.Name}'.");
 
-            var latest = context.SalesOrders
-                                .Where(s => s.SalesOrderNumber.StartsWith(prefix))
-                                .OrderByDescending(s => s.Id)
-                                .Select(s => s.SalesOrderNumber)
-                                .FirstOrDefault();
+        //    var latest = context.SalesOrders
+        //                        .Where(s => s.SalesOrderNumber.StartsWith(prefix))
+        //                        .OrderByDescending(s => s.Id)
+        //                        .Select(s => s.SalesOrderNumber)
+        //                        .FirstOrDefault();
 
-            int next = 1;
-            if (latest != null)
-            {
-                // strip suffix like ".1" or "-A"
-                var end = latest.IndexOfAny(new[] { '.', '-' });
-                var core = end >= 0 ? latest[..end] : latest;
+        //    int next = 1;
+        //    if (latest != null)
+        //    {
+        //        // strip suffix like ".1" or "-A"
+        //        var end = latest.IndexOfAny(new[] { '.', '-' });
+        //        var core = end >= 0 ? latest[..end] : latest;
 
-                if (int.TryParse(core.Substring(prefix.Length), out var n))
-                    next = n + 1;
-            }
+        //        if (int.TryParse(core.Substring(prefix.Length), out var n))
+        //            next = n + 1;
+        //    }
 
-            return $"{prefix}{next.ToString().PadLeft(width, '0')}";
-        }
+        //    return $"{prefix}{next.ToString().PadLeft(width, '0')}";
+        //}
 
     }
 }

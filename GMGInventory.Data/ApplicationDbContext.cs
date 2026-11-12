@@ -275,5 +275,6 @@ namespace GMGInventory.Data
         public DbSet<Unit> Units { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
+        public DbSet<SalesOrderCounter> SalesOrderCounters { get; set; }
     }
 }
