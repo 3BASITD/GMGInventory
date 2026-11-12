@@ -533,6 +533,7 @@ namespace GMGInventory.Application.Repositories
 
         public async Task<PurchaseOrderNewDetailedVM?> GetDetails(int orderId)
         {
+            string warehouseName = context.Warehouses.Where(s => s.IsMain == true).Select(s => s.Name).FirstOrDefault();
             var orderedQty = context.PurchaseOrderNewLineItems
                                     .Where(s => s.PurchaseOrderId == orderId)
                                     .Sum(s => (int?)s.Quantity) ?? 0;
@@ -605,7 +606,8 @@ namespace GMGInventory.Application.Repositories
                               UserCreated = SystemFormat.Name(userc.FirstName, userc.LastName, userc.Nickname),
                               DateCreatedD = order.DateCreated,
                               UserModified = userm == null ? null : SystemFormat.Name(userm.FirstName, userm.LastName, userm.Nickname),
-                              DateModifiedD = order.DateModified
+                              DateModifiedD = order.DateModified,
+                              WarehouseName = warehouseName
                           };
             return await details.FirstOrDefaultAsync();
         }

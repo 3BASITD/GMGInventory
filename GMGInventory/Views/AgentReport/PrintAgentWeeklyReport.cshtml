@@ -1,62 +1,43 @@
-﻿@model AgentMonthlyVM
+﻿@model AgentWeeklyVM
 @{
     Layout = null;
-
-    // Visited = has both longitude and latitude
-    bool IsVisited(AgentItirenaryVM r) =>
-        !string.IsNullOrWhiteSpace(r.Long) && !string.IsNullOrWhiteSpace(r.Lat);
-
-    var from = Model.DateFrom.Date;
-    var to = Model.DateTo.Date;
-
-    // Calendar grid runs Sunday..Saturday and covers the whole period
-    var gridStart = from.AddDays(-(int)from.DayOfWeek);
-    var gridEnd = to.AddDays(6 - (int)to.DayOfWeek);
-
-    var byDay = Model.Rows
-        .Where(r => r.VisitDate.HasValue)
-        .GroupBy(r => r.VisitDate!.Value.Date)
-        .ToDictionary(g => g.Key, g => g.OrderBy(x => x.CustomerName).ToList());
-
-    var dayNames = new[] { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" };
 }
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Monthly Itinerary</title>
+    <title>Sales Agent Weekly Activity Report</title>
     <style>
-        @@page { size: A4 landscape; margin: 8mm; }
-        body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; color: #000; }
+        @@page { size: A4 landscape; margin: 10mm; }
+        body { font-family: Calibri, Arial, sans-serif; font-size: 12px; margin: 0; color: #000; }
 
-        .company { text-align: center; font-size: 15px; font-weight: bold; margin: 0; }
-        .title   { text-align: center; font-size: 12px; font-weight: bold; margin: 10px 0 14px; }
+        .company { text-align: center; font-size: 20px; font-weight: bold; margin: 0; }
+        .title   { text-align: center; font-size: 15px; font-weight: bold; margin: 14px 0 18px; }
 
-        .info { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
-        .info td { font-size: 10px; padding: 0; }
-        .info .right { text-align: right; }
+        .info { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        .info td { padding: 2px 0; font-size: 13px; }
+        .info .lbl { font-weight: bold; width: 110px; }
+        .info .gap { width: 40px; }
+        .info .lbl2 { font-weight: bold; width: 140px; }
 
-        table.cal { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        table.cal th { background: #e6e6e6; border: 1px solid #555; padding: 3px; font-size: 10px; }
-        table.cal td { border: 1px solid #555; vertical-align: top; padding: 3px 4px; height: 90px; }
-        table.cal tr { page-break-inside: avoid; }
-        table.cal thead { display: table-header-group; }
+        .summary { border-collapse: collapse; width: 50%; margin-bottom: 18px; }
+        .summary td { border: 1px solid #000; padding: 8px 6px; font-size: 13px; }
+        .summary .lbl { text-align: right; font-weight: bold; width: 60%; }
+        .summary .val { text-align: right; }
 
-        .day { font-weight: bold; font-size: 10px; margin-bottom: 3px; }
+        table.report { width: 100%; border-collapse: collapse; }
+        table.report th, table.report td { border: 1px solid #000; padding: 2px 3px; vertical-align: middle; }
+        table.report th { background: #d9d9d9; text-align: center; font-size: 13px; padding: 5px 3px; }
+        table.report thead { display: table-header-group; }   /* repeat header on each page */
+        table.report tr { page-break-inside: avoid; }
 
-        .visit { padding: 3px 0; border-bottom: 1px solid #ddd; }
-        .visit:last-child { border-bottom: none; }
-        .cust { font-weight: bold; text-transform: uppercase; font-size: 9.5px; }
-        .status { font-weight: bold; white-space: nowrap; }
-        .status.no  { color: #e11d2e; }
-        .status.yes { color: #15803d; }
-        .purpose { font-size: 8px; color: #777; margin-top: 1px; }
-        .purpose::before { content: "\2022  "; }
+        .acct { display: flex; justify-content: space-between; gap: 6px; }
+        .nowrap { white-space: nowrap; }
 
         .side-note { display: none; }
         @@media screen {
-            body { margin: 20px; }
             .side-note { display: block; position: fixed; top: 6px; right: 10px; font-size: 11px; color: #666; }
+            body { margin: 20px; }
         }
         @@media print {
             .side-note { display: none; }
@@ -68,55 +49,57 @@
     <div class="side-note">This page is for printing only. Press Ctrl+P if the Print dialog did not open automatically.</div>
 
     <p class="company">3BAS Tiger's Inc.</p>
-    <p class="title">MONTHLY ITINERARY</p>
+    <p class="title">SALES AGENT WEEKLY ACTIVITY REPORT</p>
 
     <table class="info">
         <tr>
-            <td><b>NAME:</b> @Model.AgentName</td>
-            <td class="right"><b>PERIOD:</b> @from.ToString("MMM dd, yyyy") - @to.ToString("MMM dd, yyyy")</td>
+            <td class="lbl">NAME :</td>
+            <td>@Model.AgentName</td>
+            <td class="gap"></td>
+            <td class="lbl2">INCLUSIVE DATES :</td>
+            <td>@Model.DateFrom.ToString("MMM dd, yyyy") - @Model.DateTo.ToString("MMM dd, yyyy")</td>
         </tr>
     </table>
 
-    <table class="cal">
+    <table class="summary">
+        <tr>
+            <td class="lbl">SALES FOR THE WEEK:</td>
+            <td class="val">@Model.SalesForWeek.ToString("C2", new System.Globalization.CultureInfo("en-PH"))</td>
+        </tr>
+        <tr>
+            <td class="lbl">COLLECTION FOR THE WEEK:</td>
+            <td class="val">@Model.CollectionForWeek.ToString("C2", new System.Globalization.CultureInfo("en-PH"))</td>
+        </tr>
+    </table>
+
+    <table class="report">
         <thead>
             <tr>
-                @foreach (var n in dayNames)
-                {
-                    <th>@n</th>
-                }
+                <th style="width:6%">Visit Date</th>
+                <th style="width:16%">Customer Name</th>
+                <th style="width:8%">Contact Person</th>
+                <th style="width:6%">Position</th>
+                <th style="width:10%">Purpose</th>
+                <th style="width:8%">Sales Amount</th>
+                <th style="width:8%">Collection</th>
+                <th style="width:9%">Action Plan</th>
+                <th style="width:9%">Remarks</th>
             </tr>
         </thead>
         <tbody>
-        @for (var weekStart = gridStart; weekStart <= gridEnd; weekStart = weekStart.AddDays(7))
+        @foreach (var r in Model.Rows)
         {
-            <tr>
-            @for (var i = 0; i < 7; i++)
-            {
-                var d = weekStart.AddDays(i);
-                var inRange = d >= from && d <= to;
-                <td>
-                @if (inRange)
-                {
-                    <div class="day">@d.ToString("dd")</div>
-                    @if (byDay.TryGetValue(d, out var visits))
-                    {
-                        foreach (var v in visits)
-                        {
-                            var visited = IsVisited(v);
-                            <div class="visit">
-                                <span class="cust">@v.CustomerName</span>
-                                (<span class="status @(visited ? "yes" : "no")">@(visited ? "\u2714 Visited" : "\u2716 Not Visited")</span>)
-                                @if (!string.IsNullOrWhiteSpace(v.PurposeOfVisit))
-                                {
-                                    <div class="purpose">@v.PurposeOfVisit</div>
-                                }
-                            </div>
-                        }
-                    }
-                }
-                </td>
-            }
-            </tr>
+                <tr>
+                    <td class="nowrap">@(r.VisitDate?.ToString("MM/dd/yyyy"))</td>
+                    <td>@r.CustomerName</td>
+                    <td>@r.ContactPerson</td>
+                    <td>@r.Position</td>
+                    <td>@r.PurposeOfVisit</td>
+                    <td><div class="acct"><span>₱</span><span>@((r.SalesAmount ?? 0) != 0 ? (r.SalesAmount ?? 0).ToString("N2") : "")</span></div></td>
+                    <td><div class="acct"><span>₱</span><span>@((r.Collection ?? 0) != 0 ? (r.Collection ?? 0).ToString("N2") : "")</span></div></td>
+                    <td>@r.ActionPlan</td>
+                    <td>@r.Remarks</td>
+                </tr>
         }
         </tbody>
     </table>

@@ -26,6 +26,16 @@
                        !string.IsNullOrWhiteSpace(Model.DisapprovedBy) &&
                        Model.ResubmitId == null &&
                        canAdd;
+    string companyName = "";
+
+    if (Model.WarehouseName == "CETACIO" || Model.WarehouseName == "SEVERINO" || Model.WarehouseName == "PASIG2")
+    {
+        companyName = "BAS";
+    }
+    else
+    {
+        companyName = "3BAS"; 
+    }
 }
 
 @section Breadcrumb {
@@ -44,7 +54,7 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuPrint">
                         <li><a class="dropdown-item btn-details-print" data-company="GMG">Use GMG Logo</a></li>
-                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use 3BAS Logo</a></li>
+                        <li><a class="dropdown-item btn-details-print" data-company="BAS">Use @companyName Logo</a></li>
                     </ul>
                 </div>
             }

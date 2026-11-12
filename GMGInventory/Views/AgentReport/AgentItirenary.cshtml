@@ -417,7 +417,7 @@
                 urlQuery.push("DateFrom=" + $("#filter-from").val());
                 urlQuery.push("DateTo=" + $("#filter-to").val());
                 if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
-                if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+                if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
                 setTimeout(function () {
                     let win = window.open('@Url.Action("PrintAgentWeeklyReport")?' + urlQuery.join("&"), '');
                     var wintimer = setInterval(function () {
@@ -438,7 +438,7 @@
                 urlQuery.push("DateFrom=" + $("#filter-from").val());
                 urlQuery.push("DateTo=" + $("#filter-to").val());
                 if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
-                if ($("#filter-customer").val()) { urlQuery.push("Customer=" + $("#filter-customer").val()); }
+                if ($("#filter-agent").val()) { urlQuery.push("Agent=" + $("#filter-agent").val()); }
                 setTimeout(function () {
                     let win = window.open('@Url.Action("PrintAgentMonthlyReport")?' + urlQuery.join("&"), '');
                     var wintimer = setInterval(function () {

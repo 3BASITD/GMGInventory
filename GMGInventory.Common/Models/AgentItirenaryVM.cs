@@ -54,6 +54,7 @@ namespace GMGInventory.Common.Models
         public DateTime DateTo { get; set; }
         public decimal SalesForWeek { get; set; }
         public decimal CollectionForWeek { get; set; }
+        public DateTime VisitDate { get; set; }
         public IList<AgentItirenaryVM> Rows { get; set; } = new List<AgentItirenaryVM>();
     }
 

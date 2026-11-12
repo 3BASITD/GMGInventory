@@ -5,6 +5,8 @@
     var title = "Purchase Order";
     var items = ViewData["Items"] as List<PurchaseOrderLineItemVM> ?? new List<PurchaseOrderLineItemVM>();
     var colcount = Model.Type.ToLower() != "non-automotive" ? 7 : 6;
+
+    var companyLogo = TempData.Peek("CompanyLogo")?.ToString();
 }
 
 <!DOCTYPE html>
@@ -23,14 +25,18 @@
                 <td colspan="@colcount" style="padding:0;">
                     <div class="sub-header">
                         <div class="sub-col center w-150px">
-                            @if (TempData["CompanyLogo"]?.ToString() == "BAS")
-                            {
-                                <img src="~/images/3BAS.png" class="logo" />
-                            }
-                            else
-                            {
-                                <img src="~/images/GMG-01.png" class="logo" />
-                            }
+                        @if (companyLogo == "BAS" && (Model.WarehouseName == "CETACIO" || Model.WarehouseName == "SEVERINO" || Model.WarehouseName == "PASIG2"))
+                        {
+                            <img src="~/images/BAS-02.png" class="logo" />
+                        }
+                        else if (companyLogo == "BAS" && Model.WarehouseName == "PASIG1")
+                        {
+                            <img src="~/images/3BAS.png" class="logo" />
+                        }
+                        else
+                        {
+                            <img src="~/images/GMG-01.png" class="logo" />
+                        }
                         </div>
                         <div class="sub-col center w-60pc p-50">
                             <span class="title">Document Classification:</span>
@@ -286,7 +292,14 @@
             </tr>
             <tr>
                 <td colspan="@colcount">
-                    <p class="footer center-text"> 3BAS Tigers INC. | Manila Mahogany Compound Santa Lucia, Pasig City | Tel. No.N/A </p>
+                    @if(Model.WarehouseName == "CETACIO" || Model.WarehouseName == "SEVERINO" || Model.WarehouseName == "PASIG2")
+                    {
+                        <p class="footer center-text"> Bina's Auto Supply Inc. | 1034 Kusang Loob St. Brgy. 330 Zone 033 Sta. Cruz, Manila | Tel. No.8731-3923,8741-5537/39 </p>
+                    }
+                    else if(Model.WarehouseName == "PASIG1")
+                    {
+                        <p class="footer center-text"> 3BAS Tigers INC. | Manila Mahogany Compound Santa Lucia, Pasig City | Tel. No.N/A </p>
+                    }
                 </td>
             </tr>
         </tfoot>

@@ -139,6 +139,8 @@ namespace GMGInventory.Common.Models
         public DateTime? DateModifiedD { get; set; }
 
         public IList<PurchaseOrderLineItemVM> LineItems { get; set; }
+
+        public string WarehouseName { get; set; }
     }
 
     public class PurchaseOrderSaveVM
