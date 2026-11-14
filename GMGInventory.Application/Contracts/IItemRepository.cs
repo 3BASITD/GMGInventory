@@ -48,7 +48,6 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> SaveImageAsync(ItemImageFormVM form);
         Task<ResponseModelData<FileVM>> UploadFile(IFormFile file);
         Task<string> SaveItemFromFile(ItemFileVM itemFile);
-
         Task<Select2Model<JsonItemOptionsModel>> GetBinLocations(string search, int page);
     }
 }

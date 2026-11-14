@@ -27,5 +27,7 @@ namespace GMGInventory.Application.Contracts
         Task<ResponseModel> UpdatePod(int Id);
         double BusinessMinutesBetween(DateTime start, DateTime end);
         Task<bool> ForceClose(int Id);
+
+        Task<(bool Success, string Number, string Error)> GenerateNewSoNumberAsync(string currentUserId);
     }
 } 

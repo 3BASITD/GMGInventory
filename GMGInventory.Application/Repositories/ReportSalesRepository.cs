@@ -763,37 +763,130 @@ namespace GMGInventory.Application.Repositories
 
         #region Daily Sales
 
+        //public async Task<IList<DailySalesRVM>> GetDailySales(ListFilterSalesModel filter)
+        //{
+
+        //    var invoices = from invoice in context.Invoices
+        //                   where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
+        //                   && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
+        //                   && (filter.InvoiceNumberFrom == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberFrom.Trim().ToLower()) >= 0)
+        //                   && (filter.InvoiceNumberTo == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberTo.Trim().ToLower()) <= 0)
+        //                   && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
+        //                   select new DailySalesRVM
+        //                   {
+        //                       Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
+        //                       AgentId = invoice.SalesOrder.Agent.Id,
+        //                       //AmountD = (from ili in invoice.InvoiceLineItems
+        //                       //           join soli in invoice.SalesOrder.SalesOrderLineItems on ili.ItemId equals soli.ItemId
+        //                       //           where soli.IsPromo != true        
+        //                       //           let discount1 = (100 - soli.Discount1) / 100
+        //                       //           let discount2 = (100 - soli.Discount2) / 100
+        //                       //           select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)`).Sum() ?? 0,
+        //                       AmountD = (from ili in invoice.InvoiceLineItems
+        //                                  where ili.IsPromo != true
+        //                                  select (decimal?)(
+        //                                      ili.Quantity * ili.UnitPrice
+        //                                      * ((100m - (invoice.SalesOrder.SalesOrderLineItems
+        //                                                    .Where(soli => soli.ItemId == ili.ItemId)
+        //                                                    .Select(soli => (decimal?)soli.Discount1)
+        //                                                    .Max() ?? 0m)) / 100m)
+        //                                      * ((100m - (invoice.SalesOrder.SalesOrderLineItems
+        //                                                    .Where(soli => soli.ItemId == ili.ItemId)
+        //                                                    .Select(soli => (decimal?)soli.Discount2)
+        //                                                    .Max() ?? 0m)) / 100m)
+        //                                  )).Sum() ?? 0,
+        //                       CustomerCode = invoice.SalesOrder.Customer.Code,
+        //                       CustomerName = invoice.SalesOrder.Customer.Name,
+        //                       CustomerId = invoice.SalesOrder.Customer.Id,
+        //                       InvoiceDateD = invoice.InvoiceDate,
+        //                       InvoiceNumber = invoice.InvoiceNumber,
+        //                       BIRInvoiceNumber = invoice.ControlNumber,
+        //                       InvoiceId = invoice.Id,
+        //                       Term = invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.SalesOrder.Customer.CreditTerm.Name,
+        //                       PercentD = invoice.SalesOrder.Customer.CommissionRate != null
+        //                                ? invoice.SalesOrder.Customer.CommissionRate.Value
+        //                                : invoice.SalesOrder.Agent.Area.CommissionRate
+        //                   };
+        //    return await invoices.ToListAsync();
+        //}
+
         public async Task<IList<DailySalesRVM>> GetDailySales(ListFilterSalesModel filter)
         {
+            // 1) Main query: everything except AmountD
+            var invoices = await (from invoice in context.Invoices
+                                  where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
+                                  && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
+                                  && (filter.InvoiceNumberFrom == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberFrom.Trim().ToLower()) >= 0)
+                                  && (filter.InvoiceNumberTo == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberTo.Trim().ToLower()) <= 0)
+                                  && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
+                                  select new DailySalesRVM
+                                  {
+                                      Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
+                                      AgentId = invoice.SalesOrder.Agent.Id,
+                                      CustomerCode = invoice.SalesOrder.Customer.Code,
+                                      CustomerName = invoice.SalesOrder.Customer.Name,
+                                      CustomerId = invoice.SalesOrder.Customer.Id,
+                                      InvoiceDateD = invoice.InvoiceDate,
+                                      InvoiceNumber = invoice.InvoiceNumber,
+                                      BIRInvoiceNumber = invoice.ControlNumber,
+                                      InvoiceId = invoice.Id,
+                                      Term = invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.SalesOrder.Customer.CreditTerm.Name,
+                                      PercentD = invoice.SalesOrder.Customer.CommissionRate != null
+                                               ? invoice.SalesOrder.Customer.CommissionRate.Value
+                                               : invoice.SalesOrder.Agent.Area.CommissionRate
+                                  }).ToListAsync();
 
-            var invoices = from invoice in context.Invoices
-                           where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
-                           && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
-                           && (filter.InvoiceNumberFrom == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberFrom.Trim().ToLower()) >= 0)
-                           && (filter.InvoiceNumberTo == null || invoice.ControlNumber.Trim().ToLower().CompareTo(filter.InvoiceNumberTo.Trim().ToLower()) <= 0)
-                           && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
-                           select new DailySalesRVM
-                           {
-                               Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
-                               AgentId = invoice.SalesOrder.Agent.Id,
-                               AmountD = (from ili in invoice.InvoiceLineItems
-                                          join soli in invoice.SalesOrder.SalesOrderLineItems on ili.ItemId equals soli.ItemId
-                                          let discount1 = (100 - soli.Discount1) / 100
-                                          let discount2 = (100 - soli.Discount2) / 100
-                                          select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)).Sum() ?? 0,
-                               CustomerCode = invoice.SalesOrder.Customer.Code,
-                               CustomerName = invoice.SalesOrder.Customer.Name,
-                               CustomerId = invoice.SalesOrder.Customer.Id,
-                               InvoiceDateD = invoice.InvoiceDate,
-                               InvoiceNumber = invoice.InvoiceNumber,
-                               BIRInvoiceNumber = invoice.ControlNumber,
-                               InvoiceId = invoice.Id,
-                               Term = invoice.SalesOrder.Customer.CreditTerm == null ? "" : invoice.SalesOrder.Customer.CreditTerm.Name,
-                               PercentD = invoice.SalesOrder.Customer.CommissionRate != null
-                                        ? invoice.SalesOrder.Customer.CommissionRate.Value
-                                        : invoice.SalesOrder.Agent.Area.CommissionRate
-                           };
-            return await invoices.ToListAsync();
+            if (invoices.Count == 0)
+                return invoices;
+
+            var invoiceIds = invoices.Select(x => x.InvoiceId).ToList();
+
+            // 2) Invoice lines (promo lines excluded, using the invoice line's own flag)
+            var invoiceLines = await context.InvoiceLineItems
+                .Where(ili => invoiceIds.Contains(ili.InvoiceId) && ili.IsPromo != true)
+                .Select(ili => new { ili.InvoiceId, ili.ItemId, ili.Quantity, ili.UnitPrice })
+                .ToListAsync();
+
+            // 3) SO lines of each invoice's sales order (plain select, grouped in memory)
+            var soLines = await (from invoice in context.Invoices
+                                 where invoiceIds.Contains(invoice.Id)
+                                 from soli in invoice.SalesOrder.SalesOrderLineItems
+                                 select new
+                                 {
+                                     InvoiceId = invoice.Id,
+                                     soli.ItemId,
+                                     soli.Discount1,
+                                     soli.Discount2
+                                 }).ToListAsync();
+
+            // One discount pair per (invoice, item); the highest is used if SO lines differ
+            var soDiscounts = soLines
+                .GroupBy(x => (x.InvoiceId, x.ItemId))
+                .ToDictionary(
+                    g => g.Key,
+                    g => (D1: g.Max(x => Convert.ToDecimal((object)x.Discount1 ?? 0)),
+                          D2: g.Max(x => Convert.ToDecimal((object)x.Discount2 ?? 0))));
+
+            // 4) Compute AmountD per invoice in memory
+            var amounts = invoiceLines
+                .GroupBy(l => l.InvoiceId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Sum(l =>
+                    {
+                        decimal d1 = 0m, d2 = 0m;
+                        if (soDiscounts.TryGetValue((l.InvoiceId, l.ItemId), out var s))
+                        {
+                            d1 = s.D1;
+                            d2 = s.D2;
+                        }
+                        return l.Quantity * l.UnitPrice * ((100m - d1) / 100m) * ((100m - d2) / 100m);
+                    }));
+
+            foreach (var inv in invoices)
+                inv.AmountD = amounts.TryGetValue(inv.InvoiceId, out var amt) ? amt : 0m;
+
+            return invoices;
         }
 
         public async Task<ForDataTables<DailySalesRVM>> GetDailySalesDT(DataTablesRequestForm form, ListFilterSalesModel filter)
@@ -935,45 +1028,105 @@ namespace GMGInventory.Application.Repositories
             //else
             //{
 
-                var invoiceAmounts = from ili in context.InvoiceLineItems
-                                     join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
-                                     group new { ili, soli } by ili.InvoiceId into g
-                                     select new
-                                     {
-                                         InvoiceId = g.Key,
-                                         TotalAmount = g.Sum(s => (decimal?)s.ili.Quantity *
-                                                                  s.ili.UnitPrice *
-                                                                  (100 - s.soli.Discount1) / 100m *
-                                                                  (100 - s.soli.Discount2) / 100m *
-                                                                  (100 - (s.soli.Discount3 == null ? 0 : s.soli.Discount3)) / 100m *
-                                                                  (100 - (s.soli.Discount4 == null ? 0 : s.soli.Discount4)) / 100m *
-                                                                  (100 - (s.soli.Discount5 == null ? 0 : s.soli.Discount5)) / 100m) ?? 0
-                                     };
-                var invoices = from invoice in context.Invoices
-                               where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
-                               && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
-                               && (filter.Agent == null || invoice.SalesOrder.Agent.Id == filter.Agent)
-                               && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
-                               && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
-                               && (filter.Region2 == null || regions == null || regions.Contains(invoice.SalesOrder.Region.Code))
-                                let amount = invoiceAmounts.Where(s => s.InvoiceId == invoice.Id)
-                                                           .Sum(s => (decimal?)s.TotalAmount) ?? 0
-                               select new SalesInvoiceRVM
-                               {
-                                   Id = invoice.Id,
-                                   Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
-                                   AgentCode = invoice.SalesOrder.Agent.Code,
-                                   AgentId = invoice.SalesOrder.Agent.Id,
-                                   AmountD = amount,
-                                   ControlNumber = invoice.ControlNumber,
-                                   CustomerCode = invoice.SalesOrder.Customer.Code,
-                                   CustomerName = invoice.SalesOrder.Customer.Name,
-                                   CustomerId = invoice.SalesOrder.Customer.Id,
-                                   InvoiceDateD = invoice.InvoiceDate.Date,
-                                   InvoiceNumber = invoice.InvoiceNumber,
-                                   Status = invoice.Status.Code
-                               };
-                return await invoices.ToListAsync();
+            //OLD CODDE
+            //var invoiceAmounts = from ili in context.InvoiceLineItems
+            //                     join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
+            //                     group new { ili, soli } by ili.InvoiceId into g
+            //                     select new
+            //                     {
+            //                         InvoiceId = g.Key,
+            //                         TotalAmount = g.Sum(s => (decimal?)s.ili.Quantity *
+            //                                                  s.ili.UnitPrice *
+            //                                                  (100 - s.soli.Discount1) / 100m *
+            //                                                  (100 - s.soli.Discount2) / 100m *
+            //                                                  (100 - (s.soli.Discount3 == null ? 0 : s.soli.Discount3)) / 100m *
+            //                                                  (100 - (s.soli.Discount4 == null ? 0 : s.soli.Discount4)) / 100m *
+            //                                                  (100 - (s.soli.Discount5 == null ? 0 : s.soli.Discount5)) / 100m) ?? 0
+            //                     };
+            //var invoices = from invoice in context.Invoices
+            //               where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
+            //               && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
+            //               && (filter.Agent == null || invoice.SalesOrder.Agent.Id == filter.Agent)
+            //               && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
+            //               && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
+            //               && (filter.Region2 == null || regions == null || regions.Contains(invoice.SalesOrder.Region.Code))
+            //               let amount = invoiceAmounts.Where(s => s.InvoiceId == invoice.Id)
+            //                                          .Sum(s => (decimal?)s.TotalAmount) ?? 0
+            //               select new SalesInvoiceRVM
+            //               {
+            //                   Id = invoice.Id,
+            //                   Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
+            //                   AgentCode = invoice.SalesOrder.Agent.Code,
+            //                   AgentId = invoice.SalesOrder.Agent.Id,
+            //                   AmountD = amount,
+            //                   ControlNumber = invoice.ControlNumber,
+            //                   CustomerCode = invoice.SalesOrder.Customer.Code,
+            //                   CustomerName = invoice.SalesOrder.Customer.Name,
+            //                   CustomerId = invoice.SalesOrder.Customer.Id,
+            //                   InvoiceDateD = invoice.InvoiceDate.Date,
+            //                   InvoiceNumber = invoice.InvoiceNumber,
+            //                   Status = invoice.Status.Code
+            //               };
+            //return await invoices.ToListAsync();
+
+            // One row per (SalesOrder, Item), so duplicate items can't multiply invoice lines
+            var soDiscounts = from soli in context.SalesOrderLineItems
+                              where soli.IsPromo != true
+                              group soli by new { soli.SalesOrderId, soli.ItemId } into g
+                              select new
+                              {
+                                  g.Key.SalesOrderId,
+                                  g.Key.ItemId,
+                                  D1 = g.Max(x => x.Discount1),
+                                  D2 = g.Max(x => x.Discount2),
+                                  D3 = g.Max(x => x.Discount3),
+                                  D4 = g.Max(x => x.Discount4),
+                                  D5 = g.Max(x => x.Discount5)
+                              };
+
+            var invoiceAmounts = from ili in context.InvoiceLineItems
+                                 join so in soDiscounts
+                                      on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                      equals new { so.SalesOrderId, so.ItemId }
+                                 where ili.IsPromo != true
+                                 group new { ili, so } by ili.InvoiceId into g
+                                 select new
+                                 {
+                                     InvoiceId = g.Key,
+                                     TotalAmount = g.Sum(s => (decimal?)s.ili.Quantity *
+                                                              s.ili.UnitPrice *
+                                                              (100 - s.so.D1) / 100m *
+                                                              (100 - s.so.D2) / 100m *
+                                                              (100 - (s.so.D3 == null ? 0 : s.so.D3)) / 100m *
+                                                              (100 - (s.so.D4 == null ? 0 : s.so.D4)) / 100m *
+                                                              (100 - (s.so.D5 == null ? 0 : s.so.D5)) / 100m) ?? 0
+                                 };
+
+            var invoices = from invoice in context.Invoices
+                           where (filter.DateFrom == null || filter.DateFrom <= invoice.InvoiceDate.Date)
+                           && (filter.DateTo == null || invoice.InvoiceDate.Date <= filter.DateTo)
+                           && (filter.Agent == null || invoice.SalesOrder.Agent.Id == filter.Agent)
+                           && (filter.Customer == null || invoice.SalesOrder.Customer.Id == filter.Customer)
+                           && (filter.StatusCode == null || invoice.Status.Code.Trim().ToLower() == filter.StatusCode.Trim().ToLower())
+                           && (filter.Region2 == null || regions == null || regions.Contains(invoice.SalesOrder.Region.Code))
+                           let amount = invoiceAmounts.Where(s => s.InvoiceId == invoice.Id)
+                                                      .Sum(s => (decimal?)s.TotalAmount) ?? 0
+                           select new SalesInvoiceRVM
+                           {
+                               Id = invoice.Id,
+                               Agent = invoice.SalesOrder.Agent.FirstName + " " + invoice.SalesOrder.Agent.LastName,
+                               AgentCode = invoice.SalesOrder.Agent.Code,
+                               AgentId = invoice.SalesOrder.Agent.Id,
+                               AmountD = amount,
+                               ControlNumber = invoice.ControlNumber,
+                               CustomerCode = invoice.SalesOrder.Customer.Code,
+                               CustomerName = invoice.SalesOrder.Customer.Name,
+                               CustomerId = invoice.SalesOrder.Customer.Id,
+                               InvoiceDateD = invoice.InvoiceDate.Date,
+                               InvoiceNumber = invoice.InvoiceNumber,
+                               Status = invoice.Status.Code
+                           };
+            return await invoices.ToListAsync();
             //}
         }
 

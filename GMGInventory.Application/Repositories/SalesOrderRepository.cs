@@ -1376,7 +1376,7 @@ namespace GMGInventory.Application.Repositories
             });
         }
 
-        private async Task<(bool Success, string Number, string Error)> GenerateNewSoNumberAsync(string currentUserId)
+        public async Task<(bool Success, string Number, string Error)> GenerateNewSoNumberAsync(string currentUserId)
         {
             var warehouse = await context.Warehouses.FirstOrDefaultAsync(s => s.IsMain == true);
 

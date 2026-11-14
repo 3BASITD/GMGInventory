@@ -342,12 +342,69 @@ namespace GMGInventory.Application.Repositories
         #region for SOACR/Generate CR
         private async Task<List<SoacrInvoiceVM>> GetCustomerInvoiceToAdd(int? customerId)
         {
+            //var invoice = from inv in context.Invoices
+            //              join soal in context.SOACRLineItems on inv.Id equals soal.InvoiceId into soali
+            //              from soaInvoice in soali.DefaultIfEmpty()
+            //              where inv.SalesOrder.Customer.Id == customerId
+            //              && soaInvoice == null
+            //              && (inv.Status.Code.Trim().ToLower() == "invoiced" || inv.Status.Code.Trim().ToLower() == "draft")
+            //              select new SoacrInvoiceVM
+            //              {
+            //                  Id = inv.Id,
+            //                  InvoiceDateD = inv.InvoiceDate,
+            //                  InvoiceNumber = inv.InvoiceNumber,
+            //                  ControlNumber = inv.ControlNumber,
+            //                  InvoiceType = inv.InvoiceType.Name,
+            //                  TotalAmountD = (from invli in inv.InvoiceLineItems
+            //                                  join order in context.SalesOrders on invli.Invoice.SalesOrderId equals order.Id
+            //                                  join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
+            //                                  let discount1 = (100 - orderli.Discount1) / 100
+            //                                  let discount2 = (100 - orderli.Discount2) / 100
+            //                                  where invli.ItemId == orderli.ItemId
+            //                                  select invli.Quantity * invli.UnitPrice * discount1 * discount2).Sum()
+            //              };
+
+            //return await invoice.ToListAsync();
+
+
+
+            // One row per (SalesOrder, Item), so duplicate items can't multiply invoice lines
+            var soDiscounts = from orderli in context.SalesOrderLineItems
+                              where orderli.IsPromo != true
+                              group orderli by new { orderli.SalesOrderId, orderli.ItemId } into g
+                              select new
+                              {
+                                  g.Key.SalesOrderId,
+                                  g.Key.ItemId,
+                                  D1 = g.Max(x => x.Discount1),
+                                  D2 = g.Max(x => x.Discount2)
+                              };
+
+            // Total per invoice, limited to this customer's invoices
+            var invoiceAmounts = from invli in context.InvoiceLineItems
+                                 where invli.Invoice.SalesOrder.Customer.Id == customerId
+                                    && invli.IsPromo != true
+                                 join so in soDiscounts
+                                      on new { invli.Invoice.SalesOrderId, invli.ItemId }
+                                      equals new { so.SalesOrderId, so.ItemId }
+                                 group new { invli, so } by invli.InvoiceId into g
+                                 select new
+                                 {
+                                     InvoiceId = g.Key,
+                                     TotalAmount = g.Sum(s => (decimal?)s.invli.Quantity *
+                                                              s.invli.UnitPrice *
+                                                              (100 - s.so.D1) / 100m *
+                                                              (100 - s.so.D2) / 100m) ?? 0
+                                 };
+
             var invoice = from inv in context.Invoices
                           join soal in context.SOACRLineItems on inv.Id equals soal.InvoiceId into soali
                           from soaInvoice in soali.DefaultIfEmpty()
                           where inv.SalesOrder.Customer.Id == customerId
                           && soaInvoice == null
                           && (inv.Status.Code.Trim().ToLower() == "invoiced" || inv.Status.Code.Trim().ToLower() == "draft")
+                          let totalAmount = invoiceAmounts.Where(s => s.InvoiceId == inv.Id)
+                                                          .Sum(s => (decimal?)s.TotalAmount) ?? 0
                           select new SoacrInvoiceVM
                           {
                               Id = inv.Id,
@@ -355,13 +412,7 @@ namespace GMGInventory.Application.Repositories
                               InvoiceNumber = inv.InvoiceNumber,
                               ControlNumber = inv.ControlNumber,
                               InvoiceType = inv.InvoiceType.Name,
-                              TotalAmountD = (from invli in inv.InvoiceLineItems
-                                              join order in context.SalesOrders on invli.Invoice.SalesOrderId equals order.Id
-                                              join orderli in context.SalesOrderLineItems on order.Id equals orderli.SalesOrderId
-                                              let discount1 = (100 - orderli.Discount1) / 100
-                                              let discount2 = (100 - orderli.Discount2) / 100
-                                              where invli.ItemId == orderli.ItemId
-                                              select invli.Quantity * invli.UnitPrice * discount1 * discount2).Sum()
+                              TotalAmountD = totalAmount
                           };
 
             return await invoice.ToListAsync();

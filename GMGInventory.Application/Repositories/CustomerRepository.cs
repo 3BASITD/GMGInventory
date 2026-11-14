@@ -1370,21 +1370,84 @@ namespace GMGInventory.Application.Repositories
 
         private IQueryable<CustomerVM> GetCustomerReceivable(int Id)
         {
+            //OLD CODE 11/14/2026
+            //return from inv in context.Invoices
+            //       where inv.SalesOrder.Customer.Id == Id
+            //          && (inv.Status.Code.Trim().ToLower() == "invoiced" || inv.Status.Code.Trim().ToLower() == "draft")
+            //       select new CustomerVM
+            //       {
+            //           InvoiceNo = inv.InvoiceNumber,
+            //           BIRInvoiceNo = inv.ControlNumber,
+            //           InvoicedDateD = inv.InvoiceDate,
+            //           InvoicedAmountD = ((from ili in inv.InvoiceLineItems
+            //                               join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
+            //                               let discount1 = (100 - soli.Discount1) / 100
+            //                               let discount2 = (100 - soli.Discount2) / 100
+            //                               select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)
+            //                             ).Sum() ?? 0)
+            //                           - (context.CustomerPaymentDetails
+            //                                     .Where(s => s.InvoiceId == inv.Id)
+            //                                     .Sum(s => (decimal?)s.PaidAmount) ?? 0)
+            //                           - ((from tbr in context.SOACRLineItemTBRs
+            //                               let discount1 = (100 - tbr.SalesReturnLineItem.Discount1) / 100
+            //                               let discount2 = (100 - tbr.SalesReturnLineItem.Discount2) / 100
+            //                               where tbr.SalesReturnLineItem.InvoiceLineItem!.Invoice.Id == inv.Id
+            //                               select (decimal?)(tbr.SalesReturnLineItem.Quantity * tbr.SalesReturnLineItem.SellingPrice * discount1 * discount2)).Sum() ?? 0)
+            //                           - (context.SOACRLineItems
+            //                                     .Where(s => s.InvoiceId == inv.Id)
+            //                                     .Sum(s => (decimal?)s.CreditAmount) ?? 0)
+            //                           + (context.SOACRLineItems
+            //                                     .Where(s => s.InvoiceId == inv.Id)
+            //                                     .Sum(s => (decimal?)s.DebitAmount) ?? 0)
+            //                           + (context.SOACRLineItems
+            //                                     .Where(s => s.InvoiceId == inv.Id)
+            //                                     .Sum(s => (decimal?)s.FreightCost) ?? 0)
+            //       };
+
+
+
+
+
+            // One row per (SalesOrder, Item), so duplicate items can't multiply invoice lines
+            var soDiscounts = from soli in context.SalesOrderLineItems
+                              where soli.IsPromo != true
+                              group soli by new { soli.SalesOrderId, soli.ItemId } into g
+                              select new
+                              {
+                                  g.Key.SalesOrderId,
+                                  g.Key.ItemId,
+                                  D1 = g.Max(x => x.Discount1),
+                                  D2 = g.Max(x => x.Discount2)
+                              };
+
+            // Invoiced amount per invoice, limited to this customer's invoices
+            var invoiceAmounts = from ili in context.InvoiceLineItems
+                                 where ili.Invoice.SalesOrder.Customer.Id == Id
+                                    && ili.IsPromo != true
+                                 join so in soDiscounts
+                                      on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                      equals new { so.SalesOrderId, so.ItemId }
+                                 group new { ili, so } by ili.InvoiceId into g
+                                 select new
+                                 {
+                                     InvoiceId = g.Key,
+                                     TotalAmount = g.Sum(s => (decimal?)s.ili.Quantity *
+                                                              s.ili.UnitPrice *
+                                                              (100 - s.so.D1) / 100m *
+                                                              (100 - s.so.D2) / 100m) ?? 0
+                                 };
 
             return from inv in context.Invoices
                    where inv.SalesOrder.Customer.Id == Id
                       && (inv.Status.Code.Trim().ToLower() == "invoiced" || inv.Status.Code.Trim().ToLower() == "draft")
+                   let invoicedAmount = invoiceAmounts.Where(s => s.InvoiceId == inv.Id)
+                                                      .Sum(s => (decimal?)s.TotalAmount) ?? 0
                    select new CustomerVM
                    {
                        InvoiceNo = inv.InvoiceNumber,
                        BIRInvoiceNo = inv.ControlNumber,
                        InvoicedDateD = inv.InvoiceDate,
-                       InvoicedAmountD = ((from ili in inv.InvoiceLineItems
-                                           join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
-                                           let discount1 = (100 - soli.Discount1) / 100
-                                           let discount2 = (100 - soli.Discount2) / 100
-                                           select (decimal?)(ili.Quantity * ili.UnitPrice * discount1 * discount2)
-                                         ).Sum() ?? 0)
+                       InvoicedAmountD = invoicedAmount
                                        - (context.CustomerPaymentDetails
                                                  .Where(s => s.InvoiceId == inv.Id)
                                                  .Sum(s => (decimal?)s.PaidAmount) ?? 0)

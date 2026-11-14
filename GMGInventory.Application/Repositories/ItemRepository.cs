@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using GMGInventory.Application.Contracts;
 using GMGInventory.Common.Constants;
 using GMGInventory.Common.Models;
@@ -1996,13 +1997,13 @@ namespace GMGInventory.Application.Repositories
             var items = from binsloc in context.ItemInventories
                         join item in context.Items on binsloc.ItemId equals item.Id
                         join wh in context.Warehouses on binsloc.WarehouseId equals wh.Id
-                        where item.Code == search && wh.IsMain == true
+                        where item.Code == search && wh.IsMain == true && !string.IsNullOrWhiteSpace(binsloc.BinLocation)
                         orderby item.Code ascending
                         select new JsonItemOptionsModel
                         {
                             Id = binsloc.Id.ToString(),
                             Text = binsloc.BinLocation,
-                           
+                            QuantityD = binsloc.Quantity,
                         };
             var itemsFiltered = await items.ToListAsync();
             return new Select2Model<JsonItemOptionsModel>

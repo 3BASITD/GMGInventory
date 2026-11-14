@@ -488,6 +488,23 @@
                 placeholder: 'Select Bin Location',
                 allowClear: true,
                 width: '100%',
+                templateResult: function (repo) {
+                    if (repo.loading) {
+                        return repo.text;
+                    }
+                    var qty = repo.quantity ?? repo.Quantity; // handles camelCase or PascalCase JSON
+
+                    var $el = $('<div>').append(
+                        $('<div>').append($('<strong>').text(repo.text))
+                    );
+
+                    if (qty != null) {
+                        $el.append(
+                            $('<div>').append($('<small class="text-muted">').text('Quantity: ' + qty))
+                        );
+                    }
+                    return $el;
+                },
                 ajax: {
                     url: '@Url.Action("GetBinLocation", "Item")',
                     dataType: 'json',

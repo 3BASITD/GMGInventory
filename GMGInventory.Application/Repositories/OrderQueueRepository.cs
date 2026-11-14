@@ -16,15 +16,17 @@ namespace GMGInventory.Application.Repositories
         private readonly ApplicationDbContext context;
         private readonly AppOrderDbContext app_context;
         private readonly string currentUser;
-
+        private readonly ISalesOrderRepository _salesOrderRepository;
         public OrderQueueRepository(ApplicationDbContext context
                                   , AppOrderDbContext app_context
                                   , IHttpContextAccessor httpContextAccessor
-                                  , UserManager<User> userManager)
+                                  , UserManager<User> userManager
+                                  , ISalesOrderRepository salesOrderRepository)
         {
             this.context = context;
             this.app_context = app_context;
             this.currentUser = userManager.GetUserId(httpContextAccessor?.HttpContext?.User);
+            _salesOrderRepository = salesOrderRepository;
         }
 
         private async Task<IList<OrderQueueVM>> GetOrders(string? Status, DateTime? DateFrom, DateTime? DateTo)
@@ -262,11 +264,255 @@ namespace GMGInventory.Application.Repositories
             return order;
         }
 
+        //public async Task<ResponseModel> AddOrder(string OrderNumber, List<int> ItemIds)
+        //{
+        //    //try
+        //    //{
+        //    var invalids = new List<string>();
+        //    var orders = app_context.Orders
+        //                            .Where(s => ItemIds != null
+        //                                     && ItemIds.Contains(s.Id)
+        //                                     && s.OrderNo != null
+        //                                     && s.OrderNo.ToLower() == OrderNumber.ToLower())
+        //                            .OrderBy(s => s.Id)
+        //                            .ToList();
+
+        //    if (orders.Count == 0)
+        //        return new ResponseModel
+        //        {
+        //            Status = "Error",
+        //            Message = "Invalid Order Number. Record cannot be found"
+        //        };
+
+        //    var agent_first = orders.First().AgentId;
+        //    var customer_first = orders.First().CustomerId;
+
+        //    var agent = context.Agents
+        //                       .Where(s => agent_first > 0
+        //                                && s.Id == agent_first)
+        //                       .FirstOrDefault();
+
+        //    var customer = context.Customers
+        //                          .Include(s => s.Area)
+        //                          .Where(s => customer_first > 0
+        //                                   && s.Id == customer_first)
+        //                          .FirstOrDefault();
+
+        //    var temp = new List<string>();
+
+        //    if (agent == null) temp.Add($"<span class='text-muted'>Invalid Agent:</span> Unknown PK_{agent_first}");
+        //    if (customer == null) temp.Add($"<span class='text-muted'>Invalid Customer:</span> Unknown PK_{customer_first}");
+
+        //    if (temp.Count > 0)
+        //    {
+        //        temp = [.. temp.Distinct().OrderBy(s => s)];
+        //        return new ResponseModel
+        //        {
+        //            Status = "Error",
+        //            Message = "Cannot proceed with the following problems: <ul><li>" + string.Join("</li><li>", temp) + "</li>"
+        //        };
+        //    }
+        //    else
+        //    {
+        //        var warehouse = context.Warehouses
+        //                                 .Where(s => s.IsMain == true).FirstOrDefault();
+
+        //        string startwith = "";
+        //        if (warehouse.Name == WareHouseName.PASIG1.ToString())
+        //        {
+        //            startwith = "PSG1";
+        //        }
+        //        else if (warehouse.Name == WareHouseName.PASIG2.ToString())
+        //        {
+        //            startwith = "PSG2";
+        //        }
+        //        else if (warehouse.Name == WareHouseName.CETACIO.ToString())
+        //        {
+        //            startwith = "CT38";
+        //        }
+        //        else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
+        //        {
+        //            startwith = "SEV";
+        //        }
+
+
+        //        var latestOrder = context.SalesOrders
+        //                             .Where(s => s.SalesOrderNumber.StartsWith(startwith)
+        //                                      && !s.SalesOrderNumber.Contains("-D"))
+        //                             .OrderByDescending(s => s.SalesOrderNumber)
+        //                             .Select(s => s.SalesOrderNumber)
+        //                             .FirstOrDefault();
+
+        //        if (latestOrder != null && latestOrder.Contains('.'))
+        //        {
+        //            var splitLatestOrder = latestOrder.Split(".");
+        //            latestOrder = splitLatestOrder[0];
+        //        }
+
+        //        if (latestOrder != null && latestOrder.Contains('-'))
+        //        {
+        //            var splitLatestOrder = latestOrder.Split("-");
+        //            latestOrder = splitLatestOrder[0];
+        //        }
+
+        //        int? latestOrderNumber = 0;
+
+        //        if (latestOrder != null)
+        //        {
+        //            if (latestOrder.Contains("SO"))
+        //            {
+        //                latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
+        //            }
+        //            else if (latestOrder.Contains("PSG1"))
+        //            {
+        //                latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
+        //            }
+        //            else if (latestOrder.Contains("PSG2"))
+        //            {
+        //                latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
+        //            }
+        //            else if (latestOrder.Contains("CT38"))
+        //            {
+        //                latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
+        //            }
+        //            else if (latestOrder.Contains("SEV"))
+        //            {
+        //                latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
+        //            }
+        //        }
+
+        //        string soNumber = "";
+
+        //        if (warehouse != null && latestOrder != null)
+        //        {
+        //            if (warehouse.Name == WareHouseName.PASIG1.ToString())
+        //            {
+        //                soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
+        //            }
+        //            else if (warehouse.Name == WareHouseName.PASIG2.ToString())
+        //            {
+        //                soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
+        //            }
+        //            else if (warehouse.Name == WareHouseName.CETACIO.ToString())
+        //            {
+        //                soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 20);
+        //            }
+        //            else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
+        //            {
+        //                soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
+        //            }
+        //        }
+
+        //        int statusId = context.Statuses
+        //                              .Where(s => s.Name.ToLower() == "sales order draft")
+        //                              .Select(s => s.Id)
+        //                              .First();
+
+        //        var itemClasses = await (from item in context.Items
+        //                                 select new
+        //                                 {
+        //                                     item.ItemClass,
+        //                                     ItemId = item.Id
+        //                                 }).ToListAsync();
+
+        //        var itemsToAdd = (from item in itemClasses
+        //                          join order in orders on item.ItemId equals int.Parse(order.ItemId!)
+        //                          group item by item.ItemClass into gitem
+        //                          orderby gitem.Key == null ? "0" : (1 + "_" + gitem.Key!.Name)
+        //                          select new
+        //                          {
+        //                              ItemClass = gitem.Key,
+        //                              ItemIds = gitem.Select(s => s.ItemId)
+        //                          }).ToList();
+
+        //        var soNumberAdded = new List<string>();
+        //        int salesOrderId = 0;
+
+        //        foreach (var itemToAdd in itemsToAdd)
+        //        {
+        //            var soNumberForAdd = soNumber + (itemsToAdd.Count() == 1 ? "" : string.Format("-{0:00}", itemsToAdd.IndexOf(itemToAdd) + 1));
+        //            var salesOrder = new SalesOrder
+        //            {
+        //                AgentId = agent == null ? 0 : agent.Id,
+        //                RegionId = customer == null ? 0 : customer.Area.RegionId,
+        //                CustomerId = customer == null ? 0 : customer.Id,
+        //                RequiredDeliveryDate = DateTime.Today,
+        //                SalesOrderDate = DateTime.Today,
+        //                SalesOrderNumber = soNumberForAdd,
+        //                StatusId = statusId,
+        //                OverallDiscount = 0,
+        //                WithLP = false,
+        //                WithREYCONonDefective = false,
+        //                SpecialInstruction = orders.First().Instruction
+        //            };
+        //            soNumberAdded.Add(soNumberForAdd);
+
+        //            await context.SalesOrders.AddAsync(salesOrder);
+        //            await context.SaveChangesAsync(currentUser);
+        //            salesOrderId = salesOrder.Id;
+
+        //            var lineNumber = 1;
+
+        //            foreach (var itemId in itemToAdd.ItemIds)
+        //            {
+        //                var itm = orders.Where(s => s.ItemId == itemId.ToString()).First();
+
+        //                var soitem = new SalesOrderLineItem
+        //                {
+        //                    SalesOrderId = salesOrder.Id,
+        //                    LineNumber = lineNumber,
+        //                    ItemId = itemId,
+        //                    Quantity = itm.Quantity == null ? 0 : itm.Quantity.Value,
+        //                    SellingPrice = itm.UnitPrice == null ? 0 : itm.UnitPrice.Value,
+        //                    Discount1 = itm.Discount1 == null ? 0 : itm.Discount1.Value,
+        //                    Discount2 = itm.Discount2 == null ? 0 : itm.Discount2.Value,
+        //                    Discount3 = itm.Discount3 == null ? 0 : itm.Discount3.Value,
+        //                    Discount4 = itm.Discount4 == null ? 0 : itm.Discount4.Value,
+        //                    Discount5 = itm.Discount5 == null ? 0 : itm.Discount5.Value
+        //                };
+        //                await context.SalesOrderLineItems.AddAsync(soitem);
+
+        //                var source = new SalesOrderItemSource
+        //                {
+        //                    SourceOrderNumber = OrderNumber,
+        //                    SalesOrderId = salesOrder.Id,
+        //                    ItemId = itemId,
+        //                    Status = "Added"
+        //                };
+        //                await context.SalesOrderItemSources.AddAsync(source);
+
+        //                await context.SaveChangesAsync(currentUser);
+
+        //                lineNumber++;
+        //            }
+        //        }
+
+        //        var kpi = new KPI
+        //        {
+        //            SalesOrderId = salesOrderId,
+        //            UserCreated = currentUser,
+        //            KpiStart = DateTime.Now,
+        //            Department = "SA"
+        //        };
+        //        await context.KPIs.AddAsync(kpi);
+        //        await context.SaveChangesAsync(currentUser);
+
+        //        return new ResponseModel
+        //        {
+        //            Status = "Success",
+        //            Message = $"Successfully added to sales order with SONumber: {string.Join(",", soNumberAdded)}"
+        //        };
+        //    }
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
+        //    //}
+        //}
+
         public async Task<ResponseModel> AddOrder(string OrderNumber, List<int> ItemIds)
         {
-            //try
-            //{
-            var invalids = new List<string>();
+            // ---------- Read-only lookups and validation (unchanged) ----------
             var orders = app_context.Orders
                                     .Where(s => ItemIds != null
                                              && ItemIds.Contains(s.Id)
@@ -310,118 +556,50 @@ namespace GMGInventory.Application.Repositories
                     Message = "Cannot proceed with the following problems: <ul><li>" + string.Join("</li><li>", temp) + "</li>"
                 };
             }
-            else
+
+            // Capture plain values so nothing depends on tracked entities inside the transaction
+            int agentId = agent == null ? 0 : agent.Id;
+            int customerId = customer == null ? 0 : customer.Id;
+            int regionId = customer == null ? 0 : customer.Area.RegionId;
+
+            int statusId = context.Statuses
+                                  .Where(s => s.Name.ToLower() == "sales order draft")
+                                  .Select(s => s.Id)
+                                  .First();
+
+            var itemClasses = await (from item in context.Items
+                                     select new
+                                     {
+                                         item.ItemClass,
+                                         ItemId = item.Id
+                                     }).ToListAsync();
+
+            var itemsToAdd = (from item in itemClasses
+                              join order in orders on item.ItemId equals int.Parse(order.ItemId!)
+                              group item by item.ItemClass into gitem
+                              orderby gitem.Key == null ? "0" : (1 + "_" + gitem.Key!.Name)
+                              select new
+                              {
+                                  ItemClass = gitem.Key,
+                                  ItemIds = gitem.Select(s => s.ItemId)
+                              }).ToList();
+
+            // ---------- Everything that writes runs in ONE transaction ----------
+            // The counter increment and all the inserts commit together: if anything fails,
+            // the counter rolls back too and no number is skipped.
+            var strategy = context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
             {
-                var warehouse = context.Warehouses
-                                         .Where(s => s.IsMain == true).FirstOrDefault();
+                context.ChangeTracker.Clear(); // clean slate if the strategy retries
 
-                string startwith = "";
-                if (warehouse.Name == WareHouseName.PASIG1.ToString())
-                {
-                    startwith = "PSG1";
-                }
-                else if (warehouse.Name == WareHouseName.PASIG2.ToString())
-                {
-                    startwith = "PSG2";
-                }
-                else if (warehouse.Name == WareHouseName.CETACIO.ToString())
-                {
-                    startwith = "CT38";
-                }
-                else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
-                {
-                    startwith = "SEV";
-                }
+                await using var tx = await context.Database.BeginTransactionAsync();
 
-
-                var latestOrder = context.SalesOrders
-                                     .Where(s => s.SalesOrderNumber.StartsWith(startwith)
-                                              && !s.SalesOrderNumber.Contains("-D"))
-                                     .OrderByDescending(s => s.SalesOrderNumber)
-                                     .Select(s => s.SalesOrderNumber)
-                                     .FirstOrDefault();
-
-                if (latestOrder != null && latestOrder.Contains('.'))
-                {
-                    var splitLatestOrder = latestOrder.Split(".");
-                    latestOrder = splitLatestOrder[0];
-                }
-
-                if (latestOrder != null && latestOrder.Contains('-'))
-                {
-                    var splitLatestOrder = latestOrder.Split("-");
-                    latestOrder = splitLatestOrder[0];
-                }
-
-                int? latestOrderNumber = 0;
-
-                if (latestOrder != null)
-                {
-                    if (latestOrder.Contains("SO"))
-                    {
-                        latestOrderNumber = int.Parse(latestOrder.Replace("SO", ""));
-                    }
-                    else if (latestOrder.Contains("PSG1"))
-                    {
-                        latestOrderNumber = int.Parse(latestOrder.Replace("PSG1", ""));
-                    }
-                    else if (latestOrder.Contains("PSG2"))
-                    {
-                        latestOrderNumber = int.Parse(latestOrder.Replace("PSG2", ""));
-                    }
-                    else if (latestOrder.Contains("CT38"))
-                    {
-                        latestOrderNumber = int.Parse(latestOrder.Replace("CT38", ""));
-                    }
-                    else if (latestOrder.Contains("SEV"))
-                    {
-                        latestOrderNumber = int.Parse(latestOrder.Replace("SEV", ""));
-                    }
-                }
-
-                string soNumber = "";
-
-                if (warehouse != null && latestOrder != null)
-                {
-                    if (warehouse.Name == WareHouseName.PASIG1.ToString())
-                    {
-                        soNumber = string.Format("{0:PSG1000000}", latestOrderNumber + 1);
-                    }
-                    else if (warehouse.Name == WareHouseName.PASIG2.ToString())
-                    {
-                        soNumber = string.Format("{0:PSG2000000}", latestOrderNumber + 1);
-                    }
-                    else if (warehouse.Name == WareHouseName.CETACIO.ToString())
-                    {
-                        soNumber = string.Format("{0:CT38000000}", latestOrderNumber + 20);
-                    }
-                    else if (warehouse.Name == WareHouseName.SEVERINO.ToString())
-                    {
-                        soNumber = string.Format("{0:SEV0000000}", latestOrderNumber + 1);
-                    }
-                }
-
-                int statusId = context.Statuses
-                                      .Where(s => s.Name.ToLower() == "sales order draft")
-                                      .Select(s => s.Id)
-                                      .First();
-
-                var itemClasses = await (from item in context.Items
-                                         select new
-                                         {
-                                             item.ItemClass,
-                                             ItemId = item.Id
-                                         }).ToListAsync();
-
-                var itemsToAdd = (from item in itemClasses
-                                  join order in orders on item.ItemId equals int.Parse(order.ItemId!)
-                                  group item by item.ItemClass into gitem
-                                  orderby gitem.Key == null ? "0" : (1 + "_" + gitem.Key!.Name)
-                                  select new
-                                  {
-                                      ItemClass = gitem.Key,
-                                      ItemIds = gitem.Select(s => s.ItemId)
-                                  }).ToList();
+                // ONE number per AddOrder call. The -01, -02 suffixes below still split by item class.
+                // This replaces the old "latest + 20" / "latest + 1" logic for every warehouse prefix.
+                var (success, soNumber, error) = await _salesOrderRepository.GenerateNewSoNumberAsync(currentUser);
+                if (!success)
+                    return new ResponseModel { Status = "Error", Message = error };
 
                 var soNumberAdded = new List<string>();
                 int salesOrderId = 0;
@@ -431,9 +609,9 @@ namespace GMGInventory.Application.Repositories
                     var soNumberForAdd = soNumber + (itemsToAdd.Count() == 1 ? "" : string.Format("-{0:00}", itemsToAdd.IndexOf(itemToAdd) + 1));
                     var salesOrder = new SalesOrder
                     {
-                        AgentId = agent == null ? 0 : agent.Id,
-                        RegionId = customer == null ? 0 : customer.Area.RegionId,
-                        CustomerId = customer == null ? 0 : customer.Id,
+                        AgentId = agentId,
+                        RegionId = regionId,
+                        CustomerId = customerId,
                         RequiredDeliveryDate = DateTime.Today,
                         SalesOrderDate = DateTime.Today,
                         SalesOrderNumber = soNumberForAdd,
@@ -495,17 +673,14 @@ namespace GMGInventory.Application.Repositories
                 await context.KPIs.AddAsync(kpi);
                 await context.SaveChangesAsync(currentUser);
 
+                await tx.CommitAsync();
+
                 return new ResponseModel
                 {
                     Status = "Success",
                     Message = $"Successfully added to sales order with SONumber: {string.Join(",", soNumberAdded)}"
                 };
-            }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return new ResponseModel { Status = "Error", Message = SystemFormat.GetInnermostExceptionMessage(ex) };
-            //}
+            });
         }
 
         public async Task<ResponseModel> IgnoreOrder(string OrderNumber, List<int> ItemIds)
