@@ -842,6 +842,9 @@ namespace GMGInventory.Application.Repositories
                                                     .OrderByDescending(pr => pr.DateCreated)
                                                     .Take(1)
                                                     .DefaultIfEmpty()
+
+                                let isPromoLine = order.IsPromo ?? false
+
                                 let items = context.ItemInventories
                                                    .Where(s => s.ItemId == order.ItemId && s.Warehouse.IsMain == true && s.BinLocation != null && s.Quantity != 0)
                                                    .Select(s => new
@@ -863,6 +866,8 @@ namespace GMGInventory.Application.Repositories
                                 let packedQuantity = context.PackLineItems
                                                             .Where(s => s.Pack.SalesOrderId == order.SalesOrderId
                                                                      && s.ItemId == order.ItemId
+                                                                     && (s.IsPromo ?? false) == isPromoLine
+                                                                     // && s.ItemPromoId == order.ItemPromoId  // add if PackLineItems has ItemPromoId
                                                                      && s.Pack.Status.Code.Trim().ToLower() == "posted")
                                                             .Sum(s => (int?)s.Quantity) ?? 0
                                 let invoicedQuantity = context.InvoiceLineItems
