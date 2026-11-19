@@ -565,7 +565,7 @@ namespace GMGInventory.Application.Repositories
                               Supplier = order.Supplier.Name,
                               SupplierId = order.Supplier.Id,
                               SupplierContactPerson = order.Supplier.ContactPerson + "",
-                              SupplierContactNumber = order.Supplier.OfficeTelNo + "",
+                              SupplierContactNumber = order.Supplier.MobileNumber + "",
                               SupplierAddress = order.Supplier.AddressLine1,
                               Term = order.Term.Name,
                               TermId = order.Term.Id,

@@ -533,16 +533,81 @@ namespace GMGInventory.Application.Repositories
             return details;
         }
 
+        //private async Task<IList<SOACRItemsVM>> GetSOACRItemsAsync(int id)
+        //{
+        //    var soa = from sl in context.SOACRLineItems
+        //              let inv = (from ili in sl.Invoice.InvoiceLineItems
+        //                         join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
+        //                                                              equals new { soli.SalesOrderId, soli.ItemId }
+        //                         where (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
+        //                         let discount1 = (100 - soli.Discount1) / 100
+        //                         let discount2 = (100 - soli.Discount2) / 100
+        //                         select (decimal?)ili.Quantity * ili.UnitPrice * discount1 * discount2).Sum() ?? 0
+        //              let tbr = context.SOACRLineItemTBRs
+        //                               .Where(s => s.SOACRLineItemId == sl.Id)
+        //                               .Sum(s => (decimal?)s.Amount) ?? 0
+        //              let pay = context.CustomerPaymentDetails
+        //                               .Where(s => s.InvoiceId == sl.InvoiceId
+        //                                        && s.CustomerPayment.SOACR.Id == sl.SOACR.Id)
+        //                               .Sum(s => (decimal?)s.PaidAmount) ?? 0
+        //              where sl.SOACR.Id == id
+        //              select new SOACRItemsVM
+        //              {
+        //                  Id = sl.Id,
+        //                  InvoiceDateD = sl.Invoice.InvoiceDate,
+        //                  InvoiceNumber = sl.Invoice.InvoiceNumber,
+        //                  ControlNumber = sl.Invoice.ControlNumber,
+        //                  InvoiceAmountD = inv,
+        //                  InvoiceType = sl.Invoice.InvoiceType.Code,
+        //                  InvoiceId = sl.Invoice.Id,
+        //                  TBRD = tbr,
+        //                  CreditD = sl.CreditAmount,
+        //                  CreditReferenceNumber = sl.CreditReferenceNumber,
+        //                  DebitD = sl.DebitAmount,
+        //                  DebitReferenceNumber = sl.DebitReferenceNumber,
+        //                  PaidAmountD = pay,
+        //                  FreightChargeD = sl.FreightCost,
+        //                  FreightReferenceNumber = sl.FreightReferenceNumber
+        //              };
+        //    return await soa.ToListAsync();
+        //}
+
         private async Task<IList<SOACRItemsVM>> GetSOACRItemsAsync(int id)
         {
+            // One row per (SalesOrder, Item), so duplicate items can't multiply invoice lines
+            var soDiscounts = from soli in context.SalesOrderLineItems
+                              where soli.IsPromo != true
+                              group soli by new { soli.SalesOrderId, soli.ItemId } into g
+                              select new
+                              {
+                                  g.Key.SalesOrderId,
+                                  g.Key.ItemId,
+                                  D1 = g.Max(x => x.Discount1),
+                                  D2 = g.Max(x => x.Discount2)
+                              };
+
+            // Invoiced amount per invoice, limited to invoices on this SOACR
+            var invoiceAmounts = from ili in context.InvoiceLineItems
+                                 where context.SOACRLineItems.Any(s => s.SOACR.Id == id && s.InvoiceId == ili.InvoiceId)
+                                    && (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced"
+                                        || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
+                                    && ili.IsPromo != true
+                                 join so in soDiscounts
+                                      on new { ili.Invoice.SalesOrderId, ili.ItemId }
+                                      equals new { so.SalesOrderId, so.ItemId }
+                                 group new { ili, so } by ili.InvoiceId into g
+                                 select new
+                                 {
+                                     InvoiceId = g.Key,
+                                     TotalAmount = g.Sum(s => (decimal?)s.ili.Quantity *
+                                                              s.ili.UnitPrice *
+                                                              (100 - s.so.D1) / 100m *
+                                                              (100 - s.so.D2) / 100m) ?? 0
+                                 };
+
             var soa = from sl in context.SOACRLineItems
-                      let inv = (from ili in sl.Invoice.InvoiceLineItems
-                                 join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId }
-                                                                      equals new { soli.SalesOrderId, soli.ItemId }
-                                 where (ili.Invoice.Status.Code.Trim().ToLower() == "invoiced" || ili.Invoice.Status.Code.Trim().ToLower() == "draft")
-                                 let discount1 = (100 - soli.Discount1) / 100
-                                 let discount2 = (100 - soli.Discount2) / 100
-                                 select (decimal?)ili.Quantity * ili.UnitPrice * discount1 * discount2).Sum() ?? 0
+                      let inv = invoiceAmounts.Where(s => s.InvoiceId == sl.InvoiceId)
+                                              .Sum(s => (decimal?)s.TotalAmount) ?? 0
                       let tbr = context.SOACRLineItemTBRs
                                        .Where(s => s.SOACRLineItemId == sl.Id)
                                        .Sum(s => (decimal?)s.Amount) ?? 0
