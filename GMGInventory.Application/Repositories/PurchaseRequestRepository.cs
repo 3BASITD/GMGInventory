@@ -171,23 +171,23 @@ namespace GMGInventory.Application.Repositories
             //sort data
             if (!string.IsNullOrEmpty(form.SortColumn) && !string.IsNullOrEmpty(form.SortColumnDirection))
             {
-                if (form.SortColumn.ToLower().Contains("date"))
+                bool asc = form.SortColumnDirection == "asc";
+
+                if (form.SortColumn == "DocumentNumber")
                 {
-                    if (form.SortColumnDirection == "asc")
+                    data = asc
+                        ? data.OrderBy(s => ProcurementHelper.DocNoKey(s.DocumentNumber))
+                        : data.OrderByDescending(s => ProcurementHelper.DocNoKey(s.DocumentNumber));
+                }
+                else if (form.SortColumn.ToLower().Contains("date"))
+                {
+                    switch (form.SortColumn)
                     {
-                        switch (form.SortColumn)
-                        {
-                            case "RequestDate": data = data.OrderBy(s => s.RequestDateD).ThenBy(s => s.DocumentNumber); break;
-                            default: break;
-                        }
-                    }
-                    else if (form.SortColumnDirection == "desc")
-                    {
-                        switch (form.SortColumn)
-                        {
-                            case "RequestDate": data = data.OrderByDescending(s => s.RequestDateD).ThenByDescending(s => s.DocumentNumber); break;
-                            default: break;
-                        }
+                        case "RequestDate":
+                            data = asc
+                                ? data.OrderBy(s => s.RequestDateD).ThenBy(s => ProcurementHelper.DocNoKey(s.DocumentNumber))
+                                : data.OrderByDescending(s => s.RequestDateD).ThenByDescending(s => ProcurementHelper.DocNoKey(s.DocumentNumber));
+                            break;
                     }
                 }
                 else
