@@ -92,29 +92,37 @@ namespace GMGInventory.Application.Repositories
                               Quantity = g.Sum(s => (int?)s.Quantity)
                           };
 
-            var quantities = await (from ii in context.ItemInventories
-                                    join item in context.Items on ii.ItemId equals item.Id
-                                    join whse in context.Warehouses on ii.WarehouseId equals whse.Id
+            var inventory = from ii in context.ItemInventories
+                            group ii by new { ii.ItemId, ii.WarehouseId } into g
+                            select new
+                            {
+                                g.Key.ItemId,
+                                g.Key.WarehouseId,
+                                Quantity = g.Sum(x => x.Quantity)
+                            };
+
+
+            var quantities = await (from inv in inventory
+                                    join item in context.Items on inv.ItemId equals item.Id
+                                    join whse in context.Warehouses on inv.WarehouseId equals whse.Id
                                     join icls in context.ItemClasses on item.ItemClassId equals icls.Id into gicls
                                     from icls in gicls.DefaultIfEmpty()
-                                    join loc in context.LocationCodes on ii.LocationCodeId equals loc.Id into gloc
-                                    from loc in gloc.DefaultIfEmpty()
-                                    join lw in lastWeek on new { ii.ItemId, ii.WarehouseId } equals new { lw.ItemId, lw.WarehouseId } into lwg
+                                    join lw in lastWeek on new { inv.ItemId, inv.WarehouseId } equals new { lw.ItemId, lw.WarehouseId } into lwg
                                     from lw in lwg.DefaultIfEmpty()
-                                    join lm in lastMonth on new { ii.ItemId, ii.WarehouseId } equals new { lm.ItemId, lm.WarehouseId } into lmg
+                                    join lm in lastMonth on new { inv.ItemId, inv.WarehouseId } equals new { lm.ItemId, lm.WarehouseId } into lmg
                                     from lm in lmg.DefaultIfEmpty()
-                                    join l2m in last2Months on new { ii.ItemId, ii.WarehouseId } equals new { l2m.ItemId, l2m.WarehouseId } into l2mg
+                                    join l2m in last2Months on new { inv.ItemId, inv.WarehouseId } equals new { l2m.ItemId, l2m.WarehouseId } into l2mg
                                     from l2m in l2mg.DefaultIfEmpty()
-                                    join ly in lastYear on new { ii.ItemId, ii.WarehouseId } equals new { ly.ItemId, ly.WarehouseId } into lyg
+                                    join ly in lastYear on new { inv.ItemId, inv.WarehouseId } equals new { ly.ItemId, ly.WarehouseId } into lyg
                                     from ly in lyg.DefaultIfEmpty()
-                                    join oa in overall on new { ii.ItemId, ii.WarehouseId } equals new { oa.ItemId, oa.WarehouseId } into oag
+                                    join oa in overall on new { inv.ItemId, inv.WarehouseId } equals new { oa.ItemId, oa.WarehouseId } into oag
                                     from oa in oag.DefaultIfEmpty()
                                     where (filter.ItemClassId == null || item.ItemClassId == filter.ItemClassId)
                                     && (filter.BrandId == null || item.BrandId == filter.BrandId)
                                     orderby item.Code ascending
                                     select new OrderRecommendationVM
                                     {
-                                        ItemId = ii.ItemId,
+                                        ItemId = inv.ItemId,
                                         ItemCode = item.Code,
                                         ItemName = item.Name,
                                         PartNumber = item.PartNumber,
@@ -122,9 +130,7 @@ namespace GMGInventory.Application.Repositories
                                         ItemClass = icls == null ? null : icls.Name,
                                         WarehouseId = whse.Id,
                                         Warehouse = whse.Name,
-                                        LocationCodeId = loc == null ? (int?)null : loc.Id,
-                                        LocationCode = loc == null ? null : loc.Name,
-                                        StockOnHandD = ii.Quantity,
+                                        StockOnHandD = inv.Quantity,
                                         LastWeekQuantityD = lw.Quantity ?? 0,
                                         LastMonthQuantityD = lm.Quantity ?? 0,
                                         Last2MonthsQuantityD = l2m.Quantity ?? 0,
