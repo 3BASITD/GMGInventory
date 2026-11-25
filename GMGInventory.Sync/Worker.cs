@@ -888,7 +888,7 @@ namespace GMGInventory.Sync
                             }
 
                             var transferItem = await context.TransferItemDetails
-                                                            .Where(s => s.BarcotechTransferId == api_transfer.id)
+                                                            .Where(s => s.BarcotechTransferCode == api_transfer.id)
                                                             .FirstOrDefaultAsync();
 
                             if (transferItem == null)
@@ -899,7 +899,7 @@ namespace GMGInventory.Sync
                                     ItemId = item!.Id,
                                     LocationCodeId = locationId,
                                     Quantity = quantity,
-                                    BarcotechTransferId = api_transfer.id
+                                    BarcotechTransferCode = api_transfer.id
                                 };
                                 await context.TransferItemDetails.AddAsync(transferItem);
                                 await context.SaveChangesAsync(userId);
