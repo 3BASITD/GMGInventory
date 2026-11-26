@@ -375,11 +375,14 @@ namespace GMGInventory.Application.Repositories
                                                    .Where(s => s.WarehouseId == formVM.Destination && s.LocationCodeId == item.LocationCodeId && s.ItemId == item.Id)
                                                    .FirstOrDefaultAsync();
 
+                var locationCode = await context.LocationCodes.Where(s => s.Id == item.LocationCodeId).FirstOrDefaultAsync();
+
                 var destinationQuantity = 0;
                 if (destinationItem != null)
                 {
                     destinationQuantity = destinationItem.Quantity;
                     destinationItem.Quantity += item.Quantity;
+                    destinationItem.BinLocation = locationCode.Code;
                     context.ItemInventories.Update(destinationItem);
                 }
                 else
@@ -389,7 +392,8 @@ namespace GMGInventory.Application.Repositories
                         ItemId = item.Id,
                         Quantity = item.Quantity,
                         WarehouseId = formVM.Destination,
-                        LocationCodeId = item.LocationCodeId
+                        LocationCodeId = item.LocationCodeId,
+                        BinLocation = locationCode.Code
                     };
                     await context.ItemInventories.AddAsync(destinationItem);
                 }
