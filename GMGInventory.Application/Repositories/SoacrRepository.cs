@@ -101,7 +101,7 @@ namespace GMGInventory.Application.Repositories
                                  where SOACRsOnPagedList.Contains(scli.SOACRId)
                                  && (scli.Invoice.Status.Code.Trim().ToLower() == "invoiced" || scli.Invoice.Status.Code.Trim().ToLower() == "draft")
                                  join ili in context.InvoiceLineItems on scli.InvoiceId equals ili.InvoiceId
-                                 join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId } equals new { soli.SalesOrderId, soli.ItemId }
+                                 join soli in context.SalesOrderLineItems on new { ili.Invoice.SalesOrderId, ili.ItemId, ili.IsPromo } equals new { soli.SalesOrderId, soli.ItemId, soli.IsPromo }
                                  group new { scli, ili, soli } by scli.SOACRId into g
                                  select new
                                  {
